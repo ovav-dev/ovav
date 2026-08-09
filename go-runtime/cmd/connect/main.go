@@ -237,7 +237,7 @@ func report(tk *tracker.Tracker) {
 }
 
 func printUsage() {
-	fmt.Println(`OVAV Connect - Token Usage Tracking
+	fmt.Print(`OVAV Connect - Token Usage Tracking
 
 Usage:
   ovav connect <command>
@@ -256,5 +256,5 @@ Examples:
   ovav connect add anthropic sk-.. # Add Anthropic
   ovav connect history --days 30    # Last 30 days
   ovav connect report              # Monthly report
-`)
+` + "\n")
 }

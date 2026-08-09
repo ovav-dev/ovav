@@ -242,7 +242,7 @@ func TestGenerateOpenCodeTheme_Structure(t *testing.T) {
 	if result["$schema"] != "https://opencode.ai/theme.json" {
 		t.Errorf("$schema: got %v", result["$schema"])
 	}
-	if result["name"] != "OVAV" {
+	if result["name"] != "OVAV Dark" {
 		t.Errorf("name: got %v", result["name"])
 	}
 
@@ -259,12 +259,12 @@ func TestGenerateOpenCodeTheme_Structure(t *testing.T) {
 	}
 
 	// Verify theme section
-	themeSection, ok := result["theme"].(map[string]map[string]string)
+	themeSection, ok := result["theme"].(map[string]string)
 	if !ok {
-		t.Fatal("theme should be map[string]map[string]string")
+		t.Fatal("theme should be map[string]string")
 	}
-	if themeSection["primary"]["dark"] != "ovav_teal" {
-		t.Errorf("primary.dark: got %q", themeSection["primary"]["dark"])
+	if themeSection["primary"] != "ovav_teal" {
+		t.Errorf("primary: got %q", themeSection["primary"])
 	}
 }
 
@@ -421,7 +421,7 @@ func TestGenerateOpenCodeTheme_NilMaps(t *testing.T) {
 	theme := &themeRaw{}
 	// Should not panic with nil maps — all lookups return ""
 	result := generateOpenCodeTheme(theme, "dark")
-	if result["name"] != "OVAV" {
+	if result["name"] != "OVAV Dark" {
 		t.Errorf("name: got %v", result["name"])
 	}
 	defs, ok := result["defs"].(map[string]string)
@@ -810,18 +810,25 @@ func TestProjectVisual_FullPipeline(t *testing.T) {
 		t.Errorf("expected at least 3 artifacts, got %d", count)
 	}
 
-	// Verify theme JSON
-	themeJSONPath := filepath.Join(dir, ".opencode", "themes", "ovav.json")
-	data, err := os.ReadFile(themeJSONPath)
+	// Verify theme JSON (dark and light variants)
+	themeJSONDarkPath := filepath.Join(dir, ".opencode", "themes", "ovav-dark.json")
+	data, err := os.ReadFile(themeJSONDarkPath)
 	if err != nil {
-		t.Fatalf("theme.json not created: %v", err)
+		t.Fatalf("ovav-dark.json not created: %v", err)
 	}
 	var themeMap map[string]interface{}
 	if err := json.Unmarshal(data, &themeMap); err != nil {
 		t.Fatalf("invalid theme JSON: %v", err)
 	}
-	if themeMap["name"] != "OVAV" {
-		t.Errorf("theme name: %v", themeMap["name"])
+	if themeMap["name"] != "OVAV Dark" {
+		t.Errorf("theme name: got %v", themeMap["name"])
+	}
+
+	// Verify light theme also exists
+	themeJSONLightPath := filepath.Join(dir, ".opencode", "themes", "ovav-light.json")
+	_, err = os.ReadFile(themeJSONLightPath)
+	if err != nil {
+		t.Fatalf("ovav-light.json not created: %v", err)
 	}
 
 	// Verify plugin JS
@@ -856,8 +863,8 @@ func TestProjectVisual_MissingMonitoring(t *testing.T) {
 	if err == nil {
 		t.Error("expected error when monitoring.yaml is missing")
 	}
-	if count != 1 {
-		t.Errorf("expected count=1 (theme only before error), got %d", count)
+	if count != 2 {
+		t.Errorf("expected count=2 (theme dark+light before error), got %d", count)
 	}
 }
 

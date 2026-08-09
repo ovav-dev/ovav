@@ -385,18 +385,26 @@ func getInjectTargets(env string) []injectionTarget {
 	case "windows-wsl":
 		return []injectionTarget{
 			// WezTerm config → Windows user's .wezterm.lua
-			// Path: /mnt/c/Users/<username>/.wezterm.lua
 			{"wezterm-windows", "wezterm/wezterm.lua", "/mnt/c/Users/Alexa/.wezterm.lua"},
-			// WezTerm config → WSL home (for WSL native wezterm)
+			// WezTerm config → WSL home
 			{"wezterm-wsl", "wezterm/wezterm.lua", filepath.Join(home, ".wezterm.lua")},
 			// Fish config → ~/.config/fish/
 			{"fish", "fish/config.fish", filepath.Join(home, ".config", "fish", "config.fish")},
 			{"fish-aliases", "commands/aliases.fish", filepath.Join(home, ".config", "fish", "aliases.fish")},
-			// Git config → ~/.gitconfig
+			// Fish conf.d files → ~/.config/fish/conf.d/
+			{"fish-conf-10", "fish/10-ovav-color-profile.fish", filepath.Join(home, ".config", "fish", "conf.d", "10-ovav-color-profile.fish")},
+			{"fish-conf-20", "fish/20-ovav-wezterm-osc7.fish", filepath.Join(home, ".config", "fish", "conf.d", "20-ovav-wezterm-osc7.fish")},
+			{"fish-conf-25", "fish/25-ovav-wezterm-git.fish", filepath.Join(home, ".config", "fish", "conf.d", "25-ovav-wezterm-git.fish")},
+			{"fish-conf-30", "fish/30-ovav-runtime-tools.fish", filepath.Join(home, ".config", "fish", "conf.d", "30-ovav-runtime-tools.fish")},
+			{"fish-conf-35", "fish/35-ovav-wt-tsk.fish", filepath.Join(home, ".config", "fish", "conf.d", "35-ovav-wt-tsk.fish")},
+			{"fish-conf-41", "fish/41-ovav-syntax-colors.fish", filepath.Join(home, ".config", "fish", "conf.d", "41-ovav-syntax-colors.fish")},
+			{"fish-conf-90", "fish/90-ovav-terminal-auto.fish", filepath.Join(home, ".config", "fish", "conf.d", "90-ovav-terminal-auto.fish")},
+			{"fish-conf-99", "fish/99-ovav-systems-lock.fish", filepath.Join(home, ".config", "fish", "conf.d", "99-ovav-systems-lock.fish")},
+			// Git config
 			{"git", "git/gitconfig", filepath.Join(home, ".gitconfig")},
-			// Theme → WSL wezterm dir
+			// Theme
 			{"theme-wezterm", "theme/auto.wezterm.lua", filepath.Join(home, ".config", "wezterm", "theme.lua")},
-			// Windows Terminal settings (from WSL)
+			// Windows Terminal
 			{"windows-terminal", "windows-terminal/settings.json",
 				"/mnt/c/Users/Alexa/AppData/Local/Packages/Microsoft.WindowsTerminal_8wekyb3d8bbwe/LocalState/settings.json"},
 		}

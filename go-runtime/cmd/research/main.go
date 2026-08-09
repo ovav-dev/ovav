@@ -136,7 +136,7 @@ func targets(eng *engine.Engine) {
 }
 
 func printUsage() {
-	fmt.Println(`OVAV Research - Autonomous Research System
+	fmt.Print(`OVAV Research - Autonomous Research System
 
 Usage:
   ovav research <command>
@@ -151,5 +151,5 @@ Examples:
   ovav research run       # Run full research cycle
   ovav research status    # Check system status
   ovav research findings  # View all findings
-`)
+` + "\n")
 }
