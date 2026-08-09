@@ -41,19 +41,19 @@ load_agent_identity() {
         return 1
     fi
 
-    # Author = Agent (who made the change)
+    # Author = Agent (who made the change (export for git -S)
     export GIT_AUTHOR_NAME="$name"
     export GIT_AUTHOR_EMAIL="$email"
-
-    # Committer = Verified human (Alexander Salvador — gets "Verified" badge)
     export GIT_COMMITTER_NAME="$HUMAN_NAME"
     export GIT_COMMITTER_EMAIL="$HUMAN_EMAIL"
+    export GPG_KEY="$GPG_KEY"
 
-    # Configure git locally
+    # Configure git locally (used as fallback by git commit)
     git config --local user.name "$name"
     git config --local user.email "$email"
     git config --local user.signingkey "$GPG_KEY"
     git config --local commit.gpgsign true
+    git config --local commit.cleaner "sed 's/^Co-authored-by:.*//'"
 
     echo "AI+Human identity loaded:"
     echo "  Author:      $name <$email>"
