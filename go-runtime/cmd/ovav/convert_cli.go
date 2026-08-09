@@ -21,9 +21,13 @@
 package main
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/ovav/ovav/internal/projector"
 )
@@ -143,27 +147,115 @@ func printConvertStatus() int {
 	fmt.Println("📊 OVAV Convert Status")
 	fmt.Println()
 
+	hasPending := false
+
 	for _, p := range projector.AllProjectors() {
 		sourcePath := filepath.Join(root, p.SourceDir())
 		deployPath := filepath.Join(root, p.DeployDir())
 
-		sourceInfo, srcErr := os.Stat(sourcePath)
-		deployInfo, dstErr := os.Stat(deployPath)
+		srcErr := checkDir(sourcePath)
 
-		status := "⚠️  missing"
-		if srcErr == nil {
-			if dstErr == nil && deployInfo != nil {
-				if sourceInfo.ModTime().After(deployInfo.ModTime()) {
-					status = "🔄 outdated"
-				} else {
-					status = "✅ synced"
-				}
-			} else {
-				status = "📝 source only"
-			}
+		if srcErr != nil {
+			fmt.Printf("  %-12s ⚠️  source missing\n", p.Name()+":")
+			continue
 		}
 
-		fmt.Printf("  %-12s %s\n", p.Name()+":", status)
+		if p.Name() == "configs" {
+			// configs: direct copy - use hash comparison to detect exact differences
+			diffCount, staleFiles := compareSourceVsDeploy(sourcePath, deployPath)
+			if diffCount > 0 {
+				hasPending = true
+				fmt.Printf("  %-12s 🔄 pending update (%d files)\n", p.Name()+":", diffCount)
+				for _, f := range staleFiles {
+					fmt.Printf("         · %s\n", f)
+				}
+			} else {
+				fmt.Printf("  %-12s ✅ synced\n", p.Name()+":")
+			}
+		} else {
+			// generators (visual, agents, skills, programs, harnesses):
+			// just check if deploy exists and has content
+			deployErr := checkDir(deployPath)
+			if deployErr != nil || isDirEmpty(deployPath) {
+				hasPending = true
+				fmt.Printf("  %-12s 📝 needs projection\n", p.Name()+":")
+			} else {
+				fmt.Printf("  %-12s ✅ projected\n", p.Name()+":")
+			}
+		}
+	}
+
+	fmt.Println()
+	if hasPending {
+		fmt.Println("Run 'ovav convert' to project pending changes")
 	}
 	return 0
+}
+
+func checkDir(path string) error {
+	info, err := os.Stat(path)
+	if err != nil {
+		return err
+	}
+	if !info.IsDir() {
+		return fmt.Errorf("not a directory")
+	}
+	return nil
+}
+
+func compareSourceVsDeploy(sourceRoot, deployRoot string) (int, []string) {
+	var diffCount int
+	var staleFiles []string
+
+	filepath.Walk(sourceRoot, func(srcPath string, info os.FileInfo, err error) error {
+		if err != nil || info.IsDir() {
+			return nil
+		}
+
+		rel, err := filepath.Rel(sourceRoot, srcPath)
+		if err != nil {
+			return nil
+		}
+
+		// Skip top-level files (like model_routing.json) - they are system configs, not tool configs
+		if !strings.Contains(rel, string(filepath.Separator)) {
+			return nil
+		}
+
+		depPath := filepath.Join(deployRoot, rel)
+
+		srcHash, _ := fileHash(srcPath)
+		depHash, depErr := fileHash(depPath)
+
+		if depErr != nil || srcHash != depHash {
+			diffCount++
+			staleFiles = append(staleFiles, rel)
+		}
+		return nil
+	})
+
+	return diffCount, staleFiles
+}
+
+func fileHash(path string) (string, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return "", err
+	}
+	defer f.Close()
+
+	h := sha256.New()
+	if _, err := io.Copy(h, f); err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(h.Sum(nil)), nil
+}
+
+// isDirEmpty returns true if the directory has no entries (files or subdirs).
+func isDirEmpty(path string) bool {
+	entries, err := os.ReadDir(path)
+	if err != nil {
+		return true
+	}
+	return len(entries) == 0
 }
