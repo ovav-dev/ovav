@@ -100,6 +100,8 @@ func routeCommand(cmd string, args []string) int {
 		return cmdGateway(args)
 	case "sync":
 		return cmdSync(args)
+	case "convert":
+		return cmdConvert(args)
 	case "resolve-subagent", "resolve_subagent":
 		return cmdResolveSubagent(args)
 	case "delegate":
