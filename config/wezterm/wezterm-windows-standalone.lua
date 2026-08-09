@@ -190,7 +190,12 @@ local function switch_workspace(window, pane, ws_name)
   if not ws then return end
   wezterm.GLOBAL.ovav_workspace = ws_name
   apply_ws_colors(window, ws_name)
-  window:perform_action(act.SwitchToWorkspace({ name = 'ovav-' .. ws_name }), pane)
+  -- Spawn a new tab in WSL domain with the workspace's CWD
+  -- Use cd in the command since cwd param may not work for WSL domains
+  window:perform_action(act.SpawnCommandInNewTab({
+    domain = { DomainName = 'WSL:Ubuntu-24.04' },
+    args = { 'fish', '-c', 'cd ' .. ws.cwd .. ' && fish -l' },
+  }), pane)
 end
 
 -- ═══════════════════════════════════════════════════════════════════════════════
