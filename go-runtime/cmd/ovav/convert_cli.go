@@ -16,6 +16,7 @@
 //   ovav convert --visual    Project visual assets only
 //   ovav convert --status     Show conversion status
 //   ovav convert --list      List all projectors
+//   ovav convert --inject    Inject configs to user home (~/.config, etc.)
 //   ovav convert -v           Verbose output
 
 package main
@@ -27,6 +28,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 
 	"github.com/ovav/ovav/internal/projector"
@@ -57,6 +59,8 @@ func cmdConvert(args []string) int {
 			return printConvertStatus()
 		case "--list":
 			return listProjectors()
+		case "--inject":
+			// inject needs root, handled after root is found
 		case "--help", "-h":
 			printConvertHelp()
 			return 0
@@ -67,6 +71,13 @@ func cmdConvert(args []string) int {
 	if err != nil || root == "" {
 		fmt.Fprintf(os.Stderr, "❌ Cannot find OVAV root directory\n")
 		return 1
+	}
+
+	// Handle inject after root is found
+	for _, arg := range args {
+		if arg == "--inject" {
+			return injectConfigs(root, verbose)
+		}
 	}
 
 	fmt.Println("🔄 OVAV Convert Projection")
@@ -258,4 +269,146 @@ func isDirEmpty(path string) bool {
 		return true
 	}
 	return len(entries) == 0
+}
+
+// copyFile copies a file from src to dst.
+func copyFile(src, dst string) error {
+	data, err := os.ReadFile(src)
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(dst, data, 0644)
+}
+
+// injectConfigs deploys OVAV configs to user home directories.
+// It detects the environment (WSL, Linux, Windows) and copies configs accordingly.
+func injectConfigs(root string, verbose bool) int {
+	if root == "" {
+		var err error
+		root, err = findOvavRoot()
+		if err != nil || root == "" {
+			fmt.Fprintf(os.Stderr, "❌ Cannot find OVAV root directory\n")
+			return 1
+		}
+	}
+
+	fmt.Println("📦 OVAV Config Injection")
+	fmt.Println()
+
+	// Detect environment
+	env := detectEnvironment()
+	fmt.Printf("  Environment: %s\n", env)
+	fmt.Println()
+
+	configsRoot := filepath.Join(root, "config")
+	injected := 0
+
+	// Config → home injection rules
+	injections := getInjectTargets(env)
+
+	for _, injection := range injections {
+		src := filepath.Join(configsRoot, injection.src)
+		dst := injection.dst
+
+		if _, err := os.Stat(src); err != nil {
+			if verbose {
+				fmt.Printf("  ⏭ %s: source not found, skipping\n", injection.name)
+			}
+			continue
+		}
+
+		// Create parent directory if needed
+		parent := filepath.Dir(dst)
+		if err := os.MkdirAll(parent, 0755); err != nil {
+			fmt.Fprintf(os.Stderr, "  ✗ %s: cannot create directory: %v\n", injection.name, err)
+			continue
+		}
+
+		// Check if destination exists
+		if _, err := os.Stat(dst); err == nil {
+			if verbose {
+				fmt.Printf("  ⏭ %s: already exists at %s\n", injection.name, dst)
+			}
+			continue
+		}
+
+		// Copy file
+		if err := copyFile(src, dst); err != nil {
+			fmt.Fprintf(os.Stderr, "  ✗ %s: %v\n", injection.name, err)
+			continue
+		}
+
+		injected++
+		fmt.Printf("  ✅ %s → %s\n", injection.name, dst)
+	}
+
+	fmt.Println()
+	if injected > 0 {
+		fmt.Printf("✅ Injected %d configs to home directory\n", injected)
+	} else {
+		fmt.Println("No new configs to inject (all up to date)")
+	}
+	return 0
+}
+
+type injectionTarget struct {
+	name string
+	src  string
+	dst  string
+}
+
+func getInjectTargets(env string) []injectionTarget {
+	home, _ := os.UserHomeDir()
+
+	switch env {
+	case "windows-wsl":
+		return []injectionTarget{
+			// WezTerm config → ~/.wezterm.lua
+			{"wezterm", "wezterm/config.lua", filepath.Join(home, ".wezterm.lua")},
+			// Fish config → ~/.config/fish/
+			{"fish", "fish/config.fish", filepath.Join(home, ".config", "fish", "config.fish")},
+			{"fish-aliases", "commands/aliases.fish", filepath.Join(home, ".config", "fish", "aliases.fish")},
+			// Git config → ~/.gitconfig
+			{"git", "git/gitconfig", filepath.Join(home, ".gitconfig")},
+			// Theme
+			{"theme-wezterm", "theme/auto.wezterm.lua", filepath.Join(home, ".config", "wezterm", "theme.lua")},
+		}
+	case "windows":
+		return []injectionTarget{
+			// Windows Terminal settings
+			{"windows-terminal", "windows-terminal/settings.json",
+				filepath.Join(os.Getenv("LOCALAPPDATA"), "Packages",
+					"Microsoft.WindowsTerminal_8wekyb3d8bbwe", "LocalState", "settings.json")},
+			// Git config
+			{"git", "git/gitconfig", filepath.Join(home, ".gitconfig")},
+		}
+	case "linux":
+		return []injectionTarget{
+			// Fish config
+			{"fish", "fish/config.fish", filepath.Join(home, ".config", "fish", "config.fish")},
+			{"fish-aliases", "commands/aliases.fish", filepath.Join(home, ".config", "fish", "aliases.fish")},
+			// Git config
+			{"git", "git/gitconfig", filepath.Join(home, ".gitconfig")},
+			// Theme
+			{"theme-wezterm", "theme/auto.wezterm.lua", filepath.Join(home, ".config", "wezterm", "theme.lua")},
+		}
+	default:
+		return nil
+	}
+}
+
+func detectEnvironment() string {
+	// Check if WSL
+	if _, err := os.Stat("/proc/version"); err == nil {
+		data, _ := os.ReadFile("/proc/version")
+		if strings.Contains(strings.ToLower(string(data)), "microsoft") {
+			return "windows-wsl"
+		}
+		return "linux"
+	}
+	// Check if Windows
+	if strings.Contains(strings.ToLower(runtime.GOOS), "windows") {
+		return "windows"
+	}
+	return "linux"
 }

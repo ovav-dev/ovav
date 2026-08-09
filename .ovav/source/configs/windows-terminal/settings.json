@@ -1,0 +1,599 @@
+{
+    "$help": "https://aka.ms/terminal-documentation",
+    "$schema": "https://aka.ms/terminal-profiles-schema",
+    "actions": [
+        {
+            "command": "unbound",
+            "keys": "ctrl+b"
+        },
+        {
+            "command": "unbound",
+            "keys": "ctrl+o"
+        },
+        {
+            "command": "unbound",
+            "keys": "ctrl+x"
+        },
+        {
+            "command": "unbound",
+            "keys": "ctrl+k"
+        },
+        {
+            "command": "unbound",
+            "keys": "ctrl+u"
+        },
+        {
+            "command": "unbound",
+            "keys": "ctrl+d"
+        },
+        {
+            "command": "unbound",
+            "keys": "ctrl+a"
+        },
+        {
+            "command": "unbound",
+            "keys": "ctrl+e"
+        },
+        {
+            "command": "unbound",
+            "keys": "ctrl+w"
+        },
+        {
+            "command": "paste",
+            "keys": "ctrl+v"
+        },
+        {
+            "command": {
+                "action": "copy",
+                "singleLine": false
+            },
+            "keys": "ctrl+c"
+        },
+        {
+            "command": "copy",
+            "keys": "ctrl+shift+c"
+        },
+        {
+            "command": "find",
+            "keys": "ctrl+shift+f"
+        },
+        {
+            "command": {
+                "action": "splitPane",
+                "split": "auto",
+                "splitMode": "duplicate"
+            },
+            "keys": "alt+a"
+        },
+        {
+            "command": {
+                "action": "splitPane",
+                "split": "down",
+                "splitMode": "duplicate"
+            },
+            "keys": "alt+s"
+        },
+        {
+            "command": {
+                "action": "splitPane",
+                "split": "down",
+                "splitMode": "duplicate"
+            },
+            "keys": "alt+j"
+        },
+        {
+            "command": {
+                "action": "splitPane",
+                "split": "up",
+                "splitMode": "duplicate"
+            },
+            "keys": "alt+k"
+        },
+        {
+            "command": {
+                "action": "splitPane",
+                "split": "left",
+                "splitMode": "duplicate"
+            },
+            "keys": "alt+h"
+        },
+        {
+            "command": {
+                "action": "splitPane",
+                "split": "right",
+                "splitMode": "duplicate"
+            },
+            "keys": "alt+l"
+        },
+        {
+            "command": {
+                "action": "splitPane",
+                "split": "left",
+                "splitMode": "duplicate"
+            },
+            "keys": "alt+shift+h"
+        },
+        {
+            "command": {
+                "action": "splitPane",
+                "split": "down",
+                "splitMode": "duplicate"
+            },
+            "keys": "alt+shift+j"
+        },
+        {
+            "command": {
+                "action": "splitPane",
+                "split": "up",
+                "splitMode": "duplicate"
+            },
+            "keys": "alt+shift+k"
+        },
+        {
+            "command": {
+                "action": "splitPane",
+                "split": "right",
+                "splitMode": "duplicate"
+            },
+            "keys": "alt+shift+l"
+        },
+        {
+            "command": {
+                "action": "splitPane",
+                "split": "down",
+                "splitMode": "duplicate"
+            },
+            "keys": "ctrl+shift+d"
+        },
+        {
+            "command": "togglePaneZoom",
+            "keys": "alt+enter"
+        },
+        {
+            "command": "closePane",
+            "keys": "alt+w"
+        },
+        {
+            "command": "closePane",
+            "keys": "alt+x"
+        },
+        {
+            "command": "closePane",
+            "keys": "ctrl+shift+w"
+        },
+        {
+            "command": "swapPane",
+            "keys": "alt+."
+        },
+        {
+            "command": "swapPane",
+            "keys": "alt+,"
+        },
+        {
+            "command": {
+                "action": "moveFocus",
+                "direction": "left"
+            },
+            "keys": "alt+left"
+        },
+        {
+            "command": {
+                "action": "moveFocus",
+                "direction": "right"
+            },
+            "keys": "alt+right"
+        },
+        {
+            "command": {
+                "action": "moveFocus",
+                "direction": "up"
+            },
+            "keys": "alt+up"
+        },
+        {
+            "command": {
+                "action": "moveFocus",
+                "direction": "down"
+            },
+            "keys": "alt+down"
+        },
+        {
+            "command": {
+                "action": "resizePane",
+                "direction": "left"
+            },
+            "keys": "alt+shift+left"
+        },
+        {
+            "command": {
+                "action": "resizePane",
+                "direction": "right"
+            },
+            "keys": "alt+shift+right"
+        },
+        {
+            "command": {
+                "action": "resizePane",
+                "direction": "up"
+            },
+            "keys": "alt+shift+up"
+        },
+        {
+            "command": {
+                "action": "resizePane",
+                "direction": "down"
+            },
+            "keys": "alt+shift+down"
+        },
+        {
+            "command": "newTab",
+            "keys": "ctrl+t"
+        },
+        {
+            "command": "newTab",
+            "keys": "alt+t"
+        },
+        {
+            "command": "closeTab",
+            "keys": "ctrl+f4"
+        },
+        {
+            "command": "nextTab",
+            "keys": "ctrl+tab"
+        },
+        {
+            "command": "prevTab",
+            "keys": "ctrl+shift+tab"
+        },
+        {
+            "command": {
+                "action": "switchToTab",
+                "index": 0
+            },
+            "keys": "ctrl+1"
+        },
+        {
+            "command": {
+                "action": "switchToTab",
+                "index": 1
+            },
+            "keys": "ctrl+2"
+        },
+        {
+            "command": {
+                "action": "switchToTab",
+                "index": 2
+            },
+            "keys": "ctrl+3"
+        },
+        {
+            "command": {
+                "action": "switchToTab",
+                "index": 3
+            },
+            "keys": "ctrl+4"
+        },
+        {
+            "command": {
+                "action": "switchToTab",
+                "index": 4
+            },
+            "keys": "ctrl+5"
+        },
+        {
+            "command": {
+                "action": "switchToTab",
+                "index": 5
+            },
+            "keys": "ctrl+6"
+        },
+        {
+            "command": {
+                "action": "switchToTab",
+                "index": 6
+            },
+            "keys": "ctrl+7"
+        },
+        {
+            "command": {
+                "action": "switchToTab",
+                "index": 7
+            },
+            "keys": "ctrl+8"
+        },
+        {
+            "command": "quakeMode",
+            "keys": "ctrl+`"
+        },
+        {
+            "command": "commandPalette",
+            "keys": "ctrl+shift+p"
+        },
+        {
+            "command": "commandPalette",
+            "keys": "alt+space"
+        },
+        {
+            "command": {
+                "action": "adjustFontSize",
+                "delta": 1
+            },
+            "keys": "ctrl+="
+        },
+        {
+            "command": {
+                "action": "adjustFontSize",
+                "delta": 1
+            },
+            "keys": "ctrl+numpad_plus"
+        },
+        {
+            "command": {
+                "action": "adjustFontSize",
+                "delta": -1
+            },
+            "keys": "ctrl+-"
+        },
+        {
+            "command": {
+                "action": "adjustFontSize",
+                "delta": -1
+            },
+            "keys": "ctrl+numpad_minus"
+        },
+        {
+            "command": "resetFontSize",
+            "keys": "ctrl+0"
+        },
+        {
+            "command": "resetFontSize",
+            "keys": "ctrl+numpad_0"
+        },
+        {
+            "command": "scrollDown",
+            "keys": "ctrl+shift+down"
+        },
+        {
+            "command": "scrollUp",
+            "keys": "ctrl+shift+up"
+        },
+        {
+            "command": "scrollDownPage",
+            "keys": "ctrl+shift+pagedown"
+        },
+        {
+            "command": "scrollUpPage",
+            "keys": "ctrl+shift+pageup"
+        },
+        {
+            "command": {
+                "action": "sendInput",
+                "input": "\n"
+            },
+            "keys": "shift+enter"
+        }
+    ],
+    "alwaysOnTop": false,
+    "alwaysShowTabs": true,
+    "centerOnLaunch": true,
+    "copyFormatting": "none",
+    "copyOnSelect": true,
+    "disableAnimations": false,
+    "experimental.inputForcePassthrough": true,
+    "initialCols": 140,
+    "initialPosition": "48,48",
+    "initialRows": 40,
+    "launchMode": "maximized",
+    "profiles": {
+        "defaults": {
+            "acrylicOpacity": 0.5,
+            "adjustIndistinguishableColors": "never",
+            "antialiasingMode": "grayscale",
+            "background": "#16161e",
+            "backgroundImageOpacity": 0,
+            "bellStyle": "none",
+            "closeOnExit": "always",
+            "colorScheme": "OVAV Night",
+            "cursorShape": "vintage",
+            "cursorHeight": 25,
+            "experimental.retroTerminalEffect": false,
+            "font": {
+                "face": "CaskaydiaCove Nerd Font Mono",
+                "size": 12,
+                "weight": "normal"
+            },
+            "fontWeight": "normal",
+            "foreground": "#cdd6f4",
+            "intenseTextStyle": "bold",
+            "opacity": 100,
+            "padding": "8, 14, 8, 14",
+            "scrollbarState": "hidden",
+            "selectionBackground": "#454545",
+            "snapOnInput": true,
+            "tabColor": "#242424",
+            "tabTitle": "OVAV",
+            "terminateOnClose": true,
+            "useAcrylic": false
+        },
+        "list": [
+            {
+                "commandline": "C:\\Windows\\System32\\wsl.exe -d Ubuntu-24.04 --cd ~",
+                "cursorColor": "#7eb77f",
+                "font": {
+                    "face": "CaskaydiaCove Nerd Font Mono",
+                    "size": 12,
+                    "weight": "normal"
+                },
+                "guid": "{a5a97cb0-5e0b-4c5b-8e3f-1d2e8f9c0a3b}",
+                "hidden": true,
+                "icon": "\ud83d\udc27",
+                "name": "WSL \u2014 Ubuntu (OVAV)",
+                "startingDirectory": "//wsl.localhost/Ubuntu-24.04/home/braka",
+                "suppressApplicationTitle": true,
+                "tabTitle": "OVAV Home",
+                "useAtlasEngine": true
+            },
+            {
+                "commandline": "C:\\Windows\\System32\\wsl.exe -d Ubuntu-24.04 --cd /home/braka/Systems/OVAV",
+                "cursorColor": "#c47d8a",
+                "font": {
+                    "face": "CaskaydiaCove Nerd Font Mono",
+                    "size": 13,
+                    "weight": "normal"
+                },
+                "guid": "{b6b87dc1-6f1e-5d3c-9f4e-2c4f7b8a1c6d}",
+                "hidden": true,
+                "icon": "\ud83d\uddbc\ufe0f",
+                "name": "WSL \u2014 OVAV Systems",
+                "startingDirectory": "//wsl.localhost/Ubuntu-24.04/home/braka/Systems/OVAV",
+                "suppressApplicationTitle": true,
+                "tabTitle": "OVAV Systems",
+                "useAtlasEngine": true
+            },
+            {
+                "commandline": "C:\\Windows\\System32\\wsl.exe -d Ubuntu-24.04 --cd /mnt/c/Users/Alexa/OneDrive/Documentos/Dev",
+                "cursorColor": "#5a7d8a",
+                "font": {
+                    "face": "JetBrainsMono Nerd Font",
+                    "size": 12,
+                    "weight": "normal"
+                },
+                "guid": "{c7c98ed2-7f2e-6e4d-0a5f-3d5c8a9b2d7e}",
+                "hidden": true,
+                "icon": "\ud83d\ude80",
+                "name": "WSL \u2014 Development",
+                "startingDirectory": "//wsl.localhost/Ubuntu-24.04/mnt/c/Users/Alexa/OneDrive/Documentos/Dev",
+                "suppressApplicationTitle": true,
+                "tabTitle": "Dev",
+                "useAtlasEngine": true
+            },
+            {
+                "commandline": "powershell.exe -NoLogo -NoExit -Command \"cd $env:USERPROFILE\"",
+                "cursorColor": "#6d9bc3",
+                "font": {
+                    "face": "CaskaydiaCove Nerd Font Mono",
+                    "size": 12,
+                    "weight": "normal"
+                },
+                "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
+                "hidden": false,
+                "icon": "\ud83d\udcbb",
+                "name": "PowerShell (Local)",
+                "startingDirectory": "%USERPROFILE%",
+                "tabTitle": "PowerShell",
+                "useAtlasEngine": true
+            },
+            {
+                "commandline": "C:\\Windows\\System32\\cmd.exe /k cd /d %USERPROFILE%",
+                "cursorColor": "#5a7d8a",
+                "guid": "{e2e4b2d0-3a1c-4d5e-9f8a-1d2e3f4a5b6c}",
+                "hidden": false,
+                "icon": "\ud83d\udcbb",
+                "name": "CMD (Local)",
+                "startingDirectory": "%USERPROFILE%",
+                "tabTitle": "CMD",
+                "useAtlasEngine": true
+            }
+        ]
+    },
+    "schemes": [
+        {
+            "name": "OVAV Night",
+            "background": "#16161e",
+            "black": "#16161e",
+            "blue": "#89b4fa",
+            "brightBlack": "#313244",
+            "brightBlue": "#89b4fa",
+            "brightCyan": "#94e2d5",
+            "brightGreen": "#a6e3a1",
+            "brightPurple": "#cba6f7",
+            "brightRed": "#f38ba8",
+            "brightWhite": "#f5f5f5",
+            "brightYellow": "#f9e2af",
+            "cursorColor": "#cdd6f4",
+            "cyan": "#94e2d5",
+            "foreground": "#cdd6f4",
+            "green": "#a6e3a1",
+            "purple": "#cba6f7",
+            "red": "#f38ba8",
+            "selectionBackground": "#313244",
+            "white": "#cdd6f4",
+            "yellow": "#f9e2af"
+        },
+        {
+            "name": "OVAV Dark",
+            "background": "#242424",
+            "black": "#242424",
+            "blue": "#6d9bc3",
+            "brightBlack": "#383838",
+            "brightBlue": "#6d9bc3",
+            "brightCyan": "#6d9b8e",
+            "brightGreen": "#7eb77f",
+            "brightPurple": "#c47d8a",
+            "brightRed": "#d4756b",
+            "brightWhite": "#e8e8e8",
+            "brightYellow": "#c4a65a",
+            "cursorColor": "#7eb77f",
+            "cyan": "#5a7d8a",
+            "foreground": "#d4d4d4",
+            "green": "#7eb77f",
+            "purple": "#c47d8a",
+            "red": "#d4756b",
+            "selectionBackground": "#454545",
+            "white": "#d4d4d4",
+            "yellow": "#c4a65a"
+        },
+        {
+            "name": "OVAV Home",
+            "background": "#1e2a1e",
+            "black": "#1e2a1e",
+            "blue": "#6d9bc3",
+            "brightBlack": "#2d3a2d",
+            "brightBlue": "#6d9bc3",
+            "brightCyan": "#6d9b8e",
+            "brightGreen": "#7eb77f",
+            "brightPurple": "#c47d8a",
+            "brightRed": "#d4756b",
+            "brightWhite": "#e8e8e8",
+            "brightYellow": "#c4a65a",
+            "cursorColor": "#7eb77f",
+            "cyan": "#5a7d8a",
+            "foreground": "#d4d4d4",
+            "green": "#7eb77f",
+            "purple": "#c47d8a",
+            "red": "#d4756b",
+            "selectionBackground": "#2d3a2d",
+            "white": "#d4d4d4",
+            "yellow": "#c4a65a"
+        },
+        {
+            "name": "OVAV System",
+            "background": "#25281e",
+            "black": "#25281e",
+            "blue": "#6d9bc3",
+            "brightBlack": "#353820",
+            "brightBlue": "#6d9bc3",
+            "brightCyan": "#6d9b8e",
+            "brightGreen": "#7eb77f",
+            "brightPurple": "#c47d8a",
+            "brightRed": "#d4756b",
+            "brightWhite": "#e8e8e8",
+            "brightYellow": "#c4a65a",
+            "cursorColor": "#d4a85c",
+            "cyan": "#5a7d8a",
+            "foreground": "#d4d4d4",
+            "green": "#7eb77f",
+            "purple": "#c47d8a",
+            "red": "#d4756b",
+            "selectionBackground": "#353820",
+            "white": "#d4d4d4",
+            "yellow": "#c4a65a"
+        }
+    ],
+    "showTabsInTitlebar": true,
+    "tabWidthMode": "titleLength",
+    "theme": "dark",
+    "themes": [],
+    "useAcrylicInTabRow": true,
+    "windowingBehavior": "useAnyExisting"
+}
