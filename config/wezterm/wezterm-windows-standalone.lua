@@ -1,14 +1,38 @@
 -- ╔══════════════════════════════════════════════════════════════════════════════╗
--- ║               OVAV WEZTERM WINDOWS — Standalone Nightly                   ║
--- ║            config/wezterm/wezterm-windows-standalone.lua · v2.0.0          ║
+-- ║                 OVAV WEZTERM CONFIG — TEMPLATE                             ║
+-- ║          config/wezterm/wezterm-template.lua · COPY AND CUSTOMIZE          ║
 -- ║                                                                            ║
--- ║  Para WezTerm nightly Windows 11 (20260805+).                             ║
--- ║  Tema OVAV v2.0.0 — paleta canónica desde .ovav/visual/theme/theme.yaml   ║
--- ║  Workspace isolation, tab bar con acentos OVAV, status bar minimal.       ║
+-- ║  INSTRUCCIONES:                                                            ║
+-- ║  1. Copia este archivo a ~/.wezterm.lua (Windows) o ~/.wezterm.lua (WSL)  ║
+-- ║  2. Edita la sección USUARIO abajo con TUS valores                        ║
+-- ║  3. Reinicia WezTerm                                                      ║
 -- ║                                                                            ║
--- ║  Fuente canónica: config/wezterm/wezterm.lua                               ║
--- ║  Dependencias: Nerd Font (CascadiaCode ya instalado en Windows)           ║
+-- ║  Para WezTerm nightly 20260805+ en Windows 11 + WSL2                     ║
 -- ╚══════════════════════════════════════════════════════════════════════════════╝
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+-- 🔧 SECCIÓN USUARIO — EDITAR ESTOS VALORES SEGÚN TU SISTEMA
+-- ═══════════════════════════════════════════════════════════════════════════════
+local USER = {
+  -- Tu nombre de usuario en WSL (ej: braka, alex, etc.)
+  wsl_username = 'braka',
+
+  -- Distribución WSL (verifica con: wsl.exe -l)
+  wsl_distro = 'Ubuntu-24.04',
+
+  -- Dominio WezTerm para WSL (visible en tab bar)
+  wsl_domain_label = 'WSL:Ubuntu-24.04',
+
+  -- Rutas en WSL — adapta según tu estructura
+  paths = {
+    home  = '/home/braka',           -- Tu home en WSL
+    system = '/home/braka/.config',  -- Directorio de configuración
+    ovav  = '/home/braka/Systems/OVAV', -- Donde tengas OVAV
+  },
+}
+-- ═══════════════════════════════════════════════════════════════════════════════
+-- FIN SECCIÓN USUARIO — NO EDITES ABAJO A MENOS QUE SEPAS LO QUE HACES
+-- ═══════════════════════════════════════════════════════════════════════════════
 
 local wezterm = require 'wezterm'
 local act = wezterm.action
@@ -77,26 +101,26 @@ local P = {
 }
 
 -- ═══════════════════════════════════════════════════════════════════════════════
--- WORKSPACES — WSL2 paths (no Nerd Font icons, ASCII fallback)
+-- WORKSPACES — basados en USER.paths
 -- ═══════════════════════════════════════════════════════════════════════════════
 local WORKSPACES = {
   home = {
     key = '1', label = 'HOME', icon = '[H]',
     accent = '#7eb77f', accent_dim = '#1e2a1e',
-    cwd = '/home/braka',
-    prefixes = { '/home/braka' },
+    cwd = USER.paths.home,
+    prefixes = { USER.paths.home },
   },
   system = {
     key = '2', label = 'SYS', icon = '[S]',
     accent = '#d4a85c', accent_dim = '#25281e',
-    cwd = '/home/braka/.config',
-    prefixes = { '/home/braka/.config' },
+    cwd = USER.paths.system,
+    prefixes = { USER.paths.system },
   },
   ovav = {
     key = '3', label = 'OVAV', icon = '[O]',
     accent = '#c47d8a', accent_dim = '#281e22',
-    cwd = '/home/braka/Systems/OVAV',
-    prefixes = { '/home/braka/Systems/OVAV' },
+    cwd = USER.paths.ovav,
+    prefixes = { USER.paths.ovav },
   },
 }
 
@@ -121,10 +145,10 @@ end
 
 local function abbrev_path(cwd)
   if not cwd then return '' end
-  -- WSL/Linux path normalization
-  if cwd == '/home/braka' then return '~' end
-  if starts_with(cwd, '/home/braka') then
-    return '~' .. cwd:sub(#'/home/braka' + 1)
+  local home = USER.paths.home
+  if cwd == home then return '~' end
+  if starts_with(cwd, home) then
+    return '~' .. cwd:sub(#home + 1)
   end
   return cwd
 end
@@ -197,7 +221,6 @@ local function switch_workspace(window, pane, ws_name)
   for idx, tab_obj in ipairs(all_tabs) do
     local tid = tostring(tab_obj.tab_id)
     if wezterm.GLOBAL['ovav_tab_ws_' .. tid] == ws_name then
-      -- Switch to existing workspace tab (0-indexed)
       window:perform_action(act.ActivateTab(idx - 1), pane)
       return
     end
@@ -205,7 +228,7 @@ local function switch_workspace(window, pane, ws_name)
 
   -- No existing tab for this workspace - spawn new one
   window:perform_action(act.SpawnCommandInNewTab({
-    domain = { DomainName = 'WSL:Ubuntu-24.04' },
+    domain = { DomainName = USER.wsl_domain_label },
     args = { 'fish', '-c', 'cd ' .. ws.cwd .. ' && fish -l' },
   }), pane)
 end
@@ -222,7 +245,6 @@ wezterm.on('format-tab-title', function(tab, tabs, panes, _, hover, _)
   local ws = WORKSPACES[ws_name] or WORKSPACES['home']
   local accent = ws.accent or P.fg
 
-  -- Count tabs in workspace
   local tab_index = 1
   local same_ws_count = 0
   if tabs then
@@ -321,27 +343,18 @@ config.exit_behavior = 'CloseOnCleanExit'
 config.window_close_confirmation = 'NeverPrompt'
 
 -- ═══════════════════════════════════════════════════════════════════════════════
--- WSL2 DOMAIN — connect WezTerm Windows → WSL2 Ubuntu-24.04 fish shell
+-- WSL2 DOMAIN — conecta WezTerm Windows → WSL2
 -- ═══════════════════════════════════════════════════════════════════════════════
--- WSL2 domain configuration
 config.wsl_domains = {
   {
-    name = 'WSL:Ubuntu-24.04',
-    distribution = 'Ubuntu-24.04',
-    username = 'braka',
+    name = USER.wsl_domain_label,
+    distribution = USER.wsl_distro,
+    username = USER.wsl_username,
     default_prog = { 'fish', '-l' },
   },
 }
 
--- Use WSL domain by default for new tabs/pane spawns
-config.default_domain = 'WSL:Ubuntu-24.04'
-
--- gui-startup: no special handling needed - wezterm on Windows starts with cmd.exe
--- The first cmd.exe tab will be visible. User can close it manually or use ALT+1/2/3
--- to spawn WSL tabs. The switch_workspace function now checks for existing tabs
--- and doesn't accumulate duplicates.
-
-
+config.default_domain = USER.wsl_domain_label
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 -- RENDER
@@ -376,10 +389,10 @@ table.insert(config.hyperlink_rules, { regex = [[\b#(\d+)\b]], format = 'https:/
 table.insert(config.hyperlink_rules, { regex = [[\b!(\d+)\b]], format = 'https://github.com/ovav-dev/ovav-systems/pull/$1', highlight = 1 })
 
 -- ═══════════════════════════════════════════════════════════════════════════════
--- KEY BINDINGS — Windows optimized (no WSL)
+-- KEY BINDINGS
 -- ═══════════════════════════════════════════════════════════════════════════════
 config.keys = {
-  -- Workspace switching with Alt+1-4
+  -- Workspace switching with Alt+1-3
   { key = '1', mods = 'ALT', action = wezterm.action_callback(function(w, p)
     switch_workspace(w, p, 'home')
   end) },
@@ -390,7 +403,7 @@ config.keys = {
     switch_workspace(w, p, 'ovav')
   end) },
 
-  -- Pane navigation
+  -- Pane navigation (vim-style)
   { key = 'h', mods = 'ALT', action = act.ActivatePaneDirection 'Left' },
   { key = 'j', mods = 'ALT', action = act.ActivatePaneDirection 'Down' },
   { key = 'k', mods = 'ALT', action = act.ActivatePaneDirection 'Up' },
