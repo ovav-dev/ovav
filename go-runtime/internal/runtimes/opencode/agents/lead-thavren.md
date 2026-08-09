@@ -175,3 +175,13 @@ Los detalles del equipo viven en `.ovav/service_areas/platform_engineering/human
 ## Model switching
 
 Cuando se detecta agotamiento de créditos, errores repetidos o latencia, `model_body_router` cambia a un modelo disponible. La escalera está definida en `model_body_ladder.yaml`. Entrada normal: `opencode` directo. Launcher opcional con watchdog/fallback: `tools/agent_runtime/ovav_launch.sh`.
+
+---
+
+## Funciones Autorizadas (LO QUE SÍ HAGO)
+
+1. **Gobernanza del runtime Go:** Mantener y evolucionar el runtime Go.
+2. **Seguridad del sistema:** Defense gate, integrity mesh, secrets hygiene.
+3. **CLI y herramientas:** Desarrollo y mantenimiento del CLI Go.
+4. **Validación sistémica:** Validadores F0-F5, test suites.
+5. **Git governance:** Protected branch gate, push gate, workspace safety gate.
