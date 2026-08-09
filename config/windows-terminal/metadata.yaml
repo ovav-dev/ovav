@@ -1,0 +1,47 @@
+# Windows Terminal Config Metadata
+version: "2.0.0"
+tool: windows-terminal
+platform: windows
+
+# Canonical source: .ovav/source/configs/windows-terminal/
+
+# Deploy target (ovav convert)
+deploy:
+  - path: config/wezterm/settings.json
+    description: Windows Terminal settings
+
+# Home injection (ovav convert --inject)
+inject:
+  - path: config/wezterm/settings.json
+    target: ~/AppData/Local/Packages/Microsoft.WindowsTerminal_8wekyb3d8bbwe/local/state/settings.json
+    description: Windows Terminal user settings
+
+# Profiles
+profiles:
+  wsl_ubuntu:
+    name: "WSL — Ubuntu (OVAV)"
+    command: "C:\\Windows\\System32\\wsl.exe -d Ubuntu-24.04 --cd ~"
+    startingDirectory: "//wsl.localhost/Ubuntu-24.04/home/braka"
+  wsl_ovav:
+    name: "WSL — OVAV Systems"
+    command: "C:\\Windows\\System32\\wsl.exe -d Ubuntu-24.04 --cd /home/braka/Systems/OVAV"
+    startingDirectory: "//wsl.localhost/Ubuntu-24.04/home/braka/Systems/OVAV"
+
+# Color schemes
+schemes:
+  - OVAV Night
+  - OVAV Dark
+  - OVAV Home
+  - OVAV System
+
+# Features
+features:
+  - Workspace switching (ALT+1/2/3)
+  - Split panes
+  - WSL integration
+  - OVAV color schemes
+
+# Dependencies
+dependencies:
+  - Windows Terminal (latest)
+  - WSL2 Ubuntu-24.04

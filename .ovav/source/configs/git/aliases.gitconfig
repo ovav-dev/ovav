@@ -1,0 +1,20 @@
+# OVAV Git Aliases — Requerimientos de runtime
+# Canonical source: config/git/aliases.gitconfig
+# Deploy: git config --global (aplicados manualmente o por install flow)
+# Verificado en: 2026-06-12 23:30 PET
+#
+# Estos 10 aliases son requisitos de OVAV para operar eficientemente.
+# Se mantienen aquí como fuente canónica. Si se pierden del sistema,
+# se restauran desde este archivo.
+
+[alias]
+    st = status --short --branch
+    co = checkout
+    br = branch
+    ci = commit
+    sw = switch
+    lg = log --oneline --decorate --graph -20
+    df = diff
+    ds = diff --staged
+    aa = add -A
+    un = reset HEAD --

@@ -3,7 +3,8 @@ version: "2.0.0"
 tool: wezterm
 platform: windows-wsl2
 min_version: "20260805"
-canonical_source: .ovav/source/configs/wezterm/config.lua
+
+# Canonical source: .ovav/source/configs/wezterm/
 
 # User-customizable variables (top of config.lua)
 user_variables:
@@ -14,11 +15,18 @@ user_variables:
   - paths.system
   - paths.ovav
 
-# Deploy targets
+# Deploy target (ovav convert)
 deploy:
-  - path: config/wezterm/wezterm.lua
-    description: WezTerm Lua config for Windows + WSL2
+  - path: config/wezterm/config.lua
+    description: WezTerm Lua config (OVAV managed)
+
+# Home injection (ovav convert --inject)
+inject:
+  - path: config/wezterm/config.lua
+    target: ~/.wezterm.lua
+    description: User WezTerm config
   - path: config/wezterm/wezterm-template.lua
+    target: ~/.wezterm.lua.template
     description: Standalone template (user copies to ~/.wezterm.lua)
 
 # Dependencies

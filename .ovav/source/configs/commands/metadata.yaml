@@ -1,0 +1,60 @@
+# Cross-Terminal Commands Config
+version: "1.0.0"
+description: "Unified aliases and shortcuts for WezTerm and Windows Terminal"
+
+# Canonical source: .ovav/source/configs/commands/
+
+# Files
+files:
+  - aliases.fish       # Main aliases for fish shell
+  - aliases.sh          # Fallback for bash
+  - shortcuts.wezterm.lua  # WezTerm-specific key bindings
+  - shortcuts.windows.json # Windows Terminal key bindings
+
+# Shell aliases (fish format)
+shell_aliases:
+  # Navigation
+  home: "cd ~"
+  sys: "cd ~/.config"
+  ovav: "cd ~/Systems/OVAV"
+
+  # Git shortcuts (see git config for details)
+  gs: "git status"
+  ga: "git add"
+  gc: "git commit"
+  gp: "git push"
+  gl: "git log --oneline"
+  gd: "git diff"
+
+  # OVAV commands
+  ov: "ovav"
+  ovs: "ovav status"
+  ovc: "ovav convert"
+  ovv: "ovav validate"
+
+  # Worktree
+  owc: "git worktree add"
+  owl: "git worktree list"
+
+# Key bindings - WezTerm
+wezterm_bindings:
+  ALT+1: "switch to HOME workspace"
+  ALT+2: "switch to SYS workspace"
+  ALT+3: "switch to OVAV workspace"
+  ALT+h: "activate pane left"
+  ALT+j: "activate pane down"
+  ALT+k: "activate pane up"
+  ALT+l: "activate pane right"
+  ALT+t: "split horizontal"
+  ALT+SHIFT+D: "split vertical"
+
+# Key bindings - Windows Terminal (via settings.json)
+windows_bindings:
+  ALT+1: "switch to tab 0 (HOME)"
+  ALT+2: "switch to tab 1 (SYS)"
+  ALT+3: "switch to tab 2 (OVAV)"
+  ALT+h: "move focus left"
+  ALT+j: "move focus down"
+  ALT+k: "move focus up"
+  ALT+l: "move focus right"
+  ALT+t: "new tab"
