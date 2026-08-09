@@ -323,6 +323,7 @@ config.window_close_confirmation = 'NeverPrompt'
 -- ═══════════════════════════════════════════════════════════════════════════════
 -- WSL2 DOMAIN — connect WezTerm Windows → WSL2 Ubuntu-24.04 fish shell
 -- ═══════════════════════════════════════════════════════════════════════════════
+-- WSL2 domain configuration
 config.wsl_domains = {
   {
     name = 'WSL:Ubuntu-24.04',
@@ -332,12 +333,14 @@ config.wsl_domains = {
   },
 }
 
--- Default program: spawn WSL2 Ubuntu-24.04 with fish login shell
--- On Windows, wsl.exe is in PATH and resolves to WSL2
-config.default_prog = { 'wsl.exe', '-d', 'Ubuntu-24.04', '--', 'fish', '-l' }
-
--- Set WSL as default domain for new panes/tabs
+-- Use WSL domain by default for new tabs/pane spawns
 config.default_domain = 'WSL:Ubuntu-24.04'
+
+-- gui-startup: wezterm on Windows always starts with cmd.exe pane.
+-- Workaround: spawn WSL pane, then user can close the cmd.exe pane manually.
+-- New tabs (Ctrl+T) will use the WSL domain by default.
+
+
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 -- RENDER
@@ -406,7 +409,7 @@ config.keys = {
   { key = 'D', mods = 'ALT|SHIFT', action = act.SplitVertical { domain = 'CurrentPaneDomain' } },
 
   -- Tab management
-  { key = 't', mods = 'CTRL|SHIFT', action = act.SpawnTab { DefaultDomain = {} } },
+  { key = 't', mods = 'CTRL|SHIFT', action = act.SpawnTab('DefaultDomain') },
   { key = 'w', mods = 'CTRL|SHIFT', action = act.CloseCurrentTab { confirm = true } },
   { key = 'Tab', mods = 'CTRL', action = act.ActivateTabRelative(1) },
   { key = 'Tab', mods = 'CTRL|SHIFT', action = act.ActivateTabRelative(-1) },
