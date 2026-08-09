@@ -130,10 +130,10 @@ func (a *AgentSurfaceHierarchy) Validate(ctx context.Context, root string) Resul
 		}
 
 		if isHidden {
-			if cfg.mode == "subagent" || cfg.mode == "primary" {
+			if cfg.mode == "subagent" || cfg.mode == "primary" || cfg.mode == "lead" {
 				squadAgents = append(squadAgents, name)
 			} else {
-				issues = append(issues, fmt.Sprintf("[%s] %s: hidden:true with mode:%s — must be mode:primary or mode:subagent", cfg.file, name, cfg.mode))
+				issues = append(issues, fmt.Sprintf("[%s] %s: hidden:true with mode:%s — must be mode:primary, mode:subagent, or mode:lead", cfg.file, name, cfg.mode))
 			}
 			continue
 		}
