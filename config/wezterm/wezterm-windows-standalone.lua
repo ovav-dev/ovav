@@ -321,6 +321,33 @@ config.exit_behavior = 'CloseOnCleanExit'
 config.window_close_confirmation = 'NeverPrompt'
 
 -- ═══════════════════════════════════════════════════════════════════════════════
+-- WSL2 DOMAIN — connect WezTerm Windows → WSL2 Ubuntu-24.04 fish shell
+-- ═══════════════════════════════════════════════════════════════════════════════
+config.wsl_domains = {
+  {
+    name = 'WSL:Ubuntu-24.04',
+    distribution = 'Ubuntu-24.04',
+    username = 'braka',
+    default_prog = { 'fish', '-l' },
+    -- Env vars passed to WSL
+    env = {
+      LANG = 'en_US.UTF-8',
+      TERM = 'xterm-256color',
+    },
+  },
+}
+
+-- Default program: spawn WSL2 Ubuntu-24.04 with fish login shell
+-- On Windows, wsl.exe is in PATH and resolves to WSL2
+config.default_prog = { 'wsl.exe', '-d', 'Ubuntu-24.04', '--', 'fish', '-l' }
+
+-- Make new panes/tabs spawn into WSL domain by default
+config.spawn_strategy = 'WSL'
+
+-- Set WSL as default domain
+config.default_domain = 'WSL:Ubuntu-24.04'
+
+-- ═══════════════════════════════════════════════════════════════════════════════
 -- RENDER
 -- ═══════════════════════════════════════════════════════════════════════════════
 config.front_end = 'WebGpu'
