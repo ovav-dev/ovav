@@ -1,50 +1,69 @@
 #!/bin/bash
 # =============================================================================
-# OVAV Commit Identity System — Smart Commit Script
+# OVAV Commit Identity System — AI+Human Commit Model
 # =============================================================================
-# Usage: ovav-commit [options]
-# Detects lead identity from OVAV_ACTIVE_LEAD env or interactive selection
-# Signs commits with SSH key and adds OVAV metadata trailers
+# Author  = Agent identity (lead)  → shows as "Thavren (Platform Engineering)"
+# Committer = Verified human (Alexander Salvador) → GitHub "Verified" badge
+# Signing = GPG key 3DAC13769287AC80 (alexander_mya@outlook.com)
 # =============================================================================
 
 set -e
 
 OVAV_IDENTITY_DIR="${OVAV_IDENTITY_DIR:-$HOME/.config/ovav}"
-IDENTITIES_FILE="$OVAV_IDENTITY_DIR/identities.json"
-KEYS_DIR="$OVAV_IDENTITY_DIR/keys"
+# Prefer repo-local identities.json, fall back to ~/.config/ovav
+REPO_IDENTITY_DIR="$(git rev-parse --show-toplevel 2>/dev/null)/.ovav"
+if [ -f "$REPO_IDENTITY_DIR/identities.json" ]; then
+    IDENTITIES_FILE="$REPO_IDENTITY_DIR/identities.json"
+else
+    IDENTITIES_FILE="$OVAV_IDENTITY_DIR/identities.json"
+fi
 
-# Load identity for a lead
-load_identity() {
+# Verified human identity (committer — GitHub "Verified" badge)
+HUMAN_NAME="Alexander Salvador"
+HUMAN_EMAIL="alexander_mya@outlook.com"
+GPG_KEY="3DAC13769287AC80"
+
+# Load agent identity for a lead using jq
+load_agent_identity() {
     local lead="$1"
-    local name=$(grep -o "\"$lead\":.*\"name\": *\"\([^\"]*\)\"" "$IDENTITIES_FILE" 2>/dev/null | head -1 | sed 's/.*"name": *"\([^"]*\)"/\1/')
-    local email=$(grep -o "\"$lead\":.*\"email\": *\"\([^\"]*\)\"" "$IDENTITIES_FILE" 2>/dev/null | head -1 | sed 's/.*"email": *"\([^"]*\)\"/\1/')
-    local area=$(grep -o "\"$lead\":.*\"area\": *\"\([^\"]*\)\"" "$IDENTITIES_FILE" 2>/dev/null | head -1 | sed 's/.*"area": *"\([^"]*\)"/\1/')
-    local key="$KEYS_DIR/ovav-lead-${lead}_ed25519"
+    if [ ! -f "$IDENTITIES_FILE" ]; then
+        echo "ERROR: $IDENTITIES_FILE not found" >&2
+        return 1
+    fi
+
+    # Use jq for robust JSON parsing
+    local name=$(jq -r ".[\"$lead\"].name // empty" "$IDENTITIES_FILE" 2>/dev/null)
+    local email=$(jq -r ".[\"$lead\"].email // empty" "$IDENTITIES_FILE" 2>/dev/null)
+    local area=$(jq -r ".[\"$lead\"].area // empty" "$IDENTITIES_FILE" 2>/dev/null)
 
     if [ -z "$name" ]; then
         echo "ERROR: Lead '$lead' not found in $IDENTITIES_FILE" >&2
         return 1
     fi
 
+    # Author = Agent (who made the change)
     export GIT_AUTHOR_NAME="$name"
     export GIT_AUTHOR_EMAIL="$email"
-    export GIT_COMMITTER_NAME="$name"
-    export GIT_COMMITTER_EMAIL="$email"
 
+    # Committer = Verified human (Alexander Salvador — gets "Verified" badge)
+    export GIT_COMMITTER_NAME="$HUMAN_NAME"
+    export GIT_COMMITTER_EMAIL="$HUMAN_EMAIL"
+
+    # Configure git locally
     git config --local user.name "$name"
     git config --local user.email "$email"
+    git config --local user.signingkey "$GPG_KEY"
+    git config --local commit.gpgsign true
 
-    if [ -f "$key" ]; then
-        git config --local user.signingkey "$key"
-        echo "Using signing key: $key"
-    fi
-
-    echo "Identity loaded: $name <$email> [$area]"
+    echo "AI+Human identity loaded:"
+    echo "  Author:      $name <$email>"
+    echo "  Committer:   $HUMAN_NAME <$HUMAN_EMAIL> (GPG Verified)"
+    echo "  Area:        ${area:-unknown}"
 }
 
-# Auto-detect lead from environment
+# Auto-detect lead from OVAV_ACTIVE_LEAD env or default to thavren
 LEAD="${OVAV_ACTIVE_LEAD:-thavren}"
-load_identity "$LEAD"
+load_agent_identity "$LEAD"
 
-# Pass through to git commit with all arguments
+# Pass through to git commit with GPG signing
 exec git commit -S "$@"
