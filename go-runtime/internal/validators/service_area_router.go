@@ -198,7 +198,7 @@ func (s *ServiceAreaRouter) Validate(ctx context.Context, root string) Result {
 	var issues []string
 	profilesChecked := 0
 
-	agentsDir := filepath.Join(root, "runtimes", "opencode", "agents")
+	agentsDir := filepath.Join(root, "clients", "opencode", "agents")
 
 	for _, profile := range areaProfiles {
 		filePath := filepath.Join(agentsDir, profile.file)

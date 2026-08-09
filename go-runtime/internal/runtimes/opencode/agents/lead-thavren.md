@@ -1,8 +1,8 @@
 ---
 name: Thavren
 description: ✦ Platform Engineering Lead · Runtime · Security · CLI
-mode: subagent
-hidden: false
+mode: lead
+hidden: true
 color: "#83a598"
 # OVAV_PERMISSION_AUTHORITY: .ovav/policy/permission_authority.json
 permission:
