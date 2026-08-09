@@ -1,0 +1,50 @@
+#!/bin/bash
+# =============================================================================
+# OVAV Commit Identity System — Smart Commit Script
+# =============================================================================
+# Usage: ovav-commit [options]
+# Detects lead identity from OVAV_ACTIVE_LEAD env or interactive selection
+# Signs commits with SSH key and adds OVAV metadata trailers
+# =============================================================================
+
+set -e
+
+OVAV_IDENTITY_DIR="${OVAV_IDENTITY_DIR:-$HOME/.config/ovav}"
+IDENTITIES_FILE="$OVAV_IDENTITY_DIR/identities.json"
+KEYS_DIR="$OVAV_IDENTITY_DIR/keys"
+
+# Load identity for a lead
+load_identity() {
+    local lead="$1"
+    local name=$(grep -o "\"$lead\":.*\"name\": *\"\([^\"]*\)\"" "$IDENTITIES_FILE" 2>/dev/null | head -1 | sed 's/.*"name": *"\([^"]*\)"/\1/')
+    local email=$(grep -o "\"$lead\":.*\"email\": *\"\([^\"]*\)\"" "$IDENTITIES_FILE" 2>/dev/null | head -1 | sed 's/.*"email": *"\([^"]*\)\"/\1/')
+    local area=$(grep -o "\"$lead\":.*\"area\": *\"\([^\"]*\)\"" "$IDENTITIES_FILE" 2>/dev/null | head -1 | sed 's/.*"area": *"\([^"]*\)"/\1/')
+    local key="$KEYS_DIR/ovav-lead-${lead}_ed25519"
+
+    if [ -z "$name" ]; then
+        echo "ERROR: Lead '$lead' not found in $IDENTITIES_FILE" >&2
+        return 1
+    fi
+
+    export GIT_AUTHOR_NAME="$name"
+    export GIT_AUTHOR_EMAIL="$email"
+    export GIT_COMMITTER_NAME="$name"
+    export GIT_COMMITTER_EMAIL="$email"
+
+    git config --local user.name "$name"
+    git config --local user.email "$email"
+
+    if [ -f "$key" ]; then
+        git config --local user.signingkey "$key"
+        echo "Using signing key: $key"
+    fi
+
+    echo "Identity loaded: $name <$email> [$area]"
+}
+
+# Auto-detect lead from environment
+LEAD="${OVAV_ACTIVE_LEAD:-thavren}"
+load_identity "$LEAD"
+
+# Pass through to git commit with all arguments
+exec git commit -S "$@"
