@@ -37,12 +37,15 @@ import (
 // cmdConvert handles `ovav convert` — projection from canonical source to deploy.
 func cmdConvert(args []string) int {
 	verbose := false
+	force := false
 	target := ""
 
 	for _, arg := range args {
 		switch arg {
 		case "-v", "--verbose":
 			verbose = true
+		case "-f", "--force":
+			force = true
 		case "--agents":
 			target = "agents"
 		case "--skills":
@@ -76,7 +79,7 @@ func cmdConvert(args []string) int {
 	// Handle inject after root is found
 	for _, arg := range args {
 		if arg == "--inject" {
-			return injectConfigs(root, verbose)
+			return injectConfigs(root, verbose, force)
 		}
 	}
 
@@ -130,6 +133,8 @@ Usage:
   ovav convert --visual    Project visual assets (theme, plugins)
   ovav convert --status     Show conversion status
   ovav convert --list      List all projectors
+  ovav convert --inject    Inject configs to user home (~/.config, Windows paths)
+  ovav convert --inject -f Inject configs (overwrite existing)
   ovav convert -v           Verbose output
 
 Canonical Source → Deploy Target:
@@ -137,7 +142,13 @@ Canonical Source → Deploy Target:
   .ovav/source/harnesses/ → go-runtime/internal/testing/harnesses/
   .ovav/source/programs/  → .github/workflows/
   .ovav/source/skills/    → .opencode/skills/
-  .ovav/visual/           → .opencode/themes/, .opencode/plugins/`)
+  .ovav/visual/           → .opencode/themes/, .opencode/plugins/
+
+Environment Detection (--inject):
+  windows-wsl: WezTerm → C:\Users\<user>\.wezterm.lua
+                  Windows Terminal → AppData\Local\Packages\...
+  windows:   Native Windows paths
+  linux:     ~/.config/ paths`)
 }
 
 func listProjectors() int {
@@ -282,7 +293,7 @@ func copyFile(src, dst string) error {
 
 // injectConfigs deploys OVAV configs to user home directories.
 // It detects the environment (WSL, Linux, Windows) and copies configs accordingly.
-func injectConfigs(root string, verbose bool) int {
+func injectConfigs(root string, verbose bool, force bool) int {
 	if root == "" {
 		var err error
 		root, err = findOvavRoot()
@@ -325,9 +336,15 @@ func injectConfigs(root string, verbose bool) int {
 		}
 
 		// Check if destination exists
+		dstExists := false
 		if _, err := os.Stat(dst); err == nil {
+			dstExists = true
+		}
+
+		// Skip if exists and not force
+		if dstExists && !force {
 			if verbose {
-				fmt.Printf("  ⏭ %s: already exists at %s\n", injection.name, dst)
+				fmt.Printf("  ⏭ %s: already exists at %s (use --force to overwrite)\n", injection.name, dst)
 			}
 			continue
 		}
@@ -339,7 +356,11 @@ func injectConfigs(root string, verbose bool) int {
 		}
 
 		injected++
-		fmt.Printf("  ✅ %s → %s\n", injection.name, dst)
+		action := "injected"
+		if dstExists {
+			action = "updated"
+		}
+		fmt.Printf("  ✅ %s: %s → %s\n", injection.name, action, dst)
 	}
 
 	fmt.Println()
@@ -363,24 +384,32 @@ func getInjectTargets(env string) []injectionTarget {
 	switch env {
 	case "windows-wsl":
 		return []injectionTarget{
-			// WezTerm config → ~/.wezterm.lua
-			{"wezterm", "wezterm/config.lua", filepath.Join(home, ".wezterm.lua")},
+			// WezTerm config → Windows user's .wezterm.lua
+			// Path: /mnt/c/Users/<username>/.wezterm.lua
+			{"wezterm-windows", "wezterm/wezterm.lua", "/mnt/c/Users/Alexa/.wezterm.lua"},
+			// WezTerm config → WSL home (for WSL native wezterm)
+			{"wezterm-wsl", "wezterm/wezterm.lua", filepath.Join(home, ".wezterm.lua")},
 			// Fish config → ~/.config/fish/
 			{"fish", "fish/config.fish", filepath.Join(home, ".config", "fish", "config.fish")},
 			{"fish-aliases", "commands/aliases.fish", filepath.Join(home, ".config", "fish", "aliases.fish")},
 			// Git config → ~/.gitconfig
 			{"git", "git/gitconfig", filepath.Join(home, ".gitconfig")},
-			// Theme
+			// Theme → WSL wezterm dir
 			{"theme-wezterm", "theme/auto.wezterm.lua", filepath.Join(home, ".config", "wezterm", "theme.lua")},
+			// Windows Terminal settings (from WSL)
+			{"windows-terminal", "windows-terminal/settings.json",
+				"/mnt/c/Users/Alexa/AppData/Local/Packages/Microsoft.WindowsTerminal_8wekyb3d8bbwe/LocalState/settings.json"},
 		}
 	case "windows":
 		return []injectionTarget{
+			// WezTerm config
+			{"wezterm", "wezterm/wezterm.lua", filepath.Join(os.Getenv("USERPROFILE"), ".wezterm.lua")},
 			// Windows Terminal settings
 			{"windows-terminal", "windows-terminal/settings.json",
 				filepath.Join(os.Getenv("LOCALAPPDATA"), "Packages",
 					"Microsoft.WindowsTerminal_8wekyb3d8bbwe", "LocalState", "settings.json")},
 			// Git config
-			{"git", "git/gitconfig", filepath.Join(home, ".gitconfig")},
+			{"git", "git/gitconfig", filepath.Join(os.Getenv("USERPROFILE"), ".gitconfig")},
 		}
 	case "linux":
 		return []injectionTarget{
