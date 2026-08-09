@@ -77,32 +77,26 @@ local P = {
 }
 
 -- ═══════════════════════════════════════════════════════════════════════════════
--- WORKSPACES — Windows paths (PowerShell-compatible)
+-- WORKSPACES — WSL2 paths (no Nerd Font icons, ASCII fallback)
 -- ═══════════════════════════════════════════════════════════════════════════════
 local WORKSPACES = {
   home = {
-    key = '1', label = 'HOME', icon = '󰉋',
+    key = '1', label = 'HOME', icon = '[H]',
     accent = '#7eb77f', accent_dim = '#1e2a1e',
-    cwd = os.getenv('USERPROFILE') or 'C:\\Users\\Alex',
-    prefixes = { 'C:\\Users\\Alex', os.getenv('USERPROFILE') or 'C:\\Users\\Alex' },
+    cwd = '/home/braka',
+    prefixes = { '/home/braka' },
   },
   system = {
-    key = '2', label = 'SYS', icon = '󰒓',
+    key = '2', label = 'SYS', icon = '[S]',
     accent = '#d4a85c', accent_dim = '#25281e',
-    cwd = 'C:\\Windows',
-    prefixes = { 'C:\\Windows', 'C:\\Program Files', 'C:\\ProgramData' },
-  },
-  dev = {
-    key = '3', label = 'DEV', icon = '󰲋',
-    accent = '#5a7d8a', accent_dim = '#1e2528',
-    cwd = os.getenv('USERPROFILE') .. '\\dev' or 'C:\\Users\\Alex\\dev',
-    prefixes = { 'C:\\Users\\Alex\\dev', os.getenv('USERPROFILE') .. '\\dev' or 'C:\\Users\\Alex\\dev' },
+    cwd = '/home/braka/.config',
+    prefixes = { '/home/braka/.config' },
   },
   ovav = {
-    key = '4', label = 'OVAV', icon = '󱚣',
+    key = '3', label = 'OVAV', icon = '[O]',
     accent = '#c47d8a', accent_dim = '#281e22',
-    cwd = 'C:\\Systems\\OVAV',
-    prefixes = { 'C:\\Systems\\OVAV', 'C:\\Systems' },
+    cwd = '/home/braka/Systems/OVAV',
+    prefixes = { '/home/braka/Systems/OVAV' },
   },
 }
 
@@ -127,13 +121,12 @@ end
 
 local function abbrev_path(cwd)
   if not cwd then return '' end
-  -- Windows path normalization
-  local home = os.getenv('USERPROFILE') or 'C:\\Users\\Alex'
-  if cwd == home then return '~' end
-  if starts_with(cwd, home) then
-    return '~' .. cwd:sub(#home + 1):gsub('\\', '/')
+  -- WSL/Linux path normalization
+  if cwd == '/home/braka' then return '~' end
+  if starts_with(cwd, '/home/braka') then
+    return '~' .. cwd:sub(#'/home/braka' + 1)
   end
-  return cwd:gsub('\\', '/'):gsub('^%a:', '')
+  return cwd
 end
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -159,16 +152,6 @@ local WS_COLORS = {
     selection_bg = '#353820',
     ansi = { '#25281e', '#d4756b', '#7eb77f', '#c4a65a', '#6d9bc3', '#c47d8a', '#5a7d8a', '#d4d4d4' },
     brights = { '#353820', '#d4756b', '#7eb77f', '#c4a65a', '#6d9bc3', '#c47d8a', '#6d9b8e', '#e8e8e8' },
-  },
-  dev = {
-    foreground = '#d4d4d4',
-    background = '#1e2528',
-    cursor_bg = '#5a7d8a',
-    cursor_fg = '#1e2528',
-    cursor_border = '#5a7d8a',
-    selection_bg = '#2d3538',
-    ansi = { '#1e2528', '#d4756b', '#7eb77f', '#c4a65a', '#6d9bc3', '#c47d8a', '#5a7d8a', '#d4d4d4' },
-    brights = { '#2d3538', '#d4756b', '#7eb77f', '#c4a65a', '#6d9bc3', '#c47d8a', '#6d9b8e', '#e8e8e8' },
   },
   ovav = {
     foreground = '#d4d4d4',
@@ -386,9 +369,6 @@ config.keys = {
     switch_workspace(w, p, 'system')
   end) },
   { key = '3', mods = 'ALT', action = wezterm.action_callback(function(w, p)
-    switch_workspace(w, p, 'dev')
-  end) },
-  { key = '4', mods = 'ALT', action = wezterm.action_callback(function(w, p)
     switch_workspace(w, p, 'ovav')
   end) },
 
