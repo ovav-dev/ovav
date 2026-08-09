@@ -190,8 +190,20 @@ local function switch_workspace(window, pane, ws_name)
   if not ws then return end
   wezterm.GLOBAL.ovav_workspace = ws_name
   apply_ws_colors(window, ws_name)
-  -- Spawn a new tab in WSL domain with the workspace's CWD
-  -- Use cd in the command since cwd param may not work for WSL domains
+
+  -- Check if this workspace tab already exists, switch to it
+  local mux = wezterm.mux
+  local all_tabs = mux.all_tabs()
+  for idx, tab_obj in ipairs(all_tabs) do
+    local tid = tostring(tab_obj.tab_id)
+    if wezterm.GLOBAL['ovav_tab_ws_' .. tid] == ws_name then
+      -- Switch to existing workspace tab (0-indexed)
+      window:perform_action(act.ActivateTab(idx - 1), pane)
+      return
+    end
+  end
+
+  -- No existing tab for this workspace - spawn new one
   window:perform_action(act.SpawnCommandInNewTab({
     domain = { DomainName = 'WSL:Ubuntu-24.04' },
     args = { 'fish', '-c', 'cd ' .. ws.cwd .. ' && fish -l' },
@@ -246,13 +258,13 @@ wezterm.on('update-status', function(window, pane)
   local ws = WORKSPACES[ws_name] or WORKSPACES['home']
 
   local right = {
-    { Foreground = { Color = P.surface1 } }, { Text = '' },
+    { Foreground = { Color = P.surface1 } }, { Text = '[' },
     { Background = { Color = P.surface1 } },
     { Foreground = { Color = ws.accent } }, { Text = ws.icon .. ' ' },
-    { Foreground = { Color = P.fg } }, { Text = ws.label .. '  ' },
-    { Foreground = { Color = P.fg_dim } }, { Text = wezterm.strftime('%H:%M') .. '  ' },
+    { Foreground = { Color = P.fg } }, { Text = ws.label .. ' ' },
+    { Foreground = { Color = P.fg_dim } }, { Text = wezterm.strftime('%H:%M') },
     { Background = { Color = P.bg } },
-    { Foreground = { Color = P.surface1 } }, { Text = '' },
+    { Foreground = { Color = P.surface1 } }, { Text = ']' },
   }
   window:set_right_status(wezterm.format(right))
   window:set_left_status('')
@@ -324,9 +336,10 @@ config.wsl_domains = {
 -- Use WSL domain by default for new tabs/pane spawns
 config.default_domain = 'WSL:Ubuntu-24.04'
 
--- gui-startup: wezterm on Windows always starts with cmd.exe pane.
--- Workaround: spawn WSL pane, then user can close the cmd.exe pane manually.
--- New tabs (Ctrl+T) will use the WSL domain by default.
+-- gui-startup: no special handling needed - wezterm on Windows starts with cmd.exe
+-- The first cmd.exe tab will be visible. User can close it manually or use ALT+1/2/3
+-- to spawn WSL tabs. The switch_workspace function now checks for existing tabs
+-- and doesn't accumulate duplicates.
 
 
 
