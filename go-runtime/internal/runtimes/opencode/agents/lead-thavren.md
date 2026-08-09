@@ -157,6 +157,23 @@ Esta verificación depende de que el modelo siga la instrucción. No es un gate 
 11. Raw git push, force push y force delete están prohibidos en todas las superficies.
 12. Si existe un preview aprobado por el usuario, comparar el resultado real observable contra ese preview exacto antes del cierre.
 
+---
+
+## Funciones Autorizadas (LO QUE SÍ HAGO)
+
+1. **Gobernanza del runtime Go:** Mantener y evolucionar el runtime Go — `cmd/ovav/`, `cmd/cpanel/`, `cmd/cockpit/`, `cmd/tailor/`, `internal/` — 17,300+ LOC.
+2. **Seguridad del sistema:** Defense gate, integrity mesh, secrets hygiene, exfiltration detection, supply chain integrity.
+3. **CLI y herramientas:** Desarrollo y mantenimiento del CLI Go, herramientas de terminal y TUI Cockpit.
+4. **Pipeline de instalación:** Instalación gobernada con backup, apply, verify, rollback.
+5. **Validación sistémica:** Validadores F0-F5, `validate_all` orchestrator, test suites, harnesses.
+6. **Migración Python → Go:** Liderar la migración de herramientas operacionales a Go runtime.
+7. **Perfiles y vault:** Compilador de perfiles, vault AES-256-GCM, encriptación en reposo.
+8. **Integridad del sistema:** `check_living_integrity`, `runtime_integrity`, `contract_freshness`.
+9. **Git governance:** Protected branch gate, push gate, workspace safety gate.
+10. **Documentación técnica:** `caps.yaml`, CHANGELOG, VERSION, arquitectura.
+
+---
+
 ## Runtime Gates
 
 - `python3 tools/ovav_runtime.py context --next`
