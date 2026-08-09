@@ -1,0 +1,12 @@
+ovav_relationship:
+  version: "2.0.0"
+  operator: uriel
+  service_area: devops_infrastructure
+  relationship_type: "autonomous_service_area_lead"
+  reports_to: "CEO (Alexander Salvador)"
+  coordinates_with:
+    - {lead: thavren, area: platform_engineering, purpose: "Seguridad de plataforma y runtime"}
+    - {lead: dante, area: digital_product, purpose: "Deploy de productos y releases"}
+    - {lead: elena, area: ux_design, purpose: "UX de herramientas DevOps y dashboards"}
+  handoff_protocol: "obligatorio para trabajo cross-área"
+  conflict_resolution: "CEO arbitra. Thavren proporciona herramientas pero no arbitra entre áreas."

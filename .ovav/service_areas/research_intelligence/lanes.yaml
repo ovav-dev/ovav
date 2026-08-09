@@ -1,0 +1,93 @@
+# Research Intelligence — Service Lanes
+# v1.0.0
+
+lanes:
+  version: "1.0.0"
+  area: research_intelligence
+  lead: eidren
+
+  definitions:
+    - id: evidence_benchmarks
+      name: "Evidence & Benchmarks"
+      description: "Verificación de fuentes, scoring de evidencia, comparativas técnicas."
+      operator: eidren
+      delegate: Nara
+      tools:
+        - evidence_scorer.py
+        - benchmark_engine.py
+        - source_verifier.py
+      artifacts:
+        - SOURCE_MAP.md
+        - EVIDENCE_REVIEW.md
+      risk_level: low
+      mutations: none
+
+    - id: decision_support
+      name: "Decision Support"
+      description: "Decision briefs, recomendaciones accionables, análisis comparativo."
+      operator: eidren
+      delegate: null
+      tools:
+        - decision_brief_builder.py
+        - research_artifact_writer.py
+      artifacts:
+        - DECISION_BRIEF.md
+        - RESEARCH_SCOPE.md
+      risk_level: low
+      mutations: none
+
+    - id: continuity_synthesis
+      name: "Continuity Synthesis"
+      description: "Síntesis de investigación, handoffs cross-area, condensación de evidencia."
+      operator: eidren
+      delegate: Lyra
+      tools:
+        - research_context_optimizer.py
+      artifacts:
+        - handoff artifacts
+      risk_level: low
+      mutations: none
+
+    - id: research_pipeline
+      name: "Research Pipeline"
+      description: "Pipeline completo de investigación con gates de seguridad."
+      operator: eidren
+      delegate: null
+      tools:
+        - research_pipeline_runner.py
+        - research_sandbox_gate.py
+        - research_intelligence_session_rc.py
+      artifacts:
+        - pipeline reports
+      risk_level: medium
+      mutations: none
+
+    - id: cross_area_research
+      name: "Cross-Area Research"
+      description: "Investigación interna de OVAV vía handoff sanitizado de Platform Engineering."
+      operator: eidren
+      delegate: null
+      tools:
+        - handoff_protocol.py
+      artifacts:
+        - sanitized handoff
+      risk_level: medium
+      mutations: none
+
+  routing:
+    default_lane: evidence_benchmarks
+    task_based_routing:
+      benchmark: evidence_benchmarks
+      compare: evidence_benchmarks
+      verify: evidence_benchmarks
+      evidence: evidence_benchmarks
+      decide: decision_support
+      recommend: decision_support
+      brief: decision_support
+      summarize: continuity_synthesis
+      synthesize: continuity_synthesis
+      handoff: continuity_synthesis
+      research: research_pipeline
+      pipeline: research_pipeline
+      internal: cross_area_research
+      ovav_internal: cross_area_research

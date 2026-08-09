@@ -1,0 +1,8 @@
+{
+  "available": true,
+  "version": "v2026.06.03-1004",
+  "timestamp": "2026-06-03T10:04:59Z",
+  "component": "visual",
+  "message": "\ud83c\udfa8 OVAV Visual vv2026.06.03-1004 disponible. Ejecut\u00e1 'ovav update' para aplicar.",
+  "release_dir": ".ovav/forge/releases/opencode/v2026.06.03-1004"
+}

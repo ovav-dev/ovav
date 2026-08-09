@@ -1,0 +1,32 @@
+work_ledger:
+  event_template:
+    event_id: ""
+    timestamp: ""
+    service_profile: ""
+    lead: ""
+    lane: ""
+    phase: ""
+    artifacts: []
+    evidence: []
+    risks: []
+    next_action: ""
+    memory_write: false
+    user_response_summary: ""
+  required_fields:
+    - event_id
+    - timestamp
+    - service_profile
+    - lead
+    - lane
+    - phase
+    - artifacts
+    - evidence
+    - risks
+    - next_action
+    - memory_write
+    - user_response_summary
+  status_values:
+    - planned
+    - in_progress
+    - blocked
+    - complete

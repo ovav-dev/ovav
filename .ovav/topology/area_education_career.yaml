@@ -1,0 +1,95 @@
+# Education & Career Development — Topology Contract
+# Área de servicio profesional OVAV
+# Este archivo define la jerarquía, delegación y reglas de visibilidad.
+
+area:
+  name: Education & Training
+  id: area_education_career
+  description: "◆ Área de servicio · Aprendizaje personalizado · Currículos adaptativos · Formación profesional"
+  scope:
+    - personalized_learning
+    - adaptive_curricula
+    - professional_training
+    - career_development
+    - knowledge_engineering
+    - assessment_testing
+    - tutoring_scaffolding
+    - content_creation
+    - bias_detection_mitigation
+    - mentorship
+
+lead:
+  role_id: education_career_lead
+  name: Valeria
+  canonical: .ovav/source/agents/leads/valeria.md
+  agent_file: lead-valeria.md
+  mode: subagent
+  visible_in_at: true
+  description: "✦ Education & Career Development Lead · Mentoría · Currículo · Crecimiento profesional"
+  voice: primary_user_facing
+  tone: warm_pedagogical_evidence_based
+
+squads:
+  - name: Beatriz
+    canonical: .ovav/source/agents/teams/education-career/beatriz.md
+    agent_file: team-beatriz.md
+    role: learning_scientist
+    description: "Estrategia pedagógica, validación de resultados, ciencia del aprendizaje"
+    can_delegate_to: []
+
+  - name: Carmen
+    canonical: .ovav/source/agents/teams/education-career/carmen.md
+    agent_file: team-carmen.md
+    role: knowledge_engineer
+    description: "Mapas de conocimiento, cadenas de prerrequisitos"
+    can_delegate_to: []
+
+  - name: Sandra
+    canonical: .ovav/source/agents/teams/education-career/sandra.md
+    agent_file: team-sandra.md
+    role: assessment_engineer
+    description: "Tests adaptativos, estimación de maestría"
+    can_delegate_to: []
+
+  - name: Felipe
+    canonical: .ovav/source/agents/teams/education-career/felipe.md
+    agent_file: team-felipe.md
+    role: tutoring_designer
+    description: "Flujos de conversación, pistas, scaffolding"
+    can_delegate_to: []
+
+  - name: Gael
+    canonical: .ovav/source/agents/teams/education-career/gael.md
+    agent_file: team-gael.md
+    role: content_creator
+    description: "Materiales de aprendizaje, ejercicios, proyectos"
+    can_delegate_to: []
+
+  - name: Alicia
+    canonical: .ovav/source/agents/teams/education-career/alicia.md
+    agent_file: team-alicia.md
+    role: bias_auditor
+    description: "Detección de sesgo, equidad, seguridad en contenido educativo"
+    can_delegate_to: []
+
+  - name: Teo
+    canonical: .ovav/source/agents/teams/education-career/teo.md
+    agent_file: team-teo.md
+    role: career_analyst
+    description: "Mercado laboral, taxonomía de habilidades, tendencias de carrera"
+    can_delegate_to: []
+
+delegation_rules:
+  max_depth: 2
+  cross_squad: false
+  require_lead_approval_for:
+    - certification_issuance
+    - curriculum_changes
+    - public_educational_content
+    - career_path_recommendations
+
+visibility_contract:
+  at_mentions: [Valeria]
+  tab_selector: [Education & Training]
+  default_agent: Education & Training
+  hidden_from_user: [Beatriz, Carmen, Sandra, Felipe, Gael, Alicia, Teo]

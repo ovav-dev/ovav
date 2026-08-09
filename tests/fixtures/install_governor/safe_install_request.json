@@ -1,0 +1,6 @@
+{
+  "pack_id": "ovav_source_runtime_pack",
+  "mode": "dry-run",
+  "expected_risk": "user-local-risk",
+  "expected_safety_status": "review_required"
+}

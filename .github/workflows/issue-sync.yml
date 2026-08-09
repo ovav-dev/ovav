@@ -1,0 +1,238 @@
+name: OVAV Issue Sync
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# TRIGGERS
+# ═══════════════════════════════════════════════════════════════════════════════
+# OVAV → GitHub: push with .ovav/issues/*.md changes
+# GitHub → OVAV: issue events (opened/closed/edited)
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - '.ovav/issues/*.md'
+  issues:
+    types: [opened, closed, edited]
+  workflow_dispatch:
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# PERMISSIONS
+# ═══════════════════════════════════════════════════════════════════════════════
+permissions:
+  contents: write   # needed to commit INDEX.md changes back
+  issues: write     # needed to create/edit/close issues
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# JOBS
+# ═══════════════════════════════════════════════════════════════════════════════
+jobs:
+  # ═══════════════════════════════════════════════════════════════════════════
+  # OVAV → GitHub: sync .ovav/issues/*.md files to GitHub issues
+  # Triggered by: push to .ovav/issues/*.md files
+  # ═══════════════════════════════════════════════════════════════════════════
+  ovav-to-github:
+    name: OVAV Issues → GitHub
+    runs-on: ubuntu-latest
+    # Only run on push events (not issue events, handled by separate job)
+    if: github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check auth
+        run: |
+          gh auth status || { echo "❌ Not authenticated with GitHub CLI"; exit 1; }
+          echo "✅ Authenticated as: $(gh api user --jq '.login')"
+
+      - name: Sync OVAV issues to GitHub
+        env:
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          for f in .ovav/issues/ISSUE-*.md; do
+            [ -f "$f" ] || continue
+            [ "$(basename "$f")" = "INDEX.md" ] && continue
+
+            ISSUE_ID="$(basename "$f" .md)"
+
+            # Extract metadata
+            TITLE=$(head -1 "$f" | sed 's/^# //')
+            # Extract first line of status value (handles emojis, spaces, parens)
+            STATUS=$(grep -oP '^\*\*Status:\*\* \K.+' "$f" | sed 's/^\s*//' | cut -c1-30 || echo "open")
+            BODY=$(tail -n +2 "$f")
+
+            # GitHub issue number from cross-reference
+            GH_NUM=$(grep -oP 'GitHub issue #\K[0-9]+' "$f" || echo "")
+
+            echo "Processing: $ISSUE_ID | Status: $STATUS | GH#: ${GH_NUM:-none}"
+
+            # Determine GitHub state from status string
+            # Status examples: ✅ RESOLVED, 🆕 OPEN, 🔴 PENDING, open, closed
+            echo "  Status parsed: '$STATUS'"
+            case "$STATUS" in
+              *"RESOLVED"*|*"FIXED"*|*"✅"*)
+                WANT_STATE="closed"
+                ;;
+              *)
+                WANT_STATE="open"
+                ;;
+            esac
+
+            if [ -n "$GH_NUM" ]; then
+              # Issue already has a GitHub number — update it
+              CURRENT_STATE=$(gh issue view "$GH_NUM" --json state --jq '.state' 2>/dev/null || echo "unknown")
+
+              echo "  GH #$GH_NUM current_state=$CURRENT_STATE want_state=$WANT_STATE"
+
+              if [ "$CURRENT_STATE" != "$WANT_STATE" ]; then
+                if [ "$WANT_STATE" = "closed" ]; then
+                  echo "  → Closing GH #$GH_NUM"
+                  gh issue close "$GH_NUM" \
+                    --comment "Closed via OVAV issue sync: status set to RESOLVED in .ovav/issues/$ISSUE_ID.md" \
+                    || echo "  ⚠️ Failed to close #$GH_NUM"
+                else
+                  echo "  → Reopening GH #$GH_NUM"
+                  gh issue reopen "$GH_NUM" \
+                    --comment "Reopened via OVAV issue sync: status changed in .ovav/issues/$ISSUE_ID.md" \
+                    || echo "  ⚠️ Failed to reopen #$GH_NUM"
+                fi
+              fi
+
+              # Always update title/body in case they changed
+              echo "  → Updating title/body"
+              gh issue edit "$GH_NUM" \
+                --title "$TITLE" \
+                --body "$BODY" \
+                || echo "  ⚠️ Failed to edit #$GH_NUM"
+
+            else
+              # No GitHub number yet — create new issue
+              echo "  → Creating new GitHub issue"
+              NEW_URL=$(gh issue create \
+                --title "$TITLE" \
+                --body "$BODY" \
+                --label "enhancement" \
+                2>&1) || { echo "  ⚠️ Failed to create: $NEW_URL"; continue; }
+
+              NEW_NUM=$(echo "$NEW_URL" | grep -oP '[0-9]+$')
+              echo "  ✅ Created GH #$NEW_NUM"
+
+              # Add GitHub cross-reference to OVAV file
+              if [ -n "$NEW_NUM" ]; then
+                # Insert GitHub reference line after the "Cross-reference" line
+                sed -i "s|Cross-reference:.*|Cross-reference: [#$NEW_NUM](https://github.com/$REPO/issues/$NEW_NUM)|" "$f"
+                echo "  → Updated OVAV file with GH reference"
+              fi
+            fi
+          done
+
+      - name: Regenerate INDEX.md
+        run: |
+          set -euo pipefail
+
+          {
+            echo "# OVAV Issues Index"
+            echo ""
+            echo "| ID | Title | Status | GitHub |"
+            echo "|---|---|---|---|"
+          } > .ovav/issues/INDEX.md.new
+
+          for f in .ovav/issues/ISSUE-*.md; do
+            [ -f "$f" ] || continue
+            ISSUE_ID="$(basename "$f" .md)"
+            TITLE=$(head -1 "$f" | sed 's/^# //' | cut -c1-55)
+            STATUS=$(grep -oP '^\*\*Status:\*\* \K.+' "$f" | sed 's/^\s*//' | cut -c1-20 || echo "open")
+            GH_NUM=$(grep -oP 'GitHub issue #\K[0-9]+' "$f" || echo "")
+
+            if [ -n "$GH_NUM" ]; then
+              echo "| $ISSUE_ID | $TITLE | $STATUS | [#$GH_NUM](#$GH_NUM) |" >> .ovav/issues/INDEX.md.new
+            else
+              echo "| $ISSUE_ID | $TITLE | $STATUS | — |" >> .ovav/issues/INDEX.md.new
+            fi
+          done
+
+          mv .ovav/issues/INDEX.md.new .ovav/issues/INDEX.md
+          echo "✅ INDEX.md regenerated ($(wc -l < .ovav/issues/INDEX.md) lines)"
+
+      - name: Commit INDEX.md update if changed
+        run: |
+          if git diff --quiet .ovav/issues/INDEX.md; then
+            echo "No changes to INDEX.md"
+          else
+            git config user.email "ci@ovav.systems"
+            git config user.name "OVAV CI"
+            git add .ovav/issues/INDEX.md
+            git commit -m "chore: auto-regenerate INDEX.md [issue-sync]" || echo "No commit needed"
+            echo "✅ INDEX.md committed"
+          fi
+
+          git status --short
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # GitHub → OVAV: update OVAV files when GitHub issues are closed
+  # Triggered by: GitHub issue events
+  # ═══════════════════════════════════════════════════════════════════════════
+  github-to-ovav:
+    name: GitHub Issues → OVAV
+    runs-on: ubuntu-latest
+    # Only run on issue events (not push events)
+    if: github.event_name == 'issues'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Handle GitHub issue event
+        env:
+          GH_NUM: ${{ github.event.issue.number }}
+          GH_ACTION: ${{ github.event.action }}
+          GH_TITLE: ${{ github.event.issue.title }}
+          GH_STATE: ${{ github.event.issue.state }}
+          GH_REPO: ${{ github.repository }}
+          OVAV_DIR: .ovav/issues
+        run: |
+          set -euo pipefail
+
+          echo "GitHub issue #$GH_NUM | action=$GH_ACTION | state=$GH_STATE"
+          echo "Repo: $GH_REPO"
+
+          # Search OVAV files for this GitHub issue number
+          MATCH_FILE=""
+          for f in "$OVAV_DIR"/ISSUE-*.md; do
+            [ -f "$f" ] || continue
+            if grep -q "GitHub issue #$GH_NUM\|#$GH_NUM\b" "$f"; then
+              MATCH_FILE="$f"
+              break
+            fi
+          done
+
+          if [ -z "$MATCH_FILE" ]; then
+            echo "No OVAV counterpart found for GH #$GH_NUM — nothing to update"
+            exit 0
+          fi
+
+          echo "Found OVAV counterpart: $MATCH_FILE"
+
+          case "$GH_STATE" in
+            closed)
+              echo "→ Issue closed — marking RESOLVED in OVAV file"
+              # Update status: replace current status with resolved marker
+              sed -i \
+                's/\*\*Status:\*\*.*$/**Status:** ✅ RESOLVED (GitHub #'"$GH_NUM"') — '"$(date -u +%Y-%m-%d)"'/' \
+                "$MATCH_FILE"
+              echo "✅ Status updated to RESOLVED"
+              ;;
+            open)
+              echo "→ Issue reopened — marking OPEN in OVAV file"
+              sed -i \
+                's/\*\*Status:\*\*.*$/**Status:** 🆕 OPEN (GitHub #'"$GH_NUM"' reopened)/' \
+                "$MATCH_FILE"
+              echo "✅ Status updated to OPEN"
+              ;;
+          esac
+
+          # Stage the updated file
+          git config user.email "ci@ovav.systems"
+          git config user.name "OVAV CI"
+          git add "$MATCH_FILE"
+          git commit -m "chore: sync GH #$GH_NUM state → OVAV [issue-sync]" || true
+          echo "✅ OVAV file committed"
+
+          git status --short

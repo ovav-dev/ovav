@@ -1,0 +1,102 @@
+# Health & Performance Science — Topology Contract
+# Área de servicio profesional OVAV
+# Este archivo define la jerarquía, delegación y reglas de visibilidad.
+
+area:
+  name: Sports Science
+  id: area_health_performance
+  description: "◆ Área de servicio · Nutrición · Fitness · Ciencia Médica · Planes personalizados"
+  scope:
+    - sports_nutrition
+    - exercise_physiology
+    - clinical_research
+    - meal_plan_design
+    - supplementation
+    - sleep_recovery
+    - mental_performance
+    - progress_tracking
+    - patient_privacy
+    - scientific_validation
+
+lead:
+  role_id: health_performance_lead
+  name: Renata
+  canonical: .ovav/source/agents/leads/renata.md
+  agent_file: lead-renata.md
+  mode: subagent
+  visible_in_at: true
+  description: "✦ Health & Performance Science Lead · Nutrición · Fitness · Ciencia Médica"
+  voice: primary_user_facing
+  tone: scientific_warm_evidence_first
+
+squads:
+  - name: Rubén
+    canonical: .ovav/source/agents/teams/health-performance/ruben.md
+    agent_file: team-ruben.md
+    role: sports_nutritionist
+    description: "Nutrición deportiva, periodización, composición corporal"
+    can_delegate_to: []
+
+  - name: Silvia
+    canonical: .ovav/source/agents/teams/health-performance/silvia.md
+    agent_file: team-silvia.md
+    role: exercise_physiologist
+    description: "Fisiología del ejercicio, programación de entrenamiento"
+    can_delegate_to: []
+
+  - name: Marina
+    canonical: .ovav/source/agents/teams/health-performance/marina.md
+    agent_file: team-marina.md
+    role: medical_researcher
+    description: "Investigación clínica, revisión de literatura, estudios"
+    can_delegate_to: []
+
+  - name: Antonio
+    canonical: .ovav/source/agents/teams/health-performance/antonio.md
+    agent_file: team-antonio.md
+    role: meal_plan_designer
+    description: "Diseño de planes de alimentación personalizados"
+    can_delegate_to: []
+
+  - name: León
+    canonical: .ovav/source/agents/teams/health-performance/leon.md
+    agent_file: team-leon.md
+    role: supplementation_specialist
+    description: "Suplementación basada en evidencia, dosificación, timing"
+    can_delegate_to: []
+
+  - name: Luna
+    canonical: .ovav/source/agents/teams/health-performance/luna.md
+    agent_file: team-luna.md
+    role: sleep_recovery_specialist
+    description: "Sueño, recuperación, cronobiología, carga de entrenamiento"
+    can_delegate_to: []
+
+  - name: Bruno
+    canonical: .ovav/source/agents/teams/health-performance/bruno.md
+    agent_file: team-bruno.md
+    role: mental_performance_coach
+    description: "Rendimiento mental, psicología deportiva, mindfulness"
+    can_delegate_to: []
+
+  - name: Fátima
+    canonical: .ovav/source/agents/teams/health-performance/fatima.md
+    agent_file: team-fatima.md
+    role: progress_tracker
+    description: "Seguimiento de progreso, métricas, adherence, ajustes"
+    can_delegate_to: []
+
+delegation_rules:
+  max_depth: 2
+  cross_squad: false
+  require_lead_approval_for:
+    - clinical_recommendations
+    - supplementation_protocols
+    - medical_diagnosis
+    - patient_data_handling
+
+visibility_contract:
+  at_mentions: [Renata]
+  tab_selector: [Sports Science]
+  default_agent: Sports Science
+  hidden_from_user: [Rubén, Silvia, Marina, Antonio, León, Luna, Bruno, Fátima]

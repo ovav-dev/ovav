@@ -1,0 +1,543 @@
+skill_rule_packs:
+  runtime_governance_seed:
+    id: runtime_governance_seed
+    owner_profile: ovav_systems_architect
+    owner_lane: runtime_governance
+    provenance: registry_seed
+    trigger: on_runtime_governance_action
+    allowed_inputs:
+    - project_context
+    - registry_snapshot
+    denied_inputs:
+    - secrets
+    - direct_memory_write_request
+    - policy_override_request
+    required_artifacts:
+    - PROJECT_DISCOVERY.md
+    - PROPOSAL.md
+    - SPEC.md
+    - DESIGN.md
+    - TASKS.md
+    allowed_tools:
+    - read
+    - glob
+    - grep
+    denied_tools:
+    - global_config_write
+    - direct_memory_write
+    permission_level: project_read
+    memory_write: false
+    risk_level: low
+    evals_required:
+    - eval_profile_resolution
+    - eval_lane_classification
+    - eval_skill_without_owner_blocked
+    - eval_skill_without_eval_experimental
+    harnesses_required:
+    - h_skill_registry_refresh
+    - h_skill_score_gate
+    - h_skill_context_loader
+    - h_skill_rule_pack_validator
+    - h_skill_permission_gate
+    rollback_strategy: revert_to_artifacts
+    output_contract: human_compact_operational
+    examples:
+    - segment_planning
+    - runtime_governance_review
+    anti_patterns:
+    - policy_override
+    - missing_artifact_jump
+    last_validated_at: null
+  research_verification_seed:
+    id: research_verification_seed
+    owner_profile: ovav_research_analyst
+    owner_lane: source_verification
+    provenance: registry_seed
+    trigger: on_research_verification_action
+    allowed_inputs:
+    - source_map
+    - evidence_bundle
+    denied_inputs:
+    - secrets
+    - direct_memory_write_request
+    - policy_override_request
+    required_artifacts:
+    - RESEARCH_SCOPE.md
+    - SOURCE_MAP.md
+    - EVIDENCE_REVIEW.md
+    - DECISION_BRIEF.md
+    allowed_tools:
+    - read
+    - glob
+    - grep
+    denied_tools:
+    - global_config_write
+    - direct_memory_write
+    permission_level: project_read
+    memory_write: false
+    risk_level: low
+    evals_required:
+    - eval_profile_resolution
+    - eval_lane_classification
+    - eval_skill_without_owner_blocked
+    - eval_skill_without_eval_experimental
+    harnesses_required:
+    - h_skill_registry_refresh
+    - h_skill_score_gate
+    - h_skill_context_loader
+    - h_skill_rule_pack_validator
+    - h_skill_permission_gate
+    rollback_strategy: revert_to_artifacts
+    output_contract: human_evidence_operational
+    examples:
+    - source_assessment
+    - benchmark_brief
+    anti_patterns:
+    - unsupported_claims
+    - missing_source_map
+    last_validated_at: null
+  OVAV Artifact Flow Skill:
+    id: OVAV Artifact Flow Skill
+    owner_profile: ovav_systems_architect
+    owner_lane: runtime_governance
+    provenance: opencode
+    trigger: automatic
+    allowed_inputs:
+    - source_local
+    denied_inputs: []
+    required_artifacts: []
+    allowed_tools:
+    - repo_local
+    denied_tools:
+    - global_write
+    - external_services
+    permission_level: governed
+    memory_write: false
+    risk_level: high
+    evals_required: []
+    rollback_strategy: none
+    output_contract: human_compact
+    examples: []
+    anti_patterns: []
+    last_validated_at: 20260522T200917Z
+  ovav-context-pack:
+    id: ovav-context-pack
+    owner_profile: ovav_systems_architect
+    owner_lane: runtime_governance
+    provenance: opencode
+    trigger: automatic
+    allowed_inputs:
+    - source_local
+    denied_inputs: []
+    required_artifacts: []
+    allowed_tools:
+    - repo_local
+    denied_tools:
+    - global_write
+    - external_services
+    permission_level: source_local
+    memory_write: false
+    risk_level: low
+    evals_required: []
+    rollback_strategy: none
+    output_contract: human_compact
+    examples: []
+    anti_patterns: []
+    last_validated_at: 20260522T200917Z
+  ovav-identity-guard:
+    id: ovav-identity-guard
+    owner_profile: ovav_systems_architect
+    owner_lane: runtime_governance
+    provenance: opencode
+    trigger: automatic
+    allowed_inputs:
+    - source_local
+    denied_inputs: []
+    required_artifacts: []
+    allowed_tools:
+    - repo_local
+    denied_tools:
+    - global_write
+    - external_services
+    permission_level: governed
+    memory_write: false
+    risk_level: medium
+    evals_required: []
+    rollback_strategy: none
+    output_contract: human_compact
+    examples: []
+    anti_patterns: []
+    last_validated_at: 20260522T200917Z
+  ovav-platform-session:
+    id: ovav-platform-session
+    owner_profile: ovav_systems_architect
+    owner_lane: runtime_governance
+    provenance: opencode
+    trigger: automatic
+    allowed_inputs:
+    - source_local
+    denied_inputs: []
+    required_artifacts: []
+    allowed_tools:
+    - repo_local
+    denied_tools:
+    - global_write
+    - external_services
+    permission_level: source_local
+    memory_write: false
+    risk_level: low
+    evals_required: []
+    rollback_strategy: none
+    output_contract: human_compact
+    examples: []
+    anti_patterns: []
+    last_validated_at: 20260522T200917Z
+  ovav-repo-local-work-loop:
+    id: ovav-repo-local-work-loop
+    owner_profile: ovav_systems_architect
+    owner_lane: runtime_governance
+    provenance: opencode
+    trigger: automatic
+    allowed_inputs:
+    - source_local
+    denied_inputs: []
+    required_artifacts: []
+    allowed_tools:
+    - repo_local
+    denied_tools:
+    - global_write
+    - external_services
+    permission_level: source_local
+    memory_write: false
+    risk_level: low
+    evals_required: []
+    rollback_strategy: none
+    output_contract: human_compact
+    examples: []
+    anti_patterns: []
+    last_validated_at: 20260522T200917Z
+  OVAV Research Evidence Skill:
+    id: OVAV Research Evidence Skill
+    owner_profile: ovav_research_analyst
+    owner_lane: deep_research
+    provenance: opencode
+    trigger: automatic
+    allowed_inputs:
+    - source_local
+    denied_inputs: []
+    required_artifacts: []
+    allowed_tools:
+    - repo_local
+    denied_tools:
+    - global_write
+    - external_services
+    permission_level: governed
+    memory_write: false
+    risk_level: high
+    evals_required: []
+    rollback_strategy: none
+    output_contract: human_compact
+    examples: []
+    anti_patterns: []
+    last_validated_at: 20260522T200917Z
+  ovav-research-session:
+    id: ovav-research-session
+    owner_profile: ovav_research_analyst
+    owner_lane: deep_research
+    provenance: opencode
+    trigger: automatic
+    allowed_inputs:
+    - source_local
+    denied_inputs: []
+    required_artifacts: []
+    allowed_tools:
+    - repo_local
+    denied_tools:
+    - global_write
+    - external_services
+    permission_level: governed
+    memory_write: false
+    risk_level: medium
+    evals_required: []
+    rollback_strategy: none
+    output_contract: human_compact
+    examples: []
+    anti_patterns: []
+    last_validated_at: 20260522T200917Z
+  ovav-response-contract:
+    id: ovav-response-contract
+    owner_profile: ovav_systems_architect
+    owner_lane: runtime_governance
+    provenance: opencode
+    trigger: automatic
+    allowed_inputs:
+    - source_local
+    denied_inputs: []
+    required_artifacts: []
+    allowed_tools:
+    - repo_local
+    denied_tools:
+    - global_write
+    - external_services
+    permission_level: source_local
+    memory_write: false
+    risk_level: low
+    evals_required: []
+    rollback_strategy: none
+    output_contract: human_compact
+    examples: []
+    anti_patterns: []
+    last_validated_at: 20260522T200917Z
+  ovav-runtime-gates:
+    id: ovav-runtime-gates
+    owner_profile: ovav_systems_architect
+    owner_lane: runtime_governance
+    provenance: opencode
+    trigger: automatic
+    allowed_inputs:
+    - source_local
+    denied_inputs: []
+    required_artifacts: []
+    allowed_tools:
+    - repo_local
+    denied_tools:
+    - global_write
+    - external_services
+    permission_level: source_local
+    memory_write: false
+    risk_level: low
+    evals_required: []
+    rollback_strategy: none
+    output_contract: human_compact
+    examples: []
+    anti_patterns: []
+    last_validated_at: 20260522T200917Z
+  OVAV SDD Init Skill:
+    id: OVAV SDD Init Skill
+    owner_profile: ovav_systems_architect
+    owner_lane: runtime_governance
+    provenance: opencode
+    trigger: automatic
+    allowed_inputs:
+    - source_local
+    denied_inputs: []
+    required_artifacts: []
+    allowed_tools:
+    - repo_local
+    denied_tools:
+    - global_write
+    - external_services
+    permission_level: governed
+    memory_write: false
+    risk_level: high
+    evals_required: []
+    rollback_strategy: none
+    output_contract: human_compact
+    examples: []
+    anti_patterns: []
+    last_validated_at: 20260522T200917Z
+  ovav-artifact-flow:
+    id: ovav-artifact-flow
+    owner_profile: ovav_systems_architect
+    owner_lane: runtime_governance
+    provenance: opencode
+    trigger: automatic
+    allowed_inputs:
+    - source_local
+    denied_inputs: []
+    required_artifacts: []
+    allowed_tools:
+    - repo_local
+    denied_tools:
+    - global_write
+    - external_services
+    permission_level: governed
+    memory_write: false
+    risk_level: medium
+    evals_required: []
+    rollback_strategy: none
+    output_contract: human_compact
+    examples: []
+    anti_patterns: []
+    last_validated_at: 20260523T042741Z
+  ovav-research-evidence:
+    id: ovav-research-evidence
+    owner_profile: ovav_research_analyst
+    owner_lane: source_verification
+    provenance: opencode
+    trigger: automatic
+    allowed_inputs:
+    - source_local
+    denied_inputs: []
+    required_artifacts: []
+    allowed_tools:
+    - repo_local
+    denied_tools:
+    - global_write
+    - external_services
+    permission_level: governed
+    memory_write: false
+    risk_level: medium
+    evals_required: []
+    rollback_strategy: none
+    output_contract: human_compact
+    examples: []
+    anti_patterns: []
+    last_validated_at: 20260523T042741Z
+  ovav-sdd-init:
+    id: ovav-sdd-init
+    owner_profile: ovav_systems_architect
+    owner_lane: runtime_governance
+    provenance: opencode
+    trigger: automatic
+    allowed_inputs:
+    - source_local
+    denied_inputs: []
+    required_artifacts: []
+    allowed_tools:
+    - repo_local
+    denied_tools:
+    - global_write
+    - external_services
+    permission_level: governed
+    memory_write: false
+    risk_level: medium
+    evals_required: []
+    rollback_strategy: none
+    output_contract: human_compact
+    examples: []
+    anti_patterns: []
+    last_validated_at: 20260523T042741Z
+  ovav-agent-router:
+    id: ovav-agent-router
+    owner_profile: ovav_systems_architect
+    owner_lane: runtime_governance
+    provenance: registry_seed
+    trigger: automatic
+    allowed_inputs: []
+    denied_inputs: []
+    required_artifacts: []
+    allowed_tools: []
+    denied_tools: []
+    permission_level: governed
+    memory_write: false
+    risk_level: low
+    evals_required: []
+    rollback_strategy: none
+    output_contract: human_compact
+    examples: []
+    anti_patterns: []
+  ovav-session-continuity:
+    id: ovav-session-continuity
+    owner_profile: ovav_systems_architect
+    owner_lane: runtime_governance
+    provenance: registry_seed
+    trigger: automatic
+    allowed_inputs: []
+    denied_inputs: []
+    required_artifacts: []
+    allowed_tools: []
+    denied_tools: []
+    permission_level: governed
+    memory_write: false
+    risk_level: low
+    evals_required: []
+    rollback_strategy: none
+    output_contract: human_compact
+    examples: []
+    anti_patterns: []
+  ovav-security-gates:
+    id: ovav-security-gates
+    owner_profile: ovav_systems_architect
+    owner_lane: runtime_governance
+    provenance: registry_seed
+    trigger: automatic
+    allowed_inputs: []
+    denied_inputs: []
+    required_artifacts: []
+    allowed_tools: []
+    denied_tools: []
+    permission_level: governed
+    memory_write: false
+    risk_level: low
+    evals_required: []
+    rollback_strategy: none
+    output_contract: human_compact
+    examples: []
+    anti_patterns: []
+  ovav-health-session:
+    id: ovav-health-session
+    owner_profile: ovav_health_specialist
+    owner_lane: health_performance
+    provenance: registry_seed
+    trigger: automatic
+    allowed_inputs: []
+    denied_inputs: []
+    required_artifacts: []
+    allowed_tools: []
+    denied_tools: []
+    permission_level: governed
+    memory_write: false
+    risk_level: low
+    evals_required: []
+    rollback_strategy: none
+    output_contract: human_compact
+    examples: []
+    anti_patterns: []
+  ovav-education-session:
+    id: ovav-education-session
+    owner_profile: ovav_education_specialist
+    owner_lane: education_career
+    provenance: registry_seed
+    trigger: automatic
+    allowed_inputs: []
+    denied_inputs: []
+    required_artifacts: []
+    allowed_tools: []
+    denied_tools: []
+    permission_level: governed
+    memory_write: false
+    risk_level: low
+    evals_required: []
+    rollback_strategy: none
+    output_contract: human_compact
+    examples: []
+    anti_patterns: []
+  ovav-ux-session:
+    id: ovav-ux-session
+    owner_profile: ovav_ux_specialist
+    owner_lane: ux_design
+    provenance: registry_seed
+    trigger: automatic
+    allowed_inputs: []
+    denied_inputs: []
+    required_artifacts: []
+    allowed_tools: []
+    denied_tools: []
+    permission_level: governed
+    memory_write: false
+    risk_level: low
+    evals_required: []
+    rollback_strategy: none
+    output_contract: human_compact
+    examples: []
+    anti_patterns: []
+  ovav-business-session:
+    id: ovav-business-session
+    owner_profile: ovav_business_specialist
+    owner_lane: commercial_growth
+    provenance: registry_seed
+    trigger: automatic
+    allowed_inputs: []
+    denied_inputs: []
+    required_artifacts: []
+    allowed_tools: []
+    denied_tools: []
+    permission_level: governed
+    memory_write: false
+    risk_level: low
+    evals_required: []
+    rollback_strategy: none
+    output_contract: human_compact
+    examples: []
+    anti_patterns: []

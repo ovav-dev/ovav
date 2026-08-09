@@ -1,0 +1,46 @@
+schema: ovav.coordination_protocol.v2
+version: 2.0.0
+
+handoff_protocol:
+  response_times:
+    critical: 4h
+    high: 24h
+    standard: 72h
+  escalation:
+    after: deadline + 4h
+    to: thavren
+  tracking:
+    log: .ovav/runtime/logs/handoffs.jsonl
+    metrics: [response_time, completion_rate, escalation_rate]
+
+integration_contract:
+  required: true
+  format: .ovav/service_areas/<name>/integration_contract.yaml
+  rules:
+    - "Cada lead debe consumir output de al menos 2 otros leads antes de cerrar fase"
+    - "Si un lead no entrega en deadline, el coordinador re-asigna o escala"
+    - "El contrato se actualiza en vivo, no es estatico"
+
+squads_always_active:
+  rule: "Los squads no se apagan entre fases de un mismo proyecto"
+  state_tracking: squad_state.active = true durante todo el proyecto
+
+cross_review:
+  required: true
+  min_reviews_per_lead: 2
+  format: .ovav/runtime/logs/reviews.jsonl
+  rule: "Antes de cerrar cualquier fase, cada lead debe recibir feedback de al menos 2 otros leads"
+
+coordination_metrics:
+  - name: handoff_response_time
+    target: "<=24h high, <=72h standard"
+  - name: cross_consumption_rate
+    target: ">=2 leads consumidos por lead"
+  - name: review_coverage
+    target: "100% de leads recibieron >=2 revisiones"
+  - name: squad_active_ratio
+    target: "100% squads activos durante el proyecto"
+  - name: integration_depth
+    target: ">=60% de artefactos fueron consumidos por otro lead"
+
+# LAW-001 governance: .ovav/laws/area_boundary_enforcement.yaml (Non-Invasion Area Boundary Law)

@@ -1,0 +1,25 @@
+skills:
+  runtime_governance_seed:
+    owner_profile: ovav_systems_architect
+    owner_lane: runtime_governance
+    provenance: registry_seed
+    status: experimental
+    eval_status: pending
+    risk_level: low
+    permission_level: project_read
+    score: 45
+    rule_pack_ref: runtime_governance_seed
+    memory_write: false
+    last_validated_at: null
+  research_verification_seed:
+    owner_profile: ovav_research_analyst
+    owner_lane: source_verification
+    provenance: registry_seed
+    status: experimental
+    eval_status: pending
+    risk_level: low
+    permission_level: project_read
+    score: 45
+    rule_pack_ref: research_verification_seed
+    memory_write: false
+    last_validated_at: null

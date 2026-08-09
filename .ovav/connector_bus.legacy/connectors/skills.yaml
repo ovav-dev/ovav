@@ -1,0 +1,111 @@
+# OVAV Connector Bus — Skills
+# ==================================
+# Tipo de slot: skill
+# Skills de agente AI proyectadas desde .ovav/source/skills/
+#
+# CONECTAR:   1 entry acá + SKILL.md en source_dir
+# DESCONECTAR: borrar entry
+#
+# Schema: slots.yaml → slot_types.skill
+
+version: "1.0.0"
+slot_type: skill
+description: "Skills de agente AI — conocimiento operativo proyectable a clientes"
+
+components:
+
+  ovav-artifact-flow:
+    source_dir: .ovav/source/skills/ovav-artifact-flow
+    owner_profile: ovav_systems_architect
+    risk_level: low
+    labels: [sdd, artifacts, dependency]
+
+  ovav-context-pack:
+    source_dir: .ovav/source/skills/ovav-context-pack
+    owner_profile: ovav_systems_architect
+    risk_level: low
+    labels: [context, routing, gates]
+
+  ovav-identity-guard:
+    source_dir: .ovav/source/skills/ovav-identity-guard
+    owner_profile: ovav_systems_architect
+    risk_level: low
+    labels: [identity, guard, session]
+
+  ovav-platform-session:
+    source_dir: .ovav/source/skills/ovav-platform-session
+    owner_profile: ovav_systems_architect
+    risk_level: low
+    labels: [session, platform, work-loop]
+
+  ovav-repo-local-work-loop:
+    source_dir: .ovav/source/skills/ovav-repo-local-work-loop
+    owner_profile: ovav_systems_architect
+    risk_level: low
+    labels: [workflow, repo-local, git]
+
+  ovav-research-evidence:
+    source_dir: .ovav/source/skills/ovav-research-evidence
+    owner_profile: ovav_research_analyst
+    risk_level: low
+    labels: [research, evidence, sources]
+
+  ovav-research-session:
+    source_dir: .ovav/source/skills/ovav-research-session
+    owner_profile: ovav_research_analyst
+    risk_level: low
+    labels: [research, session, intelligence]
+
+  ovav-response-contract:
+    source_dir: .ovav/source/skills/ovav-response-contract
+    owner_profile: ovav_systems_architect
+    risk_level: low
+    labels: [response, delivery, contract]
+
+  ovav-runtime-gates:
+    source_dir: .ovav/source/skills/ovav-runtime-gates
+    owner_profile: ovav_systems_architect
+    risk_level: low
+    labels: [runtime, gates, validation]
+
+  ovav-sdd-init:
+    source_dir: .ovav/source/skills/ovav-sdd-init
+    owner_profile: ovav_systems_architect
+    risk_level: low
+    labels: [sdd, init, discovery]
+
+  ovav-session-continuity:
+    source_dir: .ovav/source/skills/ovav-session-continuity
+    owner_profile: ovav_systems_architect
+    risk_level: low
+    labels: [session, continuity, handoff]
+
+  ovav-business-session:
+    source_dir: .ovav/source/skills/ovav-business-session
+    owner_profile: ovav_commercial_strategist
+    risk_level: low
+    labels: [business, session, commercial]
+
+  ovav-education-session:
+    source_dir: .ovav/source/skills/ovav-education-session
+    owner_profile: ovav_education_lead
+    risk_level: low
+    labels: [education, session, curriculum]
+
+  ovav-health-session:
+    source_dir: .ovav/source/skills/ovav-health-session
+    owner_profile: ovav_health_scientist
+    risk_level: low
+    labels: [health, session, performance]
+
+  ovav-ux-session:
+    source_dir: .ovav/source/skills/ovav-ux-session
+    owner_profile: ovav_ux_designer
+    risk_level: low
+    labels: [ux, session, design]
+
+  ovav-security-gates:
+    source_dir: .ovav/source/skills/ovav-security-gates
+    owner_profile: ovav_security_auditor
+    risk_level: medium
+    labels: [security, hooks, audit, governance]

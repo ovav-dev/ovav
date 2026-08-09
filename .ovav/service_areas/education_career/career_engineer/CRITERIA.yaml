@@ -1,0 +1,32 @@
+# Career Engineer — Decision Criteria v1.0.0
+criteria:
+  version: "1.0.0"
+  established: "2026-07-28"
+  operator: torben
+  area: education_career
+  entries:
+    - id: CE-001
+      criterion: "CV debe ser premium desde la primera línea. Diseño visual avanzado + contenido optimizado para ATS + AI detection. No entregamos 'funcional'."
+      domain: quality
+      confidence: 1.0
+      status: consolidated
+    - id: CE-002
+      criterion: "Análisis de detección AI mediante scoring comparativo de herramientas (GPTZero, Originality.ai, Turnitin). Reportar porcentaje de humanismo detectado, no claim absoluto."
+      domain: ai_detection
+      confidence: 0.95
+      status: consolidated
+    - id: CE-003
+      criterion: "PDF output via pdf-official (MiMoCode built-in). Formatos: A4 profesional, tipografía corporativa, metadata SEO para ATS."
+      domain: delivery
+      confidence: 1.0
+      status: consolidated
+    - id: CE-004
+      criterion: "ATS optimization: keyword matching contra job description, score de compatibilidad, sugerencias de mejora."
+      domain: ats
+      confidence: 0.90
+      status: emerging
+    - id: CE-005
+      criterion: "Interview readiness: generar preguntas probables desde el job description, simular escenarios, preparar respuestas STAR."
+      domain: interview
+      confidence: 0.85
+      status: emerging

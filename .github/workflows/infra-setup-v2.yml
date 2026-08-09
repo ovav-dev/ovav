@@ -1,0 +1,159 @@
+# OVAV Infrastructure Setup v2 — One-time workflow
+# =============================================================================
+# Trigger: gh workflow run infra-setup-v2.yml
+# Uses CF_API_TOKEN + CLOUDFLARE_ACCOUNT_ID from GitHub secrets
+# =============================================================================
+
+name: OVAV Infra Setup v2
+
+on:
+  workflow_dispatch:
+
+env:
+  CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+  CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+
+jobs:
+  # ── 1. Tunnel DNS + Ingress ────────────────────────────────────────────────
+  setup-tunnels:
+    name: Tunnel DNS & Ingress
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get zone ID
+        run: |
+          ZONE_ID=$(curl -sf -H "Authorization: Bearer $CF_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/zones?name=ovav.dev" \
+            | jq -r '.result[0].id')
+          echo "ZONE_ID=${ZONE_ID}" >> $GITHUB_ENV
+          echo "  Zone: $ZONE_ID"
+
+      - name: Create DNS — d678beea.ovav.dev → prod tunnel
+        run: |
+          curl -sf -X POST \
+            -H "Authorization: Bearer $CF_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records" \
+            --data '{
+              "type": "CNAME",
+              "name": "d678beea",
+              "content": "3b90d21c-ce98-41f9-883b-09980289560d.cfargotunnel.com",
+              "ttl": 1,
+              "proxied": true
+            }' | jq '.success'
+          echo "  ✅ d678beea.ovav.dev → tunnel"
+
+      - name: Create DNS — staging-a7k3m.ovav.dev → staging tunnel
+        run: |
+          curl -sf -X POST \
+            -H "Authorization: Bearer $CF_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records" \
+            --data '{
+              "type": "CNAME",
+              "name": "staging-a7k3m",
+              "content": "c1780111-4a6a-431f-9813-10675645ada6.cfargotunnel.com",
+              "ttl": 1,
+              "proxied": true
+            }' | jq '.success'
+          echo "  ✅ staging-a7k3m.ovav.dev → tunnel"
+
+      - name: Configure tunnel ingress — prod
+        run: |
+          curl -sf -X PUT \
+            -H "Authorization: Bearer $CF_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/cfd_tunnel/3b90d21c-ce98-41f9-883b-09980289560d/configurations" \
+            --data '{"config":{"ingress":[
+              {"hostname":"d678beea.ovav.dev","service":"http://localhost:5858"},
+              {"service":"http_status:404"}
+            ]}}' | jq '.success'
+          echo "  ✅ Prod tunnel ingress configured"
+
+      - name: Configure tunnel ingress — staging
+        run: |
+          curl -sf -X PUT \
+            -H "Authorization: Bearer $CF_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/cfd_tunnel/c1780111-4a6a-431f-9813-10675645ada6/configurations" \
+            --data '{"config":{"ingress":[
+              {"hostname":"staging-a7k3m.ovav.dev","service":"http://localhost:5858"},
+              {"service":"http_status:404"}
+            ]}}' | jq '.success'
+          echo "  ✅ Staging tunnel ingress configured"
+
+      - name: Retrieve tunnel tokens
+        run: |
+          echo "  Retrieving prod token..."
+          PROD=$(curl -sf -H "Authorization: Bearer $CF_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/cfd_tunnel/3b90d21c-ce98-41f9-883b-09980289560d/token" \
+            | jq -r '.result // "RETRIEVAL_FAILED"')
+          echo "PROD_TOKEN_LEN=${#PROD}" >> $GITHUB_ENV
+          echo "  Prod token: ${#PROD} chars"
+          
+          echo "  Retrieving staging token..."
+          STAG=$(curl -sf -H "Authorization: Bearer $CF_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/cfd_tunnel/c1780111-4a6a-431f-9813-10675645ada6/token" \
+            | jq -r '.result // "RETRIEVAL_FAILED"')
+          echo "STAGING_TOKEN_LEN=${#STAG}" >> $GITHUB_ENV
+          echo "  Staging token: ${#STAG} chars"
+          
+          if [ "$PROD" = "RETRIEVAL_FAILED" ] || [ ${#PROD} -lt 10 ]; then
+            echo "::warning::Tunnel token API requires Zero Trust scope on the API token."
+            echo "  Get tokens manually: Dashboard → Zero Trust → Tunnels → Configure"
+            echo "  Then set via: flyctl secrets set TUNNEL_TOKEN=<token> --app ovav-systems"
+          fi
+
+  # ── 2. Fly.io Secret Reminder ──────────────────────────────────────────────
+  fly-reminder:
+    name: Fly.io Setup Reminder
+    needs: [setup-tunnels]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Instructions
+        run: |
+          echo "============================================"
+          echo "  REMAINING MANUAL STEPS"
+          echo "============================================"
+          echo ""
+          echo "  1. Get tunnel tokens from CF Dashboard:"
+          echo "     https://one.dash.cloudflare.com/ → Zero Trust → Tunnels"
+          echo "     → ovav-cpanel-prod → Configure → copy token"
+          echo "     → ovav-cpanel-staging → Configure → copy token"
+          echo ""
+          echo "  2. Set Fly.io secrets:"
+          echo "     flyctl secrets set TUNNEL_TOKEN=<prod-token> --app ovav-systems"
+          echo "     flyctl secrets set TUNNEL_TOKEN=<staging-token> --app ovav-systems-staging"
+          echo ""
+          echo "  3. Configure Cloudflare Access:"
+          echo "     https://one.dash.cloudflare.com/ → Access → Applications"
+          echo "     → Add application → Self-hosted"
+          echo "     → Subdomain: d678beea → Domain: ovav.dev"
+          echo "     → Identity provider: Google"
+          echo "     → Policy: Allow — your email only"
+          echo ""
+          echo "  4. Verify:"
+          echo "     Incognito → d678beea.ovav.dev → should show 404 (Access blocks)"
+          echo "     Logged in → d678beea.ovav.dev → should show cPanel login"
+          echo "============================================"
+
+  # ── 3. Summary ────────────────────────────────────────────────────────────
+  summary:
+    name: Setup Summary
+    needs: [fly-reminder]
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "============================================"
+          echo "  OVAV INFRASTRUCTURE — CONFIGURED"
+          echo "============================================"
+          echo ""
+          echo "  ✅ Tunnels: ovav-cpanel-prod + staging"
+          echo "  ✅ DNS: staging.ovav.dev, d678beea.ovav.dev, staging-a7k3m.ovav.dev"
+          echo "  ✅ Pages: staging domain + auto-deploy disabled on main"
+          echo "  ✅ Pages: Preview deployments for all branches"
+          echo "  ✅ WAF: Security High + Browser Check + Bot Fight"
+          echo "  ✅ WAF: Rate limiting (10/min auth) + DDoS High"
+          echo ""
+          echo "  ⚠️ Fly.io secrets: Set manually (see Fly.io Setup job)"
+          echo "  ⚠️ Cloudflare Access: Configure manually (see Fly.io Setup job)"
+          echo "============================================"

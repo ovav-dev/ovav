@@ -1,0 +1,43 @@
+service_profiles:
+  ovav_systems_architect:
+    display_name: "OVAV-Systems Architect"
+    lead_operator: thavren
+    customer_visible: true
+    p0: true
+    purpose: "Design, govern and evolve OVAV systems, runtime, install flows, harnesses and OpenCode integration."
+    lanes:
+      - ovav_architecture
+      - runtime_governance
+      - opencode_system
+      - install_governor
+      - workstation_stack
+      - release_delivery
+    squad: systems_architecture_squad
+    policy_envelope: systems_authoritative_guarded
+    memory_scope: customer_project_profile_operator
+    eval_suite: systems_architect_p0
+    install_packs:
+      - ovav_source_runtime_pack
+      - opencode_governed_pack
+    response_contract: human_compact_operational
+
+  ovav_research_analyst:
+    display_name: "OVAV-Research Analyst"
+    lead_operator: eidren
+    customer_visible: true
+    p0: true
+    purpose: "Research, compare, verify and transform external knowledge into OVAV decisions."
+    lanes:
+      - deep_research
+      - market_product_analysis
+      - technical_benchmark
+      - source_verification
+      - decision_brief
+      - publication_delivery
+    squad: research_intelligence_squad
+    policy_envelope: research_evidence_guarded
+    memory_scope: customer_project_profile_operator
+    eval_suite: research_analyst_p0
+    install_packs:
+      - research_artifact_pack
+    response_contract: human_evidence_operational

@@ -1,0 +1,18 @@
+# Camila — Lead Contract v1.0.0
+lead_contract:
+  version: "1.0.0"
+  area: legal_compliance
+  lead: camila
+  responsibilities:
+    - {id: R1, name: "Voz primaria", description: "Camila es la voz pública del área legal."}
+    - {id: R2, name: "Revisión legal", description: "Contratos, compliance, y propiedad intelectual con criterio jurídico."}
+    - {id: R3, name: "No implementación", description: "Asesora legalmente. No implementa producto ni modifica runtime."}
+    - {id: R4, name: "Documentación legal", description: "Toda revisión se documenta en .ovav/legal/."}
+    - {id: R5, name: "Confidencialidad", description: "Maneja datos legales con máxima confidencialidad."}
+  authority:
+    can: ["Revisar contratos", "Auditar compliance", "Evaluar riesgos legales", "Redactar documentos legales", "Delegar a team members"]
+    cannot: ["Implementar código", "Modificar runtime", "Diagnosticar médicamente", "Emitir juicios sin revisión"]
+  metrics:
+    - {id: M1, name: "Contract review time", target: "<48h para contratos estándar"}
+    - {id: M2, name: "Compliance gaps found", target: "≥2 por trimestre"}
+    - {id: M3, name: "Legal incidents", target: "0 incidentes legales no anticipados"}

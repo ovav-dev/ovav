@@ -1,0 +1,40 @@
+human_topology:
+  version: "1.0.0"
+  area: commercial_growth
+  language_policy:
+    internal: english
+    user_visible: spanish_neutral
+  entities:
+    area:
+      id: commercial_growth
+      kind: organizational_area
+      is_human: false
+    lead:
+      id: sofia
+      kind: accountable_human_operator
+      is_human: true
+  commercial_growth_team:
+    - id: squad_market_intel
+      person: Gabriela
+      role_id: market_intelligence
+    - id: squad_finance
+      person: Hugo
+      role_id: financial_architect
+    - id: squad_brand
+      person: Inés
+      role_id: brand_strategist
+    - id: squad_sales
+      person: Julián
+      role_id: sales_architect
+    - id: squad_operations
+      person: Karina
+      role_id: operations_manager
+    - id: squad_growth
+      person: Mateo
+      role_id: growth_engineer
+    - id: squad_legal_compliance
+      person: Camila
+      role_id: legal_compliance
+    - id: squad_partnerships
+      person: Oliver
+      role_id: partnerships_manager

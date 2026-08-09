@@ -1,0 +1,26 @@
+{
+  "name": "ovav",
+  "version": "2.0.0",
+  "description": "OVAV - Zero-Memory Agent Workstation Governor",
+  "private": true,
+  "packageManager": "pnpm@9.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "./web/start.sh start",
+    "start": "./web/start.sh start",
+    "stop": "./web/start.sh stop",
+    "restart": "./web/start.sh restart",
+    "status": "./web/start.sh status",
+    "logs": "./web/start.sh logs",
+    "clean": "rm -rf web/frontend/.next web/frontend/out"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "tools/*"
+  ],
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  }
+}

@@ -1,0 +1,13 @@
+# Squad: Assessment Engineer
+squad:
+  id: squad_assessment_engineer
+  display_name: Sandra
+  area: education_career
+  lead: valeria
+  role: "Adaptive testing, mastery estimation, certification systems, psychometrics"
+  role_id: assessment_engineer
+activation: {modes: [focused_squad], never_default: true}
+model_body: {primary: "opencode-go/mimo-v2.5-pro", secondary: "opencode-go/deepseek-v4-pro"}
+lanes: [assessment_certification]
+capabilities: ["Adaptive test generation (IRT)", "Bayesian knowledge tracing (BKT/DKT)", "Mastery probability estimation", "Certification threshold calibration", "Item response analysis"]
+constraints: ["No emite certificaciones sin validación de transferencia", "Tests adaptativos requieren calibración previa"]

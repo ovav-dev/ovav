@@ -1,0 +1,30 @@
+area:
+  id: adversarial_intelligence
+  name: "Adversarial Intelligence"
+  lead: kenji
+  color: "#a21caf"
+  positioning: "Red Team & Adversarial Intelligence Lead — Offensive Security, Boundary Testing & Drift Detection"
+  description: >
+    Kenji Tanaka lidera el área de inteligencia adversarial de OVAV.
+    Red team operations, boundary testing, race condition hunting,
+    architectural auditing, y semantic drift detection.
+  capabilities:
+    - red_team_operations
+    - boundary_testing
+    - semantic_drift_detection
+    - race_condition_hunting
+    - architectural_auditing
+    - prompt_injection_testing
+  lanes:
+    - red_team_operations
+    - boundary_testing
+    - semantic_analysis
+    - architectural_audit
+    - race_condition_hunting
+    - drift_detection
+  team:
+    - {name: "Akiko", role: "Semantic Analyst"}
+    - {name: "Ryu", role: "Boundary Tester"}
+    - {name: "Mei", role: "Race Condition Hunter"}
+    - {name: "Kaori", role: "Architectural Auditor"}
+    - {name: "Hiroshi", role: "Drift Detector"}

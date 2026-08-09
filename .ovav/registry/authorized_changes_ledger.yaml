@@ -1,0 +1,2100 @@
+authorized_changes:
+- authorized_at: '2026-06-07T00:08:19.495447+00:00'
+  authorized_by: thavren.platform_engineering
+  change: Update to v2.0.0 reflecting completed phases S1-S15, S33, SMC 80% AVANZADO
+  file: .ovav/service_areas/shared/current_authority_contract.yaml
+  hash_before: 8287c6a
+  reason: Graduation of implementation plan — all phases complete
+entries:
+- authorized_by: thavren
+  file: tools/security/sbom.py
+  new_hash: 634244cb3165e9634b97a711938e08f4e7f6110aceeaba31ab2a54186e10f673
+  old_hash: 44b55dd4f2765e6858d9aa5e578b1d9bfb0def2c142499280177658b4035acf8
+  reason: Added domain-aware SBOM exclusions for mutable_runtime (.ovav/runtime, .ovav/context,
+    .ovav/evaluation, .ovav/alerts)
+  segment: living_integrity_model
+  session: current
+  timestamp: '2026-05-30T09:34:50.353159+00:00'
+- authorized_by: thavren
+  file: tools/validators/check_host_config_drift.py
+  new_hash: f92a7a2833f6ae6f3cc1a3d634a0e5176007294754fba3d44b9abbec3f92ff53
+  old_hash: ad4aff9580ae807b638a927d886dc38b47408e3339b193b280633d62bb7a4e3b
+  reason: 'Integrated Living Integrity Model: 5-layer pipeline replacing binary defense
+    gate with domain-aware scoring'
+  segment: living_integrity_model
+  session: current
+  timestamp: '2026-05-30T09:34:50.353159+00:00'
+- authorized_by: thavren
+  file: tools/security/living_integrity.py
+  new_hash: 7279d0f65724880b8c4c28c21ebc7defa90d45e98efc3afaf76d21babdd1e2a3
+  old_hash: ''
+  reason: 'New module: Living Integrity Model core engine (F0.4) — classifier, scorer,
+    auto-healer, authorized changes ledger'
+  segment: living_integrity_model
+  session: current
+  timestamp: '2026-05-30T09:34:50.353159+00:00'
+- authorized_by: thavren
+  file: .ovav/registry/integrity_domains.yaml
+  new_hash: 29b964101a0214ccf0092c1b2d1f4b645060e3bb07bfb0d7dbff4b285e3381c0
+  old_hash: ''
+  reason: 'New registry: integrity domain classification for 4 domains (immutable_source,
+    governed_config, mutable_runtime, evidence_artifact)'
+  segment: living_integrity_model
+  session: current
+  timestamp: '2026-05-30T09:34:50.353159+00:00'
+- authorized_by: thavren
+  file: .ovav/registry/authorized_changes_ledger.yaml
+  new_hash: a3ab5a28825178360e9dc1fd1e0404ad48879951eb7d1e2ba4ea3704b38a5971
+  old_hash: ''
+  reason: 'New registry: authorized changes ledger (self-bootstrapping entry)'
+  segment: living_integrity_model
+  session: current
+  timestamp: '2026-05-30T09:34:50.353159+00:00'
+- authorized_by: thavren
+  file: tools/harnesses/workspace_safety_gate.py
+  new_hash: 86399f3a14327213049eed535d82a51b1001127ed7bc2887362c933dd01e3eee
+  old_hash: d4cadf149c8ca5b03084d53f2e5ed065cca684cf9f36647451eb54ff78c5e7e2
+  reason: 'Fixed bug: protected branch check in read mode now warns instead of blocking
+    (line 116)'
+  segment: living_integrity_model
+  session: current
+  timestamp: '2026-05-30T09:39:18.772742+00:00'
+- authorized_by: thavren
+  file: tools/agent_runtime/injection_detector.py
+  new_hash: b1bbac1b297882eee569d3340831fbf9af2be165dbfbaf75003be81fafdf0ccd
+  old_hash: ''
+  reason: 'Injection detection for L5: 4 vectors, pattern-based scoring'
+  segment: L5_context_firewall_v2
+  session: current
+  timestamp: '2026-05-30T09:51:00.894897+00:00'
+- authorized_by: thavren
+  file: tools/agent_runtime/budget_enforcer.py
+  new_hash: 24d8c92ecd087978ca6db7e1b09815eb3414957b18941e00d21049f4c5880ef6
+  old_hash: ''
+  reason: 'T0-T5 budget enforcement: tier limits, auto-compaction, token tracking'
+  segment: L5_context_firewall_v2
+  session: current
+  timestamp: '2026-05-30T09:51:00.894897+00:00'
+- authorized_by: thavren
+  file: tools/agent_runtime/context_firewall_v2.py
+  new_hash: 88c1b35d6995e1e556c66b8a4485afbe83282b9f2b9a0bdc738a8d472ec96000
+  old_hash: ''
+  reason: 'L5 engine: injection + budget + integrity + overreach pipeline'
+  segment: L5_context_firewall_v2
+  session: current
+  timestamp: '2026-05-30T09:51:00.894897+00:00'
+- authorized_by: thavren
+  file: tools/validators/check_context_firewall_v2.py
+  new_hash: c6746c37dde00c7bd15ae203b494c447427b14680134a2ddc06778c4799766a0
+  old_hash: ''
+  reason: 'Validator for L5: injection, budget, pipeline, integration tests'
+  segment: L5_context_firewall_v2
+  session: current
+  timestamp: '2026-05-30T09:51:00.894897+00:00'
+- authorized_by: thavren
+  file: tools/agent_runtime/session_greeting.py
+  new_hash: b98f779da832e921e72705118bd33c7e1850fbd44393f2e0b535be6b924ae12d
+  old_hash: ''
+  reason: 'Session Greeting Engine: auto-marca sesión, verifica integridad, detecta
+    continuidad, genera greeting context pack'
+  segment: session_continuity_protocol
+  session: current
+  timestamp: '2026-05-30T10:14:07.455175+00:00'
+- authorized_by: thavren
+  file: tools/agent_runtime/session_greeting.py
+  new_hash: 159655c6e585a47b58cabf8a3daa9811f4838de07d2a66e3f9ed8e4bb631913e
+  old_hash: b98f779da832e921e72705118bd33c7e1850fbd44393f2e0b535be6b924ae12d
+  reason: Added retry logic for integrity check to eliminate false positives; updated
+    greeting texts to warm human style
+  segment: human_conversation_pattern_v2
+  session: current
+  timestamp: '2026-05-30T10:33:00.000000+00:00'
+- authorized_by: thavren
+  file: .ovav/service_areas/shared/visual_delivery_contract.yaml
+  new_hash: fc37117e02a5c06f76ef48e1f42d9981bad476b05dbae89212fc36108089d046
+  old_hash: 6b69e52201270dcfd3f6ce84e31f8168b63d9aa57f1f68e806d173310e900d35
+  reason: 'Added human conversation patterns v2: forbidden system-report openings,
+    preferred natural phrasing, integrity in plain language'
+  segment: human_conversation_pattern_v2
+  session: current
+  timestamp: '2026-05-30T10:33:00.000000+00:00'
+- authorized_by: thavren
+  file: .ovav/artifacts/M2/global_projection_payload/agents/ovav-platform-engineering.md
+  new_hash: dfff6287d50baa5bdcb5b04973ae335718366db06bd5e3bfec86b81e133e5cbc
+  old_hash: f637644753527eda42843ba844aa790b8ccbd1656270289cb2a3ad4a46af6414
+  reason: 'Synced M2 artifact: response contract and greeting fixture updated to human-first
+    style'
+  segment: human_conversation_pattern_v2
+  session: current
+  timestamp: '2026-05-30T10:33:00.000000+00:00'
+- authorized_by: thavren
+  file: .ovav/registry/authorized_changes_ledger.yaml
+  new_hash: 1b66d34795c88fb5e9e2cb5cdcfbb0fcebdb30365118a3e7d8f4ef5d251975cb
+  old_hash: 52c4103fa1aef1adcb1fd2f8c838810c341c7316fdbca09146e23011838ea466
+  reason: Added 6 authorization entries for human conversation pattern v2 changes
+    across 5 files
+  segment: human_conversation_pattern_v2
+  session: current
+  timestamp: '2026-05-30T10:34:00.000000+00:00'
+- authorized_by: thavren
+  file: .ovav/service_areas/shared/lead_work_method_contract.yaml
+  new_hash: a9bac005ac6b7f73c54396acb437983d1934775595ffaec13c0806565795e5f4
+  old_hash: cabd0cc1cb3e794b646a813339219bef5846223108f9aad5d2efdfa46e7609bd
+  reason: 'ROOT CAUSE fix: output_bias changed from "changed files, validation, risk"
+    to "result in plain language, narrative over file lists"; tone updated to warm/colleague-like;
+    added hard_rules against system-state dumps'
+  segment: human_conversation_pattern_v2
+  session: current
+  timestamp: '2026-05-30T10:40:00.000000+00:00'
+- authorized_by: thavren
+  file: .ovav/service_areas/shared/visual_delivery_contract.yaml
+  new_hash: c863c25e77f2fbda81f518973e17d4c70517ea606cda249628234f0a5e2aa068
+  old_hash: fc37117e02a5c06f76ef48e1f42d9981bad476b05dbae89212fc36108089d046
+  reason: 'System-wide: updated purpose and human_voice to clarify speaker hierarchy
+    (OVAV=company, service area=professional line, lead=speaker); updated recommended_shapes
+    to narrative-first'
+  segment: human_conversation_pattern_v2
+  session: current
+  timestamp: '2026-05-30T10:40:00.000000+00:00'
+- authorized_by: thavren
+  file: .ovav/service_areas/shared/delivery_contracts.yaml
+  new_hash: a5d15bf23de3d1c0b3bf00cc9d564ff69db7483ef4f8bee74e522dafe5e6f06b
+  old_hash: 538f9ff1d38dc8831c485e5e87d53de405b0bb9d2130bee3b79521d8762cfeb2
+  reason: 'Reframed implementation_delivery fields: narrative-first (what_changed_narrative,
+    why_it_matters) instead of file-list-first (files_or_surfaces)'
+  segment: human_conversation_pattern_v2
+  session: current
+  timestamp: '2026-05-30T10:40:00.000000+00:00'
+- authorized_by: thavren
+  file: .ovav/source/skills/ovav-platform-session/references/language-contract.md
+  new_hash: de8344821bc379ba0fa8c1a6a5228fb361703f30cbad2c61d6a4636ed8b463a6
+  old_hash: f4ef957db68898a088a21fb4a40d02c9f13267e2bac62b2e57fd60271bfaadf7
+  reason: Updated continuity greeting examples to warm human style; dynamic sizing
+    table now includes narrative delivery column
+  segment: human_conversation_pattern_v2
+  session: current
+  timestamp: '2026-05-30T10:40:00.000000+00:00'
+- authorized_by: thavren
+  file: .ovav/source/skills/ovav-response-contract/SKILL.md
+  new_hash: c349eddd638b95d603c8732f20df08f8a93bf37b0c89a3958f95a3c8e3824809
+  old_hash: 86e4d5b7f5f8ae9862be10ea51c1ac946c1bf06e507632bb7adf5112874aace0
+  reason: Replaced "Prefer 3-6 useful bullets" with "Lead with natural language";
+    fixed description to reference service area instead of OVAV as speaker
+  segment: human_conversation_pattern_v2
+  session: current
+  timestamp: '2026-05-30T10:40:00.000000+00:00'
+- authorized_by: thavren
+  file: .ovav/registry/authorized_changes_ledger.yaml
+  new_hash: 894ed45ca1e933c60ea957a7760f25a8bf8543b57c608a92951fa26207f9355d
+  old_hash: 1b66d34795c88fb5e9e2cb5cdcfbb0fcebdb30365118a3e7d8f4ef5d251975cb
+  reason: Added 8 authorization entries for round 2 system-wide human conversation
+    pattern updates across 7 files
+  segment: human_conversation_pattern_v2
+  session: current
+  timestamp: '2026-05-30T10:41:00.000000+00:00'
+- authorized_by: thavren
+  file: tools/security/risk_scorer.py
+  new_hash: 8ec88b4c76da69df560e7bb19c6d0e041afa158d32a3b651ee0849a5f12557d4
+  old_hash: ''
+  reason: 'L6 Risk Scoring Engine: composite risk scoring (tool+context+deps+operator
+    → 0-100), integrates with F0-F4 hardening baseline'
+  segment: L6_security_zero_trust
+  session: current
+  timestamp: '2026-05-30T10:55:00.000000+00:00'
+- authorized_by: thavren
+  file: tools/security/quarantine.py
+  new_hash: 874e90fe8db5c654f3e9b3d9bc130b29a9e1844b1a5a21b69763f812dda5d04a
+  old_hash: ''
+  reason: 'L6 Quarantine Engine: isolate→verify→release/deny flow, registry-based
+    tracking, integrates with F0 validators and provenance checker'
+  segment: L6_security_zero_trust
+  session: current
+  timestamp: '2026-05-30T10:55:00.000000+00:00'
+- authorized_by: thavren
+  file: tools/security/provenance_checker.py
+  new_hash: fd953efa0c24e8a54c2082db2337e1f751469a242a94d63c3f380dd0954c207d
+  old_hash: ''
+  reason: 'L6 Provenance Checker: 5-source classification (git/sbom/generated/external/unknown),
+    trust levels 0-95, complements F0.1 sbom'
+  segment: L6_security_zero_trust
+  session: current
+  timestamp: '2026-05-30T10:55:00.000000+00:00'
+- authorized_by: thavren
+  file: tools/validators/check_L6_security_zero_trust.py
+  new_hash: 1e02bd5219795ea9b62093cdbe3712d2ca3e808bfc737076028d5e8e8b44bba4
+  old_hash: ''
+  reason: 'L6 validator: 4 checks (risk_scorer, quarantine, provenance, integration)
+    verifying full L6 functionality'
+  segment: L6_security_zero_trust
+  session: current
+  timestamp: '2026-05-30T10:55:00.000000+00:00'
+- authorized_by: thavren
+  file: .ovav/artifacts/L6/L6_SECURITY_ZERO_TRUST_SPEC.md
+  new_hash: 48d781b9492f242d92aa158c0e4218ccc319c2c1b4bf24f22131ab43d4108195
+  old_hash: ''
+  reason: 'L6 specification document: objectives, modules, integration points, done
+    definition'
+  segment: L6_security_zero_trust
+  session: current
+  timestamp: '2026-05-30T10:55:00.000000+00:00'
+- authorized_by: thavren
+  file: .ovav/registry/authorized_changes_ledger.yaml
+  new_hash: 06a86d5710cde89d6a4f3391d31619c9d25801f575ef9fece4c99f4aea835bb9
+  old_hash: 894ed45ca1e933c60ea957a7760f25a8bf8543b57c608a92951fa26207f9355d
+  reason: Added 6 authorization entries for L6 Security/Zero-Trust Runtime
+  segment: L6_security_zero_trust
+  session: current
+  timestamp: '2026-05-30T10:56:00.000000+00:00'
+- authorized_by: thavren
+  file: AGENTS.md
+  new_hash: fa7ed718b56e258c51abeca8ef6a1c0cfa36f86e87e60d6de521a6b69648188a
+  old_hash: c3e8d66fdba614cda907aea3d280c4ca025342ed9c90887cdd43991ace30dddc
+  reason: Added Evaluation Pipeline MANDATORY section — 5-stage evaluation required
+  segment: evaluation_pipeline_connection
+  session: current
+  timestamp: '2026-05-30T11:45:00.000000+00:00'
+- authorized_by: thavren
+  file: .ovav/service_areas/shared/lead_work_method_contract.yaml
+  new_hash: 84ac096c5e33aa9e88d120fc24b9f609a129740fac8956cfd4f15f5a5ec1381f
+  old_hash: a9bac005ac6b7f73c54396acb437983d1934775595ffaec13c0806565795e5f4
+  reason: Made evaluation MANDATORY — all implementations must pass pipeline
+  segment: evaluation_pipeline_connection
+  session: current
+  timestamp: '2026-05-30T11:45:00.000000+00:00'
+- authorized_by: thavren
+  file: .ovav/registry/authorized_changes_ledger.yaml
+  new_hash: 2552ad9538eb3f28da1c960403bcf16faee4935f6ba5184db9ea4d0a74713bfa
+  old_hash: 06a86d5710cde89d6a4f3391d31619c9d25801f575ef9fece4c99f4aea835bb9
+  reason: Added 3 authorization entries for evaluation pipeline connection fixes
+  segment: evaluation_pipeline_connection
+  session: current
+  timestamp: '2026-05-30T11:46:00.000000+00:00'
+- authorized_by: thavren
+  file: clients/opencode/agents/ovav-platform-engineering.md
+  new_hash: b2455001f5792ef79d0620354c64789d8f2c5ac487b7ecf4d56901dce1f9cbd0
+  old_hash: ''
+  reason: Authorized change during dev session — P1-P7 closure work
+  segment: ''
+  session: authorized_session_2026-05-30
+  timestamp: '2026-05-30T14:13:00+00:00'
+- authorized_by: thavren
+  file: tools/agent_runtime/ovav_launch.sh
+  new_hash: 92931ee1a919b8b17d15373b192b36cfc70402da2264cf239a12b479f9b340b6
+  old_hash: ''
+  reason: Authorized change during dev session — P1-P7 closure work
+  segment: ''
+  session: authorized_session_2026-05-30
+  timestamp: '2026-05-30T14:13:00+00:00'
+- authorized_by: thavren
+  file: .ovav/lockdown/state.json
+  new_hash: 1c7ce135cc7e920074309b0f64f0cb9b7c90a7b793a3a7f38e23ff79178c188d
+  old_hash: ''
+  reason: Authorized change during dev session — P1-P7 closure work
+  segment: ''
+  session: authorized_session_2026-05-30
+  timestamp: '2026-05-30T14:13:00+00:00'
+- authorized_by: thavren
+  file: clients/opencode/agents/ovav-research-intelligence.md
+  new_hash: 29adca8ade3cb13e9cea0feb32b2e828264adce3cc7344abb0aaad7274d5252a
+  old_hash: ''
+  reason: Authorized change during dev session — P1-P7 closure work
+  segment: ''
+  session: authorized_session_2026-05-30
+  timestamp: '2026-05-30T14:13:00+00:00'
+- authorized_by: thavren
+  file: .ovav/lockdown/state.json
+  new_hash: fb5c475e91cf2c8f6145224b55a56e7cdbf6a350344eb967e324380d76fd95a0
+  old_hash: ''
+  reason: P4 LockdownAuthority migration — canonical state file, expected to change
+    during runtime
+  segment: ''
+  session: ''
+  timestamp: '2026-05-30T21:01:18.324023+00:00'
+- authorized_by: thavren
+  file: .ovav/service_areas/shared/current_authority_contract.yaml
+  new_hash: 65b62c6f8e52f9c0ce8654c496e479a3c8b610201548ef93dca2d4605130fa65
+  old_hash: ''
+  reason: Fix YAML syntax + align harness to current contract phase
+  segment: ''
+  session: ''
+  timestamp: '2026-05-30T21:07:45.315591+00:00'
+- authorized_by: thavren
+  file: tools/harnesses/runtime_next_work.py
+  new_hash: cddd659d40b8174c948f9342f220171ba90fbf0fced55eb359066eb2f88909c6
+  old_hash: ''
+  reason: Fix YAML syntax + align harness to current contract phase
+  segment: ''
+  session: ''
+  timestamp: '2026-05-30T21:07:45.331259+00:00'
+- authorized_by: thavren
+  file: .ovav/service_areas/shared/current_authority_contract.yaml
+  new_hash: 196caa7fb15a828c20d58057b8611515c95e1bf130ca0466bb269393fa2b3bef
+  old_hash: ''
+  reason: Restore Final Launch Verification term for validator compliance
+  segment: ''
+  session: ''
+  timestamp: '2026-05-30T21:09:02.409446+00:00'
+- authorized_by: thavren
+  file: tools/harnesses/runtime_next_work.py
+  new_hash: ff373b70ef9c1ac35ec78a5ebd157133214810c151251a41352d23ce18f84808
+  old_hash: ''
+  reason: Restore Final Launch Verification term for validator compliance
+  segment: ''
+  session: ''
+  timestamp: '2026-05-30T21:09:02.425854+00:00'
+- authorized_by: thavren
+  file: .ovav/policy/permission_authority.json
+  new_hash: 5bb113cb0194d7c75b33eb8bf8cd33ee969435cbd3d4c57368becea2587a0e66
+  old_hash: ''
+  reason: 'F5: added f5_new_states and f5_gate_liberation to advanced_surfaces'
+  segment: ''
+  session: ''
+  timestamp: '2026-05-30T21:16:37.788245+00:00'
+- authorized_by: thavren
+  file: tools/agent_runtime/session_greeting.py
+  new_hash: aa2917ab07f6b1b5441839857b3cc6b81ef83de8aa8825fa390c913c17012806
+  old_hash: ''
+  reason: 'Continuity layer: auto-checkpoint ledger preserve + self-diagnosis'
+  segment: ''
+  session: ''
+  timestamp: '2026-05-31T20:31:21.500452+00:00'
+- authorized_by: thavren
+  file: tools/harnesses/session_checkpoint.py
+  new_hash: ec79a30aac338234f579385a32f2ccde0d0ca186634badccd58c963fd0bd571d
+  old_hash: ''
+  reason: 'Continuity layer: auto-checkpoint ledger preserve + self-diagnosis'
+  segment: ''
+  session: ''
+  timestamp: '2026-05-31T20:31:21.525644+00:00'
+- authorized_by: thavren
+  file: tools/agent_runtime/self_diagnosis.py
+  new_hash: e21dc5dee88b8e31d1f81dc0812095c4a9cf9da1e6972979bfedc20d77c311f3
+  old_hash: ''
+  reason: 'Continuity layer: auto-checkpoint ledger preserve + self-diagnosis'
+  segment: ''
+  session: ''
+  timestamp: '2026-05-31T20:31:21.544829+00:00'
+- authorized_by: thavren
+  file: tools/agent_runtime/ovav_launch.sh
+  new_hash: b2b999050ee010e07903df50b0f2c0fc4d762bc8565e66f26384d846623fcb2c
+  old_hash: 92931ee1a919b8b17d15373b192b36cfc70402da2264cf239a12b479f9b340b6
+  reason: Isolate OpenCode launch XDG config under /tmp/opencode to prevent host opencode.jsonc
+    recreation from triggering OVAV interference gate.
+  segment: final_launch_verification
+  session: current
+  timestamp: '2026-05-31T21:17:00.000000+00:00'
+- authorized_by: thavren
+  file: tools/agent_runtime/ovav_launch.sh
+  new_hash: b2b999050ee
+  old_hash: 92931ee1a919
+  reason: Authorization mirror for SBOM truncated hash comparator used by Living Integrity
+    drift parsing.
+  segment: final_launch_verification
+  session: current
+  timestamp: '2026-05-31T21:18:10.000000+00:00'
+- authorized_by: thavren
+  file: tools/agent_runtime/ovav_launch.sh
+  new_hash: b2b999050ee0
+  old_hash: 92931ee1a919
+  reason: Corrected 12-character SBOM hash authorization mirror for Living Integrity
+    drift parsing.
+  segment: final_launch_verification
+  session: current
+  timestamp: '2026-05-31T21:19:20.000000+00:00'
+- authorized_by: thavren
+  file: tools/agent_runtime/ovav_launch.sh
+  new_hash: ac9226d993400d0ebac00cdc2fb35f66444bf2dafdffd0201a1e3fa8f54a75d2
+  old_hash: 92931ee1a919b8b17d15373b192b36cfc70402da2264cf239a12b479f9b340b6
+  reason: Hardened launcher with mandatory host/runtime guards and fixed non-zero
+    OpenCode exit handling under set -e.
+  segment: final_launch_verification
+  session: current
+  timestamp: '2026-06-01T01:36:00.000000+00:00'
+- authorized_by: thavren
+  file: tools/agent_runtime/ovav_launch.sh
+  new_hash: ac9226d99340
+  old_hash: 92931ee1a919
+  reason: Authorization mirror for SBOM 12-character hash comparator after launcher
+    hardening.
+  segment: final_launch_verification
+  session: current
+  timestamp: '2026-06-01T01:36:30.000000+00:00'
+- authorized_by: thavren
+  file: tools/validators/check_host_config_drift.py
+  new_hash: f7c7a97940d147689759fb62bd927cf7d4f215409e32e5adfa6b499ed9b7d776
+  old_hash: 6d4a6cb2c79425b6d67c617e55e7df16c26d0702debd08b7874c7ee51c5e894f
+  reason: Allow schema-only OpenCode global bootstrap config while preserving blockade
+    for real host overrides.
+  segment: final_launch_verification
+  session: current
+  timestamp: '2026-06-01T01:45:00.000000+00:00'
+- authorized_by: thavren
+  file: tools/validators/check_host_config_drift.py
+  new_hash: f7c7a97940d1
+  old_hash: 6d4a6cb2c794
+  reason: Authorization mirror for SBOM 12-character hash comparator after host bootstrap
+    allowlist.
+  segment: final_launch_verification
+  session: current
+  timestamp: '2026-06-01T01:45:30.000000+00:00'
+- authorized_by: thavren
+  file: tests/evals/test_host_config_drift.py
+  new_hash: dbd5826c335ecea855a0e030866d62b85e4eaa7b5e000e450b3d701358b3775a
+  old_hash: ''
+  reason: Regression coverage for schema-only OpenCode host config allowlist and hostile
+    override rejection.
+  segment: final_launch_verification
+  session: current
+  timestamp: '2026-06-01T01:50:00.000000+00:00'
+- authorized_by: thavren
+  file: .ovav/gate_self_hash
+  new_hash: fd2d01174e1d86f3697d6b0d34a7818ef84ca7e06d36f57e7c878ab2af93fd10
+  old_hash: ''
+  reason: Gate self-protection hash refreshed after authorized host defense gate update.
+  segment: final_launch_verification
+  session: current
+  timestamp: '2026-06-01T01:52:00.000000+00:00'
+- authorized_by: thavren
+  file: .ovav/context/CURRENT_HANDOFF.md
+  new_hash: 9f437b9a8e3b48f979e4b627039532376050a9655fcf559daab48d2a52aea161
+  old_hash: ''
+  reason: Updated handoff with direct OpenCode root-cause resolution and true next
+    work state.
+  segment: final_launch_verification
+  session: current
+  timestamp: '2026-06-01T02:00:00.000000+00:00'
+- authorized_by: thavren
+  file: tools/agent_runtime/ovav_launch.sh
+  new_hash: 4d2cf6e062bb1a5aec776ad1b85b403b4133990f59bf13fb1699d8153fb35ed0
+  old_hash: ac9226d993400d0ebac00cdc2fb35f66444bf2dafdffd0201a1e3fa8f54a75d2
+  reason: Updated launcher header to optional watchdog/fallback wording after direct
+    OpenCode became safe.
+  segment: final_launch_verification
+  session: current
+  timestamp: '2026-06-01T02:05:00.000000+00:00'
+- authorized_by: thavren
+  file: tools/agent_runtime/ovav_launch.sh
+  new_hash: 4d2cf6e062bb1a5aec776ad1b85b403b4133990f59bf13fb1699d8153fb35ed0
+  old_hash: 92931ee1a919b8b17d15373b192b36cfc70402da2264cf239a12b479f9b340b6
+  reason: Full authorization from SBOM baseline to final optional-watchdog launcher
+    state.
+  segment: final_launch_verification
+  session: current
+  timestamp: '2026-06-01T02:08:00.000000+00:00'
+- authorized_by: thavren
+  file: tools/agent_runtime/ovav_launch.sh
+  new_hash: 4d2cf6e062bb
+  old_hash: 92931ee1a919
+  reason: Authorization mirror for SBOM 12-character hash comparator after final launcher
+    wording.
+  segment: final_launch_verification
+  session: current
+  timestamp: '2026-06-01T02:08:00.000000+00:00'
+- authorized_by: thavren
+  file: clients/opencode/agents/ovav-platform-engineering.md
+  new_hash: 8ed3a23472f4000331883ec779b821e9a2077d2ca18a185b00752b4e1eb302f5
+  old_hash: d5ea0aa4f1f9834fc8b5fd235c9a44c4890d36500f2ee77f4c82c8108daf4c89
+  reason: Updated stale launcher wording to mark opencode direct as normal entry and
+    launcher as optional watchdog/fallback.
+  segment: final_launch_verification
+  session: current
+  timestamp: '2026-06-01T02:12:00.000000+00:00'
+- authorized_by: thavren
+  file: clients/opencode/agents/ovav-platform-engineering.md
+  new_hash: 8ed3a23472f4
+  old_hash: d5ea0aa4f1f9
+  reason: Authorization mirror for SBOM 12-character hash comparator after stale launcher
+    wording fix.
+  segment: final_launch_verification
+  session: current
+  timestamp: '2026-06-01T02:12:00.000000+00:00'
+- authorized_by: thavren
+  file: .ovav/artifacts/L7/L7_DECISION_PACKET.yaml
+  new_hash: 41eedb2a462c27343292ee3f4cdcb834dec47940af778ea6f2668cc36fa5c93d
+  old_hash: ''
+  reason: L7 Feedback Loop authorized implementation/baseline update for .ovav/artifacts/L7/L7_DECISION_PACKET.yaml
+  segment: L7_feedback_loop
+  session: current
+  timestamp: '2026-06-01T02:41:28.340621+00:00'
+- authorized_by: thavren
+  file: .ovav/artifacts/L7/L7_FEEDBACK_LOOP_SPEC.md
+  new_hash: d2b81150ab9a9b693f80cf409e9feca78cfbe57e6db406f05b29491875b86062
+  old_hash: ''
+  reason: L7 Feedback Loop authorized implementation/baseline update for .ovav/artifacts/L7/L7_FEEDBACK_LOOP_SPEC.md
+  segment: L7_feedback_loop
+  session: current
+  timestamp: '2026-06-01T02:41:28.459119+00:00'
+- authorized_by: thavren
+  file: tools/agent_runtime/belief_manager.py
+  new_hash: eb8964f3de94ad33edcac0ab5843a0adb41e2fd71557b6f77cc52ba17767a7eb
+  old_hash: ''
+  reason: L7 Feedback Loop authorized implementation/baseline update for tools/agent_runtime/belief_manager.py
+  segment: L7_feedback_loop
+  session: current
+  timestamp: '2026-06-01T02:41:28.572768+00:00'
+- authorized_by: thavren
+  file: tools/agent_runtime/feedback_loop.py
+  new_hash: 0997dba28c85e7a41df0aea514517d770f7acd5602e39349d30973d37df74af0
+  old_hash: ''
+  reason: L7 Feedback Loop authorized implementation/baseline update for tools/agent_runtime/feedback_loop.py
+  segment: L7_feedback_loop
+  session: current
+  timestamp: '2026-06-01T02:41:28.658694+00:00'
+- authorized_by: thavren
+  file: tools/validators/check_L7_feedback_loop.py
+  new_hash: 6fd31b3aa0e2904f9569ab7ac4fe15a7bdd1bf442cbea6de571dba8a3701da82
+  old_hash: ''
+  reason: L7 Feedback Loop authorized implementation/baseline update for tools/validators/check_L7_feedback_loop.py
+  segment: L7_feedback_loop
+  session: current
+  timestamp: '2026-06-01T02:41:28.743650+00:00'
+- authorized_by: thavren
+  file: .ovav/registry/core_hashes.yaml
+  new_hash: 63a9a1a2fe6908e30629671de5c7837a9b642d05a4e4a44c47fbaf22ce063ace
+  old_hash: 18214023dc4330fbe8676c7d33b21473396941ff52706ede3f12f18b627b9453
+  reason: L7 Feedback Loop authorized implementation/baseline update for .ovav/registry/core_hashes.yaml
+  segment: L7_feedback_loop
+  session: current
+  timestamp: '2026-06-01T02:41:28.888188+00:00'
+- authorized_by: thavren
+  file: .ovav/registry/sbom.yaml
+  new_hash: 9f1313f91cb6e5c469bec9704c7d9ce28f9b88e7f98fd0ef7bed1d922d37f3f5
+  old_hash: 1fe346a8ce864cb11de35096ffe87c7e0d40f102d66a3b421dcdc17b29c26338
+  reason: L7 Feedback Loop authorized implementation/baseline update for .ovav/registry/sbom.yaml
+  segment: L7_feedback_loop
+  session: current
+  timestamp: '2026-06-01T02:41:28.984834+00:00'
+- authorized_by: thavren
+  file: requirements.hash
+  new_hash: 9104baf7a2a24ef20efb30101919902e84f1a66a6bf51180c0da7e4e2fa33721
+  old_hash: 4cb4c2c1b1f2a58075cf7221b66d7d12cbe92193377337ca3a7e24e6dfb5ae69
+  reason: L7 Feedback Loop authorized implementation/baseline update for requirements.hash
+  segment: L7_feedback_loop
+  session: current
+  timestamp: '2026-06-01T02:41:29.112925+00:00'
+- authorized_by: thavren
+  file: .ovav/artifacts/L7/L7_DECISION_PACKET.yaml
+  new_hash: 41eedb2a462c27343292ee3f4cdcb834dec47940af778ea6f2668cc36fa5c93d
+  old_hash: ''
+  reason: L7 Feedback Loop hardening authorized update for .ovav/artifacts/L7/L7_DECISION_PACKET.yaml
+  segment: L7_feedback_loop
+  session: current
+  timestamp: '2026-06-01T02:46:06.728172+00:00'
+- authorized_by: thavren
+  file: .ovav/artifacts/L7/L7_FEEDBACK_LOOP_SPEC.md
+  new_hash: b16d7f52a2b6297bb455f2ad7c66495ca54a80d798b2fdd5496038f79c85a6b1
+  old_hash: ''
+  reason: L7 Feedback Loop hardening authorized update for .ovav/artifacts/L7/L7_FEEDBACK_LOOP_SPEC.md
+  segment: L7_feedback_loop
+  session: current
+  timestamp: '2026-06-01T02:46:07.168421+00:00'
+- authorized_by: thavren
+  file: tools/agent_runtime/belief_manager.py
+  new_hash: da9e7c0ae84388b318dfc73159b6ad003e9dfa5f29b076822a550247bb1b5b6c
+  old_hash: ''
+  reason: L7 Feedback Loop hardening authorized update for tools/agent_runtime/belief_manager.py
+  segment: L7_feedback_loop
+  session: current
+  timestamp: '2026-06-01T02:46:07.464332+00:00'
+- authorized_by: thavren
+  file: tools/agent_runtime/feedback_loop.py
+  new_hash: f98b7c8d28cc309937ab01b44620eeb310a7003fe7f80bdddff115aa6ac42709
+  old_hash: ''
+  reason: L7 Feedback Loop hardening authorized update for tools/agent_runtime/feedback_loop.py
+  segment: L7_feedback_loop
+  session: current
+  timestamp: '2026-06-01T02:46:07.730560+00:00'
+- authorized_by: thavren
+  file: tools/validators/check_L7_feedback_loop.py
+  new_hash: 8dfc90cc1e8f9df38cc4d19f7588b28d8843c0991b8ae2ab564d3b12d855adac
+  old_hash: ''
+  reason: L7 Feedback Loop hardening authorized update for tools/validators/check_L7_feedback_loop.py
+  segment: L7_feedback_loop
+  session: current
+  timestamp: '2026-06-01T02:46:07.984547+00:00'
+- authorized_by: thavren
+  file: .ovav/registry/core_hashes.yaml
+  new_hash: a1f4b24ebb41733db54fecd1258087151224756bb16236e5d580c8dd0502ce9c
+  old_hash: 18214023dc4330fbe8676c7d33b21473396941ff52706ede3f12f18b627b9453
+  reason: L7 Feedback Loop hardening authorized update for .ovav/registry/core_hashes.yaml
+  segment: L7_feedback_loop
+  session: current
+  timestamp: '2026-06-01T02:46:08.382613+00:00'
+- authorized_by: thavren
+  file: .ovav/registry/sbom.yaml
+  new_hash: 34b5adb811324ece22dfbc3c72e03957cc688e4570408c79e902f9c9319d7b44
+  old_hash: 1fe346a8ce864cb11de35096ffe87c7e0d40f102d66a3b421dcdc17b29c26338
+  reason: L7 Feedback Loop hardening authorized update for .ovav/registry/sbom.yaml
+  segment: L7_feedback_loop
+  session: current
+  timestamp: '2026-06-01T02:46:08.797813+00:00'
+- authorized_by: thavren
+  file: requirements.hash
+  new_hash: 0c706bf2d402d0d28e22e439ad059c5f9025d4020180c8edf13ca73744ae1007
+  old_hash: 4cb4c2c1b1f2a58075cf7221b66d7d12cbe92193377337ca3a7e24e6dfb5ae69
+  reason: L7 Feedback Loop hardening authorized update for requirements.hash
+  segment: L7_feedback_loop
+  session: current
+  timestamp: '2026-06-01T02:46:09.117372+00:00'
+- authorized_by: thavren
+  file: .ovav/artifacts/L7/L7_DECISION_PACKET.yaml
+  new_hash: 41eedb2a462c27343292ee3f4cdcb834dec47940af778ea6f2668cc36fa5c93d
+  old_hash: ''
+  reason: L7 Feedback Loop final authorized update for .ovav/artifacts/L7/L7_DECISION_PACKET.yaml
+  segment: L7_feedback_loop
+  session: current
+  timestamp: '2026-06-01T02:50:16.789385+00:00'
+- authorized_by: thavren
+  file: .ovav/artifacts/L7/L7_FEEDBACK_LOOP_SPEC.md
+  new_hash: 635111284b68b1139088996a472ad3e9d4904f66ee8ab65b1e8f0faee17d6809
+  old_hash: ''
+  reason: L7 Feedback Loop final authorized update for .ovav/artifacts/L7/L7_FEEDBACK_LOOP_SPEC.md
+  segment: L7_feedback_loop
+  session: current
+  timestamp: '2026-06-01T02:50:16.891045+00:00'
+- authorized_by: thavren
+  file: tools/agent_runtime/belief_manager.py
+  new_hash: fda2f0796e4bbd1445e9dbae73d8c6ad9d24404ac2135998d96199a2cc005c8c
+  old_hash: ''
+  reason: L7 Feedback Loop final authorized update for tools/agent_runtime/belief_manager.py
+  segment: L7_feedback_loop
+  session: current
+  timestamp: '2026-06-01T02:50:16.996100+00:00'
+- authorized_by: thavren
+  file: tools/agent_runtime/feedback_loop.py
+  new_hash: 9d2abe7a4ceed98b556f16c199522b641ec9dc0b8d8255b9617ad91a36b7f1f5
+  old_hash: ''
+  reason: L7 Feedback Loop final authorized update for tools/agent_runtime/feedback_loop.py
+  segment: L7_feedback_loop
+  session: current
+  timestamp: '2026-06-01T02:50:17.099500+00:00'
+- authorized_by: thavren
+  file: tools/validators/check_L7_feedback_loop.py
+  new_hash: 423b26a28c2e24a769c29ed4269ba855f11c0267f1137aac7f9c1526f2769ea1
+  old_hash: ''
+  reason: L7 Feedback Loop final authorized update for tools/validators/check_L7_feedback_loop.py
+  segment: L7_feedback_loop
+  session: current
+  timestamp: '2026-06-01T02:50:17.198301+00:00'
+- authorized_by: thavren
+  file: .ovav/registry/core_hashes.yaml
+  new_hash: 2071b0b1a1ea2f7a2def14377d9787378dbaf80fe27cf80a481ca9db5bc6e664
+  old_hash: 18214023dc4330fbe8676c7d33b21473396941ff52706ede3f12f18b627b9453
+  reason: L7 Feedback Loop final authorized update for .ovav/registry/core_hashes.yaml
+  segment: L7_feedback_loop
+  session: current
+  timestamp: '2026-06-01T02:50:17.303459+00:00'
+- authorized_by: thavren
+  file: .ovav/registry/sbom.yaml
+  new_hash: 805e24701f820ed07a3c9b7072637ae8e4767a04656cdcd3d3e0ae41d7e91e7d
+  old_hash: 1fe346a8ce864cb11de35096ffe87c7e0d40f102d66a3b421dcdc17b29c26338
+  reason: L7 Feedback Loop final authorized update for .ovav/registry/sbom.yaml
+  segment: L7_feedback_loop
+  session: current
+  timestamp: '2026-06-01T02:50:17.413345+00:00'
+- authorized_by: thavren
+  file: requirements.hash
+  new_hash: de8c1507f58bb66416ec238186404b24ba61aaf93ba9ecdc56db50a70b2dc4ad
+  old_hash: 4cb4c2c1b1f2a58075cf7221b66d7d12cbe92193377337ca3a7e24e6dfb5ae69
+  reason: L7 Feedback Loop final authorized update for requirements.hash
+  segment: L7_feedback_loop
+  session: current
+  timestamp: '2026-06-01T02:50:17.526771+00:00'
+- authorized_by: thavren
+  file: .ovav/artifacts/S147/evidence/S147_ERROR_HANDLING_REPORT.json
+  new_hash: 8f04522456fa1f09d29e4316db26d4b4f0d2733284853316de4fb54ce1ba66ec
+  old_hash: ''
+  reason: Baseline sync for implementaciones branch after containment hotfixes
+  segment: f6_todo_tracker
+  session: current
+  timestamp: '2026-06-01T21:48:39.079536+00:00'
+- authorized_by: thavren
+  file: .ovav/context/CURRENT_HANDOFF.md
+  new_hash: 4c7eb2e114dcc277495d561f483d4d048151f97a756f5b040a5ea2936593ee2b
+  old_hash: ''
+  reason: Baseline sync for implementaciones branch after containment hotfixes
+  segment: f6_todo_tracker
+  session: current
+  timestamp: '2026-06-01T21:48:39.166212+00:00'
+- authorized_by: thavren
+  file: .ovav/health/baseline.json
+  new_hash: 20cffb15d3a0249c09460aaaedd7937d4a63ea2b1cac133695b313cc4ae68d8f
+  old_hash: ''
+  reason: Baseline sync for implementaciones branch after containment hotfixes
+  segment: f6_todo_tracker
+  session: current
+  timestamp: '2026-06-01T21:48:39.249694+00:00'
+- authorized_by: thavren
+  file: .ovav/trusted_head_hash
+  new_hash: ad901396ee298848f95805a4805c6d604d00f54640bac67e8d9d004d9f4f94fb
+  old_hash: ''
+  reason: Baseline sync for implementaciones branch after containment hotfixes
+  segment: f6_todo_tracker
+  session: current
+  timestamp: '2026-06-01T21:48:39.335724+00:00'
+- authorized_by: thavren
+  file: .ovav/registry/auto_triggers.yaml
+  new_hash: e8d6813fb70084ab693b620676383ad240ff801903458faa93e74392d02018cc
+  old_hash: ''
+  reason: Baseline sync for implementaciones branch after containment hotfixes
+  segment: f6_todo_tracker
+  session: current
+  timestamp: '2026-06-01T21:48:39.511120+00:00'
+- authorized_by: thavren
+  file: tools/agent_runtime/session_greeting.py
+  new_hash: 5781c11fc64d47105e5fa817dfc77f80000f660fe59d01541ee05da2b48babdc
+  old_hash: ''
+  reason: Baseline sync for implementaciones branch after containment hotfixes
+  segment: f6_todo_tracker
+  session: current
+  timestamp: '2026-06-01T21:48:39.604779+00:00'
+- authorized_by: thavren
+  file: tools/agent_runtime/trigger_engine.py
+  new_hash: 0ea12b8131eb59c2094740287098b8326fb222201746314e76447c3ae5f37f84
+  old_hash: ''
+  reason: Baseline sync for implementaciones branch after containment hotfixes
+  segment: f6_todo_tracker
+  session: current
+  timestamp: '2026-06-01T21:48:39.697329+00:00'
+- authorized_by: thavren
+  file: clients/opencode/agents/ovav-platform-engineering.md
+  new_hash: 47027e021fc4c8d40749697d4e47fcbd027f52a0c5cd723ba9335b3d367956d1
+  old_hash: d11f84be1be81d72ae55dbadfce4776aea63b9b0e566586e26075c139e45e517
+  reason: 'model_policy_fix: forbidden Claude reference removed per validator output'
+  segment: post_integrity_mesh
+  session: 019e852a-cf1a-7d27-8847-db1dc6bc59ee
+  timestamp: '2026-06-02T00:31:00.145833+00:00'
+- authorized_by: thavren
+  file: tools/security/sbom.py
+  new_hash: b5396b214e087e883fd2b32537be75bf515aa98ea3cc501c1c51b835851cf901
+  old_hash: 0d922aa8b2d583843b099da81274a465b264d0b260dddbe4d93d37a6623dfa59
+  reason: 'sbom_fix: removed hash truncation in mismatch reporting so ledger verification
+    works with full hashes'
+  segment: post_integrity_mesh
+  session: 019e852a-cf1a-7d27-8847-db1dc6bc59ee
+  timestamp: '2026-06-02T00:34:05.670799+00:00'
+- authorized_by: thavren
+  file: tools/harnesses/check_poison_guard_hardening.py
+  new_hash: 238f78c80af1a302fb245d33976d4e81119785682a2cde096db0c4ca4afe76fe
+  old_hash: b0ab6d8361f0f1077bf4f1b5cb9f2896313f850f0571b99ffb8e8ef5c4fff4ed
+  reason: 'poison_timeout_fix: only_poison fast path + timeout 30→45'
+  segment: post_integrity_mesh
+  session: 019e852a-cf1a-7d27-8847-db1dc6bc59ee
+  timestamp: '2026-06-02T00:54:03.112279+00:00'
+- authorized_by: thavren
+  file: tools/memory/core/privacy_classifier.py
+  new_hash: db978c1058a8d391dc62ae77603def0650d015dda623567da7c2ad74da16c615
+  old_hash: 5e92ee9e8087234b92e0a9c1eb140bdbd5c380fec8b262465122507891527695
+  reason: 'poison_fastpath: added only_poison parameter for O(poison) classification'
+  segment: post_integrity_mesh
+  session: 019e852a-cf1a-7d27-8847-db1dc6bc59ee
+  timestamp: '2026-06-02T00:54:03.147063+00:00'
+- authorized_by: thavren
+  file: tools/security/implementation_guard.py
+  new_hash: 9717ec1e83739662e45b8cac544860e0c6dace899e16731614b616236366d0ca
+  old_hash: 1e8d1c14e54904590edd87930669f30ef9dbec6f9544b37b98f711f5a0088cee
+  reason: 'template_variant_detection: build/agent/protocol variant penalty in SimilarityEngine'
+  segment: post_integrity_mesh
+  session: 019e852a-cf1a-7d27-8847-db1dc6bc59ee
+  timestamp: '2026-06-02T00:54:03.185307+00:00'
+- authorized_by: thavren
+  file: tools/security/system_health_scheduler.py
+  new_hash: 07c8ec8bbfd4936437eca8e1003414b9632d8afb69cf7a451ec9597974d80a23
+  old_hash: 2dbb84c45d81a4f2c371dad4ee1baf674cf22d628e0222e89e07bedaccf81ca2
+  reason: 'health_scheduler_fix: expanded scan to 4 directories'
+  segment: post_integrity_mesh
+  session: 019e852a-cf1a-7d27-8847-db1dc6bc59ee
+  timestamp: '2026-06-02T00:54:03.222252+00:00'
+- authorized_by: thavren
+  file: tools/security/system_health_scheduler.py
+  new_hash: e21ba7b65d31d93f144120a5bd2250a389de14858641e232d31e8f587e333748
+  old_hash: e21ba7b65d31d93f144120a5bd2250a389de14858641e232d31e8f587e333748
+  reason: 'health_scheduler: context_firewall fix + impact scoring'
+  segment: post_integrity_mesh
+  session: 019e852a-cf1a-7d27-8847-db1dc6bc59ee
+  timestamp: '2026-06-02T03:25:06.318925+00:00'
+- authorized_by: thavren
+  file: tools/security/implementation_guard.py
+  new_hash: 1f5bf11e91762b3d05e500c9133ed6bc0de8f73b4675c4e4addfc7aad59d58f3
+  old_hash: 1f5bf11e91762b3d05e500c9133ed6bc0de8f73b4675c4e4addfc7aad59d58f3
+  reason: 'implementation_guard: impact scoring, orphan whitelist, layer tracking'
+  segment: post_integrity_mesh
+  session: 019e852a-cf1a-7d27-8847-db1dc6bc59ee
+  timestamp: '2026-06-02T03:25:06.362718+00:00'
+- authorized_by: thavren
+  file: tools/harnesses/session_report_generator.py
+  new_hash: 969ef7f694d30f818ebb63fec0c57fff650b6903adda7bd34b075f15c347436b
+  old_hash: 969ef7f694d30f818ebb63fec0c57fff650b6903adda7bd34b075f15c347436b
+  reason: 'feat: consolidated session report generator'
+  segment: reporting_systems
+  session: 019e852a-cf1a-7d27-8847-db1dc6bc59ee
+  timestamp: '2026-06-02T03:37:28.828393+00:00'
+- authorized_by: thavren
+  file: tools/harnesses/auto_changelog.py
+  new_hash: 6b05298c7d3bac782d7f6739b559be5167b722de084a1cd644caadb080c639c8
+  old_hash: 6b05298c7d3bac782d7f6739b559be5167b722de084a1cd644caadb080c639c8
+  reason: 'feat: auto-changelog from git history'
+  segment: reporting_systems
+  session: 019e852a-cf1a-7d27-8847-db1dc6bc59ee
+  timestamp: '2026-06-02T03:37:28.869160+00:00'
+- authorized_by: thavren
+  file: tools/security/system_health_scheduler.py
+  new_hash: 77352f651a654e195fe48d87c65265bf679ae8c28e663645421a07c9b7ca7bb5
+  old_hash: 77352f651a654e195fe48d87c65265bf679ae8c28e663645421a07c9b7ca7bb5
+  reason: 'fix: health status logic — HEALTHY when score>=80 with warns'
+  segment: reporting_systems
+  session: 019e852a-cf1a-7d27-8847-db1dc6bc59ee
+  timestamp: '2026-06-02T03:37:28.908103+00:00'
+- authorized_by: thavren
+  file: tools/agent_runtime/knowledge_compiler.py
+  new_hash: 4a1a55bc207537734c154214c4c6f17226a3cda1c5964b857bc73f4aa254ed3a
+  old_hash: dba405f2faa2342584e4d07c066d590e09cb0633b14a92b9eeb7b63b97a15f9a
+  reason: Fix Knowledge Compiler ledger-read variable naming so single-writer validator remains clean.
+  segment: doc_authority_consolidation
+  session: current
+  timestamp: '2026-06-02T06:57:19.007458+00:00'
+- authorized_by: thavren
+  file: tools/validators/validate_all.py
+  new_hash: 247b44f8221cf41f81b0c9743d963294436e9eec0ceaf778f7f2510b6e4ec3f8
+  old_hash: a901b2d7b2ab5f65ce843ee1afef0df29b02944acd64145493766c981ca37785
+  reason: Fix aggregate validator severity handling so INFO/WARN/PASS telemetry is
+    non-blocking while BLOCKED defense gate remains blocking.
+  segment: validation_cable_repair
+  session: current
+  timestamp: '2026-06-02T07:19:41.023859+00:00'
+- authorized_by: thavren
+  file: tools/validators/validate_all.py
+  new_hash: 247b44f8221cf41f81b0c9743d963294436e9eec0ceaf778f7f2510b6e4ec3f8
+  old_hash: ed97c874d547454231110c406b97398d091c6b1fbf7fd864ac78f306b70fdc97
+  reason: Authorize final validate_all aggregate severity filter after baseline auto-regeneration.
+  segment: validation_cable_repair
+  session: current
+  timestamp: '2026-06-02T07:20:53.464978+00:00'
+- authorized_by: thavren
+  file: tools/harnesses/workspace_safety_gate.py
+  new_hash: 9510efb5411f8e67dc479cb130aa0548827f5ce27d3160459d69176e77c0d93a
+  old_hash: 495397c70e043913a5800ad1195c18acf6d5e08182000d48ce7ad183ac76fe8a
+  reason: 'Validation cable repair: severity filtering, session guard shape, runtime
+    HEAD trust, current evaluation packet trigger.'
+  segment: validation_cable_repair
+  session: current
+  timestamp: '2026-06-02T07:25:28.437512+00:00'
+- authorized_by: thavren
+  file: tools/security/head_integrity_verifier.py
+  new_hash: 35fd33a78e6a32a54142a4f51a4b3f3da3a6a63bd39c079ecbec8733f913ea81
+  old_hash: ac08a3347f49d590ca751d8d9be70acd848063683be703248eacd468260b5b2d
+  reason: 'Validation cable repair: severity filtering, session guard shape, runtime
+    HEAD trust, current evaluation packet trigger.'
+  segment: validation_cable_repair
+  session: current
+  timestamp: '2026-06-02T07:25:28.548047+00:00'
+- authorized_by: thavren
+  file: tools/security/session_context_guard.py
+  new_hash: 0c4a664ceae98a08e13e32c78dd6336ade6c0021e65a561a3f989fbaec73e46d
+  old_hash: 9b07ab4af5ed6ace1bcc195ee981b034b537fb0a0558dc07db2f8e457d42b80c
+  reason: 'Validation cable repair: severity filtering, session guard shape, runtime
+    HEAD trust, current evaluation packet trigger.'
+  segment: validation_cable_repair
+  session: current
+  timestamp: '2026-06-02T07:25:28.670726+00:00'
+- authorized_by: thavren
+  file: tools/validators/check_contract_freshness.py
+  new_hash: 514a0a9576122875a1a34544ab4a932b2948870677a279069862760d83db1aa1
+  old_hash: 688be53bc91b67a6e565d20e1ac519b22fc38b05800bf626dc748f693d941cea
+  reason: 'Validation cable repair: severity filtering, session guard shape, runtime
+    HEAD trust, current evaluation packet trigger.'
+  segment: validation_cable_repair
+  session: current
+  timestamp: '2026-06-02T07:25:28.792309+00:00'
+- authorized_by: thavren
+  file: tools/validators/validate_all.py
+  new_hash: 247b44f8221cf41f81b0c9743d963294436e9eec0ceaf778f7f2510b6e4ec3f8
+  old_hash: a901b2d7b2ab5f65ce843ee1afef0df29b02944acd64145493766c981ca37785
+  reason: 'Validation cable repair: severity filtering, session guard shape, runtime
+    HEAD trust, current evaluation packet trigger.'
+  segment: validation_cable_repair
+  session: current
+  timestamp: '2026-06-02T07:25:28.912856+00:00'
+- authorized_by: thavren
+  file: tools/harnesses/auto_packet_generator.py
+  new_hash: 746f9f184d7d6d2191d1c3fcef5e18dd222b34f148d838e8d0610923a46aa107
+  old_hash: 580cfd1f5265f6f42415981fce6dcddfaed59e03a0f681d240cd5c9c731771b9
+  reason: 'Validation cable repair: severity filtering, session guard shape, runtime
+    HEAD trust, current evaluation packet trigger.'
+  segment: validation_cable_repair
+  session: current
+  timestamp: '2026-06-02T07:25:29.035813+00:00'
+- authorized_by: thavren
+  file: tools/agent_runtime/trigger_engine.py
+  new_hash: d5ac8b8b0e0df7ec54acb03474a3b86ecfe9388f2a1545e2c866f37c6b3707b0
+  old_hash: 271706214332cd4d2def1c0825f9aef4e1fa41d75eb11e31fa0a8c5d4b5cca57
+  reason: 'Validation cable repair: severity filtering, session guard shape, runtime
+    HEAD trust, current evaluation packet trigger.'
+  segment: validation_cable_repair
+  session: current
+  timestamp: '2026-06-02T07:25:29.163845+00:00'
+- authorized_by: thavren
+  file: .ovav/registry/auto_triggers.yaml
+  new_hash: 3bb919453288da4c5b555893f89a6b23b1e609c0b03c35334067c71b38b4f25f
+  old_hash: b4489ebfd9f8f24f6d737c37d516151c36e6845582b649aa37a7d762dfaa04f9
+  reason: 'Validation cable repair: severity filtering, session guard shape, runtime
+    HEAD trust, current evaluation packet trigger.'
+  segment: validation_cable_repair
+  session: current
+  timestamp: '2026-06-02T07:25:29.311887+00:00'
+- authorized_by: thavren
+  file: tools/agent_runtime/runtime_safety_governor.py
+  new_hash: 9d3beb349c048458ae990b72feabc720ef82bd426a25147732d4f79edff57980
+  old_hash: cd1ee06ad11895561f30cc53b5c8ebbd690eafa5a0ed14d8ee3e2d18c6aa8be5
+  reason: 'Intelligence layer: adaptive CPU threshold, smart validate output, auto-cleanup
+    evaluation packets.'
+  segment: intelligence_adaptation
+  session: current
+  timestamp: '2026-06-02T07:41:57.279165+00:00'
+- authorized_by: thavren
+  file: tools/harnesses/auto_packet_generator.py
+  new_hash: 3e732dbd487f20001a6601f3d79edc6c725363c4fe18909df8218114751b7945
+  old_hash: 746f9f184d7d6d2191d1c3fcef5e18dd222b34f148d838e8d0610923a46aa107
+  reason: 'Intelligence layer: adaptive CPU threshold, smart validate output, auto-cleanup
+    evaluation packets.'
+  segment: intelligence_adaptation
+  session: current
+  timestamp: '2026-06-02T07:41:57.466077+00:00'
+- authorized_by: thavren
+  file: tools/harnesses/runtime_orchestrator.py
+  new_hash: 52bcfe71cec896c3a0954f6fb4eef0d36a4d60d60253d800cad22b2495f87cc9
+  old_hash: 5c2608318f8b7650868481b73e61910fd9638af7a49ff7ea3a9fa54c4db3e3bf
+  reason: 'Intelligence layer: adaptive CPU threshold, smart validate output, auto-cleanup
+    evaluation packets.'
+  segment: intelligence_adaptation
+  session: current
+  timestamp: '2026-06-02T07:41:57.652997+00:00'
+- authorized_by: thavren
+  file: tools/harnesses/runtime_orchestrator.py
+  new_hash: d54ee1b521e8700eae53586a2ddf90ab4b6e07c76b0fec65a43397fbcf9ddec7
+  old_hash: 52bcfe71cec896c3a0954f6fb4eef0d36a4d60d60253d800cad22b2495f87cc9
+  reason: Authorize current baseline after auto-regeneration.
+  segment: intelligence_adaptation
+  session: current
+  timestamp: '2026-06-02T07:43:17.893711+00:00'
+- authorized_by: thavren
+  file: tools/harnesses/runtime_orchestrator.py
+  new_hash: d54ee1b521e8700eae53586a2ddf90ab4b6e07c76b0fec65a43397fbcf9ddec7
+  old_hash: 52bcfe71cec896c3a0954f6fb4eef0d36a4d60d60253d800cad22b2495f87cc9
+  reason: Authorize current baseline after auto-regeneration.
+  segment: intelligence_adaptation
+  session: current
+  timestamp: '2026-06-02T07:43:21.033104+00:00'
+- authorized_by: thavren
+  file: .ovav/service_areas/shared/current_authority_contract.yaml
+  new_hash: c2d39f71a89b97b8e6076acf59c27872e15504fb5e8effff53e7f6bbd4d54a95
+  old_hash: 414a753bfe152684079364fc1aa0292ddcfd2ce1d610d6f861ef45c75119fc5d
+  reason: Documentation alignment update for adaptive intelligence systems.
+  segment: doc_alignment
+  session: current
+  timestamp: '2026-06-02T07:53:31.295776+00:00'
+- authorized_by: thavren
+  file: tools/harnesses/runtime_orchestrator.py
+  new_hash: d54ee1b521e8700eae53586a2ddf90ab4b6e07c76b0fec65a43397fbcf9ddec7
+  old_hash: 52bcfe71cec896c3a0954f6fb4eef0d36a4d60d60253d800cad22b2495f87cc9
+  reason: Documentation alignment update for adaptive intelligence systems.
+  segment: doc_alignment
+  session: current
+  timestamp: '2026-06-02T07:53:31.505450+00:00'
+- authorized_by: thavren
+  file: tools/harnesses/doc_alignment_trigger.py
+  new_hash: ''
+  old_hash: ''
+  reason: 'New module: documentation alignment trigger for KC→docs gap closure.'
+  segment: doc_alignment
+  session: current
+  timestamp: '2026-06-02T07:53:31.851418+00:00'
+- authorized_by: thavren
+  file: tools/harnesses/runtime_orchestrator.py
+  new_hash: d54ee1b521e8700eae53586a2ddf90ab4b6e07c76b0fec65a43397fbcf9ddec7
+  old_hash: 52bcfe71cec896c3a0954f6fb4eef0d36a4d60d60253d800cad22b2495f87cc9
+  reason: Documentation alignment update for adaptive intelligence systems.
+  segment: doc_alignment
+  session: current
+  timestamp: '2026-06-02T07:53:32.108821+00:00'
+- authorized_by: thavren
+  file: .ovav/service_areas/shared/current_authority_contract.yaml
+  new_hash: c2d39f71a89b97b8e6076acf59c27872e15504fb5e8effff53e7f6bbd4d54a95
+  old_hash: 414a753bfe152684079364fc1aa0292ddcfd2ce1d610d6f861ef45c75119fc5d
+  reason: Documentation alignment update for adaptive intelligence systems.
+  segment: doc_alignment
+  session: current
+  timestamp: '2026-06-02T07:53:32.356997+00:00'
+- authorized_by: thavren
+  file: tools/agent_runtime/feedback_loop.py
+  new_hash: c50837d32e3162e4db8befc8255c2cd873fb2ff504f5b6e15a5f5d9288b0754f
+  old_hash: a7a330210e37caad0c7763f231f5a9c6a6b2daa33ce609429868088694739258
+  reason: authorized syntax repair during startup state-sync intervention
+  segment: startup_state_sync_and_model_routing_repair
+  session: 2026-06-02-thavren
+  timestamp: '2026-06-02T10:24:18.989826+00:00'
+- authorized_by: thavren
+  file: tools/agent_runtime/session_greeting.py
+  new_hash: 21576b82314f2dde4ad17990b2c63ba8147b62e116c9da4f853e49fb59e2d9df
+  old_hash: 90499d075eb914b0ee8864f625ae7fc010fe0c082ccfd02be9c7629823ee4a71
+  reason: 'Fix repeated continuity drift: separate latest git work from pending next_work
+    in session greeting'
+  segment: session_greeting_truth_guard
+  session: ''
+  timestamp: '2026-06-02T11:05:13.279932+00:00'
+- authorized_by: thavren
+  file: tools/harnesses/check_session_greeting_truth.py
+  new_hash: b26e0e6619fbda467bcb70173290a685fdd7a9cffcafef492cd478befa1a7bbf
+  old_hash: ''
+  reason: Add regression gate preventing next_work from being presented as latest
+    work
+  segment: session_greeting_truth_guard
+  session: ''
+  timestamp: '2026-06-02T11:05:13.434179+00:00'
+- authorized_by: thavren
+  file: tools/harnesses/check_session_greeting_truth.py
+  new_hash: 21fe0c472376a496684840c4ce4335a349f33b922217366050e2d8f6e94f3f42
+  old_hash: b26e0e6619fbda467bcb70173290a685fdd7a9cffcafef492cd478befa1a7bbf
+  reason: Wire session greeting truth checker into aggregate validation
+  segment: session_greeting_truth_guard
+  session: ''
+  timestamp: '2026-06-02T11:07:39.014204+00:00'
+- authorized_by: thavren
+  file: tools/validators/validate_all.py
+  new_hash: 0926aba482e73b1e57ca57a653690a8ff227c93232f7d2a070cd638f6091afdc
+  old_hash: 247b44f8221cf41f81b0c9743d963294436e9eec0ceaf778f7f2510b6e4ec3f8
+  reason: Run session greeting truth gate in validate_all to prevent recurrence
+  segment: session_greeting_truth_guard
+  session: ''
+  timestamp: '2026-06-02T11:07:39.158886+00:00'
+- authorized_by: thavren
+  file: opencode.json
+  new_hash: 7bc7de5c7771f9dfaae7776e98a174adb254f7e5fff733f16c48304a55ac6227
+  old_hash: ''
+  reason: Align squad models with premium team authority and enforce implementation
+    delegation
+  segment: squad_model_routing_enforcement
+  session: ''
+  timestamp: '2026-06-02T11:21:15.986676+00:00'
+- authorized_by: thavren
+  file: tools/harnesses/model_task_router.py
+  new_hash: c49104dbfe88dae7c8fdc3b592cbf599f636a7be85795349c7301061051ef6c6
+  old_hash: 1ea6244993f4a87d562edd778641a8f46e42c33ff3c10873f82e935135024ebb
+  reason: Align squad models with premium team authority and enforce implementation
+    delegation
+  segment: squad_model_routing_enforcement
+  session: ''
+  timestamp: '2026-06-02T11:21:16.175798+00:00'
+- authorized_by: thavren
+  file: tools/harnesses/check_s144_model_task_router.py
+  new_hash: 57857d06676bff565d5166def81f1c00b65760296fa28ae886b64d22d642d8f7
+  old_hash: 5bf8846d0429ef2f03d25c417c61fed6dc4216c657e62c24a5fedd8dc99def4c
+  reason: Align squad models with premium team authority and enforce implementation
+    delegation
+  segment: squad_model_routing_enforcement
+  session: ''
+  timestamp: '2026-06-02T11:21:16.334369+00:00'
+- authorized_by: thavren
+  file: tools/validators/check_squad_normalization.py
+  new_hash: c872baf9dc8020f4d2bc37c03cab90b3a14db4bf9c4b2bf3fcb9dfe664626fc4
+  old_hash: 6430658e4106fc7d3d07f9852465a9e098271d7d19a5b2221332d9a77c11bf0e
+  reason: Align squad models with premium team authority and enforce implementation
+    delegation
+  segment: squad_model_routing_enforcement
+  session: ''
+  timestamp: '2026-06-02T11:21:16.491699+00:00'
+- authorized_by: thavren
+  file: tests/fixtures/golden/model_task_router_cases.json
+  new_hash: b0d852d2f38157afb10c3e1ff0b48e45d1441fe5ec547bbe8953edbeed3a4c6b
+  old_hash: ''
+  reason: Align squad models with premium team authority and enforce implementation
+    delegation
+  segment: squad_model_routing_enforcement
+  session: ''
+  timestamp: '2026-06-02T11:21:16.650326+00:00'
+- authorized_by: thavren
+  file: clients/opencode/agents/squad-benchmark-analyst.md
+  new_hash: 7f58b8a6b75c97d4f479d123ef42f3bfc14a3099fa443663424baa8f2090f9e1
+  old_hash: 6d020587d90083dcf5bf74a465797d5ebfe2181e9f238767a9e9d4f2d5992854
+  reason: Align squad models with premium team authority and enforce implementation
+    delegation
+  segment: squad_model_routing_enforcement
+  session: ''
+  timestamp: '2026-06-02T11:21:16.836704+00:00'
+- authorized_by: thavren
+  file: clients/opencode/agents/squad-code-reviewer.md
+  new_hash: a834047d31aa3a4a48a6aa00fd1a3a101bb9c20d25a457a12ce5b89951f1709a
+  old_hash: 98796ff49a507e3454068aa2a78344bc984f545c156443c03fba6a116be39e1c
+  reason: Align squad models with premium team authority and enforce implementation
+    delegation
+  segment: squad_model_routing_enforcement
+  session: ''
+  timestamp: '2026-06-02T11:21:17.033798+00:00'
+- authorized_by: thavren
+  file: clients/opencode/agents/squad-explorer-deep.md
+  new_hash: 2e4ac6cd9752d9aebe1471b7656012bd95cd0c0679c95e09ccf75414f2a1a3c4
+  old_hash: 160b6eaa2ae4041382b538e606fe70f7e667f9085c7c4856c2c65d478d05b23a
+  reason: Align squad models with premium team authority and enforce implementation
+    delegation
+  segment: squad_model_routing_enforcement
+  session: ''
+  timestamp: '2026-06-02T11:21:17.203183+00:00'
+- authorized_by: thavren
+  file: clients/opencode/agents/squad-explorer.md
+  new_hash: 41652a7b85c5c9e0563bbee5149507c0a1ed1bae807f390a1eec64e734d6802e
+  old_hash: f88fbb49d35ce4c52ddcff77546cda40afcbb7e9fef10b3b2254eed3b967f821
+  reason: Align squad models with premium team authority and enforce implementation
+    delegation
+  segment: squad_model_routing_enforcement
+  session: ''
+  timestamp: '2026-06-02T11:21:17.456763+00:00'
+- authorized_by: thavren
+  file: clients/opencode/agents/squad-implementer-codex.md
+  new_hash: 1f509a884c84500b57d557660d7f9444136e8cc600a3da383e0e75024386c2af
+  old_hash: ec234d4ed89e4d7a2d577b3f604f067d8d30d4c15379607967853d85fd6d7c96
+  reason: Align squad models with premium team authority and enforce implementation
+    delegation
+  segment: squad_model_routing_enforcement
+  session: ''
+  timestamp: '2026-06-02T11:21:17.694762+00:00'
+- authorized_by: thavren
+  file: clients/opencode/agents/squad-implementer-spark.md
+  new_hash: 382e486b9f16e391b9268bae63bef64d7b924f0edc328428603f69322b9c920e
+  old_hash: eed9cf5ec4d3b8f56baae99a95bb86532220db8979d112a86552b7cf7c89f71f
+  reason: Align squad models with premium team authority and enforce implementation
+    delegation
+  segment: squad_model_routing_enforcement
+  session: ''
+  timestamp: '2026-06-02T11:21:17.877282+00:00'
+- authorized_by: thavren
+  file: clients/opencode/agents/squad-install-engineer.md
+  new_hash: b6c4b6574a3a566d609450fe22e1c8a7d80552a406fa4a4045e69923788bdd8a
+  old_hash: 638ad65c4310a22e2d0d7a6be2f10d3fd6304cb81435c6bd52d83b049bede353
+  reason: Align squad models with premium team authority and enforce implementation
+    delegation
+  segment: squad_model_routing_enforcement
+  session: ''
+  timestamp: '2026-06-02T11:21:18.034430+00:00'
+- authorized_by: thavren
+  file: clients/opencode/agents/squad-qa-engineer.md
+  new_hash: 8ad22e8b41c2f6173426cfb8340a7daccb628ca9fdc1918e9157962c16a2b6e7
+  old_hash: f1f2fb4d4e639f743bbda5adc97f2299dfc1bf0765ce921e5bd9338f598f6a66
+  reason: Align squad models with premium team authority and enforce implementation
+    delegation
+  segment: squad_model_routing_enforcement
+  session: ''
+  timestamp: '2026-06-02T11:21:18.256909+00:00'
+- authorized_by: thavren
+  file: clients/opencode/agents/squad-security-auditor.md
+  new_hash: a5b21dd23ab5c445cab63617a0d80765b894d719d2aa09956e771b8df95973f3
+  old_hash: c1228755035ff26ac2ed53332a747e643f930497a8b0888df2573a6a7cf5f021
+  reason: Align squad models with premium team authority and enforce implementation
+    delegation
+  segment: squad_model_routing_enforcement
+  session: ''
+  timestamp: '2026-06-02T11:21:18.475363+00:00'
+- authorized_by: thavren
+  file: clients/opencode/agents/squad-summarizer-fast.md
+  new_hash: 5125888ed880329be885d249ffdf069191fdeb4331f2de7ca298695326528554
+  old_hash: efdc4a503edbea388567497d3af7551fb4df676328d96481093db93b3caf1511
+  reason: Align squad models with premium team authority and enforce implementation
+    delegation
+  segment: squad_model_routing_enforcement
+  session: ''
+  timestamp: '2026-06-02T11:21:18.722222+00:00'
+- authorized_by: thavren
+  file: clients/opencode/agents/squad-sys-architect.md
+  new_hash: c71963da62bc194c415c545ae4efcda89252219c9d4507b00822fc92812c6b8e
+  old_hash: 45585eb17dbf740ff23c38dc7465f05864efbe3d349bdc9d68d402ce68807d67
+  reason: Align squad models with premium team authority and enforce implementation
+    delegation
+  segment: squad_model_routing_enforcement
+  session: ''
+  timestamp: '2026-06-02T11:21:18.963962+00:00'
+- authorized_by: thavren
+  file: opencode.json
+  new_hash: 5bbb6b49c015551eb6e010b9b4ad9a28d691658ec9e738dbb9101312efc5d1a9
+  old_hash: ''
+  reason: Replace unverified model ids with confirmed available GPT/OpenCode models
+    and enforce allowlist
+  segment: verified_model_routing_fix
+  session: ''
+  timestamp: '2026-06-02T11:25:14.195479+00:00'
+- authorized_by: thavren
+  file: tests/fixtures/golden/model_task_router_cases.json
+  new_hash: 22923f10ff735f12e1ed12596eb674bb3fb26c095c6f5655c32d205a5cb5f82d
+  old_hash: ''
+  reason: Replace unverified model ids with confirmed available GPT/OpenCode models
+    and enforce allowlist
+  segment: verified_model_routing_fix
+  session: ''
+  timestamp: '2026-06-02T11:25:14.414099+00:00'
+- authorized_by: thavren
+  file: opencode.json
+  new_hash: dd178825a5828a7f589e0627357ab2afb57901bee151c894d857273fd9fb407c
+  old_hash: ''
+  reason: Hide native OpenCode profiles from TAB and enforce wrong-area safe stop
+    for Research Intelligence
+  segment: visible_profile_scope_enforcement
+  session: ''
+  timestamp: '2026-06-02T11:50:03.827028+00:00'
+- authorized_by: thavren
+  file: clients/opencode/agents/ovav-platform-engineering.md
+  new_hash: 3d377dc527d70db81e3f0d63d3d42a4b60fc4dac5f709fedd0c1027f67a5cbcb
+  old_hash: ffbb90c9c276920f159cb4e8c8190add453281e8ecc844dc364e6c775043eab6
+  reason: Hide native OpenCode profiles from TAB and enforce wrong-area safe stop
+    for Research Intelligence
+  segment: visible_profile_scope_enforcement
+  session: ''
+  timestamp: '2026-06-02T11:50:03.999642+00:00'
+- authorized_by: thavren
+  file: clients/opencode/agents/ovav-research-intelligence.md
+  new_hash: 7d6d0e0db7c187a430b805b3887e879618e7bfd06af47b9fb6127627bc890736
+  old_hash: bbeb69cdf059c5499ef7957c335c8bdfec204c3334cb9203b77d886adb800a22
+  reason: Hide native OpenCode profiles from TAB and enforce wrong-area safe stop
+    for Research Intelligence
+  segment: visible_profile_scope_enforcement
+  session: ''
+  timestamp: '2026-06-02T11:50:04.166753+00:00'
+- authorized_by: thavren
+  file: tools/harnesses/check_visible_surface_cleanup.py
+  new_hash: c7fee5efed07d04ca15096411f00996df0f40c2d17538284288cebd3cc856c06
+  old_hash: 23f6db55c72d23bdbb133884e52ab3027e99609397f1ebbbfa98118142e32b51
+  reason: Hide native OpenCode profiles from TAB and enforce wrong-area safe stop
+    for Research Intelligence
+  segment: visible_profile_scope_enforcement
+  session: ''
+  timestamp: '2026-06-02T11:50:04.339865+00:00'
+- authorized_by: thavren
+  file: tools/validators/check_agent_runtime_service_area_router.py
+  new_hash: 8c49fcb1b02a2dbc61136eee05cc0ea48c78d0d59f9b2c950325b976061c01ab
+  old_hash: fcaaffeda40a91ceff0b2d2a09d99f076d4cf454680c6d52b9e2f0f141141980
+  reason: Hide native OpenCode profiles from TAB and enforce wrong-area safe stop
+    for Research Intelligence
+  segment: visible_profile_scope_enforcement
+  session: ''
+  timestamp: '2026-06-02T11:50:04.518668+00:00'
+- authorized_by: thavren
+  file: .ovav/service_areas/shared/lead_work_method_contract.yaml
+  new_hash: 7ca3766126aeaeb625b65ad1cf206d46022dd68b6b5fd022dcea4ff01fb7f90f
+  old_hash: 84ac096c5e33aa9e88d120fc24b9f609a129740fac8956cfd4f15f5a5ec1381f
+  reason: Enforce approved preview to observable result validation after selector
+    UX drift feedback
+  segment: approved_preview_acceptance_contract
+  session: ''
+  timestamp: '2026-06-02T21:33:29.663917+00:00'
+- authorized_by: thavren
+  file: .ovav/service_areas/shared/visual_delivery_contract.yaml
+  new_hash: d03ce1acd57257d361b804bd618a37f42901972eb17ac47aefdd31602e181169
+  old_hash: 40ed8584bb29d57862d4beab273d8e0bb075f0393bba6241c0b93ca481f80710
+  reason: Enforce approved preview to observable result validation after selector
+    UX drift feedback
+  segment: approved_preview_acceptance_contract
+  session: ''
+  timestamp: '2026-06-02T21:33:29.663917+00:00'
+- authorized_by: thavren
+  file: .ovav/service_areas/areas/platform_engineering.yaml
+  new_hash: 902a40d1efcdfb9c09a49eb1f0b797894796744c8b5469bc0a551fdc58cbd4af
+  old_hash: 021855c698e4a2b142f864cc879e08b5ed8a4147cc817ebeddf2eab60554cd24
+  reason: Separate area, lead and independent team-member logic; enforce English internal
+    contracts and safe delegate boundaries
+  segment: human_topology_separation_pass_1
+  session: ''
+  timestamp: '2026-06-02T21:54:09.383791+00:00'
+- authorized_by: thavren
+  file: .ovav/service_areas/platform_engineering/lead_contract.yaml
+  new_hash: 2460f506750aa14deae69e6847a1936c7f6a975b52dea3138b1cef5a29a02517
+  old_hash: 20751839d941dd2eecb2254888ebf08b47a80be8182a1d4c889a41f2e687627b
+  reason: Separate area, lead and independent team-member logic; enforce English internal
+    contracts and safe delegate boundaries
+  segment: human_topology_separation_pass_1
+  session: ''
+  timestamp: '2026-06-02T21:54:09.383791+00:00'
+- authorized_by: thavren
+  file: .ovav/service_areas/platform_engineering/human_topology.yaml
+  new_hash: b834bbfd9144524ad6478db704f360c1185774ce2815d25eaebd75bf6f4ced59
+  old_hash: ''
+  reason: Separate area, lead and independent team-member logic; enforce English internal
+    contracts and safe delegate boundaries
+  segment: human_topology_separation_pass_1
+  session: ''
+  timestamp: '2026-06-02T21:54:09.383791+00:00'
+- authorized_by: thavren
+  file: .ovav/service_areas/platform_engineering/team/squad_sys_architect.yaml
+  new_hash: 9c8a49e4479c28f2b17a2906f5fc9751bcd44b4f46d3fccf73dd580ef3ab541d
+  old_hash: c00b45ad213373c1271b0bcde0d89844487e7d549a9a21aafb71bb23cd0944f1
+  reason: Separate area, lead and independent team-member logic; enforce English internal
+    contracts and safe delegate boundaries
+  segment: human_topology_separation_pass_1
+  session: ''
+  timestamp: '2026-06-02T21:54:09.383791+00:00'
+- authorized_by: thavren
+  file: .ovav/service_areas/platform_engineering/team/squad_implementer_codex.yaml
+  new_hash: 11b2d674bb9ab02dcdf559f88bc4883dbb09e2f0fe0372cb7cab79773565d832
+  old_hash: fa704713a420524fe3c2e2c131ef8c7e9e7b1546a5e1b0501d0c2a40a3da0275
+  reason: Separate area, lead and independent team-member logic; enforce English internal
+    contracts and safe delegate boundaries
+  segment: human_topology_separation_pass_1
+  session: ''
+  timestamp: '2026-06-02T21:54:09.383791+00:00'
+- authorized_by: thavren
+  file: .ovav/service_areas/platform_engineering/team/squad_install_engineer.yaml
+  new_hash: 772e985f22dd7eeff1cd49682f733f2a7802716505c6913d26a99125610266f4
+  old_hash: 1a1c7783d58fedbe8008a54f91ee209663e0c1af2c5050562b881f33e5bdcd8d
+  reason: Separate area, lead and independent team-member logic; enforce English internal
+    contracts and safe delegate boundaries
+  segment: human_topology_separation_pass_1
+  session: ''
+  timestamp: '2026-06-02T21:54:09.383791+00:00'
+- authorized_by: thavren
+  file: .ovav/service_areas/platform_engineering/team/squad_qa_engineer.yaml
+  new_hash: aeb394cb1f9d5525ecdd1f9e11e61805ee750cbbda0a3c113ce4c15a105e0a44
+  old_hash: 0767725804acdd44a99dd0da55c43c56a919dc4687825615aba00164743d3734
+  reason: Separate area, lead and independent team-member logic; enforce English internal
+    contracts and safe delegate boundaries
+  segment: human_topology_separation_pass_1
+  session: ''
+  timestamp: '2026-06-02T21:54:09.383791+00:00'
+- authorized_by: thavren
+  file: clients/opencode/agents/thavren.md
+  new_hash: 15beb0cda42708993467039f0decb088c3a010019e5c6ef680dcbdb6af90c721
+  old_hash: 61cb32c77e0a125b2847d8750fa5937631924ef158d05c4d78648c0f8e219175
+  reason: Separate area, lead and independent team-member logic; enforce English internal
+    contracts and safe delegate boundaries
+  segment: human_topology_separation_pass_1
+  session: ''
+  timestamp: '2026-06-02T21:54:09.383791+00:00'
+- authorized_by: thavren
+  file: clients/opencode/agents/ovav-platform-engineering.md
+  new_hash: 29217292412ef06c0ef57c750761c1609dc8fce522a045648f998dfac9bdc62c
+  old_hash: bd19d9eae3346bbc3a0dfacf9763041e7b9e14b13ae0c12a0a0478ff2f12f4ad
+  reason: Separate area, lead and independent team-member logic; enforce English internal
+    contracts and safe delegate boundaries
+  segment: human_topology_separation_pass_1
+  session: ''
+  timestamp: '2026-06-02T21:54:09.383791+00:00'
+- authorized_by: thavren
+  file: clients/opencode/agents/squad-sys-architect.md
+  new_hash: 155c1e74f0b7a106f5fd051e1794061859e2eb98cec8c683d875f778cb327ee2
+  old_hash: 1d223584f2444a40d7aeb70c45cc2b10386b42070131a83dd89d98ddad34706d
+  reason: Separate area, lead and independent team-member logic; enforce English internal
+    contracts and safe delegate boundaries
+  segment: human_topology_separation_pass_1
+  session: ''
+  timestamp: '2026-06-02T21:54:09.383791+00:00'
+- authorized_by: thavren
+  file: clients/opencode/agents/squad-implementer-spark.md
+  new_hash: e1bc7201dd2a4bc8d5663e52b5d6ed1d556d69158c88e1fcf001dec2d14994a7
+  old_hash: 738844612dfd1e3cfc319d93db283eb5be1542afb157558cdb1b07e3a3a73e75
+  reason: Separate area, lead and independent team-member logic; enforce English internal
+    contracts and safe delegate boundaries
+  segment: human_topology_separation_pass_1
+  session: ''
+  timestamp: '2026-06-02T21:54:09.383791+00:00'
+- authorized_by: thavren
+  file: clients/opencode/agents/squad-install-engineer.md
+  new_hash: 7dfe58d54cb45a0a14ba7f400fe348de4dcc085402bf82c5ef29f482edcab1e3
+  old_hash: 65b81a03a8b65eb22ff5db0467d3f4f81ba66a74c3b9e84bf01c5655caea27bd
+  reason: Separate area, lead and independent team-member logic; enforce English internal
+    contracts and safe delegate boundaries
+  segment: human_topology_separation_pass_1
+  session: ''
+  timestamp: '2026-06-02T21:54:09.383791+00:00'
+- authorized_by: thavren
+  file: clients/opencode/agents/squad-qa-engineer.md
+  new_hash: 33bc01a94f2df7048cd41ad45c649c451b47fb4e71a3fd58b330c61f8597df4a
+  old_hash: b44f4b3de49f3bd9f51e5df0f72f9e94c7f8af7878b5f0b42e49ba6b420f56b4
+  reason: Separate area, lead and independent team-member logic; enforce English internal
+    contracts and safe delegate boundaries
+  segment: human_topology_separation_pass_1
+  session: ''
+  timestamp: '2026-06-02T21:54:09.383791+00:00'
+- authorized_by: thavren
+  file: clients/opencode/agents/squad-implementer-codex.md
+  new_hash: 2b0b44b655579f1a67a038c94aa853cb577127073d600ee33e90caf81018d2a5
+  old_hash: 05877b44c5ea84b546b6fbf92bc0c8c242f7fa959fc7b06d1e01c31146a0e5cf
+  reason: Separate area, lead and independent team-member logic; enforce English internal
+    contracts and safe delegate boundaries
+  segment: human_topology_separation_pass_1
+  session: ''
+  timestamp: '2026-06-02T21:54:09.383791+00:00'
+- authorized_by: thavren
+  file: .ovav/context/BEHAVIORAL_DIRECTIVES.yaml
+  new_hash: 52d666b69c4376c089b36414a5f3c8907be4b62e5754715af21fd8d7192b486f
+  old_hash: 1559f5222b35d2b120b11b5901cfa284bc60a95ff86a64ba18793daea4dddb41
+  reason: Persist CEO feedback as permanent model distribution, English-internal and
+    human-topology working criteria
+  segment: persistent_model_orchestration_criteria
+  session: ''
+  timestamp: '2026-06-02T22:04:05.344979+00:00'
+- authorized_by: thavren
+  file: .ovav/service_areas/shared/model_budget_policy.yaml
+  new_hash: 902a6f168a4b6f6ba591236b5c636d20eed3f3da7ccf78fcbd29593373c1faac
+  old_hash: cf53e7313dc56d2de4b0decc80a0244a2ecfbabcc4d7330c3211ccf625d1bb34
+  reason: Persist CEO feedback as permanent model distribution, English-internal and
+    human-topology working criteria
+  segment: persistent_model_orchestration_criteria
+  session: ''
+  timestamp: '2026-06-02T22:04:05.344979+00:00'
+- authorized_by: thavren
+  file: .ovav/service_areas/shared/context_economy_contract.yaml
+  new_hash: 0317ac6e69acfa829df90b1d5044a98afc442a1479d248aad12af40136b3518e
+  old_hash: 178c4d09dc7c4afd3606f296ea2847a3b370cedd3444bfe045f980621b1c7b0f
+  reason: Persist CEO feedback as permanent model distribution, English-internal and
+    human-topology working criteria
+  segment: persistent_model_orchestration_criteria
+  session: ''
+  timestamp: '2026-06-02T22:04:05.344979+00:00'
+- authorized_by: thavren
+  file: .ovav/service_areas/shared/lead_work_method_contract.yaml
+  new_hash: 61355e04c95b2b0c16f233db6b6b96260eeaf9f134fe07ce593e77f4b3763237
+  old_hash: 7ca3766126aeaeb625b65ad1cf206d46022dd68b6b5fd022dcea4ff01fb7f90f
+  reason: Persist CEO feedback as permanent model distribution, English-internal and
+    human-topology working criteria
+  segment: persistent_model_orchestration_criteria
+  session: ''
+  timestamp: '2026-06-02T22:04:05.344979+00:00'
+- authorized_by: thavren
+  file: .ovav/context/BEHAVIORAL_DIRECTIVES.yaml
+  new_hash: b1683fe7630a42069f4a9dd70276e6121a8ef6c97c463082f4b2718c0e61e374
+  old_hash: 1559f5222b35d2b120b11b5901cfa284bc60a95ff86a64ba18793daea4dddb41
+  reason: Apply delegated audit fixes for model IDs, role IDs, team permissions, language
+    consistency and permission normalization
+  segment: delegated_human_topology_audit_fixes
+  session: ''
+  timestamp: '2026-06-02T22:09:20.443497+00:00'
+- authorized_by: thavren
+  file: .ovav/service_areas/shared/model_budget_policy.yaml
+  new_hash: 905ea95df45490b2f2e2b81c05e49e39aa74ebc536ab5141cd0b458c80873cc3
+  old_hash: 902a6f168a4b6f6ba591236b5c636d20eed3f3da7ccf78fcbd29593373c1faac
+  reason: Apply delegated audit fixes for model IDs, role IDs, team permissions, language
+    consistency and permission normalization
+  segment: delegated_human_topology_audit_fixes
+  session: ''
+  timestamp: '2026-06-02T22:09:20.443497+00:00'
+- authorized_by: thavren
+  file: .ovav/service_areas/areas/platform_engineering.yaml
+  new_hash: 034b94e58098f1b0114e5f8054f6cf6a054052b7d818dadb5b48037cb5d1a28f
+  old_hash: 902a40d1efcdfb9c09a49eb1f0b797894796744c8b5469bc0a551fdc58cbd4af
+  reason: Apply delegated audit fixes for model IDs, role IDs, team permissions, language
+    consistency and permission normalization
+  segment: delegated_human_topology_audit_fixes
+  session: ''
+  timestamp: '2026-06-02T22:09:20.443497+00:00'
+- authorized_by: thavren
+  file: .ovav/service_areas/platform_engineering/lead_contract.yaml
+  new_hash: 66cbde8aef6b2ea5bfdf3c9924b8694ac984ae31945909db98ec21c4ef1387c3
+  old_hash: 2460f506750aa14deae69e6847a1936c7f6a975b52dea3138b1cef5a29a02517
+  reason: Apply delegated audit fixes for model IDs, role IDs, team permissions, language
+    consistency and permission normalization
+  segment: delegated_human_topology_audit_fixes
+  session: ''
+  timestamp: '2026-06-02T22:09:20.443497+00:00'
+- authorized_by: thavren
+  file: .ovav/service_areas/platform_engineering/team/squad_explorer.yaml
+  new_hash: 43023632b9b44e9bdb664723a33aed1820658bcf38b39fd2f0a176710fbdeb90
+  old_hash: 2ccf02951abda0e01e1171f61350c9ec7d8eec3b6e1b1ce352d01d59d763d795
+  reason: Apply delegated audit fixes for model IDs, role IDs, team permissions, language
+    consistency and permission normalization
+  segment: delegated_human_topology_audit_fixes
+  session: ''
+  timestamp: '2026-06-02T22:09:20.443497+00:00'
+- authorized_by: thavren
+  file: .ovav/service_areas/platform_engineering/team/squad_explorer_deep.yaml
+  new_hash: 6c9334bf6424e092925c76386a5de9701376ce976e055ed93e5c671613eea9a2
+  old_hash: b73c4329f407cfa53e4a562a6f23b05a665d872365a6019a0b761d44c7597d1b
+  reason: Apply delegated audit fixes for model IDs, role IDs, team permissions, language
+    consistency and permission normalization
+  segment: delegated_human_topology_audit_fixes
+  session: ''
+  timestamp: '2026-06-02T22:09:20.443497+00:00'
+- authorized_by: thavren
+  file: .ovav/service_areas/platform_engineering/team/squad_benchmark_analyst.yaml
+  new_hash: 478c44a3fc86eddb779bc485b1154116cdce7f4ca0c773c7eb3438932f70e10d
+  old_hash: aee7e98fac99a3a6d86af0f2e460fafe9e052b960b4ee100d00906c8637c00ff
+  reason: Apply delegated audit fixes for model IDs, role IDs, team permissions, language
+    consistency and permission normalization
+  segment: delegated_human_topology_audit_fixes
+  session: ''
+  timestamp: '2026-06-02T22:09:20.443497+00:00'
+- authorized_by: thavren
+  file: .ovav/service_areas/platform_engineering/team/squad_summarizer_fast.yaml
+  new_hash: de77bfcc7c3266f633e9bd9bc7f5498d80b903a9d77fdff6a87f39695bad4211
+  old_hash: dc0c4f9ab52dcc83dfb2385621fad4e29421340f77a80513f7e50f84be0a1861
+  reason: Apply delegated audit fixes for model IDs, role IDs, team permissions, language
+    consistency and permission normalization
+  segment: delegated_human_topology_audit_fixes
+  session: ''
+  timestamp: '2026-06-02T22:09:20.443497+00:00'
+- authorized_by: thavren
+  file: .ovav/service_areas/platform_engineering/team/squad_security_auditor.yaml
+  new_hash: 4eaa9f6fad9af94233da18edaf5517d285ac59fcff2346b6dc26bfd04ecf4cd0
+  old_hash: 0852f01cdd579de367aac3d185ac525d27ac1626d3cc2bbf07cf9634455e9a2b
+  reason: Apply delegated audit fixes for model IDs, role IDs, team permissions, language
+    consistency and permission normalization
+  segment: delegated_human_topology_audit_fixes
+  session: ''
+  timestamp: '2026-06-02T22:09:20.443497+00:00'
+- authorized_by: thavren
+  file: .ovav/service_areas/platform_engineering/team/squad_code_reviewer.yaml
+  new_hash: 7b383beeeed6d71d9c6071f09fa1b3d41eeb4930abf23fed3e1e53a2b0b200be
+  old_hash: b716f5a11b16dbeb00a3ff58c8c713402a1ae7d19275bf378525c479c80453d3
+  reason: Apply delegated audit fixes for model IDs, role IDs, team permissions, language
+    consistency and permission normalization
+  segment: delegated_human_topology_audit_fixes
+  session: ''
+  timestamp: '2026-06-02T22:09:20.443497+00:00'
+- authorized_by: thavren
+  file: .ovav/service_areas/platform_engineering/team/squad_implementer_spark.yaml
+  new_hash: 99948413e36a1e9c400d0c5e14f67c65b0532f6b374815beffd79d0c7e9da5f2
+  old_hash: cedb0dbd6a6a10e48d09182b6a21125e03f1f08e1354e5ebd230ee40565c4b43
+  reason: Apply delegated audit fixes for model IDs, role IDs, team permissions, language
+    consistency and permission normalization
+  segment: delegated_human_topology_audit_fixes
+  session: ''
+  timestamp: '2026-06-02T22:09:20.443497+00:00'
+- authorized_by: thavren
+  file: clients/opencode/agents/squad-benchmark-analyst.md
+  new_hash: 8d93225a1382ba157374a5a7b0052e1f080ca61630e817581f7e312f162cca85
+  old_hash: ac65fb688c18ed03ab65325c80b24ddc600bd5a990f4cabb3c4a414be658bee9
+  reason: Apply delegated audit fixes for model IDs, role IDs, team permissions, language
+    consistency and permission normalization
+  segment: delegated_human_topology_audit_fixes
+  session: ''
+  timestamp: '2026-06-02T22:09:20.443497+00:00'
+- authorized_by: thavren
+  file: clients/opencode/agents/squad-code-reviewer.md
+  new_hash: 99b5894c557efdba2738d011b1a46c63537c0e2e2d0842d0402a66d741427d91
+  old_hash: 424ffae0e7d649ed24d9db4e0139fad9e7ef01cbf645bd5b82907aed265fbf9c
+  reason: Apply delegated audit fixes for model IDs, role IDs, team permissions, language
+    consistency and permission normalization
+  segment: delegated_human_topology_audit_fixes
+  session: ''
+  timestamp: '2026-06-02T22:09:20.443497+00:00'
+- authorized_by: thavren
+  file: clients/opencode/agents/squad-explorer-deep.md
+  new_hash: 928791c31f8458e079699e5f855a06d7346e498f2170e547ed28b46b07332c59
+  old_hash: 8da95e9cb16d530633b56a9b108287979c792f68fcb26bdad64d6d0537c4c9f0
+  reason: Apply delegated audit fixes for model IDs, role IDs, team permissions, language
+    consistency and permission normalization
+  segment: delegated_human_topology_audit_fixes
+  session: ''
+  timestamp: '2026-06-02T22:09:20.443497+00:00'
+- authorized_by: thavren
+  file: clients/opencode/agents/squad-explorer.md
+  new_hash: a3ff8d0704bbf3362812ffebeb00861f78281e509ab83fe9e5307f4695ea6dc9
+  old_hash: 6828922682ddf8f057b23613636445b6aad0029fc96d063f83c9822d4f148746
+  reason: Apply delegated audit fixes for model IDs, role IDs, team permissions, language
+    consistency and permission normalization
+  segment: delegated_human_topology_audit_fixes
+  session: ''
+  timestamp: '2026-06-02T22:09:20.443497+00:00'
+- authorized_by: thavren
+  file: clients/opencode/agents/squad-implementer-spark.md
+  new_hash: 29ea2d0c5ced8a8597f2196738a3c2fe9d7e81926ebde8155df64c899146b47b
+  old_hash: e1bc7201dd2a4bc8d5663e52b5d6ed1d556d69158c88e1fcf001dec2d14994a7
+  reason: Apply delegated audit fixes for model IDs, role IDs, team permissions, language
+    consistency and permission normalization
+  segment: delegated_human_topology_audit_fixes
+  session: ''
+  timestamp: '2026-06-02T22:09:20.443497+00:00'
+- authorized_by: thavren
+  file: clients/opencode/agents/squad-install-engineer.md
+  new_hash: eb733415a3211a77a2a0094f928f5908d1bc08cd04e46388fd7c592104cbb2fa
+  old_hash: 7dfe58d54cb45a0a14ba7f400fe348de4dcc085402bf82c5ef29f482edcab1e3
+  reason: Apply delegated audit fixes for model IDs, role IDs, team permissions, language
+    consistency and permission normalization
+  segment: delegated_human_topology_audit_fixes
+  session: ''
+  timestamp: '2026-06-02T22:09:20.443497+00:00'
+- authorized_by: thavren
+  file: clients/opencode/agents/squad-qa-engineer.md
+  new_hash: ae56f31789fb1f55ece733ab36a158fb40bc1b7abf9af6dd865924ed7330f9b5
+  old_hash: 33bc01a94f2df7048cd41ad45c649c451b47fb4e71a3fd58b330c61f8597df4a
+  reason: Apply delegated audit fixes for model IDs, role IDs, team permissions, language
+    consistency and permission normalization
+  segment: delegated_human_topology_audit_fixes
+  session: ''
+  timestamp: '2026-06-02T22:09:20.443497+00:00'
+- authorized_by: thavren
+  file: clients/opencode/agents/squad-security-auditor.md
+  new_hash: f8b814de306076ee5c2b200ea9397134430a7da87f9fe2917cee252c05e0e3a2
+  old_hash: 2c950d8e7d6d6cc5714f0ade2f80c95ff4531784661ec3725b93faa9cd6a425c
+  reason: Apply delegated audit fixes for model IDs, role IDs, team permissions, language
+    consistency and permission normalization
+  segment: delegated_human_topology_audit_fixes
+  session: ''
+  timestamp: '2026-06-02T22:09:20.443497+00:00'
+- authorized_by: thavren
+  file: clients/opencode/agents/squad-summarizer-fast.md
+  new_hash: 7a41ab44d71d1a2e83cbea44f1cb888b5cedf624c63d90856a328e4956892b63
+  old_hash: c14775b10e4dee31e8ec85fee279b4b609a589b39782ad6364ec082769b083b6
+  reason: Apply delegated audit fixes for model IDs, role IDs, team permissions, language
+    consistency and permission normalization
+  segment: delegated_human_topology_audit_fixes
+  session: ''
+  timestamp: '2026-06-02T22:09:20.443497+00:00'
+- authorized_by: thavren
+  file: clients/opencode/agents/squad-sys-architect.md
+  new_hash: 822126fdb5f682549c96b03124fd1ef5324fd3e0959d103a3b71fbdff65fe112
+  old_hash: 155c1e74f0b7a106f5fd051e1794061859e2eb98cec8c683d875f778cb327ee2
+  reason: Apply delegated audit fixes for model IDs, role IDs, team permissions, language
+    consistency and permission normalization
+  segment: delegated_human_topology_audit_fixes
+  session: ''
+  timestamp: '2026-06-02T22:09:20.443497+00:00'
+- authorized_by: thavren
+  file: tools/validators/check_agent_permission_invariants.py
+  new_hash: 226ac76bef18b75ecda7825ddd47c870ddfa5e24ab3ec995e2497a3915abcddf
+  old_hash: ''
+  reason: Add deterministic validator for intentional Platform Engineering and Thavren
+    permission topology
+  segment: agent_permission_invariants_gate
+  session: ''
+  timestamp: '2026-06-02T22:39:56.277332+00:00'
+- authorized_by: thavren
+  file: tools/validators/validate_all.py
+  new_hash: 0926aba482e73b1e57ca57a653690a8ff227c93232f7d2a070cd638f6091afdc
+  old_hash: 247b44f8221cf41f81b0c9743d963294436e9eec0ceaf778f7f2510b6e4ec3f8
+  reason: Authorize validator integration surface after review and deterministic permission
+    invariant check
+  segment: agent_permission_invariants_gate
+  session: ''
+  timestamp: '2026-06-02T22:43:05.658781+00:00'
+- authorized_by: thavren
+  file: tools/validators/check_agent_permission_invariants.py
+  new_hash: 226ac76bef18b75ecda7825ddd47c870ddfa5e24ab3ec995e2497a3915abcddf
+  old_hash: ''
+  reason: Authorize validator integration surface after review and deterministic permission
+    invariant check
+  segment: agent_permission_invariants_gate
+  session: ''
+  timestamp: '2026-06-02T22:43:05.658781+00:00'
+- authorized_by: thavren
+  file: tools/agent_runtime/self_diagnosis.py
+  new_hash: 3fa2c2cd0211b5c02e328033384d8e40958e8668d8497ebd541784f5459d1791
+  old_hash: 2175f1c389c96a6df72f4bde705556aa561b459a93320370dffad04825c0de15
+  reason: Updated file paths and checks to match area·/lead·/team· hierarchy refactor
+    (commit c751601). Aligned default_agent check, area routing verification, and
+    lead mode expectations with current architecture.
+  segment: identity_layers_refactor_sync
+  session: current
+  timestamp: '2026-06-03T06:41:59.753873+00:00'
+- authorized_by: thavren
+  file: clients/opencode/agents/team-ryn.md
+  new_hash: 28a13fd0159fa404121fa91da0109e5165115ff7af89bf45abf20d0aae8800bb
+  old_hash: a3ff8d0704bbf3362812ffebeb00861f78281e509ab83fe9e5307f4695ea6dc9
+  reason: 'Aligned squad model assignments with model_body_ladder v2.0.0: light squads
+    (Kael, Ryn, Orin, Lyra) → openai/gpt-4; eliminated free models per no_free_models
+    rule.'
+  segment: squad_model_alignment
+  session: current
+  timestamp: '2026-06-03T06:50:40.531732+00:00'
+- authorized_by: thavren
+  file: clients/opencode/agents/team-orin.md
+  new_hash: f74244fc5dbae2012de42afc5d4fc3752d4770c656f75df257e1e7026f495c3e
+  old_hash: 928791c31f8458e079699e5f855a06d7346e498f2170e547ed28b46b07332c59
+  reason: 'Aligned squad model assignments with model_body_ladder v2.0.0: light squads
+    (Kael, Ryn, Orin, Lyra) → openai/gpt-4; eliminated free models per no_free_models
+    rule.'
+  segment: squad_model_alignment
+  session: current
+  timestamp: '2026-06-03T06:50:40.539075+00:00'
+- authorized_by: thavren
+  file: clients/opencode/agents/team-lyra.md
+  new_hash: 034561bf7a7b1da1e7f7af52f0a7b30c1eecd3cdb5d6b4a454383843adac1041
+  old_hash: 7a41ab44d71d1a2e83cbea44f1cb888b5cedf624c63d90856a328e4956892b63
+  reason: 'Aligned squad model assignments with model_body_ladder v2.0.0: light squads
+    (Kael, Ryn, Orin, Lyra) → openai/gpt-4; eliminated free models per no_free_models
+    rule.'
+  segment: squad_model_alignment
+  session: current
+  timestamp: '2026-06-03T06:50:40.546392+00:00'
+- authorized_by: thavren
+  file: clients/opencode/agents/team-kael.md
+  new_hash: ebcd1ca761a2fc9cd4ce79add2bf1bd1a7e3639944fcdd9a40f39b212f3c667c
+  old_hash: 29ea2d0c5ced8a8597f2196738a3c2fe9d7e81926ebde8155df64c899146b47b
+  reason: 'Aligned squad model assignments with model_body_ladder v2.0.0: light squads
+    (Kael, Ryn, Orin, Lyra) → openai/gpt-4; eliminated free models per no_free_models
+    rule.'
+  segment: squad_model_alignment
+  session: current
+  timestamp: '2026-06-03T06:50:40.551595+00:00'
+- authorized_by: thavren
+  file: .ovav/source/agents/teams/platform-engineering/ryn.md
+  new_hash: 28a13fd0159fa404121fa91da0109e5165115ff7af89bf45abf20d0aae8800bb
+  old_hash: a3ff8d0704bbf3362812ffebeb00861f78281e509ab83fe9e5307f4695ea6dc9
+  reason: 'Aligned squad model assignments with model_body_ladder v2.0.0: light squads
+    (Kael, Ryn, Orin, Lyra) → openai/gpt-4; eliminated free models per no_free_models
+    rule.'
+  segment: squad_model_alignment
+  session: current
+  timestamp: '2026-06-03T06:50:40.558922+00:00'
+- authorized_by: thavren
+  file: .ovav/source/agents/teams/platform-engineering/orin.md
+  new_hash: f74244fc5dbae2012de42afc5d4fc3752d4770c656f75df257e1e7026f495c3e
+  old_hash: 928791c31f8458e079699e5f855a06d7346e498f2170e547ed28b46b07332c59
+  reason: 'Aligned squad model assignments with model_body_ladder v2.0.0: light squads
+    (Kael, Ryn, Orin, Lyra) → openai/gpt-4; eliminated free models per no_free_models
+    rule.'
+  segment: squad_model_alignment
+  session: current
+  timestamp: '2026-06-03T06:50:40.563684+00:00'
+- authorized_by: thavren
+  file: .ovav/source/agents/teams/platform-engineering/lyra.md
+  new_hash: 034561bf7a7b1da1e7f7af52f0a7b30c1eecd3cdb5d6b4a454383843adac1041
+  old_hash: 7a41ab44d71d1a2e83cbea44f1cb888b5cedf624c63d90856a328e4956892b63
+  reason: 'Aligned squad model assignments with model_body_ladder v2.0.0: light squads
+    (Kael, Ryn, Orin, Lyra) → openai/gpt-4; eliminated free models per no_free_models
+    rule.'
+  segment: squad_model_alignment
+  session: current
+  timestamp: '2026-06-03T06:50:40.568141+00:00'
+- authorized_by: thavren
+  file: .ovav/source/agents/teams/platform-engineering/kael.md
+  new_hash: ebcd1ca761a2fc9cd4ce79add2bf1bd1a7e3639944fcdd9a40f39b212f3c667c
+  old_hash: 29ea2d0c5ced8a8597f2196738a3c2fe9d7e81926ebde8155df64c899146b47b
+  reason: 'Aligned squad model assignments with model_body_ladder v2.0.0: light squads
+    (Kael, Ryn, Orin, Lyra) → openai/gpt-4; eliminated free models per no_free_models
+    rule.'
+  segment: squad_model_alignment
+  session: current
+  timestamp: '2026-06-03T06:50:40.572372+00:00'
+- authorized_by: thavren
+  file: .ovav/source/agents/teams/research-intelligence/lyra.md
+  new_hash: 034561bf7a7b1da1e7f7af52f0a7b30c1eecd3cdb5d6b4a454383843adac1041
+  old_hash: 7a41ab44d71d1a2e83cbea44f1cb888b5cedf624c63d90856a328e4956892b63
+  reason: 'Aligned squad model assignments with model_body_ladder v2.0.0: light squads
+    (Kael, Ryn, Orin, Lyra) → openai/gpt-4; eliminated free models per no_free_models
+    rule.'
+  segment: squad_model_alignment
+  session: current
+  timestamp: '2026-06-03T06:50:40.578126+00:00'
+- authorized_by: thavren
+  file: tools/ovav_dashboard.py
+  new_hash: 21aa91234b536883a028ea441d598472c15b178a54c0d40e25e04595a714b14c
+  old_hash: ''
+  reason: 'Aligned squad model assignments with model_body_ladder v2.0.0: light squads
+    (Kael, Ryn, Orin, Lyra) → openai/gpt-4; eliminated free models per no_free_models
+    rule.'
+  segment: squad_model_alignment
+  session: current
+  timestamp: '2026-06-03T06:50:40.586411+00:00'
+- authorized_by: intelligent_authorizer
+  file: .ovav/service_areas/shared/current_authority_contract.yaml
+  new_hash: 20e621a73cf01b1dee3820e8d0b933df00661796679534858fbdf29d9d4666d4
+  old_hash: 72cc563c18f441a218b0e99f31fa0fe88698952611f574bd4699e8ad7280649b
+  reason: '[AUTO] Patrón conocido (4 autorizaciones previas) en rama de trabajo. (domain=governed_config,
+    risk=low)'
+  segment: auto_authorized_session
+  session: auto
+  timestamp: '2026-06-03T07:01:19.832044+00:00'
+- authorized_by: intelligent_authorizer
+  file: .ovav/policy/permission_authority.json
+  new_hash: 9a4cd2df7e44e93c3c11ed2f76a0dcc863de5cce05077df26a483c338e505184
+  old_hash: 5bb113cb0194d7c75b33eb8bf8cd33ee969435cbd3d4c57368becea2587a0e66
+  reason: '[AUTO] Cambio en dominio governed_config durante sesión activa en rama
+    de trabajo. (domain=governed_config, risk=low)'
+  segment: auto_authorized_session
+  session: auto
+  timestamp: '2026-06-03T07:11:49.644546+00:00'
+- authorized_by: intelligent_authorizer
+  file: tools/validators/check_agent_permission_invariants.py
+  new_hash: 8d99c8c72823846b69d674659fe4bb6fdb4003c50cca531a77514462925dd43c
+  old_hash: 226ac76bef18b75ecda7825ddd47c870ddfa5e24ab3ec995e2497a3915abcddf
+  reason: '[AUTO] Cambio en immutable_source durante sesión activa en rama de trabajo
+    — verificar en review. (domain=immutable_source, risk=medium)'
+  segment: auto_authorized_session
+  session: auto
+  timestamp: '2026-06-03T07:11:49.652262+00:00'
+- authorized_by: intelligent_authorizer
+  file: tools/validators/check_agent_runtime_service_area_router.py
+  new_hash: d3ffe59ab230e19143a95d6151bf190f2eac070f0b159e5bac1d9e20e5b6cd01
+  old_hash: 8c49fcb1b02a2dbc61136eee05cc0ea48c78d0d59f9b2c950325b976061c01ab
+  reason: '[AUTO] Cambio en immutable_source durante sesión activa en rama de trabajo
+    — verificar en review. (domain=immutable_source, risk=medium)'
+  segment: auto_authorized_session
+  session: auto
+  timestamp: '2026-06-03T07:11:49.659735+00:00'
+- authorized_by: intelligent_authorizer
+  file: tools/validators/check_agent_ux_visual_delivery.py
+  new_hash: 4fa3582e670273dc21f23760a4cf6c3b144251bc6e755dafa6c6ddcb48116f45
+  old_hash: 9698e0aae0aaf5f242eded5f5e9313fcc926e1e58f4cf28f42d114e3d0d94499
+  reason: '[AUTO] Cambio en immutable_source durante sesión activa en rama de trabajo
+    — verificar en review. (domain=immutable_source, risk=medium)'
+  segment: auto_authorized_session
+  session: auto
+  timestamp: '2026-06-03T07:11:49.667193+00:00'
+- authorized_by: intelligent_authorizer
+  file: tools/validators/check_context_economy_and_active_connections.py
+  new_hash: 25fdca6f93eef7b0fcf2b7ce0a505fd5e091080734cc975a12216884e9095b30
+  old_hash: 51b8c3b68dcf872ab3ba47dc7a7698f0545b86cf2c02647e072d34457333be37
+  reason: '[AUTO] Cambio en immutable_source durante sesión activa en rama de trabajo
+    — verificar en review. (domain=immutable_source, risk=medium)'
+  segment: auto_authorized_session
+  session: auto
+  timestamp: '2026-06-03T07:11:49.674820+00:00'
+- authorized_by: intelligent_authorizer
+  file: tools/validators/check_final_launch_current_authority.py
+  new_hash: 095f288a3d6799f51152d8ee402737ed4f8fdeb3b3f6630ae93ca7d11b81103c
+  old_hash: d41e7704e5685947712e05fbb014ab1f7cf9345abff7f837135450b76da8bff0
+  reason: '[AUTO] Cambio en immutable_source durante sesión activa en rama de trabajo
+    — verificar en review. (domain=immutable_source, risk=medium)'
+  segment: auto_authorized_session
+  session: auto
+  timestamp: '2026-06-03T07:11:49.682602+00:00'
+- authorized_by: intelligent_authorizer
+  file: tools/validators/check_git_push_gate.py
+  new_hash: f5926be23347a09571a4cd0255e3825c3e6b36b29aa3ab98293b37676be8380e
+  old_hash: 506565386da7f1dccbc6b114a39ee89a5d90571b98406919f3ede72fa0ab6211
+  reason: '[AUTO] Cambio en immutable_source durante sesión activa en rama de trabajo
+    — verificar en review. (domain=immutable_source, risk=medium)'
+  segment: auto_authorized_session
+  session: auto
+  timestamp: '2026-06-03T07:11:49.690565+00:00'
+- authorized_by: intelligent_authorizer
+  file: tools/validators/check_host_config_drift.py
+  new_hash: 8ff2e50c602b60d278cec7e47c681d24880f457db3a471d680a2fe6dd670a5a4
+  old_hash: f7c7a97940d147689759fb62bd927cf7d4f215409e32e5adfa6b499ed9b7d776
+  reason: '[AUTO] Patrón conocido (3 autorizaciones previas) en rama de trabajo. (domain=immutable_source,
+    risk=medium)'
+  segment: auto_authorized_session
+  session: auto
+  timestamp: '2026-06-03T07:11:49.697852+00:00'
+- authorized_by: intelligent_authorizer
+  file: tools/validators/check_opencode_runtime_wiring.py
+  new_hash: 6d4ba1c6b66bf1405a0d52a830e0bf8d25f56749a1d6c679a239759e3bcfc29f
+  old_hash: 29bd2188404ce5a633c20df54a97dbf5bdd926607429df1e53e0ab40b6fa039a
+  reason: '[AUTO] Cambio en immutable_source durante sesión activa en rama de trabajo
+    — verificar en review. (domain=immutable_source, risk=medium)'
+  segment: auto_authorized_session
+  session: auto
+  timestamp: '2026-06-03T07:11:49.705509+00:00'
+- authorized_by: intelligent_authorizer
+  file: tools/validators/check_workspace_safety_gate.py
+  new_hash: 28da77b327fe39fcdd983491710510821e0cb54f77823e8196d9692517574811
+  old_hash: 6f28f7546b1e09adaa4287b69d3dede39c71132b360f72920c11d05bd6c48d44
+  reason: '[AUTO] Cambio en immutable_source durante sesión activa en rama de trabajo
+    — verificar en review. (domain=immutable_source, risk=medium)'
+  segment: auto_authorized_session
+  session: auto
+  timestamp: '2026-06-03T07:11:49.712615+00:00'
+- authorized_by: intelligent_authorizer
+  file: tools/harnesses/check_build5_opencode_visible_role_freeze.py
+  new_hash: 1320fb79ff08782a328f01e61e50afa784b66c411590156a32772392d1b5409b
+  old_hash: fa9e4d31b52062854a323d2cee9cd3ad8211872175e353fa22548776380fc145
+  reason: '[AUTO] Cambio en immutable_source durante sesión activa en rama de trabajo
+    — verificar en review. (domain=immutable_source, risk=medium)'
+  segment: auto_authorized_session
+  session: auto
+  timestamp: '2026-06-03T07:11:49.720189+00:00'
+- authorized_by: intelligent_authorizer
+  file: tools/harnesses/check_git_stage_intelligence.py
+  new_hash: b3aae18a70df51451d5a692cd8f5afcf970694f38789e972f38436f1a19a6015
+  old_hash: 07a7488a18b32505b6c10433282d26f2fb7e2ae2ae511c8e42ef1d5dd883d72b
+  reason: '[AUTO] Cambio en immutable_source durante sesión activa en rama de trabajo
+    — verificar en review. (domain=immutable_source, risk=medium)'
+  segment: auto_authorized_session
+  session: auto
+  timestamp: '2026-06-03T07:11:49.727533+00:00'
+- authorized_by: intelligent_authorizer
+  file: tools/harnesses/check_global_projection_bridge_m2.py
+  new_hash: 7f303a9adbccd33f96ac4211a8bf431d7a2d4e89b3b8407790c67087dc191760
+  old_hash: 5cedf425aea8c14e516f3bee64cebaa0131f41e650c9f3cf8026eb9d91be2fbd
+  reason: '[AUTO] Cambio en immutable_source durante sesión activa en rama de trabajo
+    — verificar en review. (domain=immutable_source, risk=medium)'
+  segment: auto_authorized_session
+  session: auto
+  timestamp: '2026-06-03T07:11:49.735090+00:00'
+- authorized_by: intelligent_authorizer
+  file: tools/harnesses/check_opencode_command_surface.py
+  new_hash: 0888b5a1e851c4dd0cb2dee2aaa0893831315fbcd50cea67c9cf96334ed1afb7
+  old_hash: f32d58ce47393b8bcf7320146d497c447c78fb7cc06618ba3aee9fefbc3c37db
+  reason: '[AUTO] Cambio en immutable_source durante sesión activa en rama de trabajo
+    — verificar en review. (domain=immutable_source, risk=medium)'
+  segment: auto_authorized_session
+  session: auto
+  timestamp: '2026-06-03T07:11:49.742355+00:00'
+- authorized_by: intelligent_authorizer
+  file: tools/harnesses/check_opencode_repo_local_pack.py
+  new_hash: 1a3a540a51401bf37963025809f8e78f7349c3c61e74be6f5e320b7c3bbf675d
+  old_hash: 1f3986f860acec5792138b0e898f7d06328bfbbe8da58848e575c8b01d5207d1
+  reason: '[AUTO] Cambio en immutable_source durante sesión activa en rama de trabajo
+    — verificar en review. (domain=immutable_source, risk=medium)'
+  segment: auto_authorized_session
+  session: auto
+  timestamp: '2026-06-03T07:11:49.750415+00:00'
+- authorized_by: intelligent_authorizer
+  file: tools/harnesses/check_opencode_repo_local_smoke.py
+  new_hash: a5bc065caaedfdcaf5cb319e78da671497003a190f197ffdd5165f9e3129860b
+  old_hash: 6422bd5106680c9b6528080ff960a9b0d319deb0f6991ae4452821ab21687503
+  reason: '[AUTO] Cambio en immutable_source durante sesión activa en rama de trabajo
+    — verificar en review. (domain=immutable_source, risk=medium)'
+  segment: auto_authorized_session
+  session: auto
+  timestamp: '2026-06-03T07:11:49.758195+00:00'
+- authorized_by: intelligent_authorizer
+  file: tools/harnesses/check_visible_surface_cleanup.py
+  new_hash: b44308fadc91626f9608527c05bcdcf1bc0b8ce2dda4aa8ae5a12d4f80d36fe3
+  old_hash: 23f6db55c72d23bdbb133884e52ab3027e99609397f1ebbbfa98118142e32b51
+  reason: '[AUTO] Cambio en immutable_source durante sesión activa en rama de trabajo
+    — verificar en review. (domain=immutable_source, risk=medium)'
+  segment: auto_authorized_session
+  session: auto
+  timestamp: '2026-06-03T07:11:49.765586+00:00'
+- authorized_by: intelligent_authorizer
+  file: tools/harnesses/close_manifest_builder.py
+  new_hash: faad213b6dcb4f405ea0a2be5975263368c268a69b5a07ea6a1471327027f205
+  old_hash: 252a458f9d7846db54eccf7e410bc405439f1fa464abd9fa30fda4ddb1c9fdc7
+  reason: '[AUTO] Cambio en immutable_source durante sesión activa en rama de trabajo
+    — verificar en review. (domain=immutable_source, risk=medium)'
+  segment: auto_authorized_session
+  session: auto
+  timestamp: '2026-06-03T07:11:49.773862+00:00'
+- authorized_by: intelligent_authorizer
+  file: tools/harnesses/opencode_agent_surface.py
+  new_hash: b5c7481eba3e0728d6f6b4cd35e0e27c22a5da224405502fddc22b01d9300d7f
+  old_hash: c92808680d40e26daa4da2896d9a3842d8382ad7d20e97af30668573075e4b7b
+  reason: '[AUTO] Cambio en immutable_source durante sesión activa en rama de trabajo
+    — verificar en review. (domain=immutable_source, risk=medium)'
+  segment: auto_authorized_session
+  session: auto
+  timestamp: '2026-06-03T07:11:49.781987+00:00'
+- authorized_by: intelligent_authorizer
+  file: tools/harnesses/opencode_command_surface_report.py
+  new_hash: c801b47ee9d670363fa3484c8f7060e043c881508c04444643bc84838e759fe6
+  old_hash: 82407bdd0a37c7dc713d857bb0feb6e75950188a3e76007ca41ea6038d22cc4a
+  reason: '[AUTO] Cambio en immutable_source durante sesión activa en rama de trabajo
+    — verificar en review. (domain=immutable_source, risk=medium)'
+  segment: auto_authorized_session
+  session: auto
+  timestamp: '2026-06-03T07:11:49.789818+00:00'
+- authorized_by: intelligent_authorizer
+  file: tools/harnesses/opencode_identity_guard.py
+  new_hash: da74b531ba3418af625099936c04f5bda61a2af5278c2e8f673b11af926f9bfb
+  old_hash: 28ce196c0df1598f574f2265358e09c481b20a06fb0d539a88d55a3ce5bb906d
+  reason: '[AUTO] Cambio en immutable_source durante sesión activa en rama de trabajo
+    — verificar en review. (domain=immutable_source, risk=medium)'
+  segment: auto_authorized_session
+  session: auto
+  timestamp: '2026-06-03T07:11:49.797197+00:00'
+- authorized_by: intelligent_authorizer
+  file: tools/harnesses/opencode_repo_local_boundaries.py
+  new_hash: e63bb8ee7ae73f4ed0a335623aa7c224e41cb848ead070a35816fe6e5adc065e
+  old_hash: 02612dce70c96e6da0e9ef460ccc8641278645153430f75988a2a2b1b0893632
+  reason: '[AUTO] Cambio en immutable_source durante sesión activa en rama de trabajo
+    — verificar en review. (domain=immutable_source, risk=medium)'
+  segment: auto_authorized_session
+  session: auto
+  timestamp: '2026-06-03T07:11:49.804637+00:00'
+- authorized_by: intelligent_authorizer
+  file: tools/harnesses/opencode_repo_local_contract.py
+  new_hash: cb56ddcb3940c1d792ad4285e250c3cffa57570beb39be53c069fd38a8f968a2
+  old_hash: 2902054f3731615be3b2aebeea2f1605579bc316498a64e7c119c4c44b0a197d
+  reason: '[AUTO] Cambio en immutable_source durante sesión activa en rama de trabajo
+    — verificar en review. (domain=immutable_source, risk=medium)'
+  segment: auto_authorized_session
+  session: auto
+  timestamp: '2026-06-03T07:11:49.811920+00:00'
+- authorized_by: intelligent_authorizer
+  file: tools/harnesses/opencode_repo_local_pack.py
+  new_hash: 80dec917e96df9b7ba97ac4458fdb99a70e8b200cd7fa49742827e6b70c2660d
+  old_hash: e861b190e478bded669a556848598bdee107207282531fcf01e4d42096c60372
+  reason: '[AUTO] Cambio en immutable_source durante sesión activa en rama de trabajo
+    — verificar en review. (domain=immutable_source, risk=medium)'
+  segment: auto_authorized_session
+  session: auto
+  timestamp: '2026-06-03T07:11:49.819167+00:00'
+- authorized_by: intelligent_authorizer
+  file: tools/harnesses/opencode_repo_local_pack_report.py
+  new_hash: 4a97d7fe6b16d34cd1dd3de0dc91e70329c214bfecfd701cf03f72f3340ba796
+  old_hash: 6eae6c46bde68ddd212dbdee3a05b0e51d856ae79897fcfde578b0ac866eb411
+  reason: '[AUTO] Cambio en immutable_source durante sesión activa en rama de trabajo
+    — verificar en review. (domain=immutable_source, risk=medium)'
+  segment: auto_authorized_session
+  session: auto
+  timestamp: '2026-06-03T07:11:49.826410+00:00'
+- authorized_by: intelligent_authorizer
+  file: tools/harnesses/opencode_repo_local_pack_validator.py
+  new_hash: 3a34f43dfeb6f52a94d83c8d8290fe7eecf3b6fe690fc89087af8539f61b154a
+  old_hash: bd1ecdccb4ef17c5e3fd4024ef49dafdeee90c253c79c70b883f0e82708b7ea4
+  reason: '[AUTO] Cambio en immutable_source durante sesión activa en rama de trabajo
+    — verificar en review. (domain=immutable_source, risk=medium)'
+  segment: auto_authorized_session
+  session: auto
+  timestamp: '2026-06-03T07:11:49.833495+00:00'
+- authorized_by: intelligent_authorizer
+  file: tools/harnesses/opencode_repo_local_pack_writer.py
+  new_hash: f867202a94045167b3f85eed8d8aa8fdd1f063bf6d2dfce02274383dfeaab07d
+  old_hash: e8dc3423dde3628409242d756b585bf19341a2aa1ef36ea651a62a249fe1ab86
+  reason: '[AUTO] Cambio en immutable_source durante sesión activa en rama de trabajo
+    — verificar en review. (domain=immutable_source, risk=medium)'
+  segment: auto_authorized_session
+  session: auto
+  timestamp: '2026-06-03T07:11:49.840891+00:00'
+- authorized_by: intelligent_authorizer
+  file: tools/harnesses/opencode_repo_local_smoke.py
+  new_hash: 87d3c4375215980c7636c9c1a17ec818c9283abba3b0b2085ab17eeaf54edfaa
+  old_hash: b91d0119e581596ac0fe9170348e42ccafb70398cd1687a3c1ec79831a46cfae
+  reason: '[AUTO] Cambio en immutable_source durante sesión activa en rama de trabajo
+    — verificar en review. (domain=immutable_source, risk=medium)'
+  segment: auto_authorized_session
+  session: auto
+  timestamp: '2026-06-03T07:11:49.848147+00:00'
+- authorized_by: intelligent_authorizer
+  file: tools/harnesses/opencode_session_manifest.py
+  new_hash: ab7febf09e4f817b3e30bb0831389f1e43443a72e3d0ecdcc835d768626016fb
+  old_hash: 4354de81474c5a5127c0c9c663a11e88bad39a6d19e6b69db4e3958652dbbdb0
+  reason: '[AUTO] Cambio en immutable_source durante sesión activa en rama de trabajo
+    — verificar en review. (domain=immutable_source, risk=medium)'
+  segment: auto_authorized_session
+  session: auto
+  timestamp: '2026-06-03T07:11:49.855400+00:00'
+- authorized_by: intelligent_authorizer
+  file: tools/harnesses/opencode_usability_e2e.py
+  new_hash: 986cbc89bdd1a85c2f7db058d24dbbff8e8801f683fbfbe211e5d8b7590808f5
+  old_hash: c7f1fe960fc5d658a31f8f5399aa8e93d22930c64cfd90d1ceed4f3e98c575d5
+  reason: '[AUTO] Cambio en immutable_source durante sesión activa en rama de trabajo
+    — verificar en review. (domain=immutable_source, risk=medium)'
+  segment: auto_authorized_session
+  session: auto
+  timestamp: '2026-06-03T07:11:49.862848+00:00'
+- authorized_by: intelligent_authorizer
+  file: tools/harnesses/platform_engineering_session_rc.py
+  new_hash: 0309d1e993d48d17a7fc4fe891c66fc56133afcfc1ff4d3b7364ec8f6710c02b
+  old_hash: bc319d39638384889966522d0bdcb8ef55bf23fef7a79d15ca7dbe39f313ce4b
+  reason: '[AUTO] Cambio en immutable_source durante sesión activa en rama de trabajo
+    — verificar en review. (domain=immutable_source, risk=medium)'
+  segment: auto_authorized_session
+  session: auto
+  timestamp: '2026-06-03T07:11:49.870291+00:00'
+- authorized_by: intelligent_authorizer
+  file: tools/harnesses/profile_task_execution_plan.py
+  new_hash: 81e657a1fa0a6e3e769c22d972fa97c75788a3f9c1ff193553da415296a808b4
+  old_hash: ecf9196c3ba913d1dae6884717319c8018e164da9266cf330b391308218f7ca4
+  reason: '[AUTO] Cambio en immutable_source durante sesión activa en rama de trabajo
+    — verificar en review. (domain=immutable_source, risk=medium)'
+  segment: auto_authorized_session
+  session: auto
+  timestamp: '2026-06-03T07:11:49.877674+00:00'
+- authorized_by: intelligent_authorizer
+  file: tools/harnesses/research_intelligence_session_rc.py
+  new_hash: d9b09c7280e8dc872e3e9c639f6b07d5983e74348f652b4a294d52abd33bff87
+  old_hash: 675b31f858405465db72366892b8bed9a841e9f75e3d6eb19245c4b6597e65ba
+  reason: '[AUTO] Cambio en immutable_source durante sesión activa en rama de trabajo
+    — verificar en review. (domain=immutable_source, risk=medium)'
+  segment: auto_authorized_session
+  session: auto
+  timestamp: '2026-06-03T07:11:49.884772+00:00'
+- authorized_by: intelligent_authorizer
+  file: tools/harnesses/runtime_next_work.py
+  new_hash: 66e70b55892a05807b0dcc0e1dc8652c76284843c9ca844374e1a2b451764b99
+  old_hash: b76571eaece89a505bec327427c57f7bd69be0c3a1055c9589f1d1229e004620
+  reason: '[AUTO] Cambio en immutable_source durante sesión activa en rama de trabajo
+    — verificar en review. (domain=immutable_source, risk=medium)'
+  segment: auto_authorized_session
+  session: auto
+  timestamp: '2026-06-03T07:11:49.891776+00:00'
+schema: ovav.authorized_changes_ledger.v1
+total_entries: 247
+updated_at: '2026-06-03T07:11:49.891784+00:00'

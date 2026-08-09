@@ -1,0 +1,102 @@
+# Commercial & Growth Strategy — Topology Contract
+# Área de servicio profesional OVAV
+# Este archivo define la jerarquía, delegación y reglas de visibilidad.
+
+area:
+  name: Commercial & Growth
+  id: area_commercial_growth
+  description: "◆ Área de servicio · Negocio · Monetización · Crecimiento"
+  scope:
+    - business_strategy
+    - monetization_pricing
+    - market_intelligence
+    - brand_positioning
+    - sales_revenue
+    - financial_architecture
+    - growth_engineering
+    - legal_compliance
+    - partnerships
+    - operations
+
+lead:
+  role_id: commercial_growth_lead
+  name: Sofía
+  canonical: .ovav/source/agents/leads/sofia.md
+  agent_file: lead-sofia.md
+  mode: subagent
+  visible_in_at: true
+  description: "✦ Commercial & Growth Strategy Lead · Negocio · Monetización · Crecimiento"
+  voice: primary_user_facing
+  tone: strategic_data_driven_direct
+
+squads:
+  - name: Gabriela
+    canonical: .ovav/source/agents/teams/commercial-growth/gabriela.md
+    agent_file: team-gabriela.md
+    role: market_intelligence
+    description: "Inteligencia de mercado, análisis competitivo, tendencias"
+    can_delegate_to: []
+
+  - name: Inés
+    canonical: .ovav/source/agents/teams/commercial-growth/ines.md
+    agent_file: team-ines.md
+    role: brand_positioning
+    description: "Marca, posicionamiento, messaging"
+    can_delegate_to: []
+
+  - name: Julián
+    canonical: .ovav/source/agents/teams/commercial-growth/julian.md
+    agent_file: team-julian.md
+    role: sales_revenue
+    description: "Ventas, revenue strategy, pipeline"
+    can_delegate_to: []
+
+  - name: Hugo
+    canonical: .ovav/source/agents/teams/commercial-growth/hugo.md
+    agent_file: team-hugo.md
+    role: financial_architecture
+    description: "Modelado financiero, pricing, proyecciones"
+    can_delegate_to: []
+
+  - name: Mateo
+    canonical: .ovav/source/agents/teams/commercial-growth/mateo.md
+    agent_file: team-mateo.md
+    role: growth_engineering
+    description: "Growth loops, experimentation, metrics"
+    can_delegate_to: []
+
+  - name: Camila
+    canonical: .ovav/source/agents/teams/commercial-growth/camila.md
+    agent_file: team-camila.md
+    role: legal_compliance
+    description: "Legal, compliance, términos de servicio"
+    can_delegate_to: []
+
+  - name: Oliver
+    canonical: .ovav/source/agents/teams/commercial-growth/oliver.md
+    agent_file: team-oliver.md
+    role: partnerships
+    description: "Alianzas estratégicas, partnerships, B2B"
+    can_delegate_to: []
+
+  - name: Karina
+    canonical: .ovav/source/agents/teams/commercial-growth/karina.md
+    agent_file: team-karina.md
+    role: operations
+    description: "Operaciones, procesos, escalabilidad"
+    can_delegate_to: []
+
+delegation_rules:
+  max_depth: 2
+  cross_squad: false
+  require_lead_approval_for:
+    - pricing_changes
+    - public_announcements
+    - legal_commitments
+    - partnership_agreements
+
+visibility_contract:
+  at_mentions: [Sofía]
+  tab_selector: [Commercial & Growth]
+  default_agent: Commercial & Growth
+  hidden_from_user: [Gabriela, Inés, Julián, Hugo, Mateo, Camila, Oliver, Karina]

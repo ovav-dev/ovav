@@ -1,0 +1,33 @@
+# OVAV cPanel OAuth Configuration
+# ==================================
+# Configure OAuth providers for cPanel login.
+# If not configured, cPanel falls back to token-based auth (dev mode).
+#
+# Local dev redirect URIs:
+#   Google: http://localhost:5858/oauth/google
+#   GitHub: http://localhost:5858/oauth/github
+#
+# Production redirect URIs (d678beea.ovav.dev — canonical non-indexable admin URL):
+#   IMPORTANT: Redirect URI must be the SPA base URL, NOT the API endpoint.
+#   The frontend Login.tsx reads ?code= from the URL — the API path would return raw JSON.
+#   Google: https://d678beea.ovav.dev
+#   GitHub: https://d678beea.ovav.dev
+#
+# To get credentials:
+#   Google: https://console.cloud.google.com/apis/credentials
+#   GitHub: https://github.com/settings/developers
+
+google:
+  client_id: ""
+  client_secret: ""
+
+github:
+  client_id: ""
+  client_secret: ""
+
+# Role mapping: email → role
+# Roles: admin (full access), operator (operations), viewer (read-only)
+role_mapping:
+  alexander@ovav.dev: admin
+  # dev@ovav.dev: operator
+  # guest@example.com: viewer

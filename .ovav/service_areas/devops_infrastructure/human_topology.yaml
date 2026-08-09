@@ -1,0 +1,21 @@
+human_topology:
+  version: "2.0.0"
+  area: devops_infrastructure
+  language_policy:
+    internal: english
+    user_visible: spanish_neutral
+  entities:
+    area:
+      id: devops_infrastructure
+      kind: organizational_area
+      is_human: false
+    lead:
+      id: uriel
+      kind: accountable_human_operator
+      is_human: true
+  devops_infrastructure_team:
+    - {id: squad_ci_cd, person: Uriel, role: lead_devops_engineer}
+    - {id: squad_cloud, person: Uriel, role: cloud_architect}
+    - {id: squad_monitoring, person: Uriel, role: monitoring_engineer}
+    - {id: squad_sre, person: Uriel, role: sre_engineer}
+    - {id: squad_infra_security, person: Uriel, role: infra_security_engineer}

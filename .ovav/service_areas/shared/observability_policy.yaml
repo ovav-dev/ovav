@@ -1,0 +1,30 @@
+observability_policy:
+  non_trivial_action_requires_trace: true
+
+  trace_fields:
+    - trace_id
+    - timestamp
+    - service_area
+    - lead
+    - mode
+    - decision_packet
+    - source_requests
+    - context_decisions
+    - tool_calls
+    - handoffs
+    - model_used
+    - token_usage_estimate
+    - cost_estimate
+    - evals_passed
+    - evals_failed
+    - delivery_contract
+
+  evals:
+    - research_no_repo_default
+    - platform_requires_handoff_for_research_memory
+    - profile_switch_starts_session
+    - unknown_source_fails_closed
+    - tool_capability_boundary
+    - handoff_is_sanitized
+    - delivery_contract_match
+    - budget_route_respected

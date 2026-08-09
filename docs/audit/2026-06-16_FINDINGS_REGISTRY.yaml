@@ -1,0 +1,347 @@
+# OVAV — REGISTRO DE HALLAZGOS DE AUDITORÍA
+# Fecha: 2026-06-16 | Commit: f46b334 | 1020 commits
+# Integrity Mesh: DEGRADED 80% | Defense Gate: BLOCKED
+
+findings:
+  critical:
+    - id: G1
+      layer: go-runtime
+      file: cmd/cpanel/events.go
+      line: 32
+      title: "DATA RACE en SSE handler"
+      description: "handleEvents escribe a httptest.ResponseRecorder mientras el test lee concurrentemente. 5 warnings con -race."
+      fix: "Agregar sync.Mutex al ResponseRecorder o usar channels para serializar escrituras."
+      status: open
+
+    - id: G2
+      layer: go-runtime
+      file: cmd/cpanel/auth.go
+      line: 232
+      title: "Auth bypass: token 4 chars + magic string 'dev'"
+      description: "Validación de token mínimo 4 caracteres. String 'dev' aceptado como bypass. Bruteforce trivial."
+      fix: "Elevar mínimo a 32 caracteres, eliminar bypass 'dev', agregar rate limiting."
+      status: open
+
+    - id: P1
+      layer: python-tools
+      file: tools/validators/thought_firewall.py
+      line: 91
+      title: "Artifact leak — XML de tool call incrustado"
+      description: "Línea 91 contiene '<parameter name=\"replaceAll\" string=\"false\">false' — un XML de tool call de OpenCode que se filtró al código fuente. Carácter U+FF5C rompe sintaxis Python."
+      fix: "Eliminar línea 91. Revisar cómo ocurrió el leak."
+      status: open
+
+    - id: P2
+      layer: python-tools
+      file: tools/security/secrets_vault.py
+      line: 57-70
+      title: "XOR encryption disfrazado de AES-256-GCM"
+      description: "Docstring dice 'AES-256-GCM encryption' pero implementación usa _xor_bytes(). Cifrado trivialmente reversible."
+      fix: "Migrar a Go vault (internal/vault) que sí implementa AES-256-GCM real. Deprecar secrets_vault.py."
+      status: open
+
+    - id: P3
+      layer: python-tools
+      files:
+        - tools/harnesses/s102_gate_verification.py
+        - tools/harnesses/checks/check_s86_install_pipeline_consolidation.py
+        - tools/harnesses/checks/check_s89_backup_rollback_hardening.py
+      title: "6 imports rotos a tools.install_gateway.*"
+      description: "Módulos backup.py, rollback.py, apply.py referenciados en 3 harnesses pero no existen."
+      fix: "Crear stubs en tools/install_gateway/ o migrar harnesses a Go install pipeline."
+      status: open
+
+    - id: GV1
+      layer: governance
+      files: docs/contracts/*.md
+      title: "9 contratos son stubs de 1 línea"
+      description: "Ningún contrato tiene mecanismos de enforcement, schemas I/O, ni referencias a validadores."
+      fix: "Desarrollar contratos reales con cláusulas ejecutables y validadores asociados."
+      status: open
+
+    - id: GV6
+      layer: governance
+      file: tools/security/gate_self_protection.py
+      title: "ovav_defense_gate BLOCKED — 1 intrusión"
+      description: "Gate de autoprotección detectó hash mismatch no autorizado. Integrity Mesh DEGRADADO 80%."
+      fix: "Ejecutar: python3 tools/security/gate_self_protection.py --update"
+      status: open
+
+    - id: D1
+      layer: docs
+      files:
+        - VERSION
+        - RELEASE_NOTES.md
+        - RELEASE_v2.0.0.md
+        - CHANGELOG.md
+        - docs/RELEASE_NOTES.md
+        - docs-site/package.json
+      title: "6 archivos de versión inconsistentes"
+      description: "Versiones desde 1.0.0 hasta 2.0.0-dev. CHANGELOG congelado en v1.0.0."
+      fix: "Unificar en 1 fuente canónica. Actualizar CHANGELOG."
+      status: open
+
+    - id: D2
+      layer: docs-site
+      file: docs-site/src/assets/ovav-logo.svg
+      title: "Logo faltante — build roto"
+      description: "astro.config.mjs referencia ovav-logo.svg que no existe. Build fallará."
+      fix: "Crear logo SVG o actualizar referencia en astro.config.mjs."
+      status: open
+
+    - id: S1
+      layer: system
+      title: "Integrity Mesh DEGRADADO (80%)"
+      description: "1 validador falló en check_living_integrity. 1 intrusión detectada."
+      fix: "Resolver GV6 primero. Luego re-ejecutar integrity mesh."
+      status: open
+
+  high:
+    - id: G3
+      layer: go-runtime
+      file: cmd/cpanel/auth.go
+      line: 99
+      title: "JWT private key con permisos 0644"
+      description: "World-readable. Debe ser 0600."
+      fix: "os.Chmod(privateKeyPath, 0600) después de escribir."
+      status: open
+
+    - id: G4
+      layer: go-runtime
+      file: cmd/cpanel/shared.go
+      line: 79
+      title: "CORS Allow-Origin: * en todas las responses"
+      description: "Cualquier origen puede llamar endpoints autenticados."
+      fix: "Restringir a orígenes autorizados (ovav.dev, localhost)."
+      status: open
+
+    - id: G5
+      layer: go-runtime
+      file: cmd/cpanel/oauth.go
+      line: 234
+      title: "io.ReadAll sin límite en OAuth provider response"
+      description: "Memory exhaustion si provider responde con payload enorme."
+      fix: "Usar io.LimitReader con límite razonable (1MB)."
+      status: open
+
+    - id: P7
+      layer: python-tools
+      file: tools/cli/ovav_cpanel.py
+      line: 96
+      title: "except: pass — silencia todas las excepciones"
+      description: "Incluye KeyboardInterrupt, SystemExit, MemoryError."
+      fix: "Cambiar a except (ValueError, AttributeError): o manejar error explícitamente."
+      status: open
+
+    - id: P8
+      layer: python-tools
+      file: tools/cli/ovav_tui.py
+      line: 26
+      title: "os.system('clear') — shell injection potencial"
+      description: "Ejecuta comando en shell sin sanitización."
+      fix: "Usar ANSI escape codes o shutil.get_terminal_size()."
+      status: open
+
+    - id: GV2
+      layer: governance
+      files:
+        - clients/opencode/agents/
+        - .opencode/agents/
+      title: "70 agentes duplicados (140 archivos idénticos)"
+      description: "Confirmado en caps.yaml SEG4. Ambos directorios contienen los mismos 70 archivos."
+      fix: "Eliminar .opencode/agents/ y mantener solo clients/opencode/agents/."
+      status: open
+
+    - id: GV3
+      layer: governance
+      title: "Claude Code client sin leads"
+      description: "0/7 leads proyectados. Solo 1/11 skills."
+      fix: "Proyectar leads faltantes o declarar Claude Code como no soportado."
+      status: open
+
+    - id: P9
+      layer: python-tools
+      files:
+        - tools/governor/system_maturity_classifier.py
+        - tools/harnesses/self_audit.py
+        - tools/git/hooks/install.py
+        - tools/snapshot/snapshot_router.py
+        - tools/visual/release_pipeline.py
+      title: "__import__() dinámico en 5 archivos"
+      description: "Import dinámico con variables externas. Riesgo de import injection."
+      fix: "Usar importlib.import_module() o imports estáticos."
+      status: open
+
+  medium:
+    - id: G6
+      layer: go-runtime
+      file: cmd/cpanel/static.go
+      line: 61
+      title: "Path traversal defense insuficiente"
+      fix: "Detectar variantes URL-encoded (%2e%2e, %252e%252e)."
+      status: open
+
+    - id: G7
+      layer: go-runtime
+      file: cmd/cpanel/oauth.go
+      title: "Sin verificación CSRF state en OAuth"
+      fix: "Implementar state parameter verification."
+      status: open
+
+    - id: G8
+      layer: go-runtime
+      file: internal/license/bind.go
+      line: 271
+      title: "Licencia sin HMAC — forgeable"
+      fix: "Agregar HMAC-SHA256 al formato de licencia."
+      status: open
+
+    - id: G9
+      layer: go-runtime
+      file: cmd/cpanel/auth.go
+      line: 108
+      title: "Goroutine de limpieza sin context cancellation"
+      fix: "Usar context.Context con cancelación."
+      status: open
+
+    - id: P11
+      layer: python-config
+      file: opencode.json
+      line: 134
+      title: "Path sospechoso ..ovav/source/configs/wezterm/*"
+      description: "Posible typo de .ovav (doble punto en vez de punto)."
+      fix: "Verificar y corregir si es typo."
+      status: open
+
+    - id: P12
+      layer: python-tools
+      file: tools/cli/ovav_public_cli.py
+      line: 66,87
+      title: "subprocess.call() legacy sin capture/timeout"
+      fix: "Migrar a subprocess.run() con capture_output=True, timeout=30."
+      status: open
+
+    - id: P13
+      layer: python-tools
+      title: "53 marcadores TODO/FIXME/HACK"
+      description: "Distribuidos en ~15 archivos. Mayor concentración: check_todo_debt.py (22), harness_index.py (5)."
+      fix: "Triage: eliminar los resueltos, planificar los pendientes."
+      status: open
+
+    - id: GV4
+      layer: governance
+      file: .ovav/registry/skills.yaml
+      title: "Metadata skills inconsistente"
+      description: "Dice blocked:0 pero 3 skills tienen status:blocked."
+      fix: "Sincronizar metadata con estado real."
+      status: open
+
+    - id: GV5
+      layer: governance
+      title: "validate_service_profiles espera 2 perfiles, hay 3"
+      description: "Perfiles definidos: health_performance, research_analyst, systems_architect."
+      fix: "Actualizar validador o consolidar perfiles."
+      status: open
+
+    - id: D3
+      layer: docs-site
+      title: "3 páginas faltantes en docs-site"
+      description: "guides/cpanel, reference/cli, reference/api referenciadas en sidebar pero no existen."
+      fix: "Crear contenido para las 3 páginas."
+      status: open
+
+  low:
+    - id: G10
+      layer: go-runtime
+      file: cmd/cpanel/git.go
+      line: 69
+      title: "limit hasta 1000 sin paginación"
+      status: open
+
+    - id: G11
+      layer: go-runtime
+      file: internal/cli/format.go
+      line: 109
+      title: "git sin path absoluto en runGitCmd"
+      status: open
+
+    - id: G12
+      layer: go-runtime
+      file: cmd/cpanel/events.go
+      title: "SSE sin límite de conexiones"
+      status: open
+
+    - id: D4
+      layer: docs-site
+      title: "Sin lockfile (pnpm/yarn/package)"
+      status: open
+
+    - id: D5
+      layer: docs-site
+      title: "node_modules no instalado"
+      status: open
+
+    - id: T1
+      layer: python-tests
+      title: "2 tests protocol MCP fallan por falta de servidores registrados"
+      status: open
+
+    - id: T2
+      layer: python-tests
+      title: "test_runtime_safety_governor.py: ModuleNotFoundError"
+      status: open
+
+migration_gaps:
+  - layer: validators
+    python_count: 73
+    go_count: 0
+    priority: highest
+    notes: "Columna vertebral de OVAV. Sin migrar."
+
+  - layer: harnesses
+    python_count: ~50
+    go_count: 0
+    priority: high
+    notes: "Verificación pre-commit, pre-push. Sin equivalente Go."
+
+  - layer: security_tools
+    python_count: ~10
+    go_count: 2
+    priority: high
+    notes: "Vault migrado (Go superior). Resto sin migrar."
+
+  - layer: web_tools
+    python_count: 5
+    go_count: 0
+    priority: medium
+    notes: "Research cache, content extractor, search gateway."
+
+  - layer: visual_tools
+    python_count: 4
+    go_count: 1
+    priority: low
+    notes: "Cockpit TUI en Go. Resto Python."
+
+  - layer: memory_system
+    python_count: ~15
+    go_count: 0
+    priority: medium
+    notes: "Signals, probes, redactor, privacy classifier."
+
+  - layer: cli_public
+    python_count: ~10
+    go_count: 1
+    priority: medium
+    notes: "cmd/ovav cubre CLI principal. Subcomandos específicos sin migrar."
+
+go_coverage_by_package:
+  internal/tools: 100.0
+  internal/profile: 88.0
+  internal/tailor: 83.7
+  internal/doctor: 74.8
+  internal/vault: 72.5
+  internal/install: 70.4
+  internal/license: 67.7
+  internal/config: 64.0
+  internal/cli: 34.5
+  cmd/cpanel: 7.8

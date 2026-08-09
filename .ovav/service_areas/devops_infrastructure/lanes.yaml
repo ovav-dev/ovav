@@ -1,0 +1,16 @@
+lanes:
+  version: "2.0.0"
+  area: devops_infrastructure
+  routing:
+    default_lane: infrastructure
+    task_based:
+      deploy: ci_cd
+      cicd: ci_cd
+      cloud: cloud
+      monitor: monitoring
+      alert: monitoring
+      sre: sre
+      reliability: sre
+      security: infra_security
+      infra: infrastructure
+      infrastructure: infrastructure

@@ -1,0 +1,44 @@
+handoff_protocol:
+  version: "2.0.0"
+  tiers:
+    full_delegation:
+      description: "Delegación formal de trabajo cross-area. Requiere todos los campos."
+      required_fields:
+        - handoff_id
+        - from_service_area
+        - to_service_area
+        - purpose
+        - allowed_context
+        - denied_context
+        - scope
+        - trace_id
+        - user_permission_basis
+    audit_request:
+      description: "Solicitud de auditoría adversarial (Red Team). Campos esenciales."
+      required_fields:
+        - handoff_id
+        - from_service_area
+        - to_service_area
+        - scope
+        - purpose
+
+  denied_by_default:
+    - raw_chat_history
+    - raw_repo_root
+    - git_history
+    - secrets
+    - credentials
+    - install_artifacts
+    - unresolved_local_diffs
+    - raw_snapshots
+
+  allowed_when_scoped:
+    - architecture_summary
+    - service_area_names
+    - current_design_goals
+    - explicit_files_named_by_user
+    - sanitized_findings
+
+  rule: "A handoff is a controlled document, not a chat memory leak."
+
+# LAW-001 governance: .ovav/laws/area_boundary_enforcement.yaml (Non-Invasion Area Boundary Law)

@@ -1,0 +1,37 @@
+student_id: "stu-0042"
+career_goal: "Data Scientist"
+self_assessment:
+  - skill: "python"
+    self_rated_level: "intermediate"
+    years_experience: 2.0
+    last_used: "2026-03-01"
+    confidence: 0.7
+    evidence:
+      - "Curso 'Python for Everybody' en Coursera"
+      - "Scripts de automatización en trabajo actual"
+  - skill: "sql"
+    self_rated_level: "beginner"
+    years_experience: 0.5
+    last_used: "2025-12-01"
+    confidence: 0.3
+    evidence:
+      - "Tutorial de SQLZoo completado"
+  - skill: "statistics"
+    self_rated_level: "novice"
+    years_experience: 0.0
+    last_used: "never"
+    confidence: 0.1
+    evidence: []
+  - skill: "machine_learning"
+    self_rated_level: "novice"
+    years_experience: 0.0
+    last_used: "never"
+    confidence: 0.1
+    evidence: []
+  - skill: "data_visualization"
+    self_rated_level: "beginner"
+    years_experience: 1.0
+    last_used: "2026-01-15"
+    confidence: 0.5
+    evidence:
+      - "Reportes en Power BI para gerencia"

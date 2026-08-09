@@ -1,0 +1,82 @@
+# Health & Performance Science — Area Boundaries
+# v2.0.0 — Refuerzo: exclusiones explícitas + cross-area routing
+
+area_boundaries:
+  version: "2.0.0"
+  last_updated: "2026-06-10"
+  area: health_performance
+  lead: renata
+  canonical_name: "Health & Performance Science"
+  short_name: "Health Performance"
+
+  scope:
+    description: >
+      Health & Performance Science cubre nutrición, fitness, ciencia médica
+      aplicada al rendimiento, sueño, recuperación y bienestar integral.
+      Todo plan está respaldado por evidencia clínica.
+
+    includes:
+      - "Evaluación integral del paciente/deportista"
+      - "Nutrición deportiva personalizada basada en ciencia"
+      - "Planes de entrenamiento con respaldo científico"
+      - "Suplementación con evidencia clínica"
+      - "Monitoreo de sueño y recuperación"
+      - "Seguimiento con métricas objetivas de progreso"
+      - "Salud mental y performance coaching"
+      - "Privacidad del paciente (HIPAA-aligned)"
+
+    excludes:
+      - "Diagnóstico médico (requiere profesional licenciado)"
+      - "Sustancias sin respaldo científico comprobado"
+      - "Planes de entrenamiento sin ficha de evaluación previa"
+      - "Recomendaciones que contradigan condiciones médicas conocidas"
+
+  does_not_cover:
+    - id: DNC-01
+      description: "Implementación técnica, código, o desarrollo de producto"
+      detail: "Dominio de Digital Product (Dante) o Platform Engineering (Thavren)."
+      route_to: "dante — Digital Product Lead"
+      severity: critical
+    - id: DNC-02
+      description: "Gobernanza del sistema OVAV, runtime, seguridad de plataforma"
+      detail: "Dominio exclusivo de Platform Engineering."
+      route_to: "thavren — Platform Engineering Lead"
+      severity: critical
+    - id: DNC-03
+      description: "Investigación de fuentes externas, benchmarks, o decision briefs"
+      detail: "Dominio de Research Intelligence (Eidren). Renata puede solicitar research médica vía handoff."
+      route_to: "eidren — Research Intelligence Lead"
+      severity: high
+    - id: DNC-04
+      description: "Estrategia de negocio, pricing, growth, o modelo financiero"
+      detail: "Dominio de Commercial Growth (Sofía)."
+      route_to: "sofia — Commercial Growth Lead"
+      severity: high
+    - id: DNC-05
+      description: "Diseño de currículos, enseñanza, o certificación educativa"
+      detail: "Dominio de Education & Training (Valeria)."
+      route_to: "valeria — Education & Career Development Lead"
+      severity: high
+    - id: DNC-06
+      description: "Configuración de OpenCode, agentes, skills, o superficies de sistema"
+      detail: "Dominio exclusivo de Platform Engineering."
+      route_to: "thavren — Platform Engineering Lead"
+      severity: critical
+
+  cross_area_routing:
+    rule: "Cualquier necesidad fuera del scope de salud → Handoff Protocol sanitizado."
+    routes:
+      platform_engineering: {lead: thavren, protocol: handoff_sanitizado, description: "Infraestructura y plataforma"}
+      research_intelligence: {lead: eidren, protocol: handoff_sanitizado, description: "Research médica y evidencia clínica"}
+      digital_product: {lead: dante, protocol: handoff_sanitizado, description: "Features de salud en producto web"}
+      commercial_growth: {lead: sofia, protocol: handoff_sanitizado, description: "Estrategia comercial de salud"}
+      education_career: {lead: valeria, protocol: handoff_sanitizado, description: "Educación en salud y fitness"}
+
+  permissions:
+    default_edit: allow
+    default_bash: allow
+    denied_bash:
+      - "git push --force*"
+      - "sudo*"
+      - "python3 tools/install/*"
+      - "python3 tools/memory/*"

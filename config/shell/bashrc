@@ -1,0 +1,7 @@
+# OVAV root shell — thin bash layer
+# WSL ~/.bashrc → source → este archivo
+
+export OVAV_ROOT="${OVAV_ROOT:-/home/braka/Systems/OVAV}"
+export PATH="$OVAV_ROOT/bin:$PATH"
+
+# fish es el shell principal en WSL — bashrc solo carga entorno base

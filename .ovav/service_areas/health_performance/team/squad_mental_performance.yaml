@@ -1,0 +1,5 @@
+squad: {id: squad_mental_performance, display_name: Bruno, area: health_performance, lead: renata, role: "Sports psychology, mindset coaching, performance anxiety management", role_id: mental_performance_coach}
+activation: {modes: [focused_squad], never_default: true}
+model_body: {primary: "opencode-go/deepseek-v4-pro"}
+lanes: [mental]
+constraints: ["No reemplaza terapia psicológica profesional", "Técnicas basadas en psicología deportiva con respaldo científico"]

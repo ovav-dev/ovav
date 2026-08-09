@@ -1,0 +1,81 @@
+---
+alwaysApply: true
+description: OVAV project conventions for Cursor Agent. Go runtime, TypeScript/React, YAML configs, git workflow, and governance rules.
+globs: ["**/*.go", "**/*.yaml", "**/*.yml", "**/*.sh", "**/*.md", "**/*.ts", "**/*.tsx", "**/*.jsx"]
+---
+
+# OVAV Project Conventions
+
+## Stack
+
+- **Go 1.23+** runtime at `go-runtime/` — all Go code lives here
+- **TypeScript/React** at `tools/cpanel/` and `.ovav/projects/ovav-product/webapp/frontend/`
+- **YAML configs** at `.ovav/` — canonical source of truth: `.ovav/plan/caps.yaml`
+- **Shell scripts** at `bin/` — worktree system, validators
+- **Skills** at `.opencode/skills/` and `.mimocode/skills/`
+
+## Go Conventions
+
+- Format with `gofumpt` (stricter than `gofmt`) — NOT gofmt
+- Tests: table-driven with `t.Run()`, run with `-v -count=1 -race`
+- **NEVER** use `panic()` in library code — return `error` always
+- Zero-value initialization preferred over explicit constructors
+- Interface names: single method = `-er` suffix (Reader, Writer, Validator)
+- Package names: lowercase, single word, no underscores
+- Errors: use `fmt.Errorf("context: %w", err)` for wrapping
+- Build tags: use `//go:build ovav` for OVAV-specific code
+
+## TypeScript / React Conventions
+
+- **Strict mode** — `noImplicitAny`, `strictNullChecks`, `noUncheckedIndexedAccess`
+- **Single quotes** for strings, **no semicolons** (Prettier default)
+- **Relative imports** for within packages, **absolute** from `src/` root
+- Components: **functional only**, named exports, PascalCase filenames
+- Hooks: `use<Name>` prefix, always start with `use`
+- Types: prefer `interface` for objects, `type` for unions/intersections
+- Avoid `enum` — use `as const` objects instead
+- **Never** use `any` — use `unknown` + narrowing
+- **Never** use `require()` — use ESM `import`
+- Run `npx tsc --noEmit` before commits touching TS files
+- Run `npx vitest run` for tests, NOT `jest`
+
+## YAML Conventions
+
+- 2-space indentation (NOT tabs)
+- All `.ovav/` configs follow caps.yaml schema
+- Namespace keys with service area prefix: `platform_`, `research_`, `ux_`, etc.
+- Timestamps in ISO 8601 with timezone: `2026-07-19T21:03:53-0500`
+
+## Git Workflow
+
+- **PROHIBITED**: `git add .` — stage exact files by path
+- **PROHIBITED**: force push (`--force`, `--skip-gates`) on ANY branch
+- **PROHIBITED**: raw `git push` or `git merge` — use `owd` (worktree done)
+- Protected branches: `main`, `master`, `develop`, `production`, `staging`
+- Worktrees: `owc <feature>` → work → `owd` (merge + cleanup)
+- Commits: `<type>(<scope>): <message>` — types: feat, fix, align, refactor, docs, chore
+- Commit scope examples: `caps`, `go-runtime`, `skills`, `browser-mcp`, `worktree`, `cpanel`, `frontend`
+- CEO Waiver required for writes on protected branches
+
+## OVAV Governance
+
+- Session greeting: `go run -C go-runtime ./cmd/session_greeting --json` at start
+- Protected branch check before ANY write/edit: `--check-protected`
+- Output guard: `echo "<RESPONSE>" | go run -C go-runtime ./cmd/output_guard --sign`
+- Never claim "production ready" or "global ready" — launch verification still in progress
+- `.ovav/plan/caps.yaml` is canonical plan data — git HEAD is canonical temporal data
+
+## Directory Map
+
+```
+go-runtime/          → Go source (cmd/, internal/, pkg/)
+tools/cpanel/        → React/TS control panel (Vite + Vitest)
+.ovav/projects/      → Product webapp (Next.js frontend)
+.ovav/               → Governance configs
+  plan/caps.yaml     →  Canonical plan
+  registry/          →  Operational state
+  policy/            →  Permission rules
+bin/                 → Shell tools (owc, owd, owv, ...)
+.opencode/skills/    → OpenCode skills
+.mimocode/skills/    → MiMoCode skills
+```

@@ -1,0 +1,1 @@
+lanes: {version: "1.0.0", area: digital_product, routing: {default_lane: fullstack, task_based: {frontend: frontend, backend: backend, deploy: devops, design: uiux, test: qa, plan: pm, fullstack: fullstack}}}

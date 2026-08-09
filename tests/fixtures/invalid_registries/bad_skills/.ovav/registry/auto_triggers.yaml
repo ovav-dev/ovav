@@ -1,0 +1,87 @@
+auto_triggers:
+  router:
+    on_user_message:
+      - h_sdd_init
+      - h_skill_registry_refresh
+      - h_engram_healthcheck
+      - h_service_profile_resolver
+      - h_lane_classifier
+      - h_lead_or_delegate_decider
+    before_apply:
+      - h_phase_dag
+      - h_artifact_dependency
+      - h_permission_gate
+      - h_skill_permission_gate
+    before_close:
+      - h_verify_evidence
+      - h_result_contract
+      - h_work_report_builder
+      - h_memory_write_gateway
+    after_git_stage:
+      - h_git_stage_review
+    after_git_commit:
+      - h_git_commit_review
+    after_git_push:
+      - h_git_push_review
+
+  h_sdd_init:
+    tier: 10
+    when:
+      - project_unknown
+      - discovery_missing
+      - discovery_stale
+      - stack_files_changed
+      - first_interaction_in_workspace
+    manual_command_fallback: "ovav init --refresh"
+
+  h_skill_registry_refresh:
+    tier: 9
+    when:
+      - skill_registry_missing
+      - skill_registry_stale
+      - skill_paths_changed
+      - first_service_profile_activation
+    manual_command_fallback: "ovav skills refresh"
+
+  h_engram_healthcheck:
+    tier: 9
+    when:
+      - memory_required
+      - memory_status_unknown
+    manual_command_fallback: "ovav memory healthcheck"
+
+  h_phase_dag:
+    tier: 10
+    when:
+      - before_phase_transition
+
+  h_artifact_dependency:
+    tier: 10
+    when:
+      - before_apply
+      - before_verify
+
+  h_result_contract:
+    tier: 9
+    when:
+      - before_response_close
+
+  h_verify_evidence:
+    tier: 10
+    when:
+      - before_close
+
+  h_git_stage_review:
+    tier: 10
+    when:
+      - after_git_stage
+
+  h_git_commit_review:
+    tier: 10
+    when:
+      - after_git_commit
+
+  h_git_push_review:
+    tier: 10
+    when:
+      - after_git_push

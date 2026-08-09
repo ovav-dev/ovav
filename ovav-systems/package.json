@@ -1,0 +1,50 @@
+{
+  "name": "ovav-systems",
+  "version": "3.0.0",
+  "description": "OVAV MEMORY v3 — TypeScript runtime for pi.dev extension",
+  "type": "module",
+  "main": "./dist/ovav-memory.js",
+  "types": "./dist/ovav-memory.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/ovav-memory.js",
+      "types": "./dist/ovav-memory.d.ts"
+    },
+    "./memory": {
+      "import": "./dist/ovav-memory.js",
+      "types": "./dist/ovav-memory.d.ts"
+    },
+    "./governance": {
+      "import": "./dist/ovav-governance/registry.js",
+      "types": "./dist/ovav-governance/registry.d.ts"
+    },
+    "./permissions": {
+      "import": "./dist/ovav-permissions/gate.js",
+      "types": "./dist/ovav-permissions/gate.d.ts"
+    },
+    "./audit": {
+      "import": "./dist/ovav-audit/logger.js",
+      "types": "./dist/ovav-audit/logger.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc --project pi-extension/tsconfig.json",
+    "test": "node --test tests/*.test.ts",
+    "test:coverage": "node --test --experimental-test-coverage tests/*.test.ts",
+    "clean": "rm -rf dist"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.2",
+    "typescript": "^5.4.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "keywords": [
+    "ovav",
+    "memory",
+    "pi-dev",
+    "governance",
+    "cell-store"
+  ]
+}

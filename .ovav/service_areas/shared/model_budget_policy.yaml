@@ -1,0 +1,85 @@
+model_budget_policy:
+  principles:
+    - minimum_sufficient_model
+    - minimum_sufficient_context
+    - stable_prefix
+    - select_before_read
+    - compress_before_escalate
+    - isolate_by_service_area
+    - trace_every_escalation
+    - distribute_long_workloads
+    - lead_context_for_judgment_not_bulk_reading
+    - delegate_large_docs_before_summarizing
+
+  routes:
+    external_research_bulk:
+      default: opencode-go/deepseek-v4-flash
+      escalation: opencode-go/deepseek-v4-pro
+
+    comparison_matrix:
+      default: opencode-go/qwen3.5-plus
+      escalation: opencode-go/deepseek-v4-pro
+
+    daily_implementation:
+      default: opencode-go/deepseek-v4-pro
+      escalation: openai/gpt-4o
+
+    critical_code_or_harness_closure:
+      default: openai/gpt-4o
+      escalation: openai/gpt-5.5
+
+    architecture_review:
+      default: openai/gpt-5.5
+      escalation: openai/gpt-5.5 scoped audit
+
+    logs_tool_outputs:
+      default: opencode-go/deepseek-v4-flash
+      escalation: compress_first_never_raw_logs
+
+    long_document_or_repo_audit:
+      default: opencode-go/deepseek-v4-pro
+      escalation: openai/gpt-4o scoped synthesis
+      rule: Delegate broad reads, file inventories and repeated pattern scans before loading them into the lead context.
+
+    lead_final_judgment:
+      default: openai/gpt-5.5
+      escalation: openai/gpt-5.5 scoped audit
+      rule: Use the strongest lead body for architecture decisions, sensitive safety boundaries, final synthesis and user-facing accountability.
+
+  operational_rules:
+    - Do not use one model for every step when a task naturally separates into exploration, implementation, review, QA and synthesis.
+    - Prefer lower-cost exploration bodies for long scans and repository maps; return compact findings to the lead.
+    - Preserve Thavren's context for judgment, architecture, safety and final delivery.
+    - Every delegation must remain governed by service area, context gateway, tool gateway and visible-surface boundaries.
+
+  # ── Monetary Budget — gobernado por Monetary Cortex ──────────────────────
+  budget:
+    monthly_budget_usd: 200.0
+    per_session_limit_usd: 10.0
+    alert_thresholds: [0.70, 0.85, 0.95]
+    auto_stop_threshold: 1.0
+    cost_estimation_enabled: true
+    cumulative_tracking: true
+    # Auto-stop: si se llega al 100% de sesión, bloquear requests.
+    # Las alertas disparan eventos NerveBus + indicador visual en OpenCode.
+
+  # ── Credential Provider Preferences — gobernado por Credential Governor ───
+  provider_preferences:
+    deepseek:
+      accounts: [ovav]           # Cuentas disponibles (OVAV producto)
+      default_account: ovav
+      fallback_provider: openai  # Si DeepSeek está agotado, usar OpenAI
+    openai:
+      accounts: [ovav]
+      default_account: ovav
+      fallback_provider: deepseek
+    anthropic:
+      accounts: [ovav]
+      default_account: ovav
+      fallback_provider: deepseek
+    qwen:
+      accounts: [ovav]
+      default_account: ovav
+      fallback_provider: deepseek
+
+# LAW-001 governance: .ovav/laws/area_boundary_enforcement.yaml (Non-Invasion Area Boundary Law)

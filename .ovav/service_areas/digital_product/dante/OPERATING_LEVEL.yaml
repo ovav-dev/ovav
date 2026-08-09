@@ -1,0 +1,14 @@
+operating_level:
+  version: "1.0.0"
+  operator: dante
+  level: "AVANZADO+"
+  capabilities:
+    - {name: "Full-stack architecture", confidence: 0.95}
+    - {name: "Frontend (React/Vue/Svelte)", confidence: 0.90}
+    - {name: "Backend (Node/Python/Go)", confidence: 0.90}
+    - {name: "Database design (SQL/NoSQL)", confidence: 0.85}
+    - {name: "DevOps (Docker/CI/CD)", confidence: 0.85}
+    - {name: "Testing (unit/integration/e2e)", confidence: 0.90}
+    - {name: "Performance optimization", confidence: 0.80}
+    - {name: "Security (OWASP)", confidence: 0.80}
+  limitations: ["No force push/delete", "No datos reales en dev", "No producción sin tests"]

@@ -1,0 +1,115 @@
+{
+  "$schema": "https://opencode.ai/theme.json",
+  "name": "OVAV",
+  "defs": {
+    "ovav_teal": "#83a598",
+    "ovav_green": "#b8bb26",
+    "ovav_blue": "#458588",
+    "ovav_rose": "#d3869b",
+    "ovav_success": "#a3be8c",
+    "ovav_error": "#bf616a",
+    "ovav_warning": "#d08770",
+    "ovav_info": "#81a1c1",
+    "ovav_bg": "#1d2021",
+    "ovav_panel": "#282828",
+    "ovav_element": "#3c3836",
+    "ovav_border": "#3c3836",
+    "ovav_text": "#ebdbb2",
+    "ovav_text_secondary": "#bdae93",
+    "ovav_text_muted": "#7c6f64",
+    "ovav_syn_keyword": "#d3869b",
+    "ovav_syn_string": "#b8bb26",
+    "ovav_syn_comment": "#7c6f64",
+    "ovav_syn_function": "#83a598",
+    "ovav_syn_type": "#fabd2f",
+    "ovav_diff_added": "#a3be8c",
+    "ovav_diff_removed": "#bf616a",
+    "ovav_diff_context": "#7c6f64"
+  },
+  "theme": {
+    "primary": {
+      "dark": "ovav_teal",
+      "light": "ovav_blue"
+    },
+    "secondary": {
+      "dark": "ovav_green",
+      "light": "ovav_green"
+    },
+    "accent": {
+      "dark": "ovav_rose",
+      "light": "ovav_rose"
+    },
+    "error": {
+      "dark": "ovav_error",
+      "light": "ovav_error"
+    },
+    "warning": {
+      "dark": "ovav_warning",
+      "light": "ovav_warning"
+    },
+    "success": {
+      "dark": "ovav_success",
+      "light": "ovav_success"
+    },
+    "info": {
+      "dark": "ovav_info",
+      "light": "ovav_info"
+    },
+    "text": {
+      "dark": "ovav_text",
+      "light": "ovav_bg"
+    },
+    "textMuted": {
+      "dark": "ovav_text_muted",
+      "light": "ovav_text_muted"
+    },
+    "background": {
+      "dark": "ovav_bg",
+      "light": "ovav_text"
+    },
+    "backgroundPanel": {
+      "dark": "ovav_panel",
+      "light": "ovav_panel"
+    },
+    "backgroundElement": {
+      "dark": "ovav_element",
+      "light": "ovav_element"
+    },
+    "border": {
+      "dark": "ovav_border",
+      "light": "ovav_border"
+    },
+    "borderActive": {
+      "dark": "ovav_teal",
+      "light": "ovav_blue"
+    },
+    "borderSubtle": {
+      "dark": "ovav_element",
+      "light": "ovav_element"
+    },
+    "diffAdded": {
+      "dark": "ovav_diff_added",
+      "light": "ovav_diff_added"
+    },
+    "diffRemoved": {
+      "dark": "ovav_diff_removed",
+      "light": "ovav_diff_removed"
+    },
+    "diffContext": {
+      "dark": "ovav_diff_context",
+      "light": "ovav_diff_context"
+    },
+    "diffHunkHeader": {
+      "dark": "ovav_blue",
+      "light": "ovav_blue"
+    },
+    "diffHighlightAdded": {
+      "dark": "ovav_diff_added",
+      "light": "ovav_diff_added"
+    },
+    "diffHighlightRemoved": {
+      "dark": "ovav_diff_removed",
+      "light": "ovav_diff_removed"
+    }
+  }
+}

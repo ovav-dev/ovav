@@ -1,0 +1,145 @@
+# OVAV Connector Bus — Slot Types Catalog v2.0
+# ===============================================
+# Define los TIPOS de slots disponibles en OVAV.
+# Cada tipo tiene su propio archivo en connectors/<tipo>.yaml
+#
+# Principio: un nuevo desarrollo se integra a OVAV tocando EXACTAMENTE
+# UN archivo (connectors/<tipo>.yaml). El bus engine resuelve todo.
+#
+# Patrones profesionales aplicados:
+#   - VS Code: extensión = 1 manifest (connectors/<tipo>.yaml)
+#   - Kubernetes: desired state → reconciliation
+#   - Spring Boot: @Conditional + auto-wiring
+#
+# Actualizado: 2026-06-03 v2.0
+
+version: "1.0.0"
+
+slot_types:
+
+  # ── VALIDADORES ────────────────────────────────────────────────────────
+  # Se ejecutan en validate_all. Pueden tener triggers automáticos.
+  validator:
+    description: "Componente de validación que verifica integridad, sintaxis o policy"
+    required_fields:
+      - module        # dotted Python module path (ej: tools.validators.check_foo)
+      - function      # nombre de la función validate dentro del módulo
+    optional_fields:
+      tier: 10        # prioridad (10 = crítico, 9 = estándar, 8 = informativo)
+      triggers: []    # eventos que disparan este validador (on_session_start, etc.)
+      surface: null   # superficie del surface_validator_map a la que pertenece
+      blocking: true  # si sus errores bloquean validate_all
+    auto_wires_to:
+      - validate_all
+      - auto_triggers (si tiene triggers)
+      - surface_validator_map (si tiene surface)
+
+  # ── HARNESSES ──────────────────────────────────────────────────────────
+  # Verificaciones de runtime que pueden ejecutarse bajo demanda o por trigger.
+  harness:
+    description: "Verificación de runtime o integración que se ejecuta por evento"
+    required_fields:
+      - module
+      - function
+    optional_fields:
+      tier: 10
+      triggers: []
+      manual_command: null  # comando para ejecución manual (fallback)
+    auto_wires_to:
+      - auto_triggers (si tiene triggers)
+
+  # ── TOOLS ──────────────────────────────────────────────────────────────
+  # Comandos CLI expuestos vía bin/ovav o acceso directo.
+  tool:
+    description: "Comando ejecutable expuesto al usuario o a otros componentes"
+    required_fields:
+      - command       # comando shell o path relativo
+    optional_fields:
+      alias: null     # nombre corto
+      category: null  # agrupación lógica
+      risk: low       # low | medium | high | blocked
+    auto_wires_to:
+      - ovav CLI
+
+  # ── SKILLS ─────────────────────────────────────────────────────────────
+  # Skills de OpenCode proyectados desde .ovav/source/skills/
+  skill:
+    description: "Skill de agente AI (OpenCode) proyectada desde fuente canónica"
+    required_fields:
+      - source_dir    # directorio fuente en .ovav/source/skills/
+    optional_fields:
+      owner_profile: null
+      owner_lane: null
+      risk_level: low
+    auto_wires_to:
+      - discover_skills
+      - opencode projection
+
+  # ── ADAPTERS ───────────────────────────────────────────────────────────
+  # Adaptadores que proyectan assets OVAV a clientes externos.
+  adapter:
+    description: "Proyector de assets OVAV a formato de cliente externo"
+    required_fields:
+      - module
+      - target_client  # opencode | claude-code | vscode | pi
+    optional_fields:
+      surface: null    # agents | skills | plugins | themes | commands
+    auto_wires_to:
+      - forge pipeline
+      - client projection
+
+  # ── PLUGINS ────────────────────────────────────────────────────────────
+  # Plugins de interfaz (TUI, monitor, status) para clientes.
+  plugin:
+    description: "Plugin de UI/extensión para un cliente externo"
+    required_fields:
+      - source_dir
+      - target_client
+    optional_fields:
+      plugin_type: null  # tui | monitor | status | theme
+    auto_wires_to:
+      - forge pipeline
+
+  # ── CONFIG WATCHERS ────────────────────────────────────────────────────
+  # Watchers que monitorean archivos de configuración y alertan sobre drift.
+  config_watcher:
+    description: "Monitor de drift para archivos de configuración"
+    required_fields:
+      - watch_path    # path relativo al archivo vigilado
+      - module
+    optional_fields:
+      triggers: [on_session_start]
+    auto_wires_to:
+      - host_defense
+
+  # ── CLIENTS ──────────────────────────────────────────────────────────
+  # Clientes externos a los que OVAV proyecta assets.
+  client:
+    description: "Cliente externo (IDE, CLI, asistente) que recibe proyección OVAV"
+    required_fields:
+      - target_dir    # clients/<nombre>/
+      - projection_root
+    optional_fields:
+      symlink: null   # symlink para compatibilidad con CLI
+      status: planned # planned | pending_migration | active | deprecated
+      forge_target: null
+    auto_wires_to:
+      - forge pipeline
+      - projection engine
+
+  # ── PERSONNEL ────────────────────────────────────────────────────────
+  # Registro de personal: leads y team members.
+  personnel:
+    description: "Lead humano o team member que opera un área de OVAV"
+    required_fields:
+      - role          # platform_engineering_lead | research_intelligence_lead | ...
+      - area          # platform_engineering | research_intelligence
+      - type          # lead | team_member
+    optional_fields:
+      artifacts: []   # archivos asociados (para deregister)
+      permissions: null
+      active: true
+    auto_wires_to:
+      - topology contracts
+      - agent projection
+      - service_areas

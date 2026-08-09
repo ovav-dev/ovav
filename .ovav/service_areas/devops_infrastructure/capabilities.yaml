@@ -1,0 +1,9 @@
+capabilities:
+  version: "2.0.0"
+  area: devops_infrastructure
+  registered:
+    - {id: ci_cd, name: "CI/CD Pipelines", status: active}
+    - {id: cloud, name: "Cloud Infrastructure", status: active}
+    - {id: monitoring, name: "Monitoring & Alerting", status: active}
+    - {id: sre, name: "Site Reliability Engineering", status: active}
+    - {id: infra_security, name: "Infrastructure Security", status: active}

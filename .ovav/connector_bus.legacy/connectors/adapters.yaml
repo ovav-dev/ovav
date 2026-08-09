@@ -1,0 +1,51 @@
+# OVAV Connector Bus — Adapters
+# ==================================
+# Tipo de slot: adapter
+# Proyectores de assets OVAV a formato de cliente externo.
+#
+# CONECTAR:   1 entry acá + módulo funcional
+# DESCONECTAR: borrar entry
+#
+# Schema: slots.yaml → slot_types.adapter
+
+version: "1.0.0"
+slot_type: adapter
+description: "Adaptadores OVAV → cliente externo (agents, skills, plugins, themes)"
+
+components:
+
+  opencode_agents:
+    module: .ovav.forge.adapters.opencode.agents
+    target_client: opencode
+    surface: agents
+    labels: [projection, agents, opencode]
+
+  opencode_skills:
+    module: .ovav.forge.adapters.opencode.skills
+    target_client: opencode
+    surface: skills
+    labels: [projection, skills, opencode]
+
+  opencode_visual:
+    module: .ovav.forge.adapters.opencode.visual
+    target_client: opencode
+    surface: themes
+    labels: [projection, visual, opencode]
+
+  opencode_plugins_status:
+    module: .ovav.source.plugins.opencode.status
+    target_client: opencode
+    surface: plugins
+    labels: [projection, plugins, status]
+
+  opencode_plugins_monitor:
+    module: .ovav.source.plugins.opencode.monitor
+    target_client: opencode
+    surface: plugins
+    labels: [projection, plugins, monitor]
+
+  opencode_tui:
+    module: .ovav.source.plugins.opencode.tui
+    target_client: opencode
+    surface: tui
+    labels: [projection, tui, interface]

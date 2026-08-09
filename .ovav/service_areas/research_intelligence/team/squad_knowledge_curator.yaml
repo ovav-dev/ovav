@@ -1,0 +1,5 @@
+squad: {id: squad_knowledge_curator, display_name: Celia, area: research_intelligence, lead: eidren, role: "Research cache management, knowledge organization, taxonomy maintenance", role_id: knowledge_curator}
+activation: {modes: [focused_squad], never_default: true}
+model_body: {primary: "opencode-go/deepseek-v4-pro"}
+lanes: [evidence_benchmarks]
+constraints: ["Cache TTL: 24h web, 7d papers, 30d benchmarks", "Fuentes stale deben marcarse para re-verificación"]

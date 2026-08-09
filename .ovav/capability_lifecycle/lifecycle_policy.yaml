@@ -1,0 +1,246 @@
+# OVAV Capability Lifecycle Policy — Phase 9
+# Governs how capabilities move through lifecycle states.
+# Rule: Ninguna capability salta de idea a full_active.
+# Canonical source: docs/lab/OVAV_LIVING_INTELLIGENCE_EVALUATION_LAYER_THAVREN.md (Section 10)
+
+schema: capability_lifecycle_policy.v1
+generated_at: "2026-05-30T00:00:00Z"
+canonical_source: docs/lab/OVAV_LIVING_INTELLIGENCE_EVALUATION_LAYER_THAVREN.md
+
+lifecycle_policy:
+  version: "1.0.0"
+  description: >
+    Toda capability en OVAV debe pasar por un ciclo de vida definido con gates
+    de entrada y salida. No se permite saltar estados. Cada transición requiere
+    evidencia y validación.
+
+  states:
+    idea:
+      order: 0
+      description: "Propuesta conceptual. No hay implementación, solo descripción y rationale."
+      allowed_actions: [document, discuss, evaluate]
+      max_duration_days: 90
+      auto_retire_if_stale: true
+
+    spec:
+      order: 1
+      description: "Especificación formal. Schema, contrato, campos requeridos definidos."
+      allowed_actions: [document, schema_design, peer_review]
+      requires:
+        - decision_packet
+        - law_compliance_check
+      max_duration_days: 180
+      auto_flag_if_stale: true
+
+    sandbox:
+      order: 2
+      description: "Implementación aislada. Sin efectos laterales, sin writes a producción."
+      allowed_actions: [create_files, run_tests, dry_run]
+      requires:
+        - isolated_environment
+        - no_production_writes
+        - rollback_plan_draft
+      max_duration_days: 90
+      auto_flag_if_stale: true
+
+    read_only:
+      order: 3
+      description: "Opera en modo solo lectura sobre datos reales. Sin writes."
+      allowed_actions: [read, inspect, validate, report]
+      requires:
+        - read_only_tool_grants
+        - zero_trust_context_check
+      max_duration_days: 60
+
+    gated_write:
+      order: 4
+      description: "Escribe bajo gates específicos. Cada write requiere aprobación."
+      allowed_actions: [scoped_write, append_only, artifact_write]
+      requires:
+        - workspace_safety_gate
+        - permission_authority_check
+        - approval_per_write
+      max_duration_days: null
+
+    limited_active:
+      order: 5
+      description: "Activo con limitaciones. Scope reducido, monitoreo activo."
+      allowed_actions: [scoped_read, scoped_write, trigger_harnesses]
+      requires:
+        - scope_boundary_defined
+        - monitoring_active
+        - circuit_breaker_configured
+      max_duration_days: null
+
+    full_active:
+      order: 6
+      description: "Completamente operativo. Sin restricciones dentro de su scope."
+      allowed_actions: [full_read, full_write, trigger_all, delegate]
+      requires:
+        - all_gates_passed
+        - evidence_complete
+        - rollback_tested
+        - monitoring_configured
+      max_duration_days: null
+
+    deprecated:
+      order: 7
+      description: "Marcado para retiro. Aún funcional pero no recomendado."
+      allowed_actions: [read, maintenance_only]
+      requires:
+        - migration_path_documented
+        - deprecation_notice_published
+      auto_trigger: "90 days without use or validation"
+
+    retired:
+      order: 8
+      description: "Fuera de servicio. Código puede permanecer como referencia histórica."
+      allowed_actions: [read_historical_only]
+      requires:
+        - retirement_evidence
+        - registry_updated
+        - dependents_migrated
+
+  transitions:
+    # Valid transitions. Any transition not listed here is BLOCKED.
+    allowed:
+      - from: idea
+        to: spec
+        gate: decision_packet_approved
+        description: "Propuesta aprobada → especificación formal"
+
+      - from: spec
+        to: sandbox
+        gate: schema_validated
+        description: "Especificación validada → implementación aislada"
+
+      - from: spec
+        to: idea
+        gate: redesign_required
+        description: "Especificación inviable → volver a concepto"
+
+      - from: sandbox
+        to: read_only
+        gate: sandbox_tests_pass
+        description: "Tests en sandbox OK → lectura sobre datos reales"
+
+      - from: sandbox
+        to: spec
+        gate: sandbox_failure
+        description: "Sandbox revela fallas → rediseñar especificación"
+
+      - from: read_only
+        to: gated_write
+        gate: read_only_validation_pass
+        description: "Lectura validada → escritura controlada"
+
+      - from: read_only
+        to: sandbox
+        gate: read_only_failure
+        description: "Falla en lectura real → volver a sandbox"
+
+      - from: gated_write
+        to: limited_active
+        gate: gated_write_evidence_ok
+        description: "Escrituras exitosas → activación limitada"
+
+      - from: gated_write
+        to: read_only
+        gate: gated_write_failure
+        description: "Escrituras fallan → regresar a solo lectura"
+
+      - from: limited_active
+        to: full_active
+        gate: limited_active_stable
+        description: "Estabilidad demostrada → activación completa"
+
+      - from: limited_active
+        to: gated_write
+        gate: limited_active_issues
+        description: "Problemas en activo → restringir escrituras"
+
+      - from: full_active
+        to: deprecated
+        gate: capability_superseded_or_unused
+        description: "Capacidad obsoleta → marcar como deprecada"
+
+      - from: deprecated
+        to: retired
+        gate: migration_complete
+        description: "Migración terminada → retirar"
+
+      - from: deprecated
+        to: full_active
+        gate: capability_restored
+        description: "Capacidad vuelve a ser necesaria → reactivar (requiere re-validación)"
+
+      - from: any
+        to: deprecated
+        gate: security_incident_or_blocker
+        description: "Incidente de seguridad o bloqueante → deprecar inmediatamente"
+
+  blocked_transitions:
+    - from: idea
+      to: full_active
+      reason: "NINGUNA capability salta de idea a full_active. Debe pasar por todos los estados intermedios."
+      severity: critical
+    - from: idea
+      to: limited_active
+      reason: "Saltar estados intermedios no está permitido."
+      severity: critical
+    - from: spec
+      to: full_active
+      reason: "Debe pasar por sandbox, read_only, gated_write y limited_active."
+      severity: critical
+    - from: sandbox
+      to: full_active
+      reason: "Debe pasar por read_only, gated_write y limited_active."
+      severity: critical
+    - from: read_only
+      to: full_active
+      reason: "Debe pasar por gated_write y limited_active."
+      severity: high
+    - from: gated_write
+      to: full_active
+      reason: "Debe pasar por limited_active primero."
+      severity: high
+
+  rollback_policy:
+    description: "Toda capability en gated_write o superior debe tener un plan de rollback."
+    required_for_states: [gated_write, limited_active, full_active]
+    rollback_must_include:
+      - previous_state_restore_steps
+      - data_migration_reversal
+      - registry_update
+      - evidence_of_rollback_test
+    auto_rollback_triggers:
+      - security_incident
+      - data_corruption
+      - permission_escalation
+      - law_violation
+
+  gate_evidence_requirements:
+    description: "Qué evidencia se requiere para cada tipo de gate."
+    decision_packet_approved:
+      - decision_packet.yaml with PASS status
+      - law_compliance_check PASS
+    schema_validated:
+      - json_schema_validator PASS
+      - peer_review_approved
+    sandbox_tests_pass:
+      - test_suite_green
+      - no_production_side_effects
+    read_only_validation_pass:
+      - read_only_probe_results
+      - zero_trust_context PASS
+    gated_write_evidence_ok:
+      - write_audit_log
+      - safety_gate_logs
+    limited_active_stable:
+      - stability_metrics (7 days minimum)
+      - incident_count: 0
+
+  activation:
+    always_active: true
+    enforced_by: capability_lifecycle_gate
+    check_on: [capability_create, capability_state_change, registry_update]

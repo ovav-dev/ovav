@@ -1,0 +1,60 @@
+{
+  "schema": "ovav.L7_implementation_report.v1",
+  "layer": "L7",
+  "name": "Feedback Loop",
+  "phase": "Fase 3 — Integración",
+  "status": "COMPLETADO",
+  "completed_at": "2026-06-01T03:00:00+00:00",
+  "commit": "a08fd20",
+  "branch": "task/implementaciones",
+  "files": {
+    "implemented": [
+      "tools/agent_runtime/feedback_loop.py (226 líneas)",
+      "tools/agent_runtime/belief_manager.py (301 líneas)",
+      "tools/validators/check_L7_feedback_loop.py (171 líneas)",
+      ".ovav/artifacts/L7/L7_DECISION_PACKET.yaml",
+      ".ovav/artifacts/L7/L7_FEEDBACK_LOOP_SPEC.md"
+    ],
+    "total_loc": 527
+  },
+  "modules": {
+    "feedback_loop": {
+      "functions": ["capture_decision", "deprecate_belief", "compact_memory", "improve_packet"],
+      "description": "Sistema de aprendizaje operativo: captura decisiones, depreca creencias obsoletas, compacta memoria, mejora paquetes de contexto"
+    },
+    "belief_manager": {
+      "states": ["revocable", "emergent"],
+      "expiry": "semanal sin validación",
+      "description": "Creencias revocables/emergentes con expiración semanal. F5.1 gated. Estados desconocidos fallan cerrados."
+    }
+  },
+  "validation": {
+    "validator": "check_L7_feedback_loop.py",
+    "checks": {
+      "capture_sanitizes": "PASS",
+      "beliefs_and_expiry": "PASS",
+      "gate_safe_stop": "PASS",
+      "compaction": "PASS",
+      "override_boundaries": "PASS",
+      "public_save_guard": "PASS"
+    },
+    "total": "6/6 PASS"
+  },
+  "evaluation_pipeline": {
+    "runner": "evaluation_pipeline_runner.py .ovav/artifacts/L7/L7_DECISION_PACKET.yaml",
+    "stages": {
+      "decision_packet": {"decision": "PASS", "passed": 15},
+      "law_compliance": {"status": "PASS", "passed": 12, "failed": 0},
+      "stress_gate": {"decision": "PASS", "passed": 3},
+      "red_team": {"decision": "PASS", "passed": 5, "failed": 0},
+      "semantic_drift": {"severity": "low", "conflicts": 1}
+    },
+    "total": "5/5 PASS"
+  },
+  "integration": {
+    "F5.1_new_states": "creencias usan solo estados revocable y emergent",
+    "F5.2_ledger_vivo": "escrituras reales bloqueadas si gate cerrado; safe-stop si no hay permiso",
+    "F0.2_secrets_vault": "secrets saneados antes de persistir",
+    "F0.6_exfil_detector": "patrones de exfiltración detectados en outputs de memoria"
+  }
+}

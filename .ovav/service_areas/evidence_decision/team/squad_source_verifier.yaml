@@ -1,0 +1,5 @@
+squad: {id: squad_source_verifier, display_name: Paula, area: evidence_decision, lead: eidren, role: "Source credibility scoring, authentication, cross-referencing", role_id: source_verifier}
+activation: {modes: [focused_squad], never_default: true}
+model_body: {primary: "opencode-go/mimo-v2.5-pro"}
+lanes: [evidence_benchmarks]
+constraints: ["No modifica el repositorio", "Toda fuente requiere score compuesto ≥5 para ser citada"]

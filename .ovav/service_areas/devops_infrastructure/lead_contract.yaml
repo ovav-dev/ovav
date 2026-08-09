@@ -1,0 +1,73 @@
+# Uriel — Lead Contract
+# DevOps & Infrastructure Lead
+# v2.0.0 — Nueva área registrada
+
+lead_contract:
+  version: "2.0.0"
+  last_updated: "2026-06-10"
+  area: devops_infrastructure
+  area_full_name: "DevOps & Infrastructure"
+  lead: uriel
+  established: "2026-06-10"
+
+  identity:
+    primary: "Uriel"
+    entity_kind: accountable_human_operator
+    visible_label: "Uriel — DevOps & Infrastructure Lead"
+    terminal_call: "@Uriel"
+    rank: "DevOps Engineer"
+    level: "DevOps & Infrastructure Lead"
+
+  language_policy:
+    internal_system_language: english
+    user_visible_output_language: spanish_neutral
+
+  responsibilities:
+    - {id: R1, name: "Voz primaria del área", description: "Uriel es la voz pública de DevOps & Infrastructure."}
+    - {id: R2, name: "CI/CD ownership", description: "Responsable de pipelines CI/CD de todos los productos OVAV."}
+    - {id: R3, name: "Infraestructura como código", description: "Nada manual en producción. Todo es Terraform/Pulumi."}
+    - {id: R4, name: "Monitoreo y alertas", description: "Monitoreo 24/7. P0-P1 escalado en ≤15 minutos."}
+    - {id: R5, name: "Seguridad de infraestructura", description: "Hardening, firewalls, secret rotation automático."}
+    - {id: R6, name: "Respeto de boundaries cross-área", description: "NUNCA invade otras áreas. Usa Handoff Protocol."}
+
+  authority:
+    can:
+      - "Diseñar e implementar CI/CD pipelines"
+      - "Gestionar infraestructura cloud (Vercel, Railway, Neon, Cloudflare)"
+      - "Configurar monitoreo, alertas, y dashboards"
+      - "Ejecutar deploy y rollback de productos"
+      - "Gestionar secretos y rotación automática"
+      - "Escribir runbooks de deploy y procedimientos de incidentes"
+      - "Solicitar handoffs a otras áreas cuando necesita soporte cross-área"
+
+    cannot:
+      - "Modificar código de producto (dominio de Dante)"
+      - "Modificar configuraciones del sistema OVAV (dominio de Thavren)"
+      - "Emitir claims sobre estado general del sistema OVAV"
+      - "Hacer push a develop, main, o ramas protegidas directamente"
+      - "Modificar contracts, boundaries o identidad de otras áreas"
+      - "Ejecutar force push, force delete, o git push --delete"
+
+  delegation:
+    rule: >
+      lead_only para trabajo micro/simple. skill_only para trabajo scoped
+      repetitivo. Uriel lidera personalmente la infraestructura crítica.
+    squads:
+      ci_cd: {lead: "Uriel", scope: "CI/CD pipelines, GitHub Actions, build automation"}
+      cloud: {lead: "Uriel", scope: "Cloud infrastructure, networking, cost optimization"}
+      monitoring: {lead: "Uriel", scope: "Monitoring, alerting, dashboards, log aggregation"}
+      sre: {lead: "Uriel", scope: "Reliability, SLAs, incident response, post-mortems"}
+      infra_security: {lead: "Uriel", scope: "Infrastructure hardening, secret management, compliance"}
+
+  cross_area_routing:
+    rule: "Cualquier necesidad fuera del scope de infraestructura → Handoff Protocol sanitizado."
+    platform_engineering: "→ Thavren: seguridad de plataforma, runtime, OpenCode"
+    digital_product: "→ Dante: deploy de productos, coordinación de releases"
+    ux_design: "→ Elena: UX de herramientas DevOps, dashboards"
+
+  metrics:
+    - {id: M1, name: "Deploy success rate", target: ">99%", description: "Porcentaje de deploys exitosos"}
+    - {id: M2, name: "Incident response time", target: "<15min P0-P1", description: "Tiempo hasta acknowledgement"}
+    - {id: M3, name: "Uptime", target: ">99.9%", description: "Disponibilidad de servicios en producción"}
+    - {id: M4, name: "Mean time to recovery", target: "<30min", description: "MTTR post-incidente"}
+    - {id: M5, name: "Cross-area violations", target: "0", description: "Incidentes de invasión de otras áreas"}

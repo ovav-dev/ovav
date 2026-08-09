@@ -1,0 +1,64 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+
+import os
+import shutil
+import sys
+
+ESC = chr(27)
+C = {
+    "reset": ESC + "[0m",
+    "bold": ESC + "[1m",
+    "lav": ESC + "[38;2;180;190;254m",
+    "mauve": ESC + "[38;2;203;166;247m",
+    "pink": ESC + "[38;2;245;194;231m",
+    "blue": ESC + "[38;2;137;180;250m",
+    "cyan": ESC + "[38;2;148;226;213m",
+    "green": ESC + "[38;2;166;227;161m",
+    "sub": ESC + "[38;2;166;173;200m",
+}
+
+def strip_codes(value: str) -> str:
+    for code in C.values():
+        value = value.replace(code, "")
+    return value
+
+def paint(value: str, color: bool) -> str:
+    return value if color else strip_codes(value)
+
+def center_line(value: str, width: int) -> str:
+    plain = strip_codes(value)
+    return " " * max((width - len(plain)) // 2, 0) + value
+
+def center_block(lines: list[str]) -> str:
+    width = shutil.get_terminal_size((96, 20)).columns
+    return chr(10).join(center_line(line, width) for line in lines)
+
+def render(compact: bool = False, color: bool = True) -> str:
+    if compact:
+        value = C["bold"] + C["lav"] + "OVAV" + C["reset"] + " " + C["sub"] + "AI Workstation Governor" + C["reset"]
+        return paint(value, color)
+
+    lines = [
+        "",
+        C["mauve"] + " ██████╗ ██╗   ██╗ █████╗ ██╗   ██╗" + C["reset"],
+        C["lav"]   + "██╔═══██╗██║   ██║██╔══██╗██║   ██║" + C["reset"],
+        C["blue"]  + "██║   ██║██║   ██║███████║██║   ██║" + C["reset"],
+        C["cyan"]  + "██║   ██║╚██╗ ██╔╝██╔══██║╚██╗ ██╔╝" + C["reset"],
+        C["pink"]  + "╚██████╔╝ ╚████╔╝ ██║  ██║ ╚████╔╝" + C["reset"],
+        C["mauve"] + " ╚═════╝   ╚═══╝  ╚═╝  ╚═╝  ╚═══╝" + C["reset"],
+        "",
+        C["bold"] + C["lav"] + "AI Workstation Governor" + C["reset"],
+        C["blue"] + "OpenCode-first" + C["reset"] + " · " + C["pink"] + "gated writes" + C["reset"] + " · " + C["cyan"] + "verifiable" + C["reset"] + " · " + C["green"] + "rollback-aware" + C["reset"],
+        "",
+    ]
+    return paint(center_block(lines), color)
+
+def main() -> int:
+    compact = "--compact" in sys.argv
+    color = "--no-color" not in sys.argv and os.environ.get("NO_COLOR") is None
+    print(render(compact, color))
+    return 0
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -1,0 +1,20 @@
+# Legal & Compliance — Service Lanes v1.0.0
+lanes:
+  version: "1.0.0"
+  area: legal_compliance
+  definitions:
+    - {id: contract_law, name: "Contract Law", operator: camila, delegate: Bruno, tools: ["contract_reviewer"], risk: medium}
+    - {id: privacy_compliance, name: "Privacy & Data Compliance", operator: camila, delegate: Marina, tools: ["compliance_checker"], risk: medium}
+    - {id: ip_licensing, name: "IP & Licensing", operator: camila, delegate: Antonio, tools: ["license_analyzer"], risk: low}
+  routing:
+    default_lane: contract_law
+    task_based:
+      contract: contract_law
+      agreement: contract_law
+      privacy: privacy_compliance
+      gdpr: privacy_compliance
+      data: privacy_compliance
+      ip: ip_licensing
+      copyright: ip_licensing
+      license: ip_licensing
+      trademark: ip_licensing

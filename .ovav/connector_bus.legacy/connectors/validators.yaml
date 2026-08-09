@@ -1,0 +1,459 @@
+version: 1.0.0
+slot_type: validator
+description: Componentes de validación — integridad, sintaxis, policy, seguridad
+components:
+  check_L7_feedback_loop:
+    module: tools.validators.check_L7_feedback_loop
+    function: main
+    tier: 9
+    triggers:
+    - before_implementation
+    - on_session_start
+    blocking: true
+    labels:
+    - security
+    - L7
+    - feedback-loop
+  check_agent_runtime_enforcement:
+    module: tools.validators.check_agent_runtime_enforcement
+    function: main
+    tier: 8
+    triggers:
+    - before_implementation
+    blocking: true
+    labels:
+    - agent
+    - runtime
+    - enforcement
+  check_agent_runtime_service_area_router:
+    module: tools.validators.check_agent_runtime_service_area_router
+    function: main
+    tier: 8
+    triggers:
+    - before_implementation
+    blocking: false
+    labels:
+    - agent
+    - service-area
+    - routing
+  check_agent_surface_hierarchy:
+    module: tools.validators.check_agent_surface_hierarchy
+    function: main
+    tier: 8
+    triggers:
+    - before_implementation
+    blocking: true
+    labels:
+    - agent
+    - surface
+    - ux
+  check_agent_ux_visual_delivery:
+    module: tools.validators.check_agent_ux_visual_delivery
+    function: main
+    tier: 8
+    triggers:
+    - before_implementation
+    blocking: true
+    labels:
+    - agent
+    - ux
+    - visual-delivery
+  check_architecture_guardian:
+    module: tools.validators.check_architecture_guardian
+    function: validate
+    tier: 8
+    triggers:
+    - before_implementation
+    blocking: true
+    labels:
+    - architecture
+    - drift
+    - governance
+  check_bootstrap_chain:
+    module: tools.validators.check_bootstrap_chain
+    function: validate
+    tier: 9
+    triggers:
+    - on_session_start
+    blocking: true
+    labels:
+    - security
+    - bootstrap
+    - chain-of-trust
+  check_exfil_patterns:
+    module: tools.validators.check_exfil_patterns
+    function: validate
+    tier: 9
+    triggers:
+    - before_close
+    blocking: true
+    labels:
+    - security
+    - anti-exfil
+  check_context_economy_and_active_connections:
+    module: tools.validators.check_context_economy_and_active_connections
+    function: main
+    tier: 8
+    triggers:
+    - on_session_start
+    blocking: false
+    labels:
+    - context
+    - economy
+    - budget
+  check_f1_architecture:
+    module: tools.validators.check_f1_architecture
+    function: validate
+    tier: 9
+    triggers:
+    - before_implementation
+    blocking: true
+    labels:
+    - architecture
+    - f1
+    - structural
+  check_f4_security_hardening:
+    module: tools.validators.check_f4_security_hardening
+    function: main
+    tier: 9
+    triggers:
+    - before_implementation
+    blocking: true
+    labels:
+    - security
+    - f4
+    - hardening
+  check_final_launch_current_authority:
+    module: tools.validators.check_final_launch_current_authority
+    function: main
+    tier: 8
+    triggers:
+    - before_implementation
+    - before_close
+    blocking: true
+    labels:
+    - authority
+    - launch
+    - governance
+  check_final_launch_runtime_authority:
+    module: tools.validators.check_final_launch_runtime_authority
+    function: main
+    tier: 8
+    triggers:
+    - before_implementation
+    - before_close
+    blocking: true
+    labels:
+    - authority
+    - runtime
+    - launch
+  check_harness_contract_alignment:
+    module: tools.validators.check_harness_contract_alignment
+    function: main
+    tier: 8
+    triggers:
+    - before_implementation
+    blocking: true
+    labels:
+    - harness
+    - contract
+    - alignment
+  check_invalid_fixtures:
+    module: tools.validators.check_invalid_fixtures
+    function: main
+    tier: 7
+    triggers:
+    - before_implementation
+    blocking: false
+    labels:
+    - fixtures
+    - testing
+    - validation
+  check_network_hardening:
+    module: tools.validators.check_network_hardening
+    function: validate
+    tier: 9
+    surface: .ovav/registry/
+    blocking: true
+    labels:
+    - security
+    - network
+  check_opencode_plugins:
+    module: tools.validators.check_opencode_plugins
+    function: validate
+    tier: 8
+    triggers:
+    - before_implementation
+    blocking: true
+    labels:
+    - opencode
+    - plugins
+    - security
+  check_ovav_wezterm_workspace_isolation:
+    module: tools.validators.check_ovav_wezterm_workspace_isolation
+    function: main
+    tier: 7
+    triggers:
+    - before_implementation
+    blocking: false
+    labels:
+    - wezterm
+    - workspace
+    - isolation
+  check_protected_branch:
+    module: tools.validators.check_protected_branch
+    function: main
+    tier: 9
+    triggers:
+    - on_session_start
+    - before_git_stage
+    blocking: true
+    labels:
+    - git
+    - branch
+    - protection
+  check_rego_policies:
+    module: tools.validators.check_rego_policies
+    function: validate
+    tier: 8
+    triggers:
+    - before_implementation
+    blocking: true
+    labels:
+    - rego
+    - opa
+    - policy
+  check_runtime_integrity:
+    module: tools.validators.check_runtime_integrity
+    function: validate
+    tier: 9
+    triggers:
+    - before_implementation
+    blocking: true
+    labels:
+    - security
+    - runtime
+    - integrity
+  check_secrets_hygiene:
+    module: tools.validators.check_secrets_hygiene
+    function: validate
+    tier: 9
+    triggers:
+    - before_git_stage
+    - before_git_push
+    blocking: true
+    labels:
+    - security
+    - secrets
+    - hygiene
+  check_single_authority_source:
+    module: tools.validators.check_single_authority_source
+    function: main
+    tier: 9
+    triggers:
+    - before_implementation
+    - on_session_start
+    blocking: true
+    labels:
+    - authority
+    - single-source
+    - governance
+  check_squad_normalization:
+    module: tools.validators.check_squad_normalization
+    function: main
+    tier: 8
+    triggers:
+    - before_implementation
+    blocking: true
+    labels:
+    - squad
+    - normalization
+    - governance
+  check_stale_artifact_references:
+    module: tools.validators.check_stale_artifact_references
+    function: main
+    tier: 7
+    triggers:
+    - before_close
+    blocking: false
+    labels:
+    - artifacts
+    - stale
+    - cleanup
+  check_supply_chain:
+    module: tools.validators.check_supply_chain
+    function: validate
+    tier: 9
+    surface: .ovav/
+    blocking: true
+    labels:
+    - security
+    - supply-chain
+    - integrity
+  check_surface_drift:
+    module: tools.validators.check_surface_drift
+    function: main
+    tier: 8
+    triggers:
+    - before_implementation
+    blocking: true
+    labels:
+    - surface
+    - drift
+    - governance
+  check_tool_config_profiles:
+    module: tools.validators.check_tool_config_profiles
+    function: main
+    tier: 7
+    triggers:
+    - before_implementation
+    blocking: false
+    labels:
+    - tools
+    - config
+    - profiles
+  check_tool_readiness_matrix:
+    module: tools.validators.check_tool_readiness_matrix
+    function: main
+    tier: 8
+    triggers:
+    - before_implementation
+    blocking: false
+    labels:
+    - tools
+    - readiness
+    - matrix
+  validate_config_syntax:
+    module: tools.validators.check_config_syntax
+    function: validate
+    tier: 10
+    triggers:
+    - before_implementation
+    blocking: true
+  validate_contract_freshness:
+    module: tools.validators.check_contract_freshness
+    function: validate
+    tier: 9
+    triggers:
+    - before_implementation
+    blocking: true
+  validate_git_push_gate:
+    module: tools.validators.check_git_push_gate
+    function: validate
+    tier: 10
+    triggers:
+    - after_git_stage
+    blocking: true
+    labels:
+    - git
+    - safety
+    - push
+  validate_handoff_sync:
+    module: tools.validators.check_handoff_sync
+    function: validate
+    tier: 9
+    triggers:
+    - before_close
+    - on_session_start
+    blocking: true
+  validate_harnesses:
+    module: tools.validators.validate_harnesses
+    function: validate
+    tier: 10
+    surface: .ovav/registry/
+    blocking: true
+    health:
+      check: file_exists
+      target: .ovav/registry/harnesses.yaml
+  validate_host_config_drift:
+    module: tools.validators.check_host_config_drift
+    function: validate
+    tier: 10
+    triggers:
+    - on_session_start
+    blocking: true
+    labels:
+    - host
+    - security
+    - drift
+  validate_ledger_write_path:
+    module: tools.validators.check_ledger_write_path
+    function: validate
+    tier: 10
+    triggers:
+    - before_implementation
+    blocking: true
+  validate_memory_policy:
+    module: tools.validators.validate_memory_policy
+    function: validate
+    tier: 10
+    surface: .ovav/registry/
+    blocking: true
+  validate_model_policy:
+    module: tools.validators.validate_model_policy
+    function: validate
+    tier: 10
+    surface: .opencode/
+    blocking: true
+  validate_permission_policy_drift:
+    module: tools.validators.check_permission_policy_drift
+    function: validate
+    tier: 10
+    surface: .ovav/policy/
+    blocking: true
+  validate_phase_dag:
+    module: tools.validators.validate_phase_dag
+    function: validate
+    tier: 10
+    surface: .ovav/registry/
+    blocking: true
+  validate_registry_drift:
+    module: tools.validators.check_registry_drift
+    function: validate
+    tier: 9
+    triggers:
+    - before_implementation
+    blocking: true
+  validate_result_contracts:
+    module: tools.validators.validate_result_contracts
+    function: validate
+    tier: 10
+    surface: .ovav/registry/
+    blocking: true
+  validate_service_profiles:
+    module: tools.validators.validate_service_profiles
+    function: validate
+    tier: 10
+    surface: .ovav/registry/
+    blocking: true
+    health:
+      check: file_exists
+      target: .ovav/registry/service_profiles.yaml
+  validate_skills:
+    module: tools.validators.validate_skills
+    function: validate
+    tier: 10
+    surface: .ovav/registry/
+    blocking: true
+  validate_validator_coverage:
+    module: tools.validators.check_validator_coverage
+    function: validate
+    tier: 9
+    triggers:
+    - before_implementation
+    blocking: false
+  validate_workspace_safety_gate:
+    module: tools.validators.check_workspace_safety_gate
+    function: validate
+    tier: 10
+    triggers:
+    - on_user_message
+    - before_implementation
+    - before_apply
+    - before_git_stage
+    - before_git_push
+    blocking: true
+    labels:
+    - safety
+    - gate
+    - pre-flight

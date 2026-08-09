@@ -1,0 +1,7 @@
+squad:
+  id: squad_monitoring
+  name: "Monitoring Squad"
+  area: devops_infrastructure
+  lead: uriel
+  scope: "Monitoring, alerting, dashboards, log aggregation, observability"
+  status: active

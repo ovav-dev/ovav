@@ -1,0 +1,107 @@
+lanes:
+  ovav_architecture:
+    profile: ovav_systems_architect
+    requires_artifacts:
+    - proposal
+    - spec
+    - design
+    - tasks
+  runtime_governance:
+    profile: ovav_systems_architect
+    requires_artifacts:
+    - spec
+    - design
+    - tasks
+    - verify_report
+  opencode_system:
+    profile: ovav_systems_architect
+    requires_artifacts:
+    - project_discovery
+    - design
+    - verify_report
+  install_governor:
+    profile: ovav_systems_architect
+    requires_artifacts:
+    - install_plan
+    - backup_plan
+    - verify_report
+  workstation_stack:
+    profile: ovav_systems_architect
+    requires_artifacts:
+    - project_discovery
+    - artifact_map
+    - verify_report
+  release_delivery:
+    profile: ovav_systems_architect
+    requires_artifacts:
+    - apply_log
+    - verify_report
+    - handoff_summary
+  deep_research:
+    profile: ovav_research_analyst
+    requires_artifacts:
+    - research_question
+    - source_map
+    - synthesis
+  market_product_analysis:
+    profile: ovav_research_analyst
+    requires_artifacts:
+    - research_question
+    - source_map
+    - comparison_matrix
+  technical_benchmark:
+    profile: ovav_research_analyst
+    requires_artifacts:
+    - source_map
+    - comparison_matrix
+    - decision_brief
+  source_verification:
+    profile: ovav_research_analyst
+    requires_artifacts:
+    - source_map
+    - evidence_review
+    - decision_brief
+  decision_brief:
+    profile: ovav_research_analyst
+    requires_artifacts:
+    - source_map
+    - evidence_review
+    - decision_brief
+  publication_delivery:
+    profile: ovav_research_analyst
+    requires_artifacts:
+    - synthesis
+    - decision_brief
+    - handoff_summary
+  sports_nutrition:
+    service_area: health_performance
+    description: Sports nutrition optimization
+    profile: ovav_health_performance
+  exercise_physiology:
+    service_area: health_performance
+    description: Exercise physiology and programming
+    profile: ovav_health_performance
+  clinical_research:
+    service_area: health_performance
+    description: Clinical research assessment
+    profile: ovav_health_performance
+  meal_plan_design:
+    service_area: health_performance
+    description: Meal plan design and customization
+    profile: ovav_health_performance
+  supplementation:
+    service_area: health_performance
+    description: Supplementation protocols
+    profile: ovav_health_performance
+  sleep_recovery:
+    service_area: health_performance
+    description: Sleep and recovery optimization
+    profile: ovav_health_performance
+  mental_performance:
+    service_area: health_performance
+    description: Mental performance coaching
+    profile: ovav_health_performance
+  progress_tracking:
+    service_area: health_performance
+    description: Progress and metrics tracking
+    profile: ovav_health_performance

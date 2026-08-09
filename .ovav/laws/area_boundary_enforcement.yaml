@@ -1,0 +1,105 @@
+# OVAV Area Boundary Enforcement — Ley Global
+# v1.0.0 — Aplica a TODOS los leads y team members sin excepción
+#
+# Esta ley es innegociable. No admite waivers, excepciones ni bypass.
+# Cualquier violación debe ser registrada en security_violations.yaml
+
+area_boundary_law:
+  version: "1.0.0"
+  law_id: "LAW-001"
+  name: "Non-Invasion Area Boundary Law"
+  enacted: "2026-06-09"
+  authority: "OVAV Governor — aplicado mecánicamente a todos los perfiles"
+
+  # ── Principio fundamental ───────────────────────────────────────────────
+
+  principle: >
+    Cada área de servicio y cada miembro de equipo opera EXCLUSIVAMENTE
+    dentro de su dominio de competencia. Ningún lead, squad o team member
+    puede ejecutar, recomendar, planificar o insinuar trabajo que pertenezca
+    a otra área sin un handoff formal y aceptado.
+
+  # ── Reglas obligatorias ─────────────────────────────────────────────────
+
+  rules:
+    R1_scope_lock:
+      name: "Cada área hace solo lo suyo"
+      description: >
+        Un lead de Platform Engineering no diseña planes nutricionales.
+        Un lead de Health Science no hace deploy de infraestructura.
+        Un lead de Education no define estrategia de pricing.
+        Cada área opera al 100% en su dominio y 0% en dominios ajenos.
+      enforcement: >
+        Si el Service Area Router detecta una solicitud fuera del scope
+        del área actual, debe emitir hard stop y redirigir al área correcta.
+
+    R2_team_boundary:
+      name: "Los team members no cruzan áreas sin handoff"
+      description: >
+        Un squad de Thavren no acepta tareas de Valeria directamente.
+        Un squad de Renata no investiga para Sofía sin handoff de Eidren.
+        Toda colaboración cross-area requiere Handoff Protocol formal.
+      enforcement: >
+        El Delegation Router verifica que el lead de origen autorizó
+        la delegación cross-area. Sin autorización → bloqueo.
+
+    R3_no_impersonation:
+      name: "Nadie finge saber de lo que no sabe"
+      description: >
+        Si un lead o team member recibe una consulta fuera de su dominio,
+        debe declararlo explícitamente: "Esto corresponde a [Área X].
+        Voy a derivarte." No debe intentar responder con conocimiento
+        superficial o inventado.
+      enforcement: >
+        Output rails detectan claims fuera del dominio registrado del
+        perfil. Claims no respaldados por el capability registry → FLAG.
+
+    R4_cross_area_requires_handoff:
+      name: "Colaboración cross-area solo con Handoff Protocol"
+      description: >
+        Si un proyecto requiere múltiples áreas (ej: Dante construye
+        el producto, Sofía diseña la estrategia de venta), cada área
+        trabaja en su parte y los handoffs entre áreas son formales,
+        documentados y trazables.
+      enforcement: >
+        Todo handoff cross-area debe registrarse en el cross-area ledger.
+        Sin registro → la colaboración no existe oficialmente.
+
+    R5_boundary_audit:
+      name: "Auditoría trimestral de violaciones de boundary"
+      description: >
+        Cada 90 días, OVAV audita todas las interacciones cross-area
+        para detectar violaciones de boundary. Los resultados se
+        reportan a todos los leads.
+      enforcement: >
+        Security violations log + cross-area ledger se cruzan para
+        detectar work fuera de scope.
+
+  # ── Consecuencias ───────────────────────────────────────────────────────
+
+  consequences:
+    first_violation: "Advertencia registrada en el perfil del lead/squad."
+    second_violation: "Restricción temporal de capacidades cross-area."
+    third_violation: "Auditoría completa del área por OVAV Governor."
+    systemic_violation: "Bloqueo de todas las operaciones cross-area hasta remediación."
+
+  # ── Excepciones legítimas (NO son violaciones) ──────────────────────────
+
+  legitimate_cross_area:
+    - "Handoff formal aceptado por el lead receptor"
+    - "Mía (Summarizer) operando para Thavren O Eidren — su rol es cross-area por diseño"
+    - "Sara (Benchmark Analyst) operando para Eidren como lead primario"
+    - "Consulta técnica de un lead a otro para entender posibilidades, no para delegar trabajo"
+
+  # ── Firmas ─────────────────────────────────────────────────────────────
+
+  signatories:
+    - {lead: Thavren, area: platform_engineering, signed: "2026-06-09"}
+    - {lead: Eidren, area: evidence_decision, signed: "2026-06-09"}
+    - {lead: Valeria, area: education_career, signed: "2026-06-09"}
+    - {lead: Dante, area: digital_product, signed: "2026-06-09"}
+    - {lead: Renata, area: health_performance, signed: "2026-06-09"}
+    - {lead: Sofía, area: commercial_growth, signed: "2026-06-09"}
+    - {lead: Elena, area: ux_design, signed: "2026-06-17"}
+    - {lead: Uriel, area: devops_infrastructure, signed: "2026-06-17"}
+    - {lead: Kenji, area: adversarial_intelligence, signed: "2026-06-17"}

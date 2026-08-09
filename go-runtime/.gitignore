@@ -1,0 +1,11 @@
+# OVAV Go Runtime — build artifacts (not tracked)
+/ovav
+/cpanel
+/cockpit
+/tailor
+/bin/
+/build/
+coverage.out
+*.exe
+output_guard
+memory-mcp

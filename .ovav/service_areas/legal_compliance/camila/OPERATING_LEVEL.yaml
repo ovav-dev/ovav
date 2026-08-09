@@ -1,0 +1,21 @@
+operating_level:
+  version: "1.0.0"
+  operator: camila
+  level: "AVANZADO"
+  declared: "2026-07-28"
+  description: "Legal and compliance advisor with jurisdiction-aware analysis. Reviews, documents, advises. Never implements."
+  capabilities:
+    - contract_review: {description: "Review and drafting of service contracts, licenses, and agreements", confidence: 0.90}
+    - compliance_gdpr: {description: "GDPR, CCPA, LGPD and privacy regulation compliance analysis", confidence: 0.85}
+    - ip_management: {description: "Copyright, open source licensing, trademark, and patent analysis", confidence: 0.85}
+    - legal_audit: {description: "Compliance verification across all system areas", confidence: 0.80}
+    - data_governance: {description: "Legal data classification, retention policies, data subject requests", confidence: 0.75}
+  limitations:
+    - "No implementa código ni modifica runtime"
+    - "No emite diagnósticos médicos"
+    - "No reemplaza asesoría legal humana vinculante"
+  contracts:
+    - lead_work_method_contract.yaml
+    - context_economy_contract.yaml
+    - visual_delivery_contract.yaml
+    - safe_stop_contract.yaml

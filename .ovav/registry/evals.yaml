@@ -1,0 +1,2704 @@
+eval_catalog:
+  eval_adversarial_cases_all_blocked:
+    evidence:
+    - .ovav/artifacts/S20/evidence/ADVERSARIAL_SKILL_CASES_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_adversarial_skill_cases
+    - h_check_skill_eval_adversarial
+  eval_adversarial_cases_deterministic:
+    evidence:
+    - .ovav/artifacts/S20/evidence/ADVERSARIAL_SKILL_CASES_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_adversarial_skill_cases
+    - h_check_skill_eval_adversarial
+  eval_artifact_dependency_blocks_apply:
+    evidence:
+    - .ovav/artifacts/S4/evidence/ARTIFACT_DEPENDENCY_REPORT.json
+    phases:
+    - apply
+    targets:
+    - h_artifact_dependency
+    - h_phase_dag
+  eval_auto_close_execution:
+    domain: closure
+    evidence:
+    - go_runtime/internal/validators/merge_readiness.go
+    phases:
+    - verify
+    status_policy: strict_required
+    targets:
+    - h_auto_close_executor
+  eval_auto_close_no_blocked_surfaces:
+    domain: closure
+    evidence:
+    - go_runtime/internal/validators/workspace_safety.go
+    phases:
+    - verify
+    status_policy: strict_required
+    targets:
+    - check_auto_close_executor
+  eval_auto_close_safety:
+    domain: closure
+    evidence:
+    - go_runtime/internal/validators/workspace_safety.go
+    phases:
+    - verify
+    status_policy: strict_required
+    targets:
+    - h_auto_close_executor
+    - check_auto_close_executor
+  eval_build1_blocks_global_claims:
+    evidence:
+    - .ovav/artifacts/S16/evidence/SOURCE_LOCAL_ACCEPTANCE_REPORT.json
+    phases:
+    - verify
+    targets:
+    - h_build1_readiness
+    - h_source_local_acceptance
+    - h_check_build1_closure
+  eval_build1_closure_ready_with_caution:
+    evidence:
+    - .ovav/artifacts/S16/BUILD1_READINESS_MATRIX.json
+    - .ovav/artifacts/S16/evidence/BUILD1_CLOSURE_REPORT.json
+    phases:
+    - verify
+    targets:
+    - h_build1_readiness
+    - h_build1_closure_report
+    - h_check_build1_closure
+  eval_build1_historical_evidence_unchanged:
+    evidence:
+    - .ovav/artifacts/S16/evidence/BUILD1_CLOSURE_REPORT.json
+    phases:
+    - verify
+    targets:
+    - h_check_build1_closure
+    - h_evidence_stability
+  eval_build1_source_local_acceptance_explicit:
+    evidence:
+    - .ovav/artifacts/S16/evidence/SOURCE_LOCAL_ACCEPTANCE_REPORT.json
+    phases:
+    - verify
+    targets:
+    - h_source_local_acceptance
+    - h_check_build1_closure
+  eval_build2_blocks_forbidden_surfaces:
+    evidence:
+    - .ovav/artifacts/S17/evidence/BUILD2_SCOPE_BOUNDARIES.json
+    phases:
+    - verify
+    targets:
+    - h_build2_scope_boundaries
+    - h_check_build2_planning_freeze
+  eval_build2_closure_blocks_global_claims:
+    evidence:
+    - .ovav/artifacts/S30/evidence/BUILD2_FINAL_READINESS_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_build2_final_readiness
+    - h_check_build2_closure
+  eval_build2_closure_no_historical_drift:
+    evidence:
+    - .ovav/artifacts/S30/evidence/BUILD2_CLOSURE_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_check_build2_closure
+  eval_build2_closure_ready_with_caution:
+    evidence:
+    - .ovav/artifacts/S30/BUILD2_FINAL_READINESS_MATRIX.json
+    - .ovav/artifacts/S30/evidence/BUILD2_CLOSURE_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_build2_closure
+    - h_build2_final_readiness
+    - h_check_build2_closure
+  eval_build2_closure_source_local:
+    evidence:
+    - .ovav/artifacts/S30/evidence/BUILD2_CLOSURE_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_build2_closure
+    - h_check_build2_closure
+  eval_build2_e2e_no_forbidden_behavior:
+    evidence:
+    - .ovav/artifacts/S29/evidence/BUILD2_E2E_HUMAN_REPORT.md
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_build2_e2e_report
+    - h_check_build2_e2e_rc1
+  eval_build2_e2e_rc1_chain:
+    evidence:
+    - .ovav/artifacts/S29/evidence/BUILD2_E2E_RC1_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_build2_e2e_rc1
+    - h_check_build2_e2e_rc1
+  eval_build2_planning_freeze:
+    evidence:
+    - .ovav/artifacts/S17/S17_BUILD2_PLANNING_FREEZE.md
+    - .ovav/artifacts/S17/evidence/BUILD2_SEGMENT_MAP.json
+    phases:
+    - verify
+    targets:
+    - h_build2_segment_map
+    - h_build2_scope_boundaries
+    - h_check_build2_planning_freeze
+  eval_build2_rc1_readiness_preserves_blocks:
+    evidence:
+    - .ovav/artifacts/S29/evidence/BUILD2_RC1_READINESS_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_build2_rc1_readiness
+    - h_check_build2_e2e_rc1
+  eval_build2_routing_matrix_externalized:
+    evidence:
+    - .ovav/artifacts/S17/evidence/BUILD2_ROUTING_MATRIX.json
+    phases:
+    - verify
+    targets:
+    - h_build2_routing_matrix
+    - h_check_build2_planning_freeze
+  eval_build2_segment_order_s21_before_hardening:
+    evidence:
+    - .ovav/artifacts/S17/evidence/BUILD2_SEGMENT_MAP.json
+    phases:
+    - verify
+    targets:
+    - h_build2_segment_map
+    - h_check_build2_planning_freeze
+  eval_build3_auto_trigger_matrix_blocks_unsafe:
+    evidence:
+    - .ovav/artifacts/S31/evidence/BUILD3_AUTO_TRIGGER_MATRIX.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_build3_auto_trigger_matrix
+    - h_check_build3_planning_freeze
+  eval_build3_blocks_forbidden_surfaces:
+    evidence:
+    - .ovav/artifacts/S31/evidence/BUILD3_SCOPE_BOUNDARIES.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_build3_scope_boundaries
+    - h_check_build3_planning_freeze
+  eval_build3_friction_low_with_caution:
+    evidence:
+    - .ovav/artifacts/S44/evidence/BUILD3_FRICTION_SCORE_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_build3_friction_score
+    - h_check_build3_use_friction_e2e
+  eval_build3_planning_freeze:
+    evidence:
+    - .ovav/artifacts/S31/S31_BUILD3_PLANNING_FREEZE.md
+    - .ovav/artifacts/S31/evidence/BUILD3_SEGMENT_MAP.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_build3_segment_map
+    - h_build3_scope_boundaries
+    - h_check_build3_planning_freeze
+  eval_build3_profile_before_opencode:
+    evidence:
+    - .ovav/artifacts/S31/evidence/BUILD3_SEGMENT_MAP.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_build3_segment_map
+    - h_check_build3_planning_freeze
+  eval_build3_rc2_blocks_global_claims:
+    evidence:
+    - .ovav/artifacts/S45/evidence/BUILD3_FINAL_READINESS_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_build3_final_readiness
+    - h_check_build3_rc2_closure
+  eval_build3_rc2_closure_ready_with_caution:
+    evidence:
+    - .ovav/artifacts/S45/BUILD3_FINAL_READINESS_MATRIX.json
+    - .ovav/artifacts/S45/evidence/BUILD3_RC2_CLOSURE_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_build3_rc2_closure
+    - h_build3_final_readiness
+    - h_check_build3_rc2_closure
+  eval_build3_rc2_preview_only_surfaces:
+    evidence:
+    - .ovav/artifacts/S45/evidence/BUILD3_RC2_CLOSURE_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_build3_rc2_closure
+    - h_check_build3_rc2_closure
+  eval_build3_runtime_ux_requirements:
+    evidence:
+    - .ovav/artifacts/S31/evidence/BUILD3_RUNTIME_UX_REQUIREMENTS.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_build3_runtime_ux_requirements
+    - h_check_build3_planning_freeze
+  eval_build3_segment_order_s32_first:
+    evidence:
+    - .ovav/artifacts/S31/evidence/BUILD3_SEGMENT_MAP.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_build3_segment_map
+    - h_check_build3_planning_freeze
+  eval_build3_use_friction_e2e_chain:
+    evidence:
+    - .ovav/artifacts/S44/evidence/BUILD3_USE_FRICTION_E2E_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_build3_use_friction_e2e
+    - h_check_build3_use_friction_e2e
+  eval_build4_activation_order_repo_local_first:
+    evidence:
+    - .ovav/artifacts/S46/evidence/BUILD4_ACTIVATION_ORDER.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_build4_activation_order
+    - h_check_build4_planning_freeze
+  eval_build4_blocked_surfaces_preserved:
+    evidence:
+    - .ovav/artifacts/S46/evidence/BUILD4_BLOCKED_SURFACES.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_preview_surface_graduation_policy
+    - h_build4_scope_boundaries
+    - h_check_build4_planning_freeze
+  eval_build4_blocks_forbidden_surfaces:
+    evidence:
+    - .ovav/artifacts/S46/evidence/BUILD4_SCOPE_BOUNDARIES.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_build4_scope_boundaries
+    - h_check_build4_planning_freeze
+  eval_build4_graduation_policy:
+    evidence:
+    - .ovav/artifacts/S46/evidence/PREVIEW_SURFACE_GRADUATION_POLICY.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_preview_surface_graduation_policy
+    - h_check_build4_planning_freeze
+  eval_build4_planning_freeze:
+    evidence:
+    - .ovav/artifacts/S46/S46_BUILD4_PLANNING_FREEZE.md
+    - .ovav/artifacts/S46/evidence/BUILD4_SEGMENT_MAP.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_build4_segment_map
+    - h_build4_scope_boundaries
+    - h_check_build4_planning_freeze
+  eval_build4_segment_order_opencode_first:
+    evidence:
+    - .ovav/artifacts/S46/evidence/BUILD4_SEGMENT_MAP.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_build4_segment_map
+    - h_check_build4_planning_freeze
+  eval_caution_gate_allows_source_local:
+    evidence:
+    - .ovav/artifacts/S18/evidence/CAUTION_GATE_REPORT.json
+    phases:
+    - verify
+    targets:
+    - h_caution_gate
+    - h_check_caution_policy_gates
+  eval_caution_gate_blocks_unsafe:
+    evidence:
+    - .ovav/artifacts/S18/evidence/CAUTION_GATE_REPORT.json
+    phases:
+    - verify
+    targets:
+    - h_caution_gate
+    - h_check_caution_policy_gates
+  eval_caution_graduation_preserves_experimental:
+    evidence:
+    - .ovav/artifacts/S18/evidence/CAUTION_GRADUATION_REPORT.json
+    phases:
+    - verify
+    targets:
+    - h_caution_graduation
+    - h_check_caution_policy_gates
+  eval_caution_graduation_requires_seed_skill_evals:
+    evidence:
+    - .ovav/artifacts/S18/evidence/CAUTION_GRADUATION_REPORT.json
+    phases:
+    - verify
+    targets:
+    - h_caution_graduation
+    - h_check_caution_policy_gates
+  eval_caution_no_global_install_opencode_ui_mcp_a2a_external:
+    evidence:
+    - .ovav/artifacts/S18/evidence/CAUTION_GATE_REPORT.json
+    phases:
+    - verify
+    targets:
+    - h_caution_gate
+    - h_check_caution_policy_gates
+  eval_caution_policy_deterministic:
+    evidence:
+    - .ovav/artifacts/S18/evidence/CAUTION_POLICY_REPORT.json
+    phases:
+    - verify
+    targets:
+    - h_caution_policy
+    - h_check_caution_policy_gates
+  eval_close_layer_dry_run_guidance:
+    evidence:
+    - .ovav/artifacts/S36/evidence/CLOSE_WORKFLOW_ASSISTANT_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_close_workflow_assistant
+    - h_check_runtime_close_assistant
+  eval_close_manifest_current_segment_only:
+    evidence:
+    - .ovav/artifacts/S36/evidence/CLOSE_MANIFEST_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_close_manifest_builder
+    - h_check_runtime_close_assistant
+  eval_close_snapshot_plan_dry_run:
+    evidence:
+    - .ovav/artifacts/S36/evidence/CLOSE_SNAPSHOT_PLAN_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_close_snapshot_plan
+    - h_check_runtime_close_assistant
+  eval_commit_review_requires_artifact_link:
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_git_commit_review
+  eval_compact_handoff_no_broad_artifact_tree:
+    evidence:
+    - .ovav/artifacts/S34/evidence/HANDOFF_COMPACTION_REPORT.json
+    - .ovav/artifacts/S34/evidence/RUNTIME_UX_HUMAN_REPORT.md
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_handoff_compaction
+    - h_runtime_ux_report
+    - h_check_handoff_runtime_ux
+  eval_context_budget_over_budget:
+    evidence:
+    - .ovav/artifacts/S22/evidence/CONTEXT_BUDGET_REPORT.json
+    phases:
+    - verify
+    targets:
+    - h_context_budget
+    - h_check_context_compaction_runtime
+  eval_context_compaction_profile_packs:
+    evidence:
+    - .ovav/artifacts/S22/evidence/CONTEXT_COMPACTION_REPORT.json
+    phases:
+    - verify
+    targets:
+    - h_context_compaction
+    - h_context_pack_report
+    - h_check_context_compaction_runtime
+  eval_context_default_next_works:
+    evidence:
+    - .ovav/artifacts/S33/evidence/CONTEXT_DEFAULT_ENTRYPOINT_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_context_default_entrypoint
+    - h_check_context_default_harness_index
+  eval_context_default_no_broad_artifact_tree:
+    evidence:
+    - .ovav/artifacts/S33/evidence/CONTEXT_DEFAULT_ENTRYPOINT_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_context_default_entrypoint
+    - h_check_context_default_harness_index
+  eval_cross_profile_routing_blocked:
+    evidence:
+    - .ovav/artifacts/S20/evidence/ADVERSARIAL_SKILL_CASES_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_adversarial_skill_cases
+    - h_check_skill_eval_adversarial
+  eval_daily_includes_install_sandbox_ux:
+    evidence:
+    - .ovav/artifacts/S43/evidence/INSTALL_SANDBOX_UX_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_install_sandbox_ux
+    - h_check_install_sandbox_usability
+  eval_daily_includes_memory_ux:
+    evidence:
+    - .ovav/artifacts/S42/evidence/MEMORY_RECALL_UX_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_memory_recall_ux
+    - h_check_memory_recall_ux
+  eval_daily_includes_todo_progress:
+    evidence:
+    - .ovav/artifacts/S41/evidence/TODO_PROGRESS_RUNTIME_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_todo_progress_runtime
+    - h_check_todo_progress_runtime
+  eval_delegation_coverage_for_both_profiles:
+    evidence:
+    - .ovav/artifacts/S14/evidence/P0_READINESS_REPORT.json
+    phases:
+    - verify
+    targets:
+    - h_delegation_trigger
+    - h_do_not_delegate_guard
+  eval_delegation_threshold_4_files:
+    evidence:
+    - .ovav/artifacts/S6/evidence/DELEGATION_RUNTIME_REPORT.json
+    phases:
+    - tasks
+    targets:
+    - h_delegation_trigger
+    - h_subagent_context_pack
+    - h_subagent_result_absorber
+  eval_do_not_delegate_small_task:
+    evidence:
+    - .ovav/artifacts/S6/evidence/DELEGATION_PLAN_REPORT.json
+    phases:
+    - tasks
+    targets:
+    - h_do_not_delegate_guard
+  eval_dual_profile_readiness:
+    evidence:
+    - .ovav/artifacts/S14/P0_READINESS_MATRIX.json
+    - .ovav/artifacts/S14/evidence/P0_READINESS_REPORT.json
+    phases:
+    - verify
+    targets:
+    - h_p0_readiness_matrix
+    - h_dual_profile_readiness
+    - h_p0_governance_report
+    - h_check_dual_profile_readiness
+  eval_e2e_evidence_for_both_profiles:
+    evidence:
+    - .ovav/artifacts/S12/THAVREN_E2E_PACKAGE.json
+    - .ovav/artifacts/S13/EIDREN_E2E_PACKAGE.json
+    phases:
+    - verify
+    targets:
+    - h_check_dual_profile_readiness
+  eval_eval_runtime_targets_valid:
+    evidence:
+    - .ovav/artifacts/S8/evidence/RESULT_CONTRACT_RUNTIME_REPORT.json
+    phases:
+    - verify
+    targets:
+    - h_verify_evidence
+    - human_evidence_operational
+  eval_evidence_ledger_index_lookup:
+    evidence:
+    - .ovav/artifacts/S35/evidence/EVIDENCE_LEDGER_INDEX_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_evidence_ledger_index
+    - h_check_runtime_ux_hardening
+  eval_evidence_report_parseable:
+    evidence:
+    - .ovav/artifacts/S8/evidence/EVIDENCE_VERIFICATION_REPORT.json
+    phases:
+    - verify
+    targets:
+    - h_verify_evidence
+    - human_compact_operational
+    - human_evidence_operational
+  eval_evidence_stability_no_drift:
+    evidence:
+    - .ovav/artifacts/S15/evidence/EVIDENCE_STABILITY_REPORT.json
+    phases:
+    - verify
+    targets:
+    - h_evidence_stability
+    - h_check_evidence_stability
+  eval_experimental_preserved:
+    evidence:
+    - .ovav/artifacts/S19/evidence/SEED_SKILL_TRUST_REPORT.json
+    phases:
+    - verify
+    targets:
+    - h_seed_skill_trust
+    - runtime_governance_seed
+    - research_verification_seed
+  eval_experimental_preserved_s20:
+    evidence:
+    - .ovav/artifacts/S20/evidence/SKILL_EVAL_SUITE_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_skill_eval_report
+    - h_check_skill_eval_adversarial
+    - runtime_governance_seed
+    - research_verification_seed
+  eval_git_change_manifest:
+    domain: git
+    evidence:
+    - go_runtime/internal/validators/git_push.go
+    phases:
+    - verify
+    status_policy: strict_required
+    targets:
+    - h_git_change_manifest
+  eval_git_pr_structure:
+    domain: git
+    evidence:
+    - go_runtime/internal/gitflow/workflow.go
+    phases:
+    - verify
+    status_policy: strict_required
+    targets:
+    - h_git_pr_structure
+  eval_git_stage_intelligence:
+    domain: git
+    evidence:
+    - go_runtime/internal/validators/git_push.go
+    phases:
+    - verify
+    status_policy: strict_required
+    targets:
+    - h_git_stage_intelligence
+  eval_global_escalation_blocked:
+    evidence:
+    - .ovav/artifacts/S20/evidence/ADVERSARIAL_SKILL_CASES_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_adversarial_skill_cases
+    - h_check_skill_eval_adversarial
+  eval_graduation_gate_surfaces_classified:
+    evidence:
+    - .ovav/artifacts/S47/evidence/GRADUATION_GATE_RUNTIME_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_graduation_gate_runtime
+    - h_check_graduation_gate_runtime
+  eval_graduation_global_blocked:
+    evidence:
+    - .ovav/artifacts/S47/evidence/GRADUATION_GATE_RUNTIME_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_graduation_gate_runtime
+    - h_check_graduation_gate_runtime
+  eval_graduation_install_review_required:
+    evidence:
+    - .ovav/artifacts/S47/evidence/GRADUATION_GATE_RUNTIME_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_graduation_gate_runtime
+    - h_preview_surface_state
+    - h_check_graduation_gate_runtime
+  eval_graduation_memory_review_required:
+    evidence:
+    - .ovav/artifacts/S47/evidence/GRADUATION_GATE_RUNTIME_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_graduation_gate_runtime
+    - h_preview_surface_state
+    - h_check_graduation_gate_runtime
+  eval_graduation_opencode_eligible:
+    evidence:
+    - .ovav/artifacts/S47/evidence/PREVIEW_SURFACE_STATE_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_graduation_gate_runtime
+    - h_preview_surface_state
+    - h_check_graduation_gate_runtime
+  eval_graduation_policy_blocks_readiness_without_evals:
+    evidence:
+    - .ovav/artifacts/S19/evidence/SKILL_GRADUATION_POLICY_REPORT.json
+    phases:
+    - verify
+    targets:
+    - h_skill_graduation_policy
+  eval_graduation_to_ready_blocked:
+    evidence:
+    - .ovav/artifacts/S20/evidence/SKILL_EVAL_SUITE_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_skill_eval_suite
+    - h_skill_eval_report
+    - h_check_skill_eval_adversarial
+  eval_handoff_compaction_reduces_duplicate_status:
+    evidence:
+    - .ovav/artifacts/S34/evidence/HANDOFF_COMPACTION_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_handoff_compaction
+    - h_check_handoff_runtime_ux
+  eval_harness_index_segment_lookup:
+    evidence:
+    - .ovav/artifacts/S33/evidence/HARNESS_INDEX_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_harness_index
+    - h_check_context_default_harness_index
+  eval_human_response_not_raw_runtime:
+    evidence:
+    - .ovav/artifacts/S8/S8_RESULT_EVAL_RUNTIME.md
+    phases:
+    - archive
+    targets:
+    - h_human_response_translator
+    - h_work_report_builder
+  eval_install_dry_run_safety:
+    evidence:
+    - .ovav/artifacts/S11/evidence/INSTALL_SAFETY_GATE_REPORT.json
+    phases:
+    - verify
+    targets:
+    - h_install_safety_gate
+  eval_install_plan_blocks_unknown_pack:
+    evidence:
+    - .ovav/artifacts/S11/evidence/INSTALL_PLAN_REPORT.json
+    phases:
+    - verify
+    targets:
+    - h_install_plan
+  eval_install_safety_gate_blocks_global:
+    evidence:
+    - .ovav/artifacts/S11/evidence/INSTALL_SAFETY_GATE_REPORT.json
+    phases:
+    - verify
+    targets:
+    - h_install_safety_gate
+  eval_install_sandbox_backup_and_rollback:
+    evidence:
+    - .ovav/artifacts/S27/evidence/INSTALL_BACKUP_PLAN_REPORT.json
+    - .ovav/artifacts/S27/evidence/INSTALL_ROLLBACK_SIMULATION_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_install_backup_plan
+    - h_install_rollback_simulator
+    - h_check_install_governor_sandbox
+  eval_install_sandbox_blocks_forbidden_surfaces:
+    evidence:
+    - .ovav/artifacts/S27/evidence/INSTALL_SANDBOX_REPORT.json
+    - .ovav/artifacts/S27/evidence/INSTALL_SANDBOX_HUMAN_REPORT.md
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_install_sandbox
+    - h_install_sandbox_report
+    - h_check_install_governor_sandbox
+  eval_install_sandbox_collision_detection:
+    evidence:
+    - .ovav/artifacts/S27/evidence/INSTALL_SANDBOX_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_install_sandbox
+    - h_check_install_governor_sandbox
+  eval_install_sandbox_command_works:
+    evidence:
+    - .ovav/artifacts/S43/evidence/INSTALL_SANDBOX_UX_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_install_sandbox_ux
+    - h_install_preview_router
+    - h_check_install_sandbox_usability
+  eval_install_sandbox_repo_local_only:
+    evidence:
+    - .ovav/artifacts/S27/evidence/INSTALL_SANDBOX_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_install_sandbox
+    - h_check_install_governor_sandbox
+  eval_install_sandbox_selectors_work:
+    evidence:
+    - .ovav/artifacts/S43/evidence/INSTALL_PREVIEW_ROUTER_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_install_preview_router
+    - h_check_install_sandbox_usability
+  eval_install_sandbox_unsafe_selectors_rejected:
+    evidence:
+    - .ovav/artifacts/S43/evidence/INSTALL_PREVIEW_ROUTER_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_install_preview_router
+    - h_check_install_sandbox_usability
+  eval_lane_classification:
+    evidence:
+    - .ovav/artifacts/S5/evidence/SKILL_CONTEXT_PACK_REPORT.json
+    phases:
+    - explore
+    targets:
+    - h_lane_classifier
+    - runtime_governance_seed
+    - research_verification_seed
+  eval_ledger_latest_points_to_s35:
+    evidence:
+    - .ovav/artifacts/S35/evidence/EVIDENCE_LEDGER_INDEX_REPORT.json
+    - .ovav/artifacts/S35/evidence/RUNTIME_USABILITY_HUMAN_REPORT.md
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_evidence_ledger_index
+    - h_runtime_usability_report
+    - h_check_runtime_ux_hardening
+  eval_memory_candidate_dry_runs_work:
+    evidence:
+    - .ovav/artifacts/S42/evidence/MEMORY_CANDIDATE_PREVIEW_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_memory_candidate_preview
+    - h_check_memory_recall_ux
+  eval_memory_candidates_command_works:
+    evidence:
+    - .ovav/artifacts/S42/evidence/MEMORY_CANDIDATE_PREVIEW_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_memory_candidate_preview
+    - h_check_memory_recall_ux
+  eval_memory_command_works:
+    evidence:
+    - .ovav/artifacts/S42/evidence/MEMORY_RECALL_UX_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_memory_recall_ux
+    - h_check_memory_recall_ux
+  eval_memory_gateway_proof_recall_redaction:
+    evidence:
+    - .ovav/artifacts/S26/evidence/MEMORY_GATEWAY_PROOF_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_memory_gateway_proof
+    - h_check_memory_gateway_proof
+  eval_memory_gateway_proof_review_and_deny:
+    evidence:
+    - .ovav/artifacts/S26/evidence/MEMORY_CANDIDATE_CASES_REPORT.json
+    - .ovav/artifacts/S26/evidence/MEMORY_GATEWAY_PROOF_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_memory_candidate_cases
+    - h_memory_gateway_proof
+    - h_check_memory_gateway_proof
+  eval_memory_gateway_proof_safe_fallback:
+    evidence:
+    - .ovav/artifacts/S26/evidence/MEMORY_GATEWAY_PROOF_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_memory_gateway_proof
+    - h_memory_gateway_report
+    - h_check_memory_gateway_proof
+  eval_memory_recall_command_works:
+    evidence:
+    - .ovav/artifacts/S42/evidence/MEMORY_RECALL_UX_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_memory_recall_ux
+    - h_check_memory_recall_ux
+  eval_memory_safety_for_both_profiles:
+    evidence:
+    - .ovav/artifacts/S7/evidence/MEMORY_WRITE_GATEWAY_REPORT.json
+    - .ovav/artifacts/S7/evidence/MEMORY_PRIVACY_REPORT.json
+    phases:
+    - verify
+    targets:
+    - h_memory_write_gateway
+    - h_memory_privacy_classifier
+  eval_memory_unsafe_selectors_rejected:
+    evidence:
+    - .ovav/artifacts/S42/evidence/MEMORY_CANDIDATE_PREVIEW_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_memory_candidate_preview
+    - h_check_memory_recall_ux
+  eval_memory_write_requires_gateway:
+    evidence:
+    - .ovav/artifacts/S7/evidence/MEMORY_WRITE_GATEWAY_REPORT.json
+    phases:
+    - verify
+    targets:
+    - h_memory_write_gateway
+    - h_memory_privacy_classifier
+    - h_memory_redactor
+    - h_memory_poison_guard
+  eval_no_absolute_path_leakage:
+    evidence:
+    - .ovav/artifacts/S14/P0_READINESS_MATRIX.json
+    phases:
+    - verify
+    targets:
+    - h_check_dual_profile_readiness
+  eval_no_extra_public_profiles:
+    evidence:
+    - .ovav/artifacts/S14/P0_READINESS_MATRIX.json
+    phases:
+    - verify
+    targets:
+    - h_check_dual_profile_readiness
+  eval_no_false_graduation_to_ready:
+    evidence:
+    - .ovav/artifacts/S20/evidence/SKILL_EVAL_HUMAN_REPORT.md
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_skill_eval_report
+    - h_check_skill_eval_adversarial
+  eval_no_false_ready:
+    evidence:
+    - .ovav/artifacts/S19/evidence/SEED_SKILL_TRUST_REPORT.json
+    phases:
+    - verify
+    targets:
+    - h_seed_skill_trust
+    - h_check_seed_skill_trust
+  eval_no_historical_evidence_modified:
+    evidence:
+    - .ovav/artifacts/S15/evidence/EVIDENCE_MODE_REPORT.json
+    phases:
+    - verify
+    targets:
+    - h_evidence_stability
+    - h_check_evidence_stability
+  eval_no_home_path_leakage:
+    evidence:
+    - .ovav/artifacts/S14/P0_READINESS_MATRIX.json
+    phases:
+    - verify
+    targets:
+    - h_check_dual_profile_readiness
+  eval_no_secret_leakage_in_s14:
+    evidence:
+    - .ovav/artifacts/S14/evidence/P0_GOVERNANCE_HUMAN_REPORT.md
+    phases:
+    - verify
+    targets:
+    - h_check_dual_profile_readiness
+  eval_no_write_mode_prevents_drift:
+    evidence:
+    - .ovav/artifacts/S15/evidence/EVIDENCE_MODE_REPORT.json
+    phases:
+    - verify
+    targets:
+    - h_evidence_mode
+    - h_check_evidence_stability
+  eval_opencode_handoff_for_both_profiles:
+    evidence:
+    - .ovav/artifacts/S9/evidence/OPENCODE_CONTEXT_PACK_REPORT.json
+    - .ovav/artifacts/S9/evidence/OPENCODE_TASK_BRIDGE_REPORT.json
+    phases:
+    - verify
+    targets:
+    - h_check_dual_profile_readiness
+  eval_opencode_pack_blocks_global_surfaces:
+    evidence:
+    - .ovav/artifacts/S24/evidence/OPENCODE_PACK_VALIDATION_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_opencode_pack_validator
+    - h_check_opencode_pack_simulation
+  eval_opencode_pack_simulation_profile_mapping:
+    evidence:
+    - .ovav/artifacts/S24/evidence/OPENCODE_PACK_SIMULATION_REPORT.json
+    - .ovav/artifacts/S24/evidence/OPENCODE_PACK_VALIDATION_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_opencode_pack_simulation
+    - h_opencode_pack_validator
+    - h_check_opencode_pack_simulation
+  eval_opencode_pack_uses_s23_packages:
+    evidence:
+    - .ovav/artifacts/S24/evidence/OPENCODE_PACK_SIMULATION_REPORT.json
+    - .ovav/artifacts/S24/evidence/simulated_pack/pack.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_opencode_pack_simulation
+    - h_opencode_pack_report
+    - h_check_opencode_pack_simulation
+  eval_opencode_repo_local_boundaries:
+    evidence:
+    - .ovav/artifacts/S48/evidence/OPENCODE_REPO_LOCAL_BOUNDARIES_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_opencode_repo_local_boundaries
+    - h_check_opencode_repo_local_contract
+  eval_opencode_repo_local_contract:
+    evidence:
+    - .ovav/artifacts/S48/evidence/OPENCODE_REPO_LOCAL_CONTRACT_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_opencode_repo_local_contract
+    - h_check_opencode_repo_local_contract
+  eval_opencode_repo_local_e2e_chain:
+    evidence:
+    - .ovav/artifacts/S53/evidence/OPENCODE_REPO_LOCAL_E2E_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_opencode_repo_local_e2e
+    - h_check_opencode_repo_local_e2e_rc1
+  eval_opencode_repo_local_e2e_readiness:
+    evidence:
+    - .ovav/artifacts/S53/evidence/OPENCODE_REPO_LOCAL_E2E_READINESS_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_opencode_repo_local_e2e_readiness
+    - h_check_opencode_repo_local_e2e_rc1
+  eval_opencode_repo_local_no_materialization:
+    evidence:
+    - .ovav/artifacts/S48/evidence/OPENCODE_REPO_LOCAL_CONTRACT_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_check_opencode_repo_local_contract
+  eval_opencode_repo_local_smoke:
+    evidence:
+    - .ovav/artifacts/S50/evidence/OPENCODE_REPO_LOCAL_SMOKE_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_opencode_repo_local_smoke
+    - h_check_opencode_repo_local_smoke
+  eval_opencode_repo_local_smoke_report_builds:
+    evidence:
+    - .ovav/artifacts/S50/evidence/OPENCODE_REPO_LOCAL_SMOKE_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_opencode_repo_local_smoke_report
+    - h_check_opencode_repo_local_smoke
+  eval_opencode_session_guidance_builds:
+    evidence:
+    - .ovav/artifacts/S50/evidence/OPENCODE_SESSION_GUIDANCE_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_opencode_session_guidance
+    - h_check_opencode_repo_local_smoke
+  eval_opencode_session_manifest_builds:
+    evidence:
+    - .ovav/artifacts/S50/evidence/OPENCODE_SESSION_MANIFEST_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_opencode_session_manifest
+    - h_check_opencode_repo_local_smoke
+  eval_path_leakage_blocked:
+    evidence:
+    - .ovav/artifacts/S20/evidence/ADVERSARIAL_SKILL_CASES_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_adversarial_skill_cases
+    - h_check_skill_eval_adversarial
+  eval_persona_does_not_affect_artifacts:
+    evidence:
+    - .ovav/artifacts/S4/evidence/PHASE_DAG_REPORT.json
+    phases:
+    - apply
+    targets:
+    - h_permission_gate
+    - h_sdd_artifact_grammar
+  eval_production_ready_claim_blocked:
+    evidence:
+    - .ovav/artifacts/S20/evidence/ADVERSARIAL_SKILL_CASES_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_adversarial_skill_cases
+    - h_check_skill_eval_adversarial
+  eval_profile_resolution:
+    evidence:
+    - .ovav/artifacts/S5/evidence/SKILL_INVENTORY_REPORT.json
+    phases:
+    - init
+    targets:
+    - h_service_profile_resolver
+    - runtime_governance_seed
+    - research_verification_seed
+  eval_profile_session_context_compact:
+    evidence:
+    - .ovav/artifacts/S51/evidence/PROFILE_SESSION_CONTEXT_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_profile_session_context
+    - h_check_profile_session_contracts
+  eval_profile_session_contracts_built:
+    evidence:
+    - .ovav/artifacts/S51/evidence/PROFILE_SESSION_CONTRACTS_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_profile_session_contracts
+    - h_check_profile_session_contracts
+  eval_profile_session_policy_blocks_unsafe:
+    evidence:
+    - .ovav/artifacts/S51/evidence/PROFILE_SESSION_POLICY_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_profile_session_policy
+    - h_check_profile_session_contracts
+  eval_progress_command_works:
+    evidence:
+    - .ovav/artifacts/S41/evidence/PROGRESS_STATE_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_progress_state_report
+    - h_check_todo_progress_runtime
+  eval_protocol_audit_logs_all_access:
+    domain: protocol
+    evidence:
+    - tests/evals/test_protocol_audit_logs_all_access.py
+    phases:
+    - verify
+    status_policy: strict_required
+    targets:
+    - h_protocol_audit_log
+  eval_protocol_circuit_breaker_opens:
+    domain: protocol
+    evidence:
+    - tests/evals/test_protocol_circuit_breaker_opens.py
+    phases:
+    - verify
+    status_policy: strict_required
+    targets:
+    - h_protocol_circuit_breaker
+  eval_protocol_circuit_breaker_resets:
+    domain: protocol
+    evidence:
+    - tests/evals/test_protocol_circuit_breaker_resets.py
+    phases:
+    - verify
+    status_policy: strict_required
+    targets:
+    - h_protocol_circuit_breaker
+  eval_protocol_gate_allows_registered:
+    domain: protocol
+    evidence:
+    - tests/evals/test_protocol_gate_allows_registered.py
+    phases:
+    - verify
+    status_policy: strict_required
+    targets:
+    - h_protocol_access_gate
+    - .ovav/registry/protocols.yaml
+  eval_protocol_gate_blocks_inactive:
+    domain: protocol
+    evidence:
+    - tests/evals/test_protocol_gate_blocks_inactive.py
+    phases:
+    - verify
+    status_policy: strict_required
+    targets:
+    - h_protocol_access_gate
+  eval_protocol_gate_blocks_unregistered:
+    domain: protocol
+    evidence:
+    - tests/evals/test_protocol_gate_blocks_unregistered.py
+    phases:
+    - verify
+    status_policy: strict_required
+    targets:
+    - h_protocol_access_gate
+  eval_protocol_no_bypass_permission:
+    domain: protocol
+    evidence:
+    - tests/evals/test_protocol_no_bypass_permission.py
+    phases:
+    - verify
+    status_policy: strict_required
+    targets:
+    - h_protocol_access_gate
+  eval_protocol_scope_denied:
+    domain: protocol
+    evidence:
+    - tests/evals/test_protocol_scope_denied.py
+    phases:
+    - verify
+    status_policy: strict_required
+    targets:
+    - h_protocol_access_gate
+  eval_protocol_token_budget_enforced:
+    domain: protocol
+    evidence:
+    - tests/evals/test_protocol_token_budget_enforced.py
+    phases:
+    - verify
+    status_policy: strict_required
+    targets:
+    - h_protocol_access_gate
+  eval_push_review_checks_branch:
+    phases:
+    - archive
+    status_policy: not_applicable
+    targets:
+    - h_git_push_review
+  eval_readiness_preserves_experimental:
+    evidence:
+    - .ovav/artifacts/S5/evidence/SKILL_SCORING_REPORT.json
+    phases:
+    - archive
+    targets:
+    - h_result_contract
+    - runtime_governance_seed
+    - research_verification_seed
+  eval_result_contract_requires_evidence:
+    evidence:
+    - .ovav/artifacts/S8/evidence/RESULT_CONTRACT_RUNTIME_REPORT.json
+    phases:
+    - verify
+    targets:
+    - h_result_contract
+    - human_compact_operational
+    - human_evidence_operational
+  eval_rollback_plan_requires_manifest:
+    evidence:
+    - .ovav/artifacts/S11/evidence/ROLLBACK_PLAN_REPORT.json
+    phases:
+    - verify
+    targets:
+    - h_rollback_plan
+  eval_runtime_cli_blocks_unsafe_commands:
+    evidence:
+    - .ovav/artifacts/S21/evidence/RUNTIME_ORCHESTRATOR_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_runtime_command_router
+    - h_check_runtime_orchestrator_cli
+  eval_runtime_cli_close_layer_dry_run_works:
+    evidence:
+    - .ovav/artifacts/S21/evidence/RUNTIME_ORCHESTRATOR_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_runtime_orchestrator
+    - h_check_runtime_orchestrator_cli
+  eval_runtime_cli_context_works:
+    evidence:
+    - .ovav/artifacts/S21/evidence/RUNTIME_ORCHESTRATOR_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_runtime_command_router
+    - h_check_runtime_orchestrator_cli
+  eval_runtime_cli_no_git_execution:
+    evidence:
+    - .ovav/artifacts/S21/evidence/RUNTIME_ORCHESTRATOR_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_runtime_orchestrator
+    - h_check_runtime_orchestrator_cli
+  eval_runtime_cli_plan_works:
+    evidence:
+    - .ovav/artifacts/S21/evidence/RUNTIME_ORCHESTRATOR_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_runtime_command_router
+    - h_check_runtime_orchestrator_cli
+  eval_runtime_cli_source_local_only:
+    evidence:
+    - .ovav/artifacts/S21/evidence/RUNTIME_ORCHESTRATOR_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_runtime_orchestrator
+    - h_runtime_command_router
+    - h_check_runtime_orchestrator_cli
+  eval_runtime_cli_status_works:
+    evidence:
+    - .ovav/artifacts/S21/evidence/RUNTIME_ORCHESTRATOR_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_runtime_orchestrator
+    - h_runtime_status_report
+    - h_check_runtime_orchestrator_cli
+  eval_runtime_daily_includes_evidence_ledger:
+    evidence:
+    - .ovav/artifacts/S35/evidence/RUNTIME_WORKFLOW_HARDENING_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_runtime_workflow_hardening
+    - h_check_runtime_ux_hardening
+  eval_runtime_daily_source_commands:
+    evidence:
+    - .ovav/artifacts/S34/evidence/RUNTIME_DAILY_SOURCE_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_runtime_daily_source
+    - h_check_handoff_runtime_ux
+  eval_runtime_next_blocks_unsafe_selectors:
+    evidence:
+    - .ovav/artifacts/S32/evidence/RUNTIME_NEXT_WORK_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_runtime_next_work
+    - h_check_runtime_next_work
+  eval_runtime_next_current_work_resolves_s33:
+    evidence:
+    - .ovav/artifacts/S32/evidence/RUNTIME_NEXT_WORK_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_runtime_next_work
+    - h_runtime_next_report
+    - h_check_runtime_next_work
+  eval_runtime_next_no_historical_drift:
+    evidence:
+    - .ovav/artifacts/S32/evidence/RUNTIME_NEXT_WORK_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_check_runtime_next_work
+  eval_runtime_next_profile_aware:
+    evidence:
+    - .ovav/artifacts/S32/evidence/RUNTIME_NEXT_WORK_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_runtime_next_work
+    - h_check_runtime_next_work
+  eval_s30_no_forbidden_behavior:
+    evidence:
+    - .ovav/artifacts/S30/evidence/BUILD2_HUMAN_CLOSURE_REPORT.md
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_build2_closure_report
+    - h_check_build2_closure
+  eval_s41_no_historical_drift:
+    evidence:
+    - .ovav/artifacts/S41/evidence/TODO_PROGRESS_RUNTIME_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_check_todo_progress_runtime
+  eval_s41_no_leakage:
+    evidence:
+    - .ovav/artifacts/S41/evidence/TODO_PROGRESS_HUMAN_REPORT.md
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_check_todo_progress_runtime
+  eval_s42_no_historical_drift:
+    evidence:
+    - .ovav/artifacts/S42/evidence/MEMORY_RECALL_UX_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_check_memory_recall_ux
+  eval_s42_no_leakage:
+    evidence:
+    - .ovav/artifacts/S42/evidence/MEMORY_RECALL_HUMAN_REPORT.md
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_check_memory_recall_ux
+  eval_s43_no_historical_drift:
+    evidence:
+    - .ovav/artifacts/S43/evidence/INSTALL_SANDBOX_UX_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_check_install_sandbox_usability
+  eval_s43_no_leakage:
+    evidence:
+    - .ovav/artifacts/S43/evidence/INSTALL_SANDBOX_UX_HUMAN_REPORT.md
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_check_install_sandbox_usability
+  eval_s43_no_real_install_behavior:
+    evidence:
+    - .ovav/artifacts/S43/evidence/INSTALL_RISK_ROLLBACK_GUIDE_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_install_sandbox_ux
+    - h_install_risk_rollback_guide
+    - h_check_install_sandbox_usability
+  eval_s44_no_forbidden_behavior:
+    evidence:
+    - .ovav/artifacts/S44/evidence/BUILD3_USE_FRICTION_HUMAN_REPORT.md
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_build3_use_friction_report
+    - h_check_build3_use_friction_e2e
+  eval_s44_no_historical_drift:
+    evidence:
+    - .ovav/artifacts/S44/evidence/BUILD3_USE_FRICTION_E2E_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_check_build3_use_friction_e2e
+  eval_s45_no_forbidden_behavior:
+    evidence:
+    - .ovav/artifacts/S45/evidence/BUILD3_HUMAN_CLOSURE_REPORT.md
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_build3_closure_report
+    - h_check_build3_rc2_closure
+  eval_s45_no_historical_drift:
+    evidence:
+    - .ovav/artifacts/S45/evidence/BUILD3_RC2_CLOSURE_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_check_build3_rc2_closure
+  eval_s48_no_forbidden_behavior:
+    evidence:
+    - .ovav/artifacts/S48/evidence/OPENCODE_REPO_LOCAL_CONTRACT_HUMAN_REPORT.md
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_check_opencode_repo_local_contract
+  eval_s50_no_forbidden_behavior:
+    evidence:
+    - .ovav/artifacts/S50/evidence/OPENCODE_REPO_LOCAL_SMOKE_HUMAN_REPORT.md
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_check_opencode_repo_local_smoke
+  eval_s53_no_forbidden_behavior:
+    evidence:
+    - .ovav/artifacts/S53/evidence/OPENCODE_REPO_LOCAL_E2E_HUMAN_REPORT.md
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_opencode_repo_local_e2e_report
+    - h_check_opencode_repo_local_e2e_rc1
+  eval_s54_memory_read_probe_policy:
+    evidence:
+    - .ovav/artifacts/S54/evidence/MEMORY_READ_PROBE_POLICY_REPORT.json
+    - .ovav/artifacts/S54/evidence/MEMORY_PROBE_BOUNDARIES_REPORT.json
+    - .ovav/artifacts/S54/evidence/MEMORY_PROBE_REDACTION_POLICY_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_memory_read_probe_policy
+    - h_memory_probe_boundaries
+    - h_memory_probe_redaction_policy
+    - h_check_memory_read_probe_policy
+  eval_s54_no_forbidden_behavior:
+    evidence:
+    - .ovav/artifacts/S54/evidence/MEMORY_READ_PROBE_POLICY_HUMAN_REPORT.md
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_check_memory_read_probe_policy
+  eval_s55_candidate_filter_secret_denied:
+    evidence:
+    - .ovav/artifacts/S55/evidence/MEMORY_PROBE_CANDIDATE_FILTER_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_memory_probe_candidate_filter
+    - h_check_memory_read_probe_sandbox
+  eval_s55_no_forbidden_behavior:
+    evidence:
+    - .ovav/artifacts/S55/evidence/MEMORY_READ_PROBE_SANDBOX_HUMAN_REPORT.md
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_check_memory_read_probe_sandbox
+  eval_s55_sandbox_classification:
+    evidence:
+    - .ovav/artifacts/S55/evidence/MEMORY_READ_PROBE_SANDBOX_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_memory_read_probe_sandbox
+    - h_check_memory_read_probe_sandbox
+  eval_s56_apply_boundaries:
+    evidence:
+    - .ovav/artifacts/S56/evidence/INSTALL_APPLY_BOUNDARIES_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_install_apply_boundaries
+    - h_check_install_source_local_apply_policy
+  eval_s56_backup_rollback_gate:
+    evidence:
+    - .ovav/artifacts/S56/evidence/INSTALL_BACKUP_ROLLBACK_GATE_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_install_backup_rollback_gate
+    - h_check_install_source_local_apply_policy
+  eval_s56_install_apply_policy:
+    evidence:
+    - .ovav/artifacts/S56/evidence/INSTALL_SOURCE_LOCAL_APPLY_POLICY_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_install_source_local_apply_policy
+    - h_check_install_source_local_apply_policy
+  eval_s56_no_forbidden_behavior:
+    evidence:
+    - .ovav/artifacts/S56/evidence/INSTALL_SOURCE_LOCAL_APPLY_POLICY_HUMAN_REPORT.md
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_check_install_source_local_apply_policy
+  eval_s56_no_real_install_behavior:
+    evidence:
+    - .ovav/artifacts/S56/evidence/INSTALL_SOURCE_LOCAL_APPLY_POLICY_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_install_source_local_apply_policy
+    - h_check_install_source_local_apply_policy
+  eval_s57_manifest_deterministic:
+    evidence:
+    - .ovav/artifacts/S57/evidence/INSTALL_APPLY_SANDBOX_MANIFEST_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_install_apply_sandbox_manifest
+    - h_check_install_source_local_apply_sandbox
+  eval_s57_no_forbidden_behavior:
+    evidence:
+    - .ovav/artifacts/S57/evidence/INSTALL_SOURCE_LOCAL_APPLY_SANDBOX_HUMAN_REPORT.md
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_check_install_source_local_apply_sandbox
+  eval_s57_no_real_apply_behavior:
+    evidence:
+    - .ovav/artifacts/S57/evidence/INSTALL_SOURCE_LOCAL_APPLY_SANDBOX_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_install_source_local_apply_sandbox
+    - h_check_install_source_local_apply_sandbox
+  eval_s57_rollback_completeness:
+    evidence:
+    - .ovav/artifacts/S57/evidence/INSTALL_APPLY_ROLLBACK_SANDBOX_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_install_apply_rollback_sandbox
+    - h_check_install_source_local_apply_sandbox
+  eval_s57_sandbox_classification:
+    evidence:
+    - .ovav/artifacts/S57/evidence/INSTALL_SOURCE_LOCAL_APPLY_SANDBOX_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_install_source_local_apply_sandbox
+    - h_check_install_source_local_apply_sandbox
+  eval_s58_blocked_surfaces_preserved:
+    evidence:
+    - .ovav/artifacts/S58/evidence/BUILD4_GRADUATION_E2E_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_build4_graduation_e2e
+    - h_check_build4_graduation_e2e_rc
+  eval_s58_build4_graduation_e2e_chain:
+    evidence:
+    - .ovav/artifacts/S58/evidence/BUILD4_GRADUATION_E2E_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_build4_graduation_e2e
+    - h_check_build4_graduation_e2e_rc
+  eval_s58_no_forbidden_behavior:
+    evidence:
+    - .ovav/artifacts/S58/evidence/BUILD4_GRADUATION_E2E_HUMAN_REPORT.md
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_check_build4_graduation_e2e_rc
+  eval_s58_readiness_classification:
+    evidence:
+    - .ovav/artifacts/S58/evidence/BUILD4_GRADUATION_READINESS_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_build4_graduation_readiness
+    - h_check_build4_graduation_e2e_rc
+  eval_s59_blocked_surface_audit:
+    evidence:
+    - .ovav/artifacts/S59/evidence/BUILD4_BLOCKED_SURFACE_AUDIT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_build4_blocked_surface_audit
+  eval_s59_build4_final_readiness:
+    evidence:
+    - .ovav/artifacts/S59/evidence/BUILD4_FINAL_READINESS_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_build4_final_readiness
+    - h_check_build4_final_readiness
+  eval_s59_surface_readiness_matrix:
+    evidence:
+    - .ovav/artifacts/S59/evidence/BUILD4_SURFACE_READINESS_MATRIX.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_build4_surface_readiness_matrix
+  eval_s60_build4_closure:
+    evidence:
+    - .ovav/artifacts/S60/evidence/BUILD4_CLOSURE_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_build4_closure
+    - h_check_build4_closure
+  eval_s60_build4_closure_human_report:
+    evidence:
+    - .ovav/artifacts/S60/evidence/BUILD4_HUMAN_CLOSURE_REPORT.md
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_build4_closure_report
+  eval_s60_build4_final_baseline:
+    evidence:
+    - .ovav/artifacts/S60/evidence/BUILD4_FINAL_BASELINE_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_build4_final_baseline
+  eval_s60_build5_recommendations:
+    evidence:
+    - .ovav/artifacts/S60/evidence/BUILD5_RECOMMENDATIONS.md
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_build4_closure_report
+  eval_s61_build5_opencode_visible_role_freeze:
+    evidence:
+    - .ovav/artifacts/S61/S61_OPENCODE_VISIBLE_ROLE_IDENTITY_FREEZE.md
+    - .ovav/artifacts/S61/evidence/BUILD5_OPENCODE_UX_SCOPE.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_build5_opencode_ux_scope
+    - h_opencode_visible_role_policy
+    - h_opencode_identity_guard_policy
+    - h_check_build5_opencode_visible_role_freeze
+  eval_s61_build5_ux_scope:
+    evidence:
+    - .ovav/artifacts/S61/evidence/BUILD5_OPENCODE_UX_SCOPE.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_build5_opencode_ux_scope
+    - h_check_build5_opencode_visible_role_freeze
+  eval_s61_identity_guard_policy:
+    evidence:
+    - .ovav/artifacts/S61/evidence/OPENCODE_IDENTITY_GUARD_POLICY.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_opencode_identity_guard_policy
+    - h_check_build5_opencode_visible_role_freeze
+  eval_s61_visible_role_policy:
+    evidence:
+    - .ovav/artifacts/S61/evidence/OPENCODE_VISIBLE_ROLE_POLICY.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_opencode_visible_role_policy
+    - h_check_build5_opencode_visible_role_freeze
+  eval_s62_identity_guard:
+    evidence:
+    - .ovav/artifacts/S62/evidence/OPENCODE_IDENTITY_GUARD_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_opencode_identity_guard
+    - h_check_opencode_command_surface
+  eval_s62_no_forbidden_behavior:
+    evidence:
+    - .ovav/artifacts/S62/evidence/OPENCODE_COMMAND_SURFACE_HUMAN_REPORT.md
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_check_opencode_command_surface
+  eval_s62_opencode_command_surface:
+    evidence:
+    - .ovav/artifacts/S62/evidence/OPENCODE_COMMAND_SURFACE_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_opencode_command_surface
+    - h_check_opencode_command_surface
+  eval_s62_opencode_skills:
+    evidence:
+    - .ovav/artifacts/S62/evidence/OPENCODE_SKILL_SURFACE_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_opencode_skill_surface
+    - h_check_opencode_command_surface
+  eval_s62_visible_role_agents:
+    evidence:
+    - .ovav/artifacts/S62/evidence/OPENCODE_AGENT_SURFACE_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_opencode_agent_surface
+    - h_check_opencode_command_surface
+  eval_s63_no_forbidden_behavior:
+    evidence:
+    - .ovav/artifacts/S63/evidence/PLATFORM_ENGINEERING_SESSION_RC_HUMAN_REPORT.md
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_check_platform_engineering_session_rc
+  eval_s63_platform_engineering_session_rc:
+    evidence:
+    - .ovav/artifacts/S63/evidence/PLATFORM_ENGINEERING_SESSION_RC_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_platform_engineering_session_rc
+    - h_check_platform_engineering_session_rc
+  eval_s63_platform_greeting_contract:
+    evidence:
+    - .ovav/artifacts/S63/evidence/PLATFORM_ENGINEERING_SESSION_RC_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_platform_engineering_session_rc
+    - h_check_platform_engineering_session_rc
+  eval_s63_platform_lane_routing:
+    evidence:
+    - .ovav/artifacts/S63/evidence/PLATFORM_ENGINEERING_SESSION_RC_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_platform_engineering_session_router
+    - h_check_platform_engineering_session_rc
+  eval_s64_harness_intelligence_router_coverage:
+    evidence:
+    - .ovav/artifacts/S64/evidence/HARNESS_INTELLIGENCE_ROUTER_COVERAGE.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_harness_intelligence_router
+    - h_check_harness_intelligence_router
+  eval_s64_harness_router_closure_strict:
+    evidence:
+    - .ovav/artifacts/S64/evidence/HARNESS_INTELLIGENCE_ROUTER_COVERAGE.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_harness_intelligence_router
+    - h_check_harness_intelligence_router
+  eval_s64_harness_router_greeting_minimal:
+    evidence:
+    - .ovav/artifacts/S64/evidence/HARNESS_INTELLIGENCE_ROUTER_COVERAGE.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_harness_intelligence_router
+    - h_check_harness_intelligence_router
+  eval_s64_harness_router_no_orphans:
+    evidence:
+    - .ovav/artifacts/S64/evidence/HARNESS_INTELLIGENCE_ROUTER_COVERAGE.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_harness_intelligence_router
+    - h_check_harness_intelligence_router
+  eval_s64_no_forbidden_behavior:
+    evidence:
+    - .ovav/artifacts/S64/evidence/RESEARCH_INTELLIGENCE_SESSION_RC_HUMAN_REPORT.md
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_check_research_intelligence_session_rc
+  eval_s64_research_greeting_contract:
+    evidence:
+    - .ovav/artifacts/S64/evidence/RESEARCH_INTELLIGENCE_SESSION_RC_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_research_intelligence_session_rc
+    - h_check_research_intelligence_session_rc
+  eval_s64_research_intelligence_session_rc:
+    evidence:
+    - .ovav/artifacts/S64/evidence/RESEARCH_INTELLIGENCE_SESSION_RC_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_research_intelligence_session_rc
+    - h_check_research_intelligence_session_rc
+  eval_s64_research_lane_routing:
+    evidence:
+    - .ovav/artifacts/S64/evidence/RESEARCH_INTELLIGENCE_SESSION_RC_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_research_intelligence_session_router
+    - h_check_research_intelligence_session_rc
+  eval_s65_local_git_closure:
+    evidence:
+    - .ovav/artifacts/S65/evidence/REPO_LOCAL_WORK_LOOP_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_repo_local_work_loop
+    - h_check_repo_local_work_loop
+  eval_s65_progressive_loading:
+    evidence:
+    - .ovav/artifacts/S65/evidence/REPO_LOCAL_WORK_LOOP_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_repo_local_work_loop
+    - h_check_repo_local_work_loop
+  eval_s65_repo_local_work_loop:
+    evidence:
+    - .ovav/artifacts/S65/evidence/REPO_LOCAL_WORK_LOOP_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_repo_local_work_loop
+    - h_check_repo_local_work_loop
+  eval_s65_service_area_parity:
+    evidence:
+    - .ovav/artifacts/S65/evidence/REPO_LOCAL_WORK_LOOP_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_repo_local_work_loop
+    - h_check_repo_local_work_loop
+  eval_s66_blocked_surfaces:
+    evidence:
+    - .ovav/artifacts/S66/evidence/OPENCODE_USABILITY_E2E_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_opencode_usability_e2e
+    - h_check_opencode_usability_e2e
+  eval_s66_greeting_identity:
+    evidence:
+    - .ovav/artifacts/S66/evidence/OPENCODE_USABILITY_E2E_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_opencode_usability_e2e
+    - h_check_opencode_usability_e2e
+  eval_s66_harness_intelligence_router:
+    evidence:
+    - .ovav/artifacts/S66/evidence/OPENCODE_USABILITY_E2E_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_opencode_usability_e2e
+    - h_check_opencode_usability_e2e
+  eval_s66_next_work_s67:
+    evidence:
+    - .ovav/artifacts/S66/evidence/OPENCODE_USABILITY_E2E_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_opencode_usability_e2e
+    - h_check_opencode_usability_e2e
+  eval_s66_node_modules_exclusion:
+    evidence:
+    - .ovav/artifacts/S66/evidence/OPENCODE_SURFACE_FRESHNESS_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_opencode_surface_freshness
+    - h_check_opencode_surface_freshness
+  eval_s66_professional_routing:
+    evidence:
+    - .ovav/artifacts/S66/evidence/OPENCODE_USABILITY_E2E_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_opencode_usability_e2e
+    - h_check_opencode_usability_e2e
+  eval_s66_progressive_context:
+    evidence:
+    - .ovav/artifacts/S66/evidence/OPENCODE_USABILITY_E2E_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_opencode_usability_e2e
+    - h_check_opencode_usability_e2e
+  eval_s66_repo_local_work_loop:
+    evidence:
+    - .ovav/artifacts/S66/evidence/OPENCODE_USABILITY_E2E_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_opencode_usability_e2e
+    - h_check_opencode_usability_e2e
+  eval_s66_surface_freshness:
+    evidence:
+    - .ovav/artifacts/S66/evidence/OPENCODE_SURFACE_FRESHNESS_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_opencode_surface_freshness
+    - h_check_opencode_surface_freshness
+  eval_s66_usability_e2e:
+    evidence:
+    - .ovav/artifacts/S66/evidence/OPENCODE_USABILITY_E2E_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_opencode_usability_e2e
+    - h_check_opencode_usability_e2e
+  eval_s67_blocked_surfaces:
+    evidence:
+    - .ovav/artifacts/S67/evidence/BUILD5_CLOSURE_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_build5_closure
+    - h_check_build5_closure
+  eval_s67_build5_closure:
+    evidence:
+    - .ovav/artifacts/S67/evidence/BUILD5_CLOSURE_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_build5_closure
+    - h_check_build5_closure
+  eval_s67_build5_final_baseline:
+    evidence:
+    - .ovav/artifacts/S67/evidence/BUILD5_FINAL_BASELINE_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_build5_final_baseline
+    - h_check_build5_closure
+  eval_s67_no_forbidden_behavior:
+    evidence:
+    - .ovav/artifacts/S67/evidence/BUILD5_CLOSURE_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_build5_closure
+    - h_check_build5_closure
+  eval_s67_snapshot_policy:
+    evidence:
+    - .ovav/artifacts/S67/evidence/BUILD5_CLOSURE_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_build5_closure
+    - h_check_build5_closure
+  eval_sdd_init_auto_trigger:
+    evidence:
+    - .ovav/artifacts/S3/S3_SDD_INIT.md
+    phases:
+    - init
+    targets:
+    - h_sdd_init
+  eval_sdd_init_detects_stack:
+    evidence:
+    - .ovav/artifacts/S3/evidence/web_vite_minimal/PROJECT_DISCOVERY.json
+    - .ovav/artifacts/S3/evidence/python_cli_minimal/PROJECT_DISCOVERY.json
+    phases:
+    - init
+    targets:
+    - h_sdd_init
+  eval_secret_leakage_blocked:
+    evidence:
+    - .ovav/artifacts/S20/evidence/ADVERSARIAL_SKILL_CASES_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_adversarial_skill_cases
+    - h_check_skill_eval_adversarial
+  eval_seed_skill_evals_valid:
+    evidence:
+    - .ovav/artifacts/S19/evidence/SEED_SKILL_TRUST_REPORT.json
+    phases:
+    - verify
+    targets:
+    - h_seed_skill_trust
+  eval_seed_skill_owner_linked:
+    evidence:
+    - .ovav/artifacts/S19/evidence/SEED_SKILL_TRUST_REPORT.json
+    phases:
+    - verify
+    targets:
+    - h_seed_skill_trust
+    - runtime_governance_seed
+    - research_verification_seed
+  eval_seed_skill_trust_deterministic:
+    evidence:
+    - .ovav/artifacts/S19/evidence/SEED_SKILL_TRUST_REPORT.json
+    phases:
+    - verify
+    targets:
+    - h_seed_skill_trust
+    - h_check_seed_skill_trust
+  eval_segment_completion_detection:
+    domain: closure
+    evidence:
+    - go_runtime/internal/validators/canonical_integrity.go
+    phases:
+    - verify
+    status_policy: strict_required
+    targets:
+    - h_segment_completion_detector
+  eval_session_close_label:
+    domain: closure
+    evidence:
+    - go_runtime/internal/validators/agent_ux_visual_delivery.go
+    phases:
+    - verify
+    status_policy: strict_required
+    targets:
+    - h_session_close_label
+  eval_skill_eval_suite_deterministic:
+    evidence:
+    - .ovav/artifacts/S20/evidence/SKILL_EVAL_SUITE_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_skill_eval_suite
+    - h_check_skill_eval_adversarial
+  eval_skill_eval_suite_negative_cases_exist:
+    evidence:
+    - .ovav/artifacts/S20/evidence/SKILL_EVAL_SUITE_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_skill_eval_suite
+    - h_check_skill_eval_adversarial
+  eval_skill_eval_suite_positive_cases_exist:
+    evidence:
+    - .ovav/artifacts/S20/evidence/SKILL_EVAL_SUITE_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_skill_eval_suite
+    - h_check_skill_eval_adversarial
+  eval_skill_without_eval_experimental:
+    evidence:
+    - .ovav/artifacts/S5/evidence/SKILL_SCORING_REPORT.json
+    phases:
+    - verify
+    targets:
+    - h_skill_score_gate
+    - runtime_governance_seed
+    - research_verification_seed
+  eval_skill_without_owner_blocked:
+    evidence:
+    - .ovav/artifacts/S5/evidence/SKILL_INVENTORY_REPORT.json
+    phases:
+    - verify
+    targets:
+    - h_skill_registry_refresh
+    - h_skill_rule_pack_validator
+  eval_snapshot_continuity_reported:
+    evidence:
+    - .ovav/artifacts/S22/evidence/SNAPSHOT_CONTINUITY_REPORT.json
+    phases:
+    - verify
+    targets:
+    - h_snapshot_continuity
+    - h_context_pack_report
+    - h_check_context_compaction_runtime
+  eval_source_global_approval_blocks_apply:
+    evidence:
+    - .ovav/artifacts/S28/evidence/SOURCE_GLOBAL_APPROVAL_GATE_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_source_global_approval_gate
+    - h_check_source_global_plan
+  eval_source_global_plan_no_forbidden_behavior:
+    evidence:
+    - .ovav/artifacts/S28/evidence/SOURCE_GLOBAL_PLAN_REPORT.json
+    - .ovav/artifacts/S28/evidence/SOURCE_GLOBAL_HUMAN_REPORT.md
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_source_global_plan_report
+    - h_check_source_global_plan
+  eval_source_global_plan_references_s27:
+    evidence:
+    - .ovav/artifacts/S28/evidence/SOURCE_GLOBAL_PLAN_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_source_global_plan
+    - h_check_source_global_plan
+  eval_source_global_risk_classifies_blocked:
+    evidence:
+    - .ovav/artifacts/S28/evidence/SOURCE_GLOBAL_RISK_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_source_global_risk
+    - h_check_source_global_plan
+  eval_stage_review_blocks_secrets:
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_git_stage_review
+  eval_strict_mode_fails_on_drift:
+    evidence:
+    - .ovav/artifacts/S15/evidence/STABLE_VALIDATION_REPORT.json
+    phases:
+    - verify
+    targets:
+    - h_evidence_stability
+    - h_check_evidence_stability
+  eval_todo_command_works:
+    evidence:
+    - .ovav/artifacts/S41/evidence/TODO_PROGRESS_RUNTIME_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_todo_progress_runtime
+    - h_check_todo_progress_runtime
+  eval_todo_next_works:
+    evidence:
+    - .ovav/artifacts/S41/evidence/TODO_PROGRESS_RUNTIME_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_todo_progress_runtime
+    - h_check_todo_progress_runtime
+  eval_unsafe_actions_rejected:
+    evidence:
+    - .ovav/artifacts/S41/evidence/TODO_ACTION_ROUTER_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_todo_action_router
+    - h_check_todo_progress_runtime
+  eval_workflow_command_works:
+    evidence:
+    - .ovav/artifacts/S37/evidence/THAVREN_WORKFLOW_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_thavren_workflow
+    - h_thavren_workflow_report
+    - h_check_thavren_practical_workflow
+  eval_workflow_no_historical_drift:
+    evidence:
+    - .ovav/artifacts/S37/evidence/THAVREN_WORKFLOW_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_check_thavren_practical_workflow
+  eval_workflow_no_path_home_secret_leakage:
+    evidence:
+    - .ovav/artifacts/S37/evidence/THAVREN_WORKFLOW_HUMAN_REPORT.md
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_thavren_workflow_report
+    - h_check_thavren_practical_workflow
+  eval_workflow_task_kinds_routed_safely:
+    evidence:
+    - .ovav/artifacts/S37/evidence/THAVREN_TASK_ROUTER_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_thavren_task_router
+    - h_check_thavren_practical_workflow
+  eval_workflow_unsafe_rejected:
+    evidence:
+    - .ovav/artifacts/S37/evidence/THAVREN_TASK_ROUTER_REPORT.json
+    phases:
+    - verify
+    status_policy: not_applicable
+    targets:
+    - h_thavren_task_router
+    - h_check_thavren_practical_workflow
+  eval_harness_task_router_routes_files:
+    domain: evaluation_layer
+    evidence:
+    - go_runtime/internal/validators/harness_integrity.go
+    phases:
+    - verify
+    status_policy: strict_required
+    targets:
+    - harness_task_router
+  eval_harness_task_router_risk_levels:
+    domain: evaluation_layer
+    evidence:
+    - go_runtime/internal/validators/harness_integrity.go
+    phases:
+    - verify
+    status_policy: strict_required
+    targets:
+    - harness_task_router
+  eval_harness_task_router_service_areas:
+    domain: evaluation_layer
+    evidence:
+    - go_runtime/internal/validators/harness_integrity.go
+    phases:
+    - verify
+    status_policy: strict_required
+    targets:
+    - harness_task_router
+  eval_harness_task_router_deterministic:
+    domain: evaluation_layer
+    evidence:
+    - go_runtime/internal/validators/harness_integrity.go
+    phases:
+    - verify
+    status_policy: strict_required
+    targets:
+    - harness_task_router
+  eval_harness_task_router_blocked_surfaces:
+    domain: evaluation_layer
+    evidence:
+    - go_runtime/internal/validators/harness_integrity.go
+    phases:
+    - verify
+    status_policy: strict_required
+    targets:
+    - harness_task_router
+evals:
+- eval_sdd_init_auto_trigger
+- eval_sdd_init_detects_stack
+- eval_profile_resolution
+- eval_lane_classification
+- eval_do_not_delegate_small_task
+- eval_delegation_threshold_4_files
+- eval_artifact_dependency_blocks_apply
+- eval_skill_without_owner_blocked
+- eval_skill_without_eval_experimental
+- eval_memory_write_requires_gateway
+- eval_persona_does_not_affect_artifacts
+- eval_stage_review_blocks_secrets
+- eval_commit_review_requires_artifact_link
+- eval_push_review_checks_branch
+- eval_human_response_not_raw_runtime
+- eval_result_contract_requires_evidence
+- eval_eval_runtime_targets_valid
+- eval_evidence_report_parseable
+- eval_readiness_preserves_experimental
+- eval_install_plan_blocks_unknown_pack
+- eval_install_safety_gate_blocks_global
+- eval_rollback_plan_requires_manifest
+- eval_dual_profile_readiness
+- eval_no_extra_public_profiles
+- eval_e2e_evidence_for_both_profiles
+- eval_delegation_coverage_for_both_profiles
+- eval_opencode_handoff_for_both_profiles
+- eval_memory_safety_for_both_profiles
+- eval_install_dry_run_safety
+- eval_no_absolute_path_leakage
+- eval_no_home_path_leakage
+- eval_no_secret_leakage_in_s14
+- eval_evidence_stability_no_drift
+- eval_no_write_mode_prevents_drift
+- eval_strict_mode_fails_on_drift
+- eval_no_historical_evidence_modified
+- eval_build1_closure_ready_with_caution
+- eval_build1_blocks_global_claims
+- eval_build1_source_local_acceptance_explicit
+- eval_build1_historical_evidence_unchanged
+- eval_build2_planning_freeze
+- eval_build2_segment_order_s21_before_hardening
+- eval_build2_blocks_forbidden_surfaces
+- eval_build2_routing_matrix_externalized
+- eval_caution_policy_deterministic
+- eval_caution_gate_blocks_unsafe
+- eval_caution_gate_allows_source_local
+- eval_caution_graduation_preserves_experimental
+- eval_caution_no_global_install_opencode_ui_mcp_a2a_external
+- eval_caution_graduation_requires_seed_skill_evals
+- eval_seed_skill_trust_deterministic
+- eval_seed_skill_owner_linked
+- eval_seed_skill_evals_valid
+- eval_no_false_ready
+- eval_experimental_preserved
+- eval_graduation_policy_blocks_readiness_without_evals
+- eval_skill_eval_suite_positive_cases_exist
+- eval_skill_eval_suite_negative_cases_exist
+- eval_skill_eval_suite_deterministic
+- eval_adversarial_cases_all_blocked
+- eval_adversarial_cases_deterministic
+- eval_no_false_graduation_to_ready
+- eval_experimental_preserved_s20
+- eval_graduation_to_ready_blocked
+- eval_cross_profile_routing_blocked
+- eval_global_escalation_blocked
+- eval_path_leakage_blocked
+- eval_secret_leakage_blocked
+- eval_production_ready_claim_blocked
+- eval_runtime_cli_status_works
+- eval_runtime_cli_plan_works
+- eval_runtime_cli_context_works
+- eval_runtime_cli_close_layer_dry_run_works
+- eval_runtime_cli_blocks_unsafe_commands
+- eval_runtime_cli_no_git_execution
+- eval_runtime_cli_source_local_only
+- eval_context_compaction_profile_packs
+- eval_context_budget_over_budget
+- eval_snapshot_continuity_reported
+- eval_opencode_pack_simulation_profile_mapping
+- eval_opencode_pack_blocks_global_surfaces
+- eval_opencode_pack_uses_s23_packages
+- eval_memory_gateway_proof_safe_fallback
+- eval_memory_gateway_proof_review_and_deny
+- eval_memory_gateway_proof_recall_redaction
+- eval_install_sandbox_repo_local_only
+- eval_install_sandbox_collision_detection
+- eval_install_sandbox_backup_and_rollback
+- eval_install_sandbox_blocks_forbidden_surfaces
+- eval_source_global_plan_references_s27
+- eval_source_global_risk_classifies_blocked
+- eval_source_global_approval_blocks_apply
+- eval_source_global_plan_no_forbidden_behavior
+- eval_build2_e2e_rc1_chain
+- eval_build2_rc1_readiness_preserves_blocks
+- eval_build2_e2e_no_forbidden_behavior
+- eval_build2_closure_ready_with_caution
+- eval_build2_closure_blocks_global_claims
+- eval_build2_closure_no_historical_drift
+- eval_build2_closure_source_local
+- eval_s30_no_forbidden_behavior
+- eval_build3_planning_freeze
+- eval_build3_segment_order_s32_first
+- eval_build3_profile_before_opencode
+- eval_build3_blocks_forbidden_surfaces
+- eval_build3_runtime_ux_requirements
+- eval_build3_auto_trigger_matrix_blocks_unsafe
+- eval_runtime_next_current_work_resolves_s33
+- eval_runtime_next_profile_aware
+- eval_runtime_next_blocks_unsafe_selectors
+- eval_runtime_next_no_historical_drift
+- eval_context_default_next_works
+- eval_harness_index_segment_lookup
+- eval_context_default_no_broad_artifact_tree
+- eval_handoff_compaction_reduces_duplicate_status
+- eval_runtime_daily_source_commands
+- eval_compact_handoff_no_broad_artifact_tree
+- eval_evidence_ledger_index_lookup
+- eval_runtime_daily_includes_evidence_ledger
+- eval_ledger_latest_points_to_s35
+- eval_close_layer_dry_run_guidance
+- eval_close_manifest_current_segment_only
+- eval_close_snapshot_plan_dry_run
+- eval_close_snapshot_plan_dry_run
+- eval_workflow_command_works
+- eval_workflow_task_kinds_routed_safely
+- eval_workflow_unsafe_rejected
+- eval_workflow_no_historical_drift
+- eval_workflow_no_path_home_secret_leakage
+- eval_todo_command_works
+- eval_progress_command_works
+- eval_todo_next_works
+- eval_daily_includes_todo_progress
+- eval_unsafe_actions_rejected
+- eval_s41_no_historical_drift
+- eval_s41_no_leakage
+- eval_memory_command_works
+- eval_memory_recall_command_works
+- eval_memory_candidates_command_works
+- eval_memory_candidate_dry_runs_work
+- eval_memory_unsafe_selectors_rejected
+- eval_daily_includes_memory_ux
+- eval_s42_no_historical_drift
+- eval_s42_no_leakage
+- eval_install_sandbox_command_works
+- eval_install_sandbox_selectors_work
+- eval_install_sandbox_unsafe_selectors_rejected
+- eval_daily_includes_install_sandbox_ux
+- eval_s43_no_real_install_behavior
+- eval_s43_no_historical_drift
+- eval_s43_no_leakage
+- eval_build3_use_friction_e2e_chain
+- eval_build3_runtime_command_coverage
+- eval_build3_friction_low_with_caution
+- eval_s44_no_historical_drift
+- eval_s44_no_forbidden_behavior
+- eval_build3_rc2_closure_ready_with_caution
+- eval_build3_rc2_blocks_global_claims
+- eval_build3_rc2_preview_only_surfaces
+- eval_s45_no_historical_drift
+- eval_s45_no_forbidden_behavior
+- eval_build4_planning_freeze
+- eval_build4_segment_order_opencode_first
+- eval_build4_blocks_forbidden_surfaces
+- eval_build4_graduation_policy
+- eval_build4_activation_order_repo_local_first
+- eval_build4_blocked_surfaces_preserved
+- eval_graduation_gate_surfaces_classified
+- eval_graduation_opencode_eligible
+- eval_graduation_memory_review_required
+- eval_graduation_install_review_required
+- eval_graduation_global_blocked
+- eval_opencode_repo_local_contract
+- eval_opencode_repo_local_boundaries
+- eval_opencode_repo_local_no_materialization
+- eval_s48_no_forbidden_behavior
+- eval_opencode_repo_local_pack
+- eval_opencode_repo_local_pack_files_exist
+- eval_opencode_repo_local_pack_metadata
+- eval_opencode_repo_local_pack_no_forbidden_surfaces
+- eval_s49_no_forbidden_behavior
+- eval_opencode_repo_local_smoke
+- eval_opencode_session_manifest_builds
+- eval_opencode_session_guidance_builds
+- eval_opencode_repo_local_smoke_report_builds
+- eval_s50_no_forbidden_behavior
+- eval_profile_session_contracts_built
+- eval_profile_session_context_compact
+- eval_profile_session_policy_blocks_unsafe
+- eval_opencode_repo_local_e2e_chain
+- eval_opencode_repo_local_e2e_readiness
+- eval_s53_no_forbidden_behavior
+- eval_s54_memory_read_probe_policy
+- eval_s54_no_forbidden_behavior
+- eval_s55_sandbox_classification
+- eval_s55_candidate_filter_secret_denied
+- eval_s55_no_forbidden_behavior
+- eval_s56_install_apply_policy
+- eval_s56_apply_boundaries
+- eval_s56_backup_rollback_gate
+- eval_s56_no_real_install_behavior
+- eval_s56_no_forbidden_behavior
+- eval_s57_sandbox_classification
+- eval_s57_manifest_deterministic
+- eval_s57_rollback_completeness
+- eval_s57_no_real_apply_behavior
+- eval_s58_build4_graduation_e2e_chain
+- eval_s58_readiness_classification
+- eval_s58_blocked_surfaces_preserved
+- eval_s58_no_forbidden_behavior
+- eval_s57_no_forbidden_behavior
+- eval_s59_build4_final_readiness
+- eval_s59_surface_readiness_matrix
+- eval_s59_blocked_surface_audit
+- eval_s60_build4_closure
+- eval_s60_build4_final_baseline
+- eval_s60_build4_closure_human_report
+- eval_s60_build5_recommendations
+- eval_s61_build5_opencode_visible_role_freeze
+- eval_s61_build5_ux_scope
+- eval_s61_visible_role_policy
+- eval_s61_identity_guard_policy
+- eval_s62_opencode_command_surface
+- eval_s62_visible_role_agents
+- eval_s62_opencode_skills
+- eval_s62_identity_guard
+- eval_s62_no_forbidden_behavior
+- eval_s63_platform_engineering_session_rc
+- eval_s63_platform_greeting_contract
+- eval_s63_platform_lane_routing
+- eval_s63_no_forbidden_behavior
+- eval_s64_research_intelligence_session_rc
+- eval_s64_research_greeting_contract
+- eval_s64_research_lane_routing
+- eval_s64_no_forbidden_behavior
+- eval_s64_harness_intelligence_router_coverage
+- eval_s64_harness_router_greeting_minimal
+- eval_s64_harness_router_closure_strict
+- eval_s64_harness_router_no_orphans
+- eval_s65_repo_local_work_loop
+- eval_s65_progressive_loading
+- eval_s65_local_git_closure
+- eval_s65_service_area_parity
+- eval_s66_usability_e2e
+- eval_s66_greeting_identity
+- eval_s66_progressive_context
+- eval_s66_professional_routing
+- eval_s66_harness_intelligence_router
+- eval_s66_repo_local_work_loop
+- eval_s66_surface_freshness
+- eval_s66_node_modules_exclusion
+- eval_s66_blocked_surfaces
+- eval_s66_next_work_s67
+- eval_s67_build5_closure
+- eval_s67_build5_final_baseline
+- eval_s67_blocked_surfaces
+- eval_s67_snapshot_policy
+- eval_s67_no_forbidden_behavior
+- eval_protocol_gate_blocks_unregistered
+- eval_protocol_gate_allows_registered
+- eval_protocol_gate_blocks_inactive
+- eval_protocol_audit_logs_all_access
+- eval_protocol_token_budget_enforced
+- eval_protocol_circuit_breaker_opens
+- eval_protocol_circuit_breaker_resets
+- eval_protocol_no_bypass_permission
+- eval_protocol_scope_denied
+- eval_git_stage_intelligence
+- eval_git_change_manifest
+- eval_git_pr_structure
+- eval_segment_completion_detection
+- eval_auto_close_execution
+- eval_auto_close_safety
+- eval_auto_close_no_blocked_surfaces
+- eval_session_close_label
+- eval_runtime_operations
+- eval_harness_task_router_routes_files
+- eval_harness_task_router_risk_levels
+- eval_harness_task_router_service_areas
+- eval_harness_task_router_deterministic
+- eval_harness_task_router_blocked_surfaces

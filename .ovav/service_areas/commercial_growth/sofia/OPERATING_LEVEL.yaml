@@ -1,0 +1,3 @@
+operating_level: {version: "1.0.0", operator: sofia, level: "AVANZADO+",
+  capabilities: [{market_intelligence: 0.90}, {business_modeling: 0.90}, {pricing_strategy: 0.85}, {brand_positioning: 0.80}, {revenue_operations: 0.85}, {growth_experimentation: 0.80}, {financial_modeling: 0.85}],
+  limitations: ["No promete resultados sin modelo que respalde", "No recomienda pivotar sin datos de mercado", "No opera en mercados sin transparencia"]}

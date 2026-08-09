@@ -1,0 +1,197 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ovav.dev/schemas/final_evaluation_object.schema.json",
+  "title": "OVAV Final Evaluation Object Schema",
+  "description": "Schema for the final evaluation object that every medium+ implementation must produce. Aggregates decision packet, laws, stress gate, and red team results.",
+  "type": "object",
+  "required": [
+    "proposal_id",
+    "generated_at",
+    "decision_packet",
+    "laws",
+    "stress_gate",
+    "red_team",
+    "final_decision"
+  ],
+  "properties": {
+    "proposal_id": {
+      "type": "string",
+      "description": "Unique proposal identifier"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "evaluator": {
+      "type": "string",
+      "description": "Who or what produced this evaluation"
+    },
+    "decision_packet": {
+      "type": "object",
+      "required": ["present"],
+      "properties": {
+        "present": { "type": "boolean", "const": true },
+        "proposal": { "type": "string" },
+        "rationale": { "type": "string" },
+        "expected_files": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "tools_needed": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "risk_level": {
+          "type": "string",
+          "enum": ["low", "medium", "high", "critical", "irreversible"]
+        },
+        "approval_route": {
+          "type": "string",
+          "enum": [
+            "automatic",
+            "automatic_with_evidence",
+            "human_confirmation",
+            "maintainer_or_founder_gate",
+            "backup_approval_rollback_required"
+          ]
+        }
+      }
+    },
+    "laws": {
+      "type": "object",
+      "required": [
+        "automation_useful",
+        "practical_value",
+        "friction_reduction",
+        "intelligent_experience",
+        "state_truth",
+        "single_authority",
+        "persistent_identity",
+        "zero_trust_context",
+        "governed_tools",
+        "automatic_reflexes",
+        "memory_firewall",
+        "capability_lifecycle",
+        "boring_path_first"
+      ],
+      "properties": {
+        "automation_useful": { "$ref": "#/$defs/law_evaluation" },
+        "practical_value": { "$ref": "#/$defs/law_evaluation" },
+        "friction_reduction": { "$ref": "#/$defs/law_evaluation" },
+        "intelligent_experience": { "$ref": "#/$defs/law_evaluation" },
+        "state_truth": { "$ref": "#/$defs/law_evaluation" },
+        "single_authority": { "$ref": "#/$defs/law_evaluation" },
+        "persistent_identity": { "$ref": "#/$defs/law_evaluation" },
+        "zero_trust_context": { "$ref": "#/$defs/law_evaluation" },
+        "governed_tools": { "$ref": "#/$defs/law_evaluation" },
+        "automatic_reflexes": { "$ref": "#/$defs/law_evaluation" },
+        "memory_firewall": { "$ref": "#/$defs/law_evaluation" },
+        "capability_lifecycle": { "$ref": "#/$defs/law_evaluation" },
+        "boring_path_first": { "$ref": "#/$defs/law_evaluation" }
+      }
+    },
+    "stress_gate": {
+      "type": "object",
+      "required": ["scenario_count", "results", "decision"],
+      "properties": {
+        "scenario_count": { "type": "integer", "minimum": 0 },
+        "scenarios": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "result"],
+            "properties": {
+              "name": { "type": "string" },
+              "result": {
+                "type": "string",
+                "enum": ["PASS", "PASS_WITH_CHANGES", "FAIL"]
+              },
+              "evidence": { "type": "string" }
+            }
+          }
+        },
+        "results": {
+          "type": "object",
+          "properties": {
+            "passed": { "type": "integer" },
+            "failed": { "type": "integer" },
+            "changes_required": { "type": "integer" }
+          }
+        },
+        "decision": {
+          "type": "string",
+          "enum": ["PASS", "PASS_WITH_CHANGES", "FAIL", "BLOCKED"]
+        }
+      }
+    },
+    "red_team": {
+      "type": "object",
+      "required": ["builder", "reviewer", "attacker", "maintainer", "user"],
+      "properties": {
+        "builder": { "$ref": "#/$defs/lens_evaluation" },
+        "reviewer": { "$ref": "#/$defs/lens_evaluation" },
+        "attacker": { "$ref": "#/$defs/lens_evaluation" },
+        "maintainer": { "$ref": "#/$defs/lens_evaluation" },
+        "user": { "$ref": "#/$defs/lens_evaluation" },
+        "decision": {
+          "type": "string",
+          "enum": ["PASS", "PASS_WITH_CHANGES", "FAIL"]
+        }
+      }
+    },
+    "final_decision": {
+      "type": "object",
+      "required": ["status", "required_changes", "next_action"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["PASS", "PASS_WITH_CHANGES", "FAIL", "BLOCKED"]
+        },
+        "required_changes": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "next_action": {
+          "type": "string",
+          "description": "What to do next: implement, revise, archive, escalate"
+        },
+        "approved_by": { "type": "string" },
+        "evidence_paths": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "law_evaluation": {
+      "type": "object",
+      "required": ["result", "evidence"],
+      "properties": {
+        "result": {
+          "type": "string",
+          "enum": ["COMPLIANT", "PARTIAL", "NON_COMPLIANT", "NOT_APPLICABLE"]
+        },
+        "evidence": { "type": "string" },
+        "score": { "type": "number", "minimum": 0, "maximum": 1 },
+        "notes": { "type": "string" }
+      }
+    },
+    "lens_evaluation": {
+      "type": "object",
+      "required": ["result"],
+      "properties": {
+        "result": {
+          "type": "string",
+          "enum": ["PASS", "PASS_WITH_CHANGES", "FAIL"]
+        },
+        "score": { "type": "number", "minimum": 0, "maximum": 1 },
+        "findings": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "evidence": { "type": "string" }
+      }
+    }
+  }
+}

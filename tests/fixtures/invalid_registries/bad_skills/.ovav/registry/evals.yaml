@@ -1,0 +1,16 @@
+evals:
+  - eval_sdd_init_auto_trigger
+  - eval_sdd_init_detects_stack
+  - eval_profile_resolution
+  - eval_lane_classification
+  - eval_do_not_delegate_small_task
+  - eval_delegation_threshold_4_files
+  - eval_artifact_dependency_blocks_apply
+  - eval_skill_without_owner_blocked
+  - eval_skill_without_eval_experimental
+  - eval_memory_write_requires_gateway
+  - eval_persona_does_not_affect_artifacts
+  - eval_stage_review_blocks_secrets
+  - eval_commit_review_requires_artifact_link
+  - eval_push_review_checks_branch
+  - eval_human_response_not_raw_runtime

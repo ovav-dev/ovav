@@ -1,0 +1,77 @@
+# Research Intelligence — Capabilities Registry
+# v1.0.0
+
+capabilities:
+  version: "1.0.0"
+  area: research_intelligence
+
+  registered:
+    - id: source_verification
+      name: "Verificación de fuentes"
+      status: active
+      tool: tools/research/source_verifier.py
+      maturity: production
+      description: "Evaluación de credibilidad, actualidad y relevancia de fuentes externas."
+
+    - id: evidence_scoring
+      name: "Evidence scoring"
+      status: active
+      tool: tools/research/evidence_scorer.py
+      maturity: production
+      description: "Puntaje de calidad de evidencia con detección de sesgo y contradicciones."
+
+    - id: benchmarking
+      name: "Benchmarking"
+      status: active
+      tool: tools/research/benchmark_engine.py
+      maturity: production
+      description: "Comparación técnica multi-dimensional con matriz normalizada."
+
+    - id: decision_briefs
+      name: "Decision briefs"
+      status: active
+      tool: tools/research/decision_brief_builder.py
+      maturity: production
+      description: "Síntesis de investigación en recomendación accionable."
+
+    - id: research_artifacts
+      name: "Research artifacts"
+      status: active
+      tool: tools/research/research_artifact_writer.py
+      maturity: production
+      description: "Generación de SCOPE, SOURCE_MAP, EVIDENCE_REVIEW, DECISION_BRIEF."
+
+    - id: research_pipeline
+      name: "Research pipeline"
+      status: active
+      tool: tools/harnesses/research_pipeline_runner.py
+      maturity: production
+      description: "Pipeline completo de investigación: scope → sources → evidence → decision."
+
+    - id: research_context
+      name: "Research context optimizer"
+      status: active
+      tool: tools/harnesses/research_context_optimizer.py
+      maturity: production
+      description: "Optimización de contexto para tareas de investigación."
+
+    - id: research_sandbox
+      name: "Research sandbox gate"
+      status: active
+      tool: tools/harnesses/research_sandbox_gate.py
+      maturity: production
+      description: "Gate de seguridad para operaciones de investigación externa."
+
+    - id: eidren_memory
+      name: "Eidren memory"
+      status: active
+      tool: tools/governor/eidren_memory.py
+      maturity: production
+      description: "Memoria independiente de Eidren con ledger y sesiones."
+
+    - id: research_cache
+      name: "Research cache"
+      status: active
+      tool: tools/web/research_cache.py
+      maturity: production
+      description: "Cache de investigación con TTL por tipo de fuente."

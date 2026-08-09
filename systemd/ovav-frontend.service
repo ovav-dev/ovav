@@ -1,0 +1,22 @@
+[Unit]
+Description=OVAV Frontend (Next.js)
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/braka/Systems/OVAV/web/frontend
+Environment="NEXT_TELEMETRY_DISABLED=1"
+Environment="NEXT_PUBLIC_API_URL=http://localhost:8080/api"
+Environment="PATH=/home/braka/.nvm/versions/node/v22.23.1/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+ExecStartPre=/bin/rm -rf /home/braka/Systems/OVAV/web/frontend/.next
+ExecStart=/home/braka/.nvm/versions/node/v22.23.1/bin/node /home/braka/.nvm/versions/node/v22.23.1/bin/pnpm dev --port 3000
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+# Timeout para que systemd no mate el proceso
+TimeoutStopSec=60
+
+[Install]
+WantedBy=default.target

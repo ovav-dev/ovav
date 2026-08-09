@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ovav.dev/schemas/provider_abstraction.schema.json",
+  "title": "OVAV Provider Abstraction Response",
+  "description": "Schema for provider_abstraction.py detection and resolution responses — Layer 3.",
+  "type": "object",
+  "required": ["router_version", "provider_family", "model_id", "confidence"],
+  "properties": {
+    "router_version": { "type": "string", "pattern": "^s83_provider_abstraction_v1$" },
+    "generated_at": { "type": "string" },
+    "provider_family": {
+      "type": "string",
+      "enum": ["deepseek", "openai", "anthropic", "google", "opencode", "nvidia", "unknown"]
+    },
+    "provider_display": { "type": "string" },
+    "model_id": { "type": "string" },
+    "model_tier": {
+      "type": "string",
+      "enum": ["critical", "lead", "code_full", "research", "review", "deep", "balanced", "code_light", "fast", "summary", "unknown"]
+    },
+    "model_context_window": { "type": "integer", "minimum": 0 },
+    "model_supports_tools": { "type": "boolean" },
+    "confidence": { "type": "string", "enum": ["low", "medium", "high"] },
+    "capabilities": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "source_policy": {
+      "type": "object",
+      "required": ["source_local_only", "advisory_only"],
+      "properties": {
+        "source_local_only": { "type": "boolean", "const": true },
+        "advisory_only": { "type": "boolean", "const": true },
+        "does_not_control_model": { "type": "boolean", "const": true },
+        "does_not_write_global_config": { "type": "boolean", "const": true }
+      }
+    }
+  }
+}

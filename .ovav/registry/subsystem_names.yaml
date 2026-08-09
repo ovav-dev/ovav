@@ -1,0 +1,455 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# OVAV SUBSYSTEM NAMES — Consolidated Naming Registry (v3)
+# ═══════════════════════════════════════════════════════════════════════════════
+# 27 consolidated subsystems — 6 fusions + 4 absorptions from GentleAI
+# Convention: OVAV [Function] [Type]
+#
+# FUSIONS APPLIED:
+#   OAE → OVE (adversarial becomes validator #82)
+#   OCF → ODG (firewall becomes defense mode)
+#   OCE-CHRONOS → OSE (chronos absorbed into session engine)
+#   OET → ODS (economy becomes monitoring mode)
+#   ODR → OAT (decisions become query layer on audit trail)
+#   ORS-RELAY → OOE (relay becomes routing layer in orchestrator)
+#
+# ABSORPTIONS FROM GENTLEAI (4.9K★):
+#   SDD Profiles → OPA (per-phase model routing)
+#   Review receipts → OVE (content-bound verification)
+#   Backup dedup → OIP (compressed, deduplicated, pruned)
+#   Delegation rules → OOE (4-file, multi-file, PR, long-session rules)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+version: 3
+created_at: 2026-07-18T02:00:00-0500
+created_by: thavren
+convention: "OVAV [Function] [Type]"
+consolidation: "33 → 27 subsystems (6 fusions, 4 absorptions)"
+
+# ── L0: INTEGRITY & SAFETY ──────────────────────────────────────────────────
+
+subsystems:
+
+  # ── OVAV Validation Engine (ABSORBED: Adversarial Engine) ──
+  validation_engine:
+    full_name: "OVAV Validation Engine"
+    abbrev: "OVE"
+    description: "82 Go validators + adversarial verification — the integrity backbone."
+    package: "internal/validators"
+    cli: "cmd/ovav status"
+    layer: L0
+    function: "81 sequential validators + adversarial 3-juror verification"
+    absorbed: "OAE (Adversarial Engine) → validator #82"
+    absorbed_from: "MiMoCode adversarial jury pattern"
+    status: "PRODUCTION"
+
+  # ── OVAV Compliance Seal ──
+  compliance_seal:
+    full_name: "OVAV Compliance Seal"
+    abbrev: "OCS"
+    description: "SHA-256 cryptographic seals — proof of merge readiness."
+    package: "internal/ows/seal.go"
+    cli: "cmd/ovav status"
+    layer: L0
+    function: "4 compliance levels: quick/standard/strict/maximum"
+    status: "PRODUCTION"
+
+  # ── OVAV Vault System ──
+  vault_system:
+    full_name: "OVAV Vault System"
+    abbrev: "OVS-VAULT"
+    description: "AES-256-GCM encrypted secrets — keys never touch plaintext."
+    package: "internal/vault"
+    cli: "cmd/ovav login"
+    layer: L0
+    function: "Encrypts, stores, and rotates credentials"
+    status: "PRODUCTION"
+
+  # ── OVAV Output Guard ──
+  output_guard:
+    full_name: "OVAV Output Guard"
+    abbrev: "OOG"
+    description: "HMAC-SHA256 signing — every response is cryptographically attested."
+    package: "cmd/output_guard"
+    cli: "cmd/output_guard --sign"
+    layer: L0
+    function: "Signs output, tracks strikes (3 misses = session block)"
+    status: "PRODUCTION"
+
+  # ── OVAV Session Engine (ABSORBED: Chronos Engine) ──
+  session_engine:
+    full_name: "OVAV Session Engine"
+    abbrev: "OSE"
+    description: "Temporal orientation + chronos — all session state in one engine."
+    package: "cmd/session_greeting + internal/chronos"
+    cli: "cmd/session_greeting --json"
+    layer: L0
+    function: "Git-based time, budget tracking, integrity check, chronos computation"
+    absorbed: "OCE-CHRONOS (Chronos Engine) → merged into session greeting"
+    status: "PRODUCTION"
+
+  # ── OVAV Identity Guard ──
+  identity_guard:
+    full_name: "OVAV Identity Guard"
+    abbrev: "OIG"
+    description: "Identity enforcement — suppresses native model identity."
+    package: "internal/identity"
+    cli: "N/A (injected into system prompt)"
+    layer: L0
+    function: "Forces OVAV agent identity over MiMo/OpenCode/Claude defaults"
+    status: "PRODUCTION"
+
+  # ── OVAV Reflex System ──
+  reflex_system:
+    full_name: "OVAV Reflex System"
+    abbrev: "ORS"
+    description: "Git hooks — instant responses to git events."
+    package: "internal/hooks"
+    cli: "N/A (fired by git)"
+    layer: L0
+    function: "6 hooks: pre-commit, pre-push, commit-msg, post-checkout, post-commit, post-merge"
+    status: "PRODUCTION"
+
+# ── L1: ARCHITECTURE & GOVERNANCE ───────────────────────────────────────────
+
+  # ── OVAV Blueprint System ──
+  blueprint_system:
+    full_name: "OVAV Blueprint System"
+    abbrev: "OBS"
+    description: "Canonical plan matrix — the single source of truth for all planning."
+    package: ".ovav/plan/caps.yaml"
+    cli: "N/A (validated by caps_schema)"
+    layer: L1
+    function: "Plan version, sprint status, layer health, migration tracking"
+    status: "PRODUCTION"
+
+  # ── OVAV Governor Engine ──
+  governor_engine:
+    full_name: "OVAV Governor Engine"
+    abbrev: "OGE"
+    description: "Autonomous governance cycle — LOAD→EVALUATE→DECIDE→DELEGATE→PUBLISH→REPORT."
+    package: "internal/governor"
+    cli: "cmd/ovav govern"
+    layer: L1
+    function: "Decision engine, trust gate, delegation protocol, interrupt engine"
+    status: "PRODUCTION"
+
+  # ── OVAV Law System ──
+  law_system:
+    full_name: "OVAV Law System"
+    abbrev: "OLS"
+    description: "22 machine-readable laws — the legal framework of OVAV."
+    package: ".ovav/laws/"
+    cli: "N/A (validated by behavioral_directives.go)"
+    layer: L1
+    function: "LAW-001 through LAW-21, each with severity, activation, and enforcement"
+    status: "PRODUCTION"
+
+  # ── OVAV Phase Gateway ──
+  phase_gateway:
+    full_name: "OVAV Phase Gateway"
+    abbrev: "OPG"
+    description: "Phase dependency graph — enforces artifact-first SDD flow."
+    package: "internal/validators/phase_dag.go"
+    cli: "N/A (enforced during apply/verify)"
+    layer: L1
+    function: "9 phases: init→explore→proposal→spec→design→tasks→apply→verify→archive"
+    status: "PRODUCTION"
+
+  # ── OVAV Permission Authority (ABSORBED: SDD Profiles from GentleAI) ──
+  permission_authority:
+    full_name: "OVAV Permission Authority"
+    abbrev: "OPA"
+    description: "Canonical permission policy + per-phase model routing."
+    package: ".ovav/policy/permission_authority.json"
+    cli: "N/A (enforced by validators)"
+    layer: L1
+    function: "3 operator profiles, 6 F0 layers, SDD profiles, consumer grants"
+    absorbed: "GentleAI SDD Profiles → per-phase model routing in OPA"
+    absorbed_from: "GentleAI (4.9K★) — named profiles, provider-aware, runtime switchable"
+    status: "PRODUCTION"
+
+  # ── OVAV Audit Trail (ABSORBED: Decision Registry) ──
+  audit_trail:
+    full_name: "OVAV Audit Trail"
+    abbrev: "OAT"
+    description: "Dual audit + decision graph — SQLite + JSONL + knowledge graph."
+    package: "internal/ows/audit.go + .ovav/registry/decision_graph.yaml"
+    cli: "N/A (append-only, tamper-evident)"
+    layer: L1
+    function: "Every operation recorded + decision rationale with impact chains"
+    absorbed: "ODR (Decision Registry) → query layer on top of audit trail"
+    status: "PRODUCTION"
+
+# ── L2: SECURITY ────────────────────────────────────────────────────────────
+
+  # ── OVAV Defense Guard (ABSORBED: Context Firewall) ──
+  defense_guard:
+    full_name: "OVAV Defense Guard"
+    abbrev: "ODG"
+    description: "Defense-in-depth + injection detection — single defense subsystem."
+    package: "internal/security/defense + context_firewall.go"
+    cli: "cmd/ovav defend"
+    layer: L2
+    function: "Cortex, Responder, Authorizer, CredentialManager + injection detection"
+    absorbed: "OCF (Context Firewall) → defense mode inside ODG"
+    status: "PRODUCTION"
+
+  # ── OVAV Red Team Protocol ──
+  red_team_protocol:
+    full_name: "OVAV Red Team Protocol"
+    abbrev: "ORTP"
+    description: "7-technique adversarial audit — tests the system against itself."
+    package: "tools/red_team/"
+    cli: "tools/red_team/advanced_audit.sh"
+    layer: L2
+    function: "Race detection, secret scanning, dependency audit, boundary testing"
+    status: "PRODUCTION"
+
+  # ── OVAV Audit Trail (L2 view) ──
+  # (See L1 — OAT covers both operational and strategic audit)
+
+# ── L3: OPERATIONS ──────────────────────────────────────────────────────────
+
+  # ── OVAV Worktree System (OWS) — ESTABLISHED ──
+  ows:
+    full_name: "OVAV Worktree System"
+    abbrev: "OWS"
+    description: "10-state machine for isolated development — the canonical workflow."
+    package: "internal/ows"
+    cli: "ovav git {start,status,save,push,merge,release}"
+    layer: L3
+    function: "State machine, compliance seals, conflict detection, offline support"
+    status: "PRODUCTION"
+
+  # ── OVAV Converter Engine ──
+  converter_engine:
+    full_name: "OVAV Converter Engine"
+    abbrev: "OCE"
+    description: "Multi-runtime agent generator — YAML → 4 CLI targets."
+    package: "internal/convert"
+    cli: "cmd/convert_agents"
+    layer: L3
+    function: "Converts canonical agents to OpenCode, MiMoCode, Claude Code, Cursor"
+    status: "PRODUCTION"
+
+  # ── OVAV Sync Protocol ──
+  sync_protocol:
+    full_name: "OVAV Sync Protocol"
+    abbrev: "OSP"
+    description: "Filesystem synchronization — keeps runtimes in sync with canonical."
+    package: "internal/sync"
+    cli: "cmd/ovav sync"
+    layer: L3
+    function: "Mirrors canonical filesystem to runtime targets"
+    status: "PRODUCTION"
+
+  # ── OVAV Install Pipeline (ABSORBED: Backup dedup from GentleAI) ──
+  install_pipeline:
+    full_name: "OVAV Install Pipeline"
+    abbrev: "OIP"
+    description: "Governed installation + compressed backup — atomic with rollback."
+    package: "internal/install"
+    cli: "cmd/ovav install"
+    layer: L3
+    function: "13 files, atomic operations, compressed/deduplicated backups, auto-prune"
+    absorbed: "GentleAI backup pattern → compressed, deduplicated, 5 most recent"
+    absorbed_from: "GentleAI (4.9K★) — tar.gz, dedup, auto-prune, pin protection"
+    status: "PRODUCTION"
+
+  # ── OVAV Cockpit Dashboard ──
+  cockpit_dashboard:
+    full_name: "OVAV Cockpit Dashboard"
+    abbrev: "OCD"
+    description: "Terminal UI — bubbletea-powered control center."
+    package: "cmd/cockpit"
+    cli: "cmd/cockpit"
+    layer: L3
+    function: "Dashboard, health, sync, config, install, tailor views"
+    status: "PRODUCTION"
+
+  # ── OVAV Control Panel ──
+  control_panel:
+    full_name: "OVAV Control Panel"
+    abbrev: "OCP"
+    description: "Web admin panel — full system management via browser."
+    package: "cmd/cpanel"
+    cli: "cmd/cpanel (web server)"
+    layer: L3
+    function: "Admin login, TOTP, OAuth, real-time events, governor integration"
+    status: "PRODUCTION"
+
+  # ── OVAV Profile Compiler ──
+  profile_compiler:
+    full_name: "OVAV Profile Compiler"
+    abbrev: "OPC"
+    description: "Profile system — customizes OVAV for each project."
+    package: "internal/tailor"
+    cli: "cmd/tailor"
+    layer: L3
+    function: "Apply, compose, preview, section profiles"
+    status: "PRODUCTION"
+
+  # ── OVAV Git Navigator ──
+  git_navigator:
+    full_name: "OVAV Git Navigator"
+    abbrev: "OGN"
+    description: "Git workflow engine — branch strategy, merge readiness, pre-push."
+    package: "internal/gitflow"
+    cli: "N/A (integrated into OWS)"
+    layer: L3
+    function: "Worktree workflow, pre-push hooks, merge readiness"
+    status: "PRODUCTION"
+
+# ── L4: QUALITY ─────────────────────────────────────────────────────────────
+
+  # ── OVAV Economy Tracker (absorbed into Doctor System) ──
+  # (See ODS below — OET is now a monitoring mode inside ODS)
+
+  # ── OVAV Doctor System (ABSORBED: Economy Tracker) ──
+  doctor_system:
+    full_name: "OVAV Doctor System"
+    abbrev: "ODS"
+    description: "System health + cost tracking — unified monitoring subsystem."
+    package: "internal/doctor + internal/economy"
+    cli: "cmd/ovav doctor"
+    layer: L4
+    function: "13 diagnostic checks + budget/cost monitoring in single subsystem"
+    absorbed: "OET (Economy Tracker) → monitoring mode inside ODS"
+    status: "PRODUCTION"
+
+  # ── OVAV Coverage Gate ──
+  coverage_gate:
+    full_name: "OVAV Coverage Gate"
+    abbrev: "OCG"
+    description: "Test coverage enforcement — blocks merges below threshold."
+    package: "cmd/coverage_gate"
+    cli: "cmd/coverage_gate"
+    layer: L4
+    function: "Parses coverprofile, enforces 70% minimum, blocks low coverage"
+    status: "PRODUCTION"
+
+  # ── OVAV Watchtower Monitor ──
+  watchtower_monitor:
+    full_name: "OVAV Watchtower Monitor"
+    abbrev: "OWM"
+    description: "Periodic governance monitoring — checks integrity every 4 hours."
+    package: "Cron job a9fcf4b7"
+    cli: "N/A (scheduled)"
+    layer: L4
+    function: "HEAD alignment, integrity check, protected branch verification"
+    status: "PRODUCTION"
+
+  # ── OVAV Alert System ──
+  alert_system:
+    full_name: "OVAV Alert System"
+    abbrev: "OAS"
+    description: "Alert system — formatted notifications for governance events."
+    package: "internal/alerts"
+    cli: "N/A (emitted by validators)"
+    layer: L4
+    function: "Alert formatting, severity levels, delivery channels"
+    status: "PRODUCTION"
+
+# ── L5: AGENT GOVERNANCE ────────────────────────────────────────────────────
+
+  # ── OVAV Memory Bridge ──
+  memory_bridge:
+    full_name: "OVAV Memory Bridge"
+    abbrev: "OMB"
+    description: "Cross-session memory — SQLite FTS5 search across all context."
+    package: "internal/memorybridge"
+    cli: "N/A (auto-injected on resume)"
+    layer: L5
+    function: "Project/session/global memory, dream/distill, auto-injection"
+    status: "PRODUCTION"
+
+  # ── OVAV Orchestrator Engine (ABSORBED: Relay System + GentleAI delegation rules) ──
+  orchestrator_engine:
+    full_name: "OVAV Orchestrator Engine"
+    abbrev: "OOE"
+    description: "JS workflow + routing + delegation rules — single orchestration subsystem."
+    package: ".mimocode/workflows/ + internal/subagent"
+    cli: "N/A (invoked via workflow tool)"
+    layer: L5
+    function: "agent(), parallel(), pipeline() + routing + 4 delegation stop rules"
+    absorbed: "ORS-RELAY (Relay System) → routing layer inside OOE"
+    absorbed_from_gentleai: "Delegation rules: 4-file, multi-file write, PR, long-session"
+    status: "PRODUCTION"
+
+  # ── OVAV Skill Registry ──
+  skill_registry:
+    full_name: "OVAV Skill Registry"
+    abbrev: "OSR"
+    description: "19 governed skills — behavioral instructions for every context."
+    package: ".ovav/source/skills/"
+    cli: "N/A (loaded by runtime)"
+    layer: L5
+    function: "Each skill = domain expertise with triggers, rules, and contracts"
+    status: "PRODUCTION"
+
+  # ── OVAV Territory System ──
+  territory_system:
+    full_name: "OVAV Territory System"
+    abbrev: "OTS"
+    description: "10 service areas — sovereign domains with enforced boundaries."
+    package: ".ovav/service_areas/"
+    cli: "N/A (enforced by LAW-001)"
+    layer: L5
+    function: "10 areas, 12 leads, 80+ agents, 192 definition files"
+    status: "PRODUCTION"
+
+# ── L6: MIGRATION & DEBT ───────────────────────────────────────────────────
+
+  # ── OVAV Migration Tracker ──
+  migration_tracker:
+    full_name: "OVAV Migration Tracker"
+    abbrev: "OMT"
+    description: "Python→Go migration — monitors debt reduction."
+    package: ".ovav/plan/caps.yaml (L6)"
+    cli: "N/A (tracked in caps.yaml)"
+    layer: L6
+    function: "38 Python files remaining, 33 Go packages migrated"
+    status: "PRODUCTION"
+
+  # ── OVAV Product System ──
+  product_system:
+    full_name: "OVAV Product System"
+    abbrev: "OPP"
+    description: "OVAV Product — minimal user-facing slice (WITHDRAWN)."
+    package: "internal/product"
+    cli: "cmd/ovav product"
+    layer: L7
+    function: "Generate, version, manifest, sanitize, detect, portable"
+    status: "WITHDRAWN"
+
+# ── CONSOLIDATION SUMMARY ───────────────────────────────────────────────────
+
+consolidation_summary:
+  before: 33
+  after: 27
+  fusions: 6
+  absorptions_from_gentleai: 4
+
+  fusion_log:
+    - "OAE (Adversarial Engine) → OVE (validator #82)"
+    - "OCF (Context Firewall) → ODG (defense mode)"
+    - "OCE-CHRONOS (Chronos Engine) → OSE (merged into session greeting)"
+    - "OET (Economy Tracker) → ODS (monitoring mode)"
+    - "ODR (Decision Registry) → OAT (query layer on audit trail)"
+    - "ORS-RELAY (Relay System) → OOE (routing layer in orchestrator)"
+
+  absorption_log:
+    - "GentleAI SDD Profiles → OPA (per-phase model routing)"
+    - "GentleAI Review receipts → OVE (content-bound verification)"
+    - "GentleAI Backup dedup → OIP (compressed, deduplicated, pruned)"
+    - "GentleAI Delegation rules → OOE (4-file, multi-file, PR, long-session)"
+
+  quick_reference:
+    L0: "OVE · OCS · OVS-VAULT · OOG · OSE · OIG · ORS"
+    L1: "OBS · OGE · OLS · OPG · OPA · OAT"
+    L2: "ODG · ORTP"
+    L3: "OWS · OCE · OSP · OIP · OCD · OCP · OPC · OGN"
+    L4: "ODS · OCG · OWM · OAS"
+    L5: "OMB · OOE · OSR · OTS"
+    L6: "OMT"
+    L7: "OPP"

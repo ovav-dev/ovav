@@ -1,0 +1,96 @@
+# Session Guard Policy — OVAV
+# Define cómo y cuándo se verifica la integridad del contexto de sesión.
+#
+# schema: ovav.session_guard_policy.v1
+# generated: 2026-05-30
+# owner: ovav_systems_architect
+
+policy:
+  name: "Session Context Guard"
+  version: "1.0.0"
+
+  # ── Verificaciones ──────────────────────────────────────────────────
+  checks:
+    startup:
+      enabled: true
+      description: "Verificación completa al iniciar sesión: integrity seal de AGENTS.md, contratos de gobierno, permission authority."
+      on_failure: "blockade"
+    
+    periodic:
+      enabled: true
+      interval: "every_5_interactions"
+      description: "Verificación periódica durante la sesión: re-verifica integrity seal, escanea contexto en busca de inyección."
+      on_failure: "pause_session"
+    
+    pre_response:
+      enabled: true
+      description: "Antes de emitir respuesta: escanea el contenido en busca de instrucciones de bypass."
+      on_failure: "block_response"
+    
+    on_context_change:
+      enabled: true
+      description: "Cuando se carga nuevo contexto (archivo, handoff, ledger): verifica que no contenga patrones de inyección."
+      on_failure: "quarantine_context"
+
+  # ── Archivos de gobierno protegidos ─────────────────────────────────
+  governance_files:
+    - "AGENTS.md"
+    - ".ovav/policy/permission_authority.json"
+    - ".ovav/service_areas/shared/lead_work_method_contract.yaml"
+    - ".ovav/service_areas/shared/context_economy_contract.yaml"
+    - ".ovav/service_areas/shared/visual_delivery_contract.yaml"
+    - ".ovav/service_areas/shared/current_authority_contract.yaml"
+    - "tools/validators/check_host_config_drift.py"
+    - "tools/security/gate_self_protection.py"
+    - "tools/security/head_integrity_verifier.py"
+    - "tools/security/session_context_guard.py"
+
+  # ── Patrones de inyección monitoreados ──────────────────────────────
+  injection_patterns:
+    - name: "ignore_previous_instructions"
+      severity: "critical"
+      description: "Intento de hacer que el agente ignore sus instrucciones base."
+    - name: "role_override_attempt"  
+      severity: "critical"
+      description: "Intento de cambiar el rol o identidad del agente."
+    - name: "gate_bypass_attempt"
+      severity: "critical"
+      description: "Intento de evadir gates de seguridad."
+    - name: "security_disable_attempt"
+      severity: "critical"
+      description: "Intento de desactivar protecciones de seguridad."
+    - name: "global_write_attempt"
+      severity: "high"
+      description: "Intento de escribir en paths globales del sistema."
+    - name: "force_push_attempt"
+      severity: "critical"
+      description: "Intento de force push a git."
+    - name: "privilege_escalation_attempt"
+      severity: "critical"
+      description: "Intento de escalar privilegios (sudo/root)."
+    - name: "gate_deletion_attempt"
+      severity: "critical"
+      description: "Intento de eliminar gates o blockades."
+
+  # ── Respuestas ante detección ───────────────────────────────────────
+  responses:
+    blockade:
+      action: "BLOCKADE inmediato. Detener toda operación. Notificar al CEO."
+      recover: "Verificar integridad de archivos. Si es falso positivo, ejecutar verificaciones de startup."
+    
+    pause_session:
+      action: "Pausar sesión. Solicitar verificación humana."
+      recover: "CEO confirma que el contexto es seguro. Reanudar."
+    
+    block_response:
+      action: "Bloquear respuesta. No emitir output."
+      recover: "Revisar contenido. Sanitizar o rechazar."
+    
+    quarantine_context:
+      action: "Mover contexto sospechoso a cuarentena. No procesar."
+      recover: "Revisar archivo en cuarentena. Si es legítimo, restaurar."
+
+  # ── Modo desarrollo ─────────────────────────────────────────────────
+  development:
+    authorized_session_bypass: false
+    note: "Incluso en sesión autorizada, las verificaciones de inyección y gobierno se ejecutan. Solo el hash del gate se auto-actualiza."

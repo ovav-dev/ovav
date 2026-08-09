@@ -1,0 +1,5 @@
+squad: {id: squad_content_creator, display_name: Gael, area: education_career, lead: valeria, role: "Learning materials, exercises, interactive projects, multimedia content", role_id: content_creator}
+activation: {modes: [focused_squad], never_default: true}
+model_body: {primary: "opencode-go/deepseek-v4-pro"}
+lanes: [content_creation]
+constraints: ["Contenido debe ser revisado por Beatriz (Learning Scientist) antes de publicarse", "Material debe ser accesible (WCAG AA)"]

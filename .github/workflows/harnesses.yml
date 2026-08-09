@@ -1,0 +1,167 @@
+name: OVAV Harnesses — Top 20 Critical Gates
+
+# S4-4: Top 20 critical harnesses activated from 316 total.
+# Each gate verifies a specific governance contract.
+# Gates are ordered by severity: F0 (blocking) → F1 (critical) → F2 (important).
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+    inputs:
+      gate_filter:
+        description: 'Run specific gate (e.g., f0, f1, security, all)'
+        required: false
+        default: 'all'
+
+jobs:
+  # ═══════════════════════════════════════════════════════════════════════
+  # F0: BLOCKING GATES — failure blocks merge
+  # ═══════════════════════════════════════════════════════════════════════
+  f0-gates:
+    name: F0 — Blocking Gates
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.gate_filter == 'all' || github.event.inputs.gate_filter == 'f0' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+
+      - name: G01 — Workspace Safety Gate
+        run: cd go-runtime && go test -run TestWorkspaceSafetyGate ./internal/validators/ -count=1 -v
+
+      - name: G02 — Protected Branch Gate
+        run: cd go-runtime && go test -run TestProtectedBranchGate ./internal/validators/ -count=1 -v
+
+      - name: G03 — Git Push Gate
+        run: cd go-runtime && go test -run TestGitPushGate ./internal/validators/ -count=1 -v
+
+      - name: G04 — Secrets Hygiene
+        run: cd go-runtime && go test -run TestSecretsHygiene ./internal/validators/ -count=1 -v
+
+      - name: G05 — Living Integrity
+        run: cd go-runtime && go test -run TestLivingIntegrity ./internal/validators/ -count=1 -v
+
+  # ═══════════════════════════════════════════════════════════════════════
+  # F1: SECURITY GATES — failure requires review
+  # ═══════════════════════════════════════════════════════════════════════
+  f1-security:
+    name: F1 — Security Gates
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.gate_filter == 'all' || github.event.inputs.gate_filter == 'f1' || github.event.inputs.gate_filter == 'security' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+
+      - name: G06 — Permission Policy Drift
+        run: cd go-runtime && go test -run TestPermissionDrift ./internal/validators/ -count=1 -v
+
+      - name: G07 — Config Syntax
+        run: cd go-runtime && go test -run TestConfigSyntax ./internal/validators/ -count=1 -v
+
+      - name: G08 — Contract Freshness
+        run: cd go-runtime && go test -run TestContractFreshness ./internal/validators/ -count=1 -v
+
+      - name: G09 — Host Config Drift
+        run: cd go-runtime && go test -run TestHostConfigDrift ./internal/validators/ -count=1 -v
+
+      - name: G10 — Supply Chain Integrity
+        run: cd go-runtime && go test -run TestSupplyChain ./internal/validators/ -count=1 -v
+
+      - name: G11 — Exfiltration Patterns
+        run: cd go-runtime && go test -run TestExfilPatterns ./internal/validators/ -count=1 -v
+
+  # ═══════════════════════════════════════════════════════════════════════
+  # F2: INTEGRITY GATES — failure warns
+  # ═══════════════════════════════════════════════════════════════════════
+  f2-integrity:
+    name: F2 — Integrity Gates
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.gate_filter == 'all' || github.event.inputs.gate_filter == 'f2' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+
+      - name: G12 — Registry Drift
+        run: cd go-runtime && go test -run TestRegistryDrift ./internal/validators/ -count=1 -v
+
+      - name: G13 — Caps Schema
+        run: cd go-runtime && go test -run TestCapsSchema ./internal/validators/ -count=1 -v
+
+      - name: G14 — Handoff Sync
+        run: cd go-runtime && go test -run TestHandoffSync ./internal/validators/ -count=1 -v
+
+      - name: G15 — Todo Debt
+        run: cd go-runtime && go test -run TestTodoDebt ./internal/validators/ -count=1 -v
+
+      - name: G16 — Validator Coverage
+        run: cd go-runtime && go test -run TestValidatorCoverage ./internal/validators/ -count=1 -v
+
+  # ═══════════════════════════════════════════════════════════════════════
+  # F3: GOVERNANCE GATES
+  # ═══════════════════════════════════════════════════════════════════════
+  f3-governance:
+    name: F3 — Governance Gates
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.gate_filter == 'all' || github.event.inputs.gate_filter == 'f3' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+
+      - name: G17 — Caps Single Next
+        run: cd go-runtime && go test -run TestCapsSingleNext ./internal/validators/ -count=1 -v
+
+      - name: G18 — Caps Chronos Alignment
+        run: cd go-runtime && go test -run TestCapsChronosAlignment ./internal/validators/ -count=1 -v
+
+      - name: G19 — Context Firewall
+        run: cd go-runtime && go test -run TestContextFirewall ./internal/validators/ -count=1 -v
+
+      - name: G20 — Service Area Router
+        run: cd go-runtime && go test -run TestServiceAreaRouter ./internal/validators/ -count=1 -v
+
+  # ═══════════════════════════════════════════════════════════════════════
+  # SUMMARY — aggregate results and report
+  # ═══════════════════════════════════════════════════════════════════════
+  summary:
+    name: Harness Summary
+    needs: [f0-gates, f1-security, f2-integrity, f3-governance]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check results
+        run: |
+          echo "═══════════════════════════════════════════"
+          echo "  OVAV Harness Suite — Top 20 Gates"
+          echo "═══════════════════════════════════════════"
+          echo "F0 Blocking:  ${{ needs.f0-gates.result }}"
+          echo "F1 Security:  ${{ needs.f1-security.result }}"
+          echo "F2 Integrity: ${{ needs.f2-integrity.result }}"
+          echo "F3 Governance:${{ needs.f3-governance.result }}"
+          echo "═══════════════════════════════════════════"
+
+          FAILURES=0
+          for result in "${{ needs.f0-gates.result }}" "${{ needs.f1-security.result }}" "${{ needs.f2-integrity.result }}" "${{ needs.f3-governance.result }}"; do
+            if [ "$result" != "success" ] && [ "$result" != "skipped" ]; then
+              FAILURES=$((FAILURES + 1))
+            fi
+          done
+
+          if [ $FAILURES -gt 0 ]; then
+            echo "❌ $FAILURES gate group(s) failed"
+            exit 1
+          fi
+          echo "✅ All 20 gates PASS"

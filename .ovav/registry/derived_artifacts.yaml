@@ -1,0 +1,76 @@
+derived_artifacts:
+  entries:
+  - category: runtime_state
+    description: "Registro de evoluci\xF3n del sistema \u2014 actualizado por state\
+      \ sync"
+    generator: state_sync_engine.align()
+    path: .ovav/governor/EVOLUTION_LOG.yaml
+    regenerate_on: session_start
+  - category: runtime_state
+    description: "Auto-modelo de OVAV \u2014 regenerado al despertar"
+    generator: consciousness_loop.wake()
+    path: .ovav/governor/SELF_MODEL.yaml
+    regenerate_on: session_start
+  - category: runtime_state
+    description: "Log de percepci\xF3n del sistema"
+    generator: perception_engine
+    path: .ovav/governor/perception_log.json
+    regenerate_on: session_start
+  - category: runtime_state
+    description: Reporte de feedback L7
+    generator: feedback_bridge.analyze()
+    path: .ovav/knowledge/feedback_report.json
+    regenerate_on: session_start
+  - category: runtime_state
+    description: "Progresi\xF3n de alineaci\xF3n del sistema"
+    generator: state_sync_engine.align()
+    path: .ovav/registry/alignment_progression.yaml
+    regenerate_on: session_start
+  - category: compiled_surface
+    description: Triggers compilados desde registry/triggers/*.yaml
+    generator: trigger_compiler
+    path: .ovav/registry/auto_triggers.yaml
+    regenerate_on: session_start_or_missing
+  - category: compiled_surface
+    description: Mapa de validadores por superficie
+    generator: surface_map_compiler
+    path: .ovav/registry/surface_validator_map.yaml
+    regenerate_on: session_start_or_missing
+  - category: compiled_surface
+    description: Watchers compilados para ConnectorBus
+    generator: watcher_mesh
+    path: .ovav/connector_bus/connectors/watchers_generated.yaml
+    regenerate_on: session_start_or_missing
+  - category: build_artifact
+    description: Reporte de pipeline de release
+    generator: projection_engine
+    path: .ovav/forge/releases/opencode/.pipeline_report.json
+    regenerate_on: on_push
+  - category: integrity_baseline
+    description: "SBOM \u2014 Supply Chain Bill of Materials"
+    generator: sbom.generate_sbom()
+    path: .ovav/registry/sbom.yaml
+    regenerate_on: post_commit
+  - category: integrity_baseline
+    description: Baseline de hashes de archivos core
+    generator: integrity_monitor.generate_baseline()
+    path: .ovav/registry/core_hashes.yaml
+    regenerate_on: post_commit
+  - category: integrity_baseline
+    description: Hash de requirements.txt
+    generator: sbom.generate_sbom()
+    path: requirements.hash
+    regenerate_on: post_commit
+  - category: identity_surface
+    description: "Active Identity Packet \u2014 Thavren (Platform Engineering Lead)"
+    generator: identity_packet_compiler
+    path: .ovav/runtime/active_identity_packet_thavren.yaml
+    regenerate_on: session_start
+  - category: identity_surface
+    description: "Active Identity Packet \u2014 Eidren (Research Intelligence Lead)"
+    generator: identity_packet_compiler
+    path: .ovav/runtime/active_identity_packet_eidren.yaml
+    regenerate_on: session_start
+  established: '2026-06-06'
+  total_entries: 14
+  version: 1.0.0

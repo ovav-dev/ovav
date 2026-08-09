@@ -1,0 +1,6 @@
+#!/bin/bash
+# OVAV SQLite MCP Server Wrapper
+# Uses official @modelcontextprotocol/server-sqlite via npx
+
+DATABASE="${SQLITE_PATH:-./data.db}"
+exec npx -y @modelcontextprotocol/server-sqlite "$DATABASE"

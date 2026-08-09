@@ -1,0 +1,19 @@
+result_contracts:
+  required_fields:
+    - status
+    - executive_summary
+    - artifacts
+    - evidence
+    - risks
+    - next_action
+    - next_recommended_action
+    - skill_resolution
+    - memory_action
+    - human_response
+  statuses:
+    - done
+    - blocked
+    - needs_approval
+    - needs_artifact
+    - needs_verification
+  human_response_style: compact_operational

@@ -1,0 +1,69 @@
+memory_policy:
+  version: 3
+  updated_at: '2026-07-04T07:30:00-05:00'
+  updated_by: thavren
+  change: 'memory_write policy relaxed from global false to per-lane scoped.
+    Skills declare memory_write_scope explicitly. Default is deny.
+    Addresses Memory Tool failure (T-MEM-001): agents could persist nothing,
+    leading to "empty memory" perception on first contact. Now agents can
+    write to their declared lane while respecting systems_product_isolation.'
+
+  privacy_tags:
+    public_project: store_if_useful
+    internal_project: store_scoped
+    sensitive_local: redact_then_confirm
+    secret: deny
+    identity_or_personal: minimize_and_scope
+
+  skill_write_policy:
+    # Effective 2026-07-04. Replaces global memory_write: false (v2).
+    # Each skill MUST declare memory_write_scope. Default if undeclared: deny.
+    default_undeclared: deny
+    values:
+      false: deny                          # Hard block, legacy compat
+      scoped: per_lane                     # Write only to skill's owner_lane
+      session: ephemeral_session_only     # Write to current session notes only
+      project: full_project_scope         # Write to project's MEMORY.md (requires CEO waiver)
+    lane_to_scope_map:
+      runtime_governance: scoped
+      source_verification: scoped
+      ux_design: scoped
+      digital_product: scoped
+      commercial_growth: scoped
+      health_performance: scoped
+      education_career: scoped
+      devops_infrastructure: scoped
+      adversarial_intelligence: scoped
+      legal_compliance: scoped
+      brand_positioning: scoped
+    enforcement: skills_registry_loader validates scope declaration at load
+
+  write_pipeline:
+    # Go memory system (go-runtime/internal/memory/)
+    # Replaces deleted Python harnesses: h_memory_privacy_classifier,
+    # h_memory_redactor, h_memory_poison_guard, h_memory_write_gateway
+    - go_memory_privacy_classifier   # En desarrollo 2026-06-30
+    - go_memory_redactor             # En desarrollo 2026-06-30
+    - go_memory_write_gateway        # En desarrollo 2026-06-30
+
+  recall_pipeline:
+    - go_memory_recall_filter        # En desarrollo 2026-06-30
+
+  scope_hierarchy:
+    - customer_memory
+    - project_memory
+    - service_profile_memory
+    - operator_memory
+    - session_memory
+
+  canonical_sources:
+    - git HEAD + caps.yaml           # Fuentes canónicas primarias
+    - active_context_ledger.yaml     # Memoria operacional acumulativa (Systems only)
+    - go-runtime/internal/memory/    # Sistema de memoria en Go (en desarrollo)
+
+  systems_product_isolation:
+    rule: >
+      OVAV Systems y OVAV Product son entidades separadas. La memoria de Systems
+      (active_context_ledger.yaml, .ovav/registry/, go-runtime/internal/memory/)
+      JAMÁS se sincroniza, copia ni proyecta a OVAV Product.
+    enforcement: workspace_isolation validator (F3) + sync.go target validation

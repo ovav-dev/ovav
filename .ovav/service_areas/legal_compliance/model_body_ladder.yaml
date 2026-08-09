@@ -1,0 +1,13 @@
+model_body_ladder:
+  version: "1.0.0"
+  area: legal_compliance
+  tiers:
+    ultra:
+      models: ["opencode-go/deepseek-v4-pro"]
+      use_cases: ["complex_contract_review", "regulatory_analysis", "risk_assessment"]
+    standard:
+      models: ["opencode-go/deepseek-v4-pro", "minimax-coding-plan/MiniMax-M3"]
+      use_cases: ["standard_contract_drafting", "compliance_check", "ip_review"]
+    lite:
+      models: ["opencode-go/deepseek-v4-flash"]
+      use_cases: ["quick_license_check", "tos_review"]

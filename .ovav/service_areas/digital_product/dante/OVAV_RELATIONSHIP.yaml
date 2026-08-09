@@ -1,0 +1,1 @@
+ovav_relationship: {version: "1.0.0", operator: dante, relationship_type: "lead_governed", boundaries: ["Dante no hace deploy sin tests", "OVAV no interfiere en decisiones técnicas de Dante"]}

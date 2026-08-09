@@ -1,0 +1,1063 @@
+# OVAV Education & Career Development — Roadmap SEG-6
+# =============================================================================
+# Autor: Valeria (Lead, Education & Career Development)
+# Squads: Carmen (Knowledge Engineer), Beatriz (Learning Scientist),
+#         Felipe (Tutoring Designer), Sandra (Assessment Engineer),
+#         Alicia (Bias Auditor), Teo (Career Analyst)
+# Creado: 2026-06-15 20:40 UTC-5
+# Dependencia: X6-EDU-SANDBOX (Thavren → Marco, Docker sandbox)
+# Versión del plan: 1.0
+# =============================================================================
+
+roadmap:
+  version: "1.2"
+  segment: "SEG-6"
+  task: "X6-EDU-TOOLS"
+  status: "phase_3_complete"
+  phase_1_status: "complete — gap_detector.py (340 loc) + curriculum_engine.py (550 loc) — 37/37 tests PASS"
+  phase_2_status: "complete — knowledge_tracer.py (466 loc) + transfer_validator.py (543 loc) — 56 new tests, 93/93 total PASS"
+  phase_3_status: "complete — bias_auditor.py (837 loc) + market_aligner.py (945 loc) — 65 new tests, 158/158 total PASS"
+  sandbox_dependency: "X6-EDU-SANDBOX — Thavren/Marco: Docker sandbox entregado y operacional ✅"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 1. GAP DETECTOR — gap_detector.py
+# ═══════════════════════════════════════════════════════════════════════════
+
+gap_detector:
+  file: "tools/education/gap_detector.py"
+  owner: "Carmen + Sandra"
+  status: "spec_ready"
+  language: "Python 3.12"
+  dependencies: []
+
+  purpose: >
+    Recibe un self-assessment YAML del estudiante y produce un JSON
+    estructurado con los gaps de conocimiento identificados. Usa el
+    modelo RPKT (Rasch-based Proficiency Knowledge Tracing) para
+    estimar nivel real vs. nivel declarado, ajustando por sesgo de
+    autoevaluación (Dunning-Kruger correction).
+
+  input_schema:
+    format: "YAML"
+    fields:
+      student_id: "string — identificador único del estudiante"
+      career_goal: "string — rol objetivo (ej: 'Data Scientist', 'Full-Stack Developer')"
+      self_assessment:
+        type: "list of skill objects"
+        skill:
+          name: "string — nombre canónico de la skill (de la taxonomía)"
+          self_rated_level: "enum: beginner | novice | intermediate | advanced | expert"
+          years_experience: "float — años de práctica declarados"
+          last_used: "string — fecha ISO o 'never'"
+          confidence: "float 0.0–1.0 — qué tan seguro se siente el estudiante"
+          evidence:
+            - "string — proyecto, curso o certificación que respalda el nivel declarado"
+
+  example_input: |
+    student_id: "stu-0042"
+    career_goal: "Data Scientist"
+    self_assessment:
+      - skill: "python"
+        self_rated_level: "intermediate"
+        years_experience: 2.0
+        last_used: "2026-03-01"
+        confidence: 0.7
+        evidence:
+          - "Curso 'Python for Everybody' en Coursera"
+          - "Scripts de automatización en trabajo actual"
+      - skill: "sql"
+        self_rated_level: "beginner"
+        years_experience: 0.5
+        last_used: "2025-12-01"
+        confidence: 0.3
+        evidence:
+          - "Tutorial de SQLZoo completado"
+      - skill: "statistics"
+        self_rated_level: "novice"
+        years_experience: 0.0
+        last_used: "never"
+        confidence: 0.1
+        evidence: []
+      - skill: "machine_learning"
+        self_rated_level: "novice"
+        years_experience: 0.0
+        last_used: "never"
+        confidence: 0.1
+        evidence: []
+      - skill: "data_visualization"
+        self_rated_level: "beginner"
+        years_experience: 1.0
+        last_used: "2026-01-15"
+        confidence: 0.5
+        evidence:
+          - "Reportes en Power BI para gerencia"
+
+  processing_pipeline:
+    - step: "parse"
+      action: "Validar schema YAML. Rechazar con error descriptivo si falta campo obligatorio."
+    - step: "normalize"
+      action: "Mapear nombres de skill a taxonomía canónica (fuzzy match, umbral 0.85)."
+    - step: "estimate_real_level"
+      action: >
+        Aplicar RPKT: combinar self_rated_level, years_experience, confidence,
+        y evidence en una estimación bayesiana del nivel real. Ajustar por
+        Dunning-Kruger: si confidence es alta pero evidence es escasa, degradar
+        nivel estimado en 1 categoría.
+    - step: "compute_gap"
+      action: >
+        Para cada skill requerida por el career_goal (según matriz de
+        requerimientos), comparar nivel estimado con target_level. Si
+        estimated < target, registrar gap con severidad.
+    - step: "prioritize"
+      action: >
+        Ordenar gaps por: (1) bloqueante para prerequisitos, (2) severidad
+        del gap, (3) criticidad para el career_goal.
+
+  output_schema:
+    format: "JSON"
+    fields:
+      student_id: "string"
+      career_goal: "string"
+      generated_at: "ISO timestamp"
+      gaps:
+        type: "list"
+        item:
+          skill: "string — nombre canónico"
+          estimated_level: "enum: beginner | novice | intermediate | advanced | expert"
+          target_level: "enum: beginner | novice | intermediate | advanced | expert"
+          gap_severity: "int — diferencia en niveles (1=marginal, 4=crítico)"
+          priority: "int — orden de ataque (1=urgente)"
+          dunning_kruger_flag: "bool — true si confidence > evidence sugiere sobreestimación"
+          rationale: "string — explicación legible del gap"
+
+  example_output: |
+    {
+      "student_id": "stu-0042",
+      "career_goal": "Data Scientist",
+      "generated_at": "2026-06-15T20:40:00-0500",
+      "gaps": [
+        {
+          "skill": "python",
+          "estimated_level": "novice",
+          "target_level": "advanced",
+          "gap_severity": 3,
+          "priority": 1,
+          "dunning_kruger_flag": true,
+          "rationale": "Autoevaluado como intermediate pero 0 proyectos complejos ni librerías DS (numpy/pandas). Confianza 0.7 con evidencia débil → Dunning-Kruger correction aplicada."
+        },
+        {
+          "skill": "statistics",
+          "estimated_level": "novice",
+          "target_level": "advanced",
+          "gap_severity": 4,
+          "priority": 2,
+          "dunning_kruger_flag": false,
+          "rationale": "Sin experiencia ni formación en estadística. Crítico para ML."
+        },
+        {
+          "skill": "machine_learning",
+          "estimated_level": "novice",
+          "target_level": "intermediate",
+          "gap_severity": 3,
+          "priority": 3,
+          "dunning_kruger_flag": false,
+          "rationale": "Sin exposición previa. Requiere fundamentos de estadística primero."
+        },
+        {
+          "skill": "sql",
+          "estimated_level": "beginner",
+          "target_level": "intermediate",
+          "gap_severity": 2,
+          "priority": 4,
+          "dunning_kruger_flag": false,
+          "rationale": "Sintaxis básica aprendida. Falta práctica con JOINs, subconsultas, window functions."
+        },
+        {
+          "skill": "data_visualization",
+          "estimated_level": "beginner",
+          "target_level": "intermediate",
+          "gap_severity": 2,
+          "priority": 5,
+          "dunning_kruger_flag": false,
+          "rationale": "Conocimiento limitado a Power BI. Se requiere matplotlib/seaborn/plotly en Python."
+        }
+      ]
+    }
+
+  test_fixtures:
+    - area: "Python"
+      career_goal: "Backend Developer"
+    - area: "Data Science"
+      career_goal: "Data Scientist"
+    - area: "Web Dev"
+      career_goal: "Full-Stack Developer"
+
+  acceptance_criteria:
+    - "YAML inválido → error descriptivo, no crash"
+    - "Skill no canónica → fuzzy match exitoso o flag 'unmapped_skill'"
+    - "Gaps ordenados por prioridad correcta (bloqueante primero)"
+    - "Dunning-Kruger flag aparece en al menos 1 caso del fixture"
+    - "output JSON válido contra schema"
+    - "Tiempo de ejecución < 2s para 10 skills"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 2. CURRICULUM ENGINE — curriculum_engine.py
+# ═══════════════════════════════════════════════════════════════════════════
+
+curriculum_engine:
+  file: "tools/education/curriculum_engine.py"
+  owner: "Felipe + Beatriz"
+  status: "spec_ready"
+  language: "Python 3.12"
+  dependencies:
+    - "gap_detector.py (recibe sus gaps como input)"
+
+  purpose: >
+    Toma los gaps del detector + el perfil profesional del estudiante
+    y genera un learning path YAML con módulos ordenados por grafo de
+    prerrequisitos. Cada módulo incluye objetivos de aprendizaje,
+    recursos, estimación de horas y criterios de maestría.
+
+  input_schema:
+    format: "JSON (output de gap_detector) + YAML (perfil profesional)"
+    fields:
+      gaps: "JSON — output completo de gap_detector.py"
+      profile:
+        student_id: "string"
+        career_goal: "string"
+        available_hours_per_week: "int"
+        learning_style: "enum: visual | auditory | reading | kinesthetic | mixed"
+        preferred_language: "enum: es | en | pt"
+        time_constraint_days: "int — plazo máximo deseado (0 = sin límite)"
+        prior_modules_completed:
+          type: "list of string — IDs de módulos ya completados"
+
+  prerequisite_graph:
+    description: >
+      Grafo acíclico dirigido que define el orden de módulos.
+      Cada skill tiene prerrequisitos duros (no se puede cursar sin ellos)
+      y blandos (recomendados pero no bloqueantes).
+    example_modules:
+      - id: "MOD-PY-01"
+        name: "Fundamentos de Programación con Python"
+        skill: "python"
+        target_level: "beginner"
+        hours: 40
+        prerequisites: []
+        hard: true
+        topics:
+          - "Variables, tipos de datos, operadores"
+          - "Estructuras de control (if, for, while)"
+          - "Funciones y scope"
+          - "Manejo de errores con try/except"
+          - "Módulos y paquetes"
+
+      - id: "MOD-PY-02"
+        name: "Python Intermedio: Estructuras de Datos y Algoritmos"
+        skill: "python"
+        target_level: "intermediate"
+        hours: 50
+        prerequisites: ["MOD-PY-01"]
+        hard: true
+        topics:
+          - "Listas, tuplas, diccionarios, sets (complejidad)"
+          - "Comprensiones de lista y generadores"
+          - "Algoritmos de ordenamiento y búsqueda"
+          - "Recursión y memoización"
+          - "Testing con pytest"
+
+      - id: "MOD-DS-01"
+        name: "Python para Ciencia de Datos: NumPy + Pandas"
+        skill: "python"
+        target_level: "advanced"
+        hours: 45
+        prerequisites: ["MOD-PY-02"]
+        hard: true
+        topics:
+          - "Arrays NumPy: creación, slicing, broadcasting"
+          - "DataFrames Pandas: carga, limpieza, transformación"
+          - "Groupby, merge, pivot tables"
+          - "Series temporales con Pandas"
+          - "Optimización de memoria en datasets grandes"
+
+      - id: "MOD-STAT-01"
+        name: "Estadística Fundamental para Ciencia de Datos"
+        skill: "statistics"
+        target_level: "intermediate"
+        hours: 60
+        prerequisites: ["MOD-PY-01"]
+        hard: false
+        soft_prerequisites: ["MOD-PY-02"]
+        topics:
+          - "Estadística descriptiva (media, mediana, varianza, percentiles)"
+          - "Distribuciones de probabilidad (normal, binomial, Poisson)"
+          - "Teorema del límite central"
+          - "Intervalos de confianza y pruebas de hipótesis"
+          - "Correlación y regresión lineal simple"
+
+      - id: "MOD-ML-01"
+        name: "Machine Learning: Modelos Supervisados"
+        skill: "machine_learning"
+        target_level: "intermediate"
+        hours: 70
+        prerequisites: ["MOD-DS-01", "MOD-STAT-01"]
+        hard: true
+        topics:
+          - "Regresión lineal y logística (scikit-learn)"
+          - "Árboles de decisión y Random Forest"
+          - "SVM y k-NN"
+          - "Validación cruzada y métricas de evaluación"
+          - "Feature engineering y selección de variables"
+          - "Overfitting, underfitting, regularización"
+
+  output_schema:
+    format: "YAML"
+    fields:
+      student_id: "string"
+      career_goal: "string"
+      generated_at: "ISO timestamp"
+      total_estimated_hours: "int"
+      total_modules: "int"
+      critical_path_hours: "int — suma de horas del camino crítico"
+      modules:
+        type: "list (ordenada por prerrequisitos — orden topológico)"
+        item:
+          id: "string — MOD-<AREA>-<NN>"
+          name: "string"
+          skill: "string — skill canónica"
+          target_level: "string"
+          hours: "int"
+          prerequisites: "list of module IDs"
+          order: "int — posición en el plan"
+          topics: "list of strings"
+          resources:
+            - type: "enum: video | reading | exercise | project | assessment"
+              title: "string"
+              url: "string (opcional)"
+              estimated_minutes: "int"
+          mastery_criteria:
+            assessment_type: "enum: quiz | project | peer_review | portfolio"
+            passing_threshold: "float 0.0–1.0"
+            description: "string"
+
+  example_output: |
+    student_id: "stu-0042"
+    career_goal: "Data Scientist"
+    generated_at: "2026-06-15T20:40:00-0500"
+    total_estimated_hours: 265
+    total_modules: 5
+    critical_path_hours: 205
+    modules:
+      - id: "MOD-PY-01"
+        name: "Fundamentos de Programación con Python"
+        skill: "python"
+        target_level: "beginner"
+        hours: 40
+        prerequisites: []
+        order: 1
+        topics:
+          - "Variables, tipos de datos, operadores"
+          - "Estructuras de control (if, for, while)"
+          - "Funciones y scope"
+          - "Manejo de errores con try/except"
+          - "Módulos y paquetes"
+        resources:
+          - type: "video"
+            title: "Python Crash Course — Google"
+            url: "https://developers.google.com/edu/python"
+            estimated_minutes: 480
+          - type: "exercise"
+            title: "Exercism Python Track"
+            url: "https://exercism.org/tracks/python"
+            estimated_minutes: 600
+          - type: "project"
+            title: "CLI Task Manager"
+            url: null
+            estimated_minutes: 300
+        mastery_criteria:
+          assessment_type: "project"
+          passing_threshold: 0.8
+          description: "Construir un gestor de tareas CLI con persistencia en archivo."
+
+      - id: "MOD-PY-02"
+        name: "Python Intermedio: Estructuras de Datos y Algoritmos"
+        skill: "python"
+        target_level: "intermediate"
+        hours: 50
+        prerequisites: ["MOD-PY-01"]
+        order: 2
+        topics:
+          - "Listas, tuplas, diccionarios, sets (complejidad)"
+          - "Comprensiones de lista y generadores"
+          - "Algoritmos de ordenamiento y búsqueda"
+          - "Recursión y memoización"
+          - "Testing con pytest"
+        resources:
+          - type: "reading"
+            title: "Problem Solving with Algorithms and Data Structures using Python"
+            url: "https://runestone.academy/ns/books/published/pythonds/index.html"
+            estimated_minutes: 900
+          - type: "exercise"
+            title: "LeetCode Easy Collection"
+            url: "https://leetcode.com/explore/featured/card/top-interview-questions-easy/"
+            estimated_minutes: 600
+        mastery_criteria:
+          assessment_type: "quiz"
+          passing_threshold: 0.8
+          description: "Resolver 20 ejercicios LeetCode Easy con tests automatizados."
+
+      - id: "MOD-DS-01"
+        name: "Python para Ciencia de Datos: NumPy + Pandas"
+        skill: "python"
+        target_level: "advanced"
+        hours: 45
+        prerequisites: ["MOD-PY-02"]
+        order: 3
+        topics:
+          - "Arrays NumPy: creación, slicing, broadcasting"
+          - "DataFrames Pandas: carga, limpieza, transformación"
+          - "Groupby, merge, pivot tables"
+          - "Series temporales con Pandas"
+          - "Optimización de memoria en datasets grandes"
+        resources:
+          - type: "video"
+            title: "Data Analysis with Python — freeCodeCamp"
+            url: "https://www.youtube.com/watch?v=r-uOLxNrNk8"
+            estimated_minutes: 600
+          - type: "exercise"
+            title: "Kaggle Pandas Micro-Course"
+            url: "https://www.kaggle.com/learn/pandas"
+            estimated_minutes: 240
+          - type: "project"
+            title: "Limpieza y análisis de dataset real (>100K registros)"
+            url: null
+            estimated_minutes: 600
+        mastery_criteria:
+          assessment_type: "project"
+          passing_threshold: 0.8
+          description: "Cargar, limpiar y generar 5 visualizaciones estadísticas de un dataset público."
+
+      - id: "MOD-STAT-01"
+        name: "Estadística Fundamental para Ciencia de Datos"
+        skill: "statistics"
+        target_level: "intermediate"
+        hours: 60
+        prerequisites: ["MOD-PY-01"]
+        soft_prerequisites: ["MOD-PY-02"]
+        order: 4
+        topics:
+          - "Estadística descriptiva (media, mediana, varianza, percentiles)"
+          - "Distribuciones de probabilidad (normal, binomial, Poisson)"
+          - "Teorema del límite central"
+          - "Intervalos de confianza y pruebas de hipótesis"
+          - "Correlación y regresión lineal simple"
+        resources:
+          - type: "reading"
+            title: "OpenIntro Statistics — 4th Edition"
+            url: "https://www.openintro.org/book/os/"
+            estimated_minutes: 1200
+          - type: "exercise"
+            title: "StatLab Exercises (Python)"
+            url: null
+            estimated_minutes: 600
+          - type: "assessment"
+            title: "Mid-curso: Análisis estadístico de dataset"
+            url: null
+            estimated_minutes: 300
+        mastery_criteria:
+          assessment_type: "quiz"
+          passing_threshold: 0.75
+          description: "Prueba de 30 preguntas cubriendo inferencia estadística básica."
+
+      - id: "MOD-ML-01"
+        name: "Machine Learning: Modelos Supervisados"
+        skill: "machine_learning"
+        target_level: "intermediate"
+        hours: 70
+        prerequisites: ["MOD-DS-01", "MOD-STAT-01"]
+        order: 5
+        topics:
+          - "Regresión lineal y logística (scikit-learn)"
+          - "Árboles de decisión y Random Forest"
+          - "SVM y k-NN"
+          - "Validación cruzada y métricas de evaluación"
+          - "Feature engineering y selección de variables"
+          - "Overfitting, underfitting, regularización"
+        resources:
+          - type: "video"
+            title: "Machine Learning Specialization — Andrew Ng"
+            url: "https://www.coursera.org/specializations/machine-learning-introduction"
+            estimated_minutes: 1800
+          - type: "exercise"
+            title: "Kaggle ML Competitions (Getting Started)"
+            url: "https://www.kaggle.com/competitions"
+            estimated_minutes: 900
+          - type: "project"
+            title: "Modelo de predicción end-to-end con dataset real"
+            url: null
+            estimated_minutes: 1200
+        mastery_criteria:
+          assessment_type: "project"
+          passing_threshold: 0.8
+          description: "Entrenar y evaluar 3 modelos supervisados sobre un dataset real. Entregar notebook documentado."
+
+  acceptance_criteria:
+    - "Gaps sin prerrequisitos completados → no aparecen en el path (dependencia irresoluble)."
+    - "Orden topológico respetado — ningún módulo aparece antes que sus prerequisitos."
+    - "Camino crítico calculado correctamente."
+    - "Módulo con target_level ya alcanzado → omitido automáticamente."
+    - "YAML output válido, legible por humanos y parseable por máquinas."
+    - "Estimación de horas total no excede time_constraint_days (si definido) o emite warning."
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 3. KNOWLEDGE TRACER — knowledge_tracer.py [PHASE 2 ✅]
+# ═══════════════════════════════════════════════════════════════════════════
+
+knowledge_tracer:
+  file: "tools/education/knowledge_tracer.py"
+  owner: "Sandra + Beatriz"
+  status: "implemented"
+  language: "Python 3.12"
+  dependencies:
+    - "gap_detector.py (skill matrix seeding)"
+    - "curriculum_engine.py (module structure)"
+  loc: 466
+
+  purpose: >
+    Bayesian Knowledge Tracing (BKT) engine. Trackea la probabilidad de
+    maestría P(L) de cada skill usando el modelo estándar de 4 parámetros:
+    P(L₀), P(T), P(G), P(S). Actualiza P(L) con cada respuesta correcta
+    o incorrecta del estudiante. Detecta maestría cuando P(L) ≥ 0.85
+    con ≥ 3 observaciones.
+
+  bkt_model:
+    p_l0: "Probabilidad inicial de que el estudiante conozca la skill (default: 0.15)"
+    p_t:  "Probabilidad de aprendizaje entre oportunidades (default: 0.10)"
+    p_g:  "Probabilidad de adivinar correctamente sin saber (default: 0.20)"
+    p_s:  "Probabilidad de error aunque sepa la skill (default: 0.10)"
+    mastery_threshold: 0.85
+    min_observations: 3
+
+  features:
+    - "BKT update: P(L|correct) y P(L|incorrect) vía Bayes"
+    - "Learning transition: P(L_next) = P(L|obs) + (1-P(L|obs))*P(T)"
+    - "Per-skill parameter customization (P_L0, P_T, P_G, P_S)"
+    - "Seed from gap_detector output (level → P(L) mapping)"
+    - "Mastery detection with minimum observation gate"
+    - "Level estimation: P(L) → discrete level (beginner–expert)"
+    - "Next-item correctness prediction per skill"
+    - "Full trace recording per observation"
+    - "Serialization (to_dict / from_dict roundtrip)"
+    - "Export for transfer_validator integration"
+    - "Summary: readiness, mastered/unmastered lists, level estimates"
+
+  acceptance_criteria:
+    - "Correct answer increases P(L)"
+    - "Incorrect answer decreases P(L)"
+    - "P(L) converges to mastery with repeated correct answers"
+    - "P(G) and P(S) influence update magnitude correctly"
+    - "Multiple skills tracked independently"
+    - "Mastery declared only after threshold + min observations"
+    - "Serialization roundtrip preserves state"
+    - "Integration with gap_detector seeding works"
+    - "All edge cases: empty skills, invalid params, unobserved skill"
+
+  test_results:
+    total: 30
+    passed: 30
+    coverage: "BKT updates, guess/slip params, observations, levels, serialization, next-item prediction, gap detector seeding, summary"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 4. TRANSFER VALIDATOR — transfer_validator.py [PHASE 2 ✅]
+# ═══════════════════════════════════════════════════════════════════════════
+
+transfer_validator:
+  file: "tools/education/transfer_validator.py"
+  owner: "Beatriz + Alicia"
+  status: "implemented"
+  language: "Python 3.12"
+  dependencies:
+    - "knowledge_tracer.py (mastery estimates + BKT params)"
+    - "curriculum_engine.py (module sequence for path adjustment)"
+  loc: 543
+
+  purpose: >
+    Predice la probabilidad de éxito en el próximo ítem usando transferencia
+    de habilidades. Modelo TWNIC: Transfer-Weighted Next-Item Correctness.
+    P(correct_next|skill_i) = Σ w_ij * P(L_j) * (1-P(S_j)).
+    Valida transferencia entre conceptos relacionados y genera recomendaciones
+    de ajuste de ruta para el curriculum_engine.
+
+  transfer_matrix:
+    description: >
+      Matriz de transferencia entre 20 skills. Define cuánto contribuye
+      el dominio de una skill al aprendizaje de otra (0.0–1.0).
+      Self-transfer = 1.0, default transfer = 0.10.
+      Fuente: literatura de ciencia del aprendizaje + dominio experto.
+    skills_covered: 20
+    entries: "~100 conexiones dirigidas"
+
+  features:
+    - "TWNIC: next-item correctness via transfer-weighted mastery"
+    - "Transfer vector: normalized weights from all skills to target"
+    - "Transfer gap: 1 - related mastery average"
+    - "Readiness score: 0.5*self_mastery + 0.5*next_correct"
+    - "Module readiness: aggregate per-skill predictions"
+    - "Best transfer path: greedy search for strongest transfer chain"
+    - "Path adjustment recommendations: delay, reinforce, accelerate"
+    - "Integration with knowledge_tracer export format"
+    - "Custom transfer matrix support"
+    - "Summary: avg_readiness, high/low transfer skills, warnings"
+
+  path_adjustments:
+    delay: "Prerrequisitos no transferidos → mover módulo más tarde"
+    reinforce: "Transferencia insuficiente → agregar refuerzo"
+    accelerate: "Alta transferencia desde otras skills → acelerar"
+
+  acceptance_criteria:
+    - "Predictions always in [0, 1]"
+    - "High mastery + low slip → high prediction"
+    - "Low mastery → lower prediction (with guessing floor)"
+    - "Related mastered skills boost prediction for target"
+    - "Transfer gap zero when all skills mastered"
+    - "Module readiness gates work (ready/not ready)"
+    - "Path adjustments generated correctly for each scenario"
+    - "Summary with avg_readiness, transfer gaps, warnings"
+
+  test_results:
+    total: 26
+    passed: 26
+    coverage: "initialization, transfer weights, next-item prediction, module readiness, transfer path, path adjustments, summary"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 5. PRIORIZACIÓN — Orden de construcción de las 6 herramientas
+# ═══════════════════════════════════════════════════════════════════════════
+
+prioritization:
+  context: >
+    El área de Education tiene 6 herramientas planificadas. Las primeras 2
+    (gap_detector, curriculum_engine) son la fase 1 de SEG-6. La priorización
+    completa es:
+
+  tools:
+    - rank: 1
+      tool: "gap_detector.py"
+      why_first: >
+        Es la puerta de entrada. Sin diagnóstico no hay plan.
+        Todo el pipeline educativo depende de tener gaps bien identificados.
+        Además, es la herramienta que más rápido da valor al usuario:
+        en 2 segundos recibe un mapa claro de dónde está parado.
+        Carmen y Sandra pueden construirlo en 3 días con los fixtures de prueba.
+      dependency_of: ["curriculum_engine", "knowledge_tracer", "transfer_validator"]
+      estimated_days: 3
+      squad: "Carmen + Sandra"
+
+    - rank: 2
+      tool: "curriculum_engine.py"
+      why_first: >
+        Segundo porque consume los gaps del detector. Sin plan de estudios
+        no hay ruta de aprendizaje. Es el corazón del área: transforma
+        diagnóstico en acción. Felipe ya tiene experiencia en diseño de
+        prerrequisitos desde su trabajo en Río. Beatriz aporta la ciencia
+        del aprendizaje para la estimación de horas.
+      dependency_of: ["knowledge_tracer", "transfer_validator"]
+      estimated_days: 5
+      squad: "Felipe + Beatriz"
+
+    - rank: 3
+      tool: "knowledge_tracer.py"
+      status: "✅ IMPLEMENTADO — Phase 2 (2026-06-16)"
+      why_first: >
+        Tercero porque requiere que el curriculum_engine esté listo para
+        trackear progreso por módulo. Implementa Bayesian Knowledge Tracing
+        (BKT) para estimar probabilidad de maestría de cada concepto.
+        Esta herramienta cierra el ciclo de feedback: ¿está funcionando
+        el plan que generamos?
+      dependency_of: ["transfer_validator", "bias_auditor"]
+      estimated_days: 0  # completado
+      actual_days: 1
+      squad: "Sandra + Beatriz → Valeria (Lead)"
+      loc: 466
+      tests: 30
+
+    - rank: 4
+      tool: "transfer_validator.py"
+      status: "✅ IMPLEMENTADO — Phase 2 (2026-06-16)"
+      why_first: >
+        Cuarto porque mide si el aprendizaje se transfiere a contextos
+        nuevos (next-item correctness). Sin esto, podemos tener estudiantes
+        que pasan quizzes pero no resuelven problemas reales. Es el
+        metricáculo de calidad educativa más importante del sistema.
+      dependency_of: ["market_aligner"]
+      estimated_days: 0  # completado
+      actual_days: 1
+      squad: "Beatriz + Alicia → Valeria (Lead)"
+      loc: 543
+      tests: 26
+
+    - rank: 5
+      tool: "bias_auditor.py"
+      status: "✅ IMPLEMENTADO — Phase 3 (2026-06-16)"
+      why_first: >
+        Quinto porque audita todo el pipeline anterior en busca de sesgos:
+        ¿el detector subestima a estudiantes hispanohablantes? ¿el curriculum
+        engine recomienda rutas más cortas a hombres que a mujeres con
+        mismo perfil? Cumplimiento AIED 2026. Alicia lidera desde Toronto.
+      dependency_of: []
+      estimated_days: 6
+      squad: "Alicia + Teo"
+      note: >
+        Corre sobre datos agregados — puede ejecutarse en paralelo con
+        transfer_validator si hay capacidad.
+
+    - rank: 6
+      tool: "market_aligner.py"
+      status: "✅ IMPLEMENTADO — Phase 3 (2026-06-16)"
+      why_first: >
+        Sexto porque alinea el output del curriculum con la demanda real
+        del mercado laboral (scraping de job posts, tendencias de LinkedIn,
+        Stack Overflow survey). Es la capa de "¿esto para qué me sirve?".
+        Teo lidera desde Singapur con datos frescos del mercado APAC y LATAM.
+      dependency_of: []
+      estimated_days: 5
+      squad: "Teo + Carmen"
+      note: >
+        Corre en paralelo con bias_auditor. Requiere API keys de fuentes
+        de mercado laboral (a gestionar con Sofía).
+
+  decision_summary: >
+    gap_detector → curriculum_engine → knowledge_tracer → transfer_validator
+    → bias_auditor ∥ market_aligner (paralelo al final)
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 4. TAXONOMÍA DE HABILIDADES — 20 skills con niveles
+# ═══════════════════════════════════════════════════════════════════════════
+
+skills_taxonomy:
+  version: "1.0"
+  description: >
+    Taxonomía canónica de 20 habilidades técnicas y blandas organizadas
+    en 4 categorías. Cada skill tiene 5 niveles progresivos con descriptores
+    conductuales observables. Inspirada en el Marco Europeo de Competencias
+    Digitales (DigComp 2.2) y el SFIA Framework v9.
+
+  levels:
+    - id: "L0"
+      name: "beginner"
+      description: "No tiene conocimiento previo. Puede reconocer términos pero no aplicarlos."
+      indicators:
+        - "Identifica conceptos básicos si se los mencionan."
+        - "No puede completar tareas sin guía paso a paso."
+        - "Comete errores frecuentes de sintaxis o concepto."
+    - id: "L1"
+      name: "novice"
+      description: "Conocimiento fundamental. Ejecuta tareas simples con supervisión."
+      indicators:
+        - "Escribe código funcional en ejercicios guiados."
+        - "Necesita documentación para tareas no rutinarias."
+        - "Entiende el 60% de un tutorial sin pausar."
+    - id: "L2"
+      name: "intermediate"
+      description: "Autonomía parcial. Resuelve problemas de mediana complejidad sin ayuda."
+      indicators:
+        - "Debuggea sus propios errores en < 30 min."
+        - "Participa en code reviews como reviewer junior."
+        - "Completa proyectos personales sin scaffolding."
+    - id: "L3"
+      name: "advanced"
+      description: "Dominio operativo. Diseña soluciones, optimiza y mentoriza."
+      indicators:
+        - "Diseña arquitectura de un módulo o servicio completo."
+        - "Identifica bugs sutiles en código ajeno."
+        - "Escribe documentación técnica clara para otros devs."
+        - "Mentoriza a beginners y novices efectivamente."
+    - id: "L4"
+      name: "expert"
+      description: "Maestría. Define estándares, innova y enseña a advanced."
+      indicators:
+        - "Contribuye a proyectos open-source del ecosistema."
+        - "Publica artículos, charlas o cursos sobre el tema."
+        - "Resuelve problemas que otros consideran irresolubles."
+        - "Define buenas prácticas que adopta el equipo u organización."
+
+  categories:
+    - category: "programming_fundamentals"
+      label: "Fundamentos de Programación"
+      skills:
+        - name: "python"
+          description: "Lenguaje Python — sintaxis, ecosistema, buenas prácticas."
+          bloom_taxonomy: "Create"
+          target_level_by_role:
+            backend_developer: "advanced"
+            data_scientist: "advanced"
+            fullstack_developer: "intermediate"
+            ml_engineer: "advanced"
+            devops_engineer: "intermediate"
+
+        - name: "javascript"
+          description: "JavaScript/TypeScript — frontend y backend con Node.js."
+          bloom_taxonomy: "Create"
+          target_level_by_role:
+            fullstack_developer: "advanced"
+            frontend_developer: "expert"
+            backend_developer: "intermediate"
+
+        - name: "go"
+          description: "Lenguaje Go — sistemas, CLI, servicios de red."
+          bloom_taxonomy: "Create"
+          target_level_by_role:
+            backend_developer: "advanced"
+            devops_engineer: "advanced"
+            platform_engineer: "expert"
+
+        - name: "sql"
+          description: "Consultas, diseño de bases de datos relacionales, optimización."
+          bloom_taxonomy: "Apply"
+          target_level_by_role:
+            backend_developer: "advanced"
+            data_scientist: "intermediate"
+            data_engineer: "expert"
+            fullstack_developer: "intermediate"
+
+        - name: "git"
+          description: "Control de versiones, branching strategies, code review."
+          bloom_taxonomy: "Apply"
+          target_level_by_role:
+            all_roles: "intermediate"
+
+        - name: "shell_scripting"
+          description: "Bash/PowerShell — automatización de tareas, CI/CD scripting."
+          bloom_taxonomy: "Apply"
+          target_level_by_role:
+            devops_engineer: "advanced"
+            backend_developer: "intermediate"
+            platform_engineer: "advanced"
+
+    - category: "data_and_ai"
+      label: "Datos e Inteligencia Artificial"
+      skills:
+        - name: "statistics"
+          description: "Estadística descriptiva e inferencial, pruebas de hipótesis."
+          bloom_taxonomy: "Analyze"
+          target_level_by_role:
+            data_scientist: "advanced"
+            ml_engineer: "advanced"
+            data_analyst: "expert"
+
+        - name: "machine_learning"
+          description: "Modelos supervisados y no supervisados, evaluación, deployment."
+          bloom_taxonomy: "Evaluate"
+          target_level_by_role:
+            data_scientist: "advanced"
+            ml_engineer: "expert"
+
+        - name: "data_visualization"
+          description: "Comunicación visual de datos — matplotlib, seaborn, D3.js, Power BI."
+          bloom_taxonomy: "Create"
+          target_level_by_role:
+            data_scientist: "intermediate"
+            data_analyst: "advanced"
+            business_analyst: "expert"
+
+        - name: "deep_learning"
+          description: "Redes neuronales, PyTorch/TensorFlow, NLP, computer vision."
+          bloom_taxonomy: "Evaluate"
+          target_level_by_role:
+            ml_engineer: "advanced"
+            ai_researcher: "expert"
+
+        - name: "data_engineering"
+          description: "ETL/ELT pipelines, Apache Spark/Airflow, data warehousing."
+          bloom_taxonomy: "Create"
+          target_level_by_role:
+            data_engineer: "expert"
+            data_scientist: "intermediate"
+            backend_developer: "novice"
+
+    - category: "web_and_systems"
+      label: "Desarrollo Web y Sistemas"
+      skills:
+        - name: "frontend_development"
+          description: "HTML, CSS, React/Vue/Angular, responsive design, a11y."
+          bloom_taxonomy: "Create"
+          target_level_by_role:
+            frontend_developer: "expert"
+            fullstack_developer: "advanced"
+
+        - name: "backend_development"
+          description: "APIs REST/GraphQL, autenticación, bases de datos, arquitectura de servidores."
+          bloom_taxonomy: "Create"
+          target_level_by_role:
+            backend_developer: "expert"
+            fullstack_developer: "advanced"
+
+        - name: "devops_and_cloud"
+          description: "Docker, Kubernetes, CI/CD, AWS/GCP/Azure, infraestructura como código."
+          bloom_taxonomy: "Apply"
+          target_level_by_role:
+            devops_engineer: "expert"
+            platform_engineer: "advanced"
+            backend_developer: "intermediate"
+
+        - name: "system_design"
+          description: "Arquitectura de sistemas distribuidos, escalabilidad, patrones de diseño."
+          bloom_taxonomy: "Evaluate"
+          target_level_by_role:
+            backend_developer: "advanced"
+            platform_engineer: "expert"
+            solutions_architect: "expert"
+
+        - name: "cybersecurity"
+          description: "OWASP Top 10, criptografía aplicada, modelado de amenazas."
+          bloom_taxonomy: "Evaluate"
+          target_level_by_role:
+            security_engineer: "expert"
+            backend_developer: "intermediate"
+            devops_engineer: "intermediate"
+
+    - category: "professional_skills"
+      label: "Habilidades Profesionales Transversales"
+      skills:
+        - name: "technical_writing"
+          description: "Documentación técnica clara, ADRs, RFCs, postmortems."
+          bloom_taxonomy: "Create"
+          target_level_by_role:
+            all_roles: "intermediate"
+            tech_lead: "expert"
+
+        - name: "code_review"
+          description: "Revisión de código efectiva, feedback constructivo, seguridad y estilo."
+          bloom_taxonomy: "Evaluate"
+          target_level_by_role:
+            all_roles: "intermediate"
+            tech_lead: "expert"
+
+        - name: "problem_solving"
+          description: "Descomposición de problemas complejos, pensamiento algorítmico, depuración sistemática."
+          bloom_taxonomy: "Analyze"
+          target_level_by_role:
+            all_roles: "advanced"
+
+        - name: "project_management"
+          description: "Metodologías ágiles, estimación, gestión de stakeholders, priorización."
+          bloom_taxonomy: "Apply"
+          target_level_by_role:
+            tech_lead: "advanced"
+            engineering_manager: "expert"
+
+  # ── Matriz de progresión para Python (ejemplo detallado) ──────────────────
+
+  skill_progression_example:
+    skill: "python"
+    levels_detail:
+      beginner:
+        can:
+          - "Reconocer sintaxis básica de Python (indentación, comentarios, print)."
+          - "Ejecutar un script .py desde la terminal."
+          - "Declarar variables simples (int, float, str, bool)."
+        cannot:
+          - "Escribir una función desde cero."
+          - "Usar listas o diccionarios para estructurar datos."
+          - "Debuggear un error sin ayuda externa."
+        assessment_sample:
+          task: "Corregir un script con 3 errores de sintaxis obvios."
+          passing_time: "< 10 minutos"
+
+      novice:
+        can:
+          - "Escribir funciones con parámetros y return."
+          - "Usar listas, diccionarios y sets para modelar datos simples."
+          - "Leer y escribir archivos CSV con el módulo csv."
+          - "Instalar paquetes con pip y usar entornos virtuales (venv)."
+        cannot:
+          - "Escribir clases con herencia o decoradores."
+          - "Usar comprehensions de lista de forma natural."
+          - "Escribir tests unitarios con pytest."
+        assessment_sample:
+          task: "Procesar un CSV de 1000 líneas: filtrar, agrupar y escribir resumen."
+          passing_time: "< 45 minutos"
+
+      intermediate:
+        can:
+          - "Usar clases, herencia, métodos estáticos y properties."
+          - "Escribir list/dict comprehensions idiomáticas."
+          - "Usar generators (yield) para datos grandes."
+          - "Escribir tests con pytest (fixtures, parametrize, mocks)."
+          - "Manejar excepciones con granularidad (no capturar Exception genérico)."
+          - "Usar type hints en Python 3.10+."
+        cannot:
+          - "Escribir un decorador parametrizado desde cero."
+          - "Optimizar código con profiling (cProfile, memory_profiler)."
+          - "Diseñar una API REST con FastAPI autodocumentada."
+        assessment_sample:
+          task: "Refactorizar un script monolítico de 500 líneas en 3 módulos con tests."
+          passing_time: "< 2 horas"
+
+      advanced:
+        can:
+          - "Escribir decoradores, context managers y descriptores."
+          - "Usar asyncio para I/O concurrente (aiohttp, httpx)."
+          - "Hacer profiling y optimizar hotspots de CPU/memoria."
+          - "Diseñar una API REST con FastAPI, Pydantic v2, y OpenAPI."
+          - "Configurar CI/CD (GitHub Actions) con lint, test, coverage gate."
+          - "Publicar un paquete en PyPI con pyproject.toml."
+        cannot:
+          - "Escribir una extensión en C o Rust para Python."
+          - "Hacer metaprogramación avanzada (metaclasses, AST manipulation)."
+          - "Contribuir al core de CPython o una librería mayor."
+        assessment_sample:
+          task: "Construir microservicio con FastAPI + SQLAlchemy async + Redis cache. 85% coverage."
+          passing_time: "< 8 horas"
+
+      expert:
+        can:
+          - "Escribir extensiones nativas (Cython, PyO3/Rust)."
+          - "Hacer metaprogramación: decoradores que modifican AST, metaclasses."
+          - "Contribuir a CPython, pip, pytest, FastAPI u otra librería core."
+          - "Dar charlas en PyCon / EuroPython con propuesta aceptada."
+          - "Diseñar la arquitectura Python de un sistema con 1M+ usuarios."
+          - "Mentorizar a advanced developers en journey a expert."
+        cannot:
+          - "No hay 'cannot' — es el techo de la taxonomía."
+        assessment_sample:
+          task: "Proponer y mergear un PEP  (Python Enhancement Proposal) o contribución significativa a proyecto core."
+          passing_time: "meses — este nivel se verifica por portfolio, no por prueba cronometrada."
+
+# ═══════════════════════════════════════════════════════════════════════════
+# METADATA
+# ═══════════════════════════════════════════════════════════════════════════
+
+meta:
+  phase_summary:
+    phase_1:
+      status: "complete"
+      date: "2026-06-15"
+      deliverables:
+        - "gap_detector.py (340 loc, 21 tests)"
+        - "curriculum_engine.py (550 loc, 16 tests)"
+      total_tests: 37
+    phase_2:
+      status: "complete"
+      date: "2026-06-16"
+      deliverables:
+        - "knowledge_tracer.py (466 loc, 30 tests)"
+        - "transfer_validator.py (543 loc, 26 tests)"
+      total_tests: 56
+      new_total: 93
+    phase_3:
+      status: "complete"
+      date: "2026-06-16"
+      deliverables:
+        - "bias_auditor.py (837 loc) — Auditoría de sesgos en todo el pipeline educativo"
+        - "market_aligner.py (945 loc) — Alineación del output con demanda laboral real"
+      total_tests: 65
+      new_total: 158
+  next_steps:
+    - "Alicia + Teo: iniciar bias_auditor.py — auditar pipeline completo (gap_detector → knowledge_tracer → transfer_validator)"
+    - "Teo + Carmen: iniciar market_aligner.py en paralelo — scraping de job posts, Stack Overflow survey, LinkedIn trends"
+    - "Valeria: validar taxonomía con Sofía (Commercial) para market_aligner"
+    - "Valeria: preparar alpha testing con 5-10 estudiantes usando el pipeline completo"
+  risks:
+    - "API keys de LinkedIn/Indeed necesarias para market_aligner — Sofía debe aprovisionar"
+    - "Alpha testing requiere sandbox estable — Thavren debe mantener disponibilidad"
+  review_cycle: "Cada viernes 16:00 UTC-5 — Valeria revisa progreso contra este roadmap."

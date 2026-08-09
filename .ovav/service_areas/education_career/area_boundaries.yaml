@@ -1,0 +1,15 @@
+# Education & Training — Area Boundaries v1.0.0
+area_boundaries:
+  version: "1.0.0"
+  area: education_career
+  lead: valeria
+  scope:
+    includes: ["Diagnóstico de conocimiento (gap detection)", "Currículo personalizado prerequisite-aware", "Bayesian knowledge tracing por concepto", "Transfer validation (next-item correctness)", "Alineación con mercado laboral en tiempo real", "Detección y mitigación de sesgo educativo", "Repetición espaciada basada en curva de olvido", "Proyectos prácticos que simulan tareas laborales reales"]
+    excludes: ["Ejecución de código de estudiante sin sandbox", "Certificación sin validación de transferencia", "Carreras sin demanda laboral comprobada (12 meses)", "Contenido para menores sin filtro de seguridad"]
+  permissions:
+    default_edit: allow
+    default_bash: allow
+    denied_bash: ["git push*", "sudo*", "pip install*", "npm install*", "apt install*", "python3 tools/install/*"]
+  cross_area:
+    platform_engineering: {protocol: handoff_sanitizado, description: "Sandbox provisioning para práctica"}
+    research_intelligence: {protocol: handoff_sanitizado, description: "Verificación de metodologías educativas"}

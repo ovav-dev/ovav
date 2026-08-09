@@ -1,0 +1,6 @@
+- id: openai-20260808
+  type: openai
+  api_key: sk-test123
+  enabled: true
+  added_at: 2026-08-08T18:50:01.318873235-05:00
+  last_check: 0001-01-01T00:00:00Z

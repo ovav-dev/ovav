@@ -1,0 +1,19 @@
+/* OVAV Docs — Custom Starlight theme overrides */
+
+:root {
+  --ovav-accent: #7c3aed;
+  --ovav-bg: #0f0f1a;
+  --ovav-text: #e4e4ed;
+  --ovav-muted: #8888a0;
+  --ovav-border: #2a2a3a;
+}
+
+/* Tighten spacing */
+.content-panel {
+  max-width: 72ch;
+}
+
+/* Accent color for OVAV branding */
+:root[data-theme='dark'] {
+  --sl-color-accent: var(--ovav-accent);
+}

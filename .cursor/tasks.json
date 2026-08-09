@@ -1,0 +1,132 @@
+{
+  "_ovav_note": "OVAV common tasks — Ctrl+Shift+P → Tasks: Run Task",
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "ovav: session greeting",
+      "type": "shell",
+      "command": "go run -C go-runtime ./cmd/session_greeting --json",
+      "problemMatcher": [],
+      "group": "none",
+      "presentation": { "reveal": "always", "panel": "dedicated" }
+    },
+    {
+      "label": "ovav: integrity check",
+      "type": "shell",
+      "command": "go run -C go-runtime ./cmd/ovav/ defend check-integrity",
+      "problemMatcher": [],
+      "group": "none"
+    },
+    {
+      "label": "ovav: validate (go vet)",
+      "type": "shell",
+      "command": "go vet ./...",
+      "options": { "cwd": "${workspaceFolder}/go-runtime" },
+      "problemMatcher": "$go",
+      "group": { "kind": "build", "isDefault": false }
+    },
+    {
+      "label": "ovav: test all (go-runtime)",
+      "type": "shell",
+      "command": "go test -v -count=1 -race -timeout=120s ./...",
+      "options": { "cwd": "${workspaceFolder}/go-runtime" },
+      "problemMatcher": "$go",
+      "group": { "kind": "test", "isDefault": true }
+    },
+    {
+      "label": "ovav: test package (cursor file)",
+      "type": "shell",
+      "command": "go test -v -count=1 -race -timeout=60s ./${relativeFileDirname}",
+      "options": { "cwd": "${workspaceFolder}/go-runtime" },
+      "problemMatcher": "$go",
+      "group": "test"
+    },
+    {
+      "label": "ovav: test coverage",
+      "type": "shell",
+      "command": "go test -v -count=1 -race -coverprofile=coverage.out -covermode=atomic ./... && go tool cover -html=coverage.out -o coverage.html",
+      "options": { "cwd": "${workspaceFolder}/go-runtime" },
+      "problemMatcher": [],
+      "group": "test"
+    },
+    {
+      "label": "ovav: build all",
+      "type": "shell",
+      "command": "go build ./...",
+      "options": { "cwd": "${workspaceFolder}/go-runtime" },
+      "problemMatcher": "$go",
+      "group": { "kind": "build", "isDefault": true }
+    },
+    {
+      "label": "cpanel: typecheck",
+      "type": "shell",
+      "command": "npx tsc --noEmit",
+      "options": { "cwd": "${workspaceFolder}/tools/cpanel" },
+      "problemMatcher": "$tsc",
+      "group": { "kind": "build", "isDefault": false }
+    },
+    {
+      "label": "cpanel: lint (eslint)",
+      "type": "shell",
+      "command": "npx eslint src/ --ext .ts,.tsx",
+      "options": { "cwd": "${workspaceFolder}/tools/cpanel" },
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "cpanel: test (vitest)",
+      "type": "shell",
+      "command": "npx vitest run",
+      "options": { "cwd": "${workspaceFolder}/tools/cpanel" },
+      "problemMatcher": [],
+      "group": { "kind": "test", "isDefault": false }
+    },
+    {
+      "label": "cpanel: build",
+      "type": "shell",
+      "command": "npx vite build",
+      "options": { "cwd": "${workspaceFolder}/tools/cpanel" },
+      "problemMatcher": [],
+      "group": { "kind": "build", "isDefault": false }
+    },
+    {
+      "label": "frontend: typecheck",
+      "type": "shell",
+      "command": "npx tsc --noEmit",
+      "options": { "cwd": "${workspaceFolder}/.ovav/projects/ovav-product/webapp/frontend" },
+      "problemMatcher": "$tsc",
+      "group": { "kind": "build", "isDefault": false }
+    },
+    {
+      "label": "ovav: owc (create worktree)",
+      "type": "shell",
+      "command": "owc ${input:worktreeName}",
+      "problemMatcher": [],
+      "group": "none",
+      "presentation": { "reveal": "always", "panel": "dedicated" }
+    },
+    {
+      "label": "ovav: owv (verify worktree)",
+      "type": "shell",
+      "command": "owv",
+      "problemMatcher": [],
+      "group": "none"
+    },
+    {
+      "label": "ovav: owl (list worktrees)",
+      "type": "shell",
+      "command": "owl",
+      "problemMatcher": [],
+      "group": "none",
+      "presentation": { "reveal": "always", "panel": "dedicated" }
+    }
+  ],
+  "inputs": [
+    {
+      "id": "worktreeName",
+      "type": "promptString",
+      "description": "Worktree name (e.g. feature/my-feature)",
+      "default": "feature/"
+    }
+  ]
+}

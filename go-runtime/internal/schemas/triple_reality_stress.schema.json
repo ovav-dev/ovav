@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ovav.dev/schemas/triple_reality_stress.schema.json",
+  "title": "OVAV Triple Reality Stress Gate Schema",
+  "description": "Schema for stress-testing implementation proposals against three realities: operational complexity, adversarial security, and future scale. Activated for medium+ task sizes.",
+  "type": "object",
+  "required": [
+    "evaluation_id",
+    "packet_id",
+    "task_size",
+    "evaluated_at",
+    "scenario_results",
+    "final_decision"
+  ],
+  "properties": {
+    "evaluation_id": {
+      "type": "string",
+      "description": "Unique identifier for this stress evaluation"
+    },
+    "packet_id": {
+      "type": "string",
+      "description": "Reference to the decision packet being stressed"
+    },
+    "task_size": {
+      "type": "string",
+      "enum": ["micro", "simple", "medium", "complex", "critical"],
+      "description": "Task size from the decision packet"
+    },
+    "evaluated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp"
+    },
+    "evaluator": {
+      "type": "string",
+      "default": "triple_reality_stress_gate.py / OVAV Platform Engineering",
+      "description": "System or operator performing the evaluation"
+    },
+    "scenario_bank_source": {
+      "type": "string",
+      "default": ".ovav/registry/scenario_bank.yaml",
+      "description": "Path to the scenario definitions used"
+    },
+    "scenario_results": {
+      "type": "object",
+      "description": "Results for each activated scenario",
+      "required": ["scenario_1_operational_complexity"],
+      "properties": {
+        "scenario_1_operational_complexity": {
+          "$ref": "#/$defs/scenario_result",
+          "description": "SCENARIO-01: Operational complexity stress"
+        },
+        "scenario_2_adversarial_security": {
+          "$ref": "#/$defs/scenario_result",
+          "description": "SCENARIO-02: Adversarial security stress (medium+)"
+        },
+        "scenario_3_future_scale": {
+          "$ref": "#/$defs/scenario_result",
+          "description": "SCENARIO-03: Future scale stress (medium+)"
+        }
+      }
+    },
+    "red_team_evaluation": {
+      "type": "object",
+      "description": "Red team lens evaluation (required for complex+)",
+      "properties": {
+        "required": {"type": "boolean"},
+        "evaluation_ref": {"type": "string"}
+      }
+    },
+    "final_decision": {
+      "type": "string",
+      "enum": ["PASS", "PASS_WITH_CHANGES", "FAIL", "BLOCKED"],
+      "description": "Aggregate decision across all scenarios"
+    },
+    "summary": {
+      "type": "object",
+      "properties": {
+        "scenarios_executed": {"type": "integer"},
+        "scenarios_passed": {"type": "integer"},
+        "scenarios_failed": {"type": "integer"},
+        "scenarios_changes_required": {"type": "integer"},
+        "failure_modes_identified": {"type": "integer"},
+        "failure_modes_unmitigated": {"type": "integer"},
+        "redesign_cycles": {"type": "integer", "maximum": 2}
+      }
+    },
+    "required_changes": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "rationale": {
+      "type": "string",
+      "description": "Human-readable rationale for the final decision"
+    },
+    "archived_as_immature": {
+      "type": "boolean",
+      "default": false,
+      "description": "True if proposal exceeded 2 redesign cycles and was archived"
+    }
+  },
+  "$defs": {
+    "scenario_result": {
+      "type": "object",
+      "required": ["scenario_id", "type", "result"],
+      "properties": {
+        "scenario_id": {
+          "type": "string",
+          "enum": ["SCENARIO-01", "SCENARIO-02", "SCENARIO-03"]
+        },
+        "type": {
+          "type": "string",
+          "enum": ["operational_complexity", "adversarial_security", "future_scale"]
+        },
+        "result": {
+          "type": "string",
+          "enum": ["PASS", "FAIL", "CHANGES_REQUIRED", "NOT_APPLICABLE"]
+        },
+        "failure_modes_checked": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "failure_mode_id": {"type": "string"},
+              "name": {"type": "string"},
+              "detected": {"type": "boolean"},
+              "mitigated": {"type": "boolean"},
+              "evidence": {"type": "string"}
+            }
+          }
+        },
+        "evidence": {
+          "type": "string",
+          "description": "Summary of findings for this scenario"
+        },
+        "validator_hints_used": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Which validators were checked against this scenario"
+        }
+      }
+    }
+  }
+}

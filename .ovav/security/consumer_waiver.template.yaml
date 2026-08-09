@@ -1,0 +1,49 @@
+# CEO Consumer Waiver — Template
+#
+# Copy this file, fill in the values, save as:
+#   ~/.config/ovav/consumer_waiver_<id>.yaml
+#
+# Then run:
+#   bin/ovav-consumer register <id> --root <path> --waiver <file>
+
+consumer_id: # REQUIRED — kebab-case, e.g. bt-sys-react
+approved_by: Alexander Salvador  # REQUIRED — must be CEO of OVAV
+approved_at: # REQUIRED — ISO 8601 UTC, e.g. 2026-07-16T20:00:00Z
+
+scope:
+  # Which OVAV subsystems this consumer can access
+  subsystems:
+    - ows   # OVAV Worktree System
+
+  # Which OWS commands this consumer can invoke
+  capabilities:
+    - owc
+    - owd
+    - owl
+    - owv
+    - ows
+    - owm
+    - owa
+    - owclean
+    # - owx     # Cross-branch cherry-pick (DANGEROUS — only enable with audit)
+    # - owlk    # Lock (DANGEROUS)
+
+  # Boundaries — limits on what the consumer can do
+  boundaries:
+    git_operations: consumer_root_only     # NEVER touch OVAV from consumer
+    audit_required: true                   # Log every command to OVAV audit
+    isolation: .worktrees/                 # Worktrees under consumer's own dir
+    network_egress: deny_all               # No network access by default
+
+  # Any URLs the consumer config touches (will be allowlist-validated)
+  urls: []
+  # - https://api-bitel-agent.fly.dev
+
+rationale: |
+  # One-paragraph explanation of WHY this consumer needs these capabilities.
+  # The CEO must be able to read this and judge the request.
+
+# Optional but recommended
+expires_at: 2026-10-16T00:00:00Z      # When the grant expires
+review_cycle: 30d                       # Periodic review cadence
+audit_destination: .ovav/runtime/logs/security_hooks.jsonl

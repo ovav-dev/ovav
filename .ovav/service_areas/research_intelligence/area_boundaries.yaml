@@ -1,0 +1,72 @@
+# Research Intelligence — Area Boundaries
+# v1.0.0
+
+area_boundaries:
+  version: "1.0.0"
+  area: research_intelligence
+  lead: eidren
+
+  scope:
+    description: >-
+      Research Intelligence es el área de servicio responsable de verificación
+      de fuentes, benchmarking, evidence scoring, comparación técnica,
+      detección de contradicciones, decision briefs y síntesis de investigación
+      para OVAV.
+
+    includes:
+      - "Verificación de fuentes externas (credibilidad, actualidad, relevancia)"
+      - "Benchmarking de herramientas, arquitecturas y prácticas"
+      - "Evidence scoring con detección de sesgo"
+      - "Decision briefs accionables (adoptar, adaptar, rechazar, monitorear)"
+      - "Detección de contradicciones entre fuentes"
+      - "Síntesis de investigación multi-fuente"
+      - "Cache de investigación con TTL por tipo de fuente"
+      - "Research artifacts: SCOPE, SOURCE_MAP, EVIDENCE_REVIEW, DECISION_BRIEF"
+      - "Investigación interna de OVAV vía handoff sanitizado de Platform Engineering"
+
+    excludes:
+      - "Implementación de código o configuración"
+      - "Operaciones de sistema (install, apply, backup, rollback)"
+      - "Git writes, commits, pushes"
+      - "Modificaciones al repositorio OVAV"
+      - "Acceso a configuraciones globales del host"
+      - "Claims production-ready o global-ready"
+      - "Operaciones de runtime, CLI, terminal o seguridad"
+      - "Tareas que requieran service_area=platform_engineering"
+
+  permissions:
+    default_edit: deny
+    default_bash: deny
+    allowed_bash:
+      - "python3 tools/ovav_runtime.py*"
+      - "python3 tools/harnesses/check_*.py"
+      - "python3 tools/validators/*.py"
+      - "python3 tools/research/*.py"
+      - "git status*"
+      - "git diff*"
+      - "git log*"
+    denied_bash:
+      - "git commit*"
+      - "git push*"
+      - "git add*"
+      - "sudo*"
+      - "pip install*"
+      - "npm install*"
+      - "apt install*"
+      - "python3 tools/install/*"
+      - "python3 tools/memory/*"
+      - "python3 tools/protocols/*"
+
+  external_access:
+    allowed:
+      - "/tmp/opencode/*"
+    denied:
+      - "*"
+
+  cross_area:
+    platform_engineering:
+      protocol: handoff_sanitizado
+      direction: bidirectional
+      description: >-
+        RI solicita acceso técnico al repo vía handoff. PE solicita investigación
+        y evidencia vía handoff. Ambos usan Handoff Protocol sanitizado.

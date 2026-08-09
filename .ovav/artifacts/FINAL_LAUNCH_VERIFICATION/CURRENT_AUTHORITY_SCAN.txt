@@ -1,0 +1,87 @@
+.ovav/source/skills/ovav-research-session/SKILL.md:6:## Current Authority — Final Launch Verification
+.ovav/source/skills/ovav-research-session/SKILL.md:8:- Active baseline: B23 Tool Readiness Matrix + Advanced Capability Boundary.
+.ovav/source/skills/ovav-research-session/SKILL.md:9:- Current phase: Final Launch Verification / OpenCode smoke testing.
+.ovav/source/skills/ovav-research-session/SKILL.md:11:- User-facing readiness wording: launch verification / launch candidate smoke in progress until final smoke evidence and final tag are complete.
+.ovav/source/skills/ovav-research-session/SKILL.md:12:- Do not present old segment labels as current authority.
+.ovav/source/skills/ovav-research-session/SKILL.md:13:- Do not use legacy preview, legacy closure, legacy caution-state, retired deployment-claim, retired closure-gate, or retired release-candidate wording as the current product state.
+.ovav/service_areas/shared/current_authority_contract.yaml:3:  active_phase: Final Launch Verification
+.ovav/service_areas/shared/current_authority_contract.yaml:4:  active_baseline: B23 Tool Readiness Matrix + Advanced Capability Boundary
+.ovav/service_areas/shared/current_authority_contract.yaml:13:    Answer current OVAV launch status from Final Launch Verification on top of B23,
+.ovav/service_areas/shared/current_authority_contract.yaml:18:      - launch candidate smoke testing
+.ovav/service_areas/shared/current_authority_contract.yaml:24:      - old preview release-candidate wording as current product state
+.ovav/source/skills/ovav-repo-local-work-loop/SKILL.md:6:## Current Authority — Final Launch Verification
+.ovav/source/skills/ovav-repo-local-work-loop/SKILL.md:8:- Active baseline: B23 Tool Readiness Matrix + Advanced Capability Boundary.
+.ovav/source/skills/ovav-repo-local-work-loop/SKILL.md:9:- Current phase: Final Launch Verification / OpenCode smoke testing.
+.ovav/source/skills/ovav-repo-local-work-loop/SKILL.md:11:- User-facing readiness wording: launch verification / launch candidate smoke in progress until final smoke evidence and final tag are complete.
+.ovav/source/skills/ovav-repo-local-work-loop/SKILL.md:12:- Do not present old segment labels as current authority.
+.ovav/source/skills/ovav-repo-local-work-loop/SKILL.md:13:- Do not use legacy preview, legacy closure, legacy caution-state, retired deployment-claim, retired closure-gate, or retired release-candidate wording as the current product state.
+.ovav/source/skills/ovav-repo-local-work-loop/SKILL.md:44:- Do not present old segment labels as the current product state.
+.ovav/source/skills/ovav-context-pack/SKILL.md:7:## Current Authority — Final Launch Verification
+.ovav/source/skills/ovav-context-pack/SKILL.md:9:- Active baseline: B23 Tool Readiness Matrix + Advanced Capability Boundary.
+.ovav/source/skills/ovav-context-pack/SKILL.md:10:- Current phase: Final Launch Verification / OpenCode smoke testing.
+.ovav/source/skills/ovav-context-pack/SKILL.md:12:- User-facing readiness wording: launch verification / launch candidate smoke in progress until final smoke evidence and final tag are complete.
+.ovav/source/skills/ovav-context-pack/SKILL.md:13:- Do not present old segment labels as current authority.
+.ovav/source/skills/ovav-context-pack/SKILL.md:14:- Do not use legacy preview, legacy closure, legacy caution-state, retired deployment-claim, retired closure-gate, or retired release-candidate wording as the current product state.
+.ovav/source/skills/ovav-response-contract/SKILL.md:6:## Current Authority — Final Launch Verification
+.ovav/source/skills/ovav-response-contract/SKILL.md:8:- Active baseline: B23 Tool Readiness Matrix + Advanced Capability Boundary.
+.ovav/source/skills/ovav-response-contract/SKILL.md:9:- Current phase: Final Launch Verification / OpenCode smoke testing.
+.ovav/source/skills/ovav-response-contract/SKILL.md:11:- User-facing readiness wording: launch verification / launch candidate smoke in progress until final smoke evidence and final tag are complete.
+.ovav/source/skills/ovav-response-contract/SKILL.md:12:- Do not present old segment labels as current authority.
+.ovav/source/skills/ovav-response-contract/SKILL.md:13:- Do not use legacy preview, legacy closure, legacy caution-state, retired deployment-claim, retired closure-gate, or retired release-candidate wording as the current product state.
+.ovav/source/skills/ovav-identity-guard/SKILL.md:2:description: Use when OVAV must protect visible service areas, internal LEAD identities, current product state, or cross-area context boundaries.
+.ovav/source/skills/ovav-identity-guard/SKILL.md:6:## Current Authority — Final Launch Verification
+.ovav/source/skills/ovav-identity-guard/SKILL.md:8:- Active baseline: B23 Tool Readiness Matrix + Advanced Capability Boundary.
+.ovav/source/skills/ovav-identity-guard/SKILL.md:9:- Current phase: Final Launch Verification / OpenCode smoke testing.
+.ovav/source/skills/ovav-identity-guard/SKILL.md:11:- User-facing readiness wording: launch verification / launch candidate smoke in progress until final smoke evidence and final tag are complete.
+.ovav/source/skills/ovav-identity-guard/SKILL.md:12:- Do not present old segment labels as current authority.
+.ovav/source/skills/ovav-identity-guard/SKILL.md:13:- Do not use legacy preview, legacy closure, legacy caution-state, retired deployment-claim, retired closure-gate, or retired release-candidate wording as the current product state.
+.ovav/source/skills/ovav-platform-session/SKILL.md:6:## Current Authority — Final Launch Verification
+.ovav/source/skills/ovav-platform-session/SKILL.md:8:- Active baseline: B23 Tool Readiness Matrix + Advanced Capability Boundary.
+.ovav/source/skills/ovav-platform-session/SKILL.md:9:- Current phase: Final Launch Verification / OpenCode smoke testing.
+.ovav/source/skills/ovav-platform-session/SKILL.md:11:- User-facing readiness wording: launch verification / launch candidate smoke in progress until final smoke evidence and final tag are complete.
+.ovav/source/skills/ovav-platform-session/SKILL.md:12:- Do not present old segment labels as current authority.
+.ovav/source/skills/ovav-platform-session/SKILL.md:13:- Do not use legacy preview, legacy closure, legacy caution-state, retired deployment-claim, retired closure-gate, or retired release-candidate wording as the current product state.
+.opencode/commands/ovav-context.md:4:## Current Authority — Final Launch Verification
+.opencode/commands/ovav-context.md:6:- Active baseline: B23 Tool Readiness Matrix + Advanced Capability Boundary.
+.opencode/commands/ovav-context.md:7:- Current phase: Final Launch Verification / OpenCode smoke testing.
+.opencode/commands/ovav-context.md:9:- User-facing readiness wording: launch verification / launch candidate smoke in progress until final smoke evidence and final tag are complete.
+.opencode/commands/ovav-context.md:10:- Do not present old segment labels as current authority.
+.opencode/commands/ovav-context.md:11:- Do not use legacy preview, legacy closure, legacy caution-state, retired deployment-claim, retired closure-gate, or retired release-candidate wording as the current product state.
+.opencode/commands/ovav-context.md:22:Use this when the session needs orientation: current baseline, service area, evidence, blocked surfaces, launch-readiness status and next safe move.
+.opencode/commands/ovav-validate.md:4:## Current Authority — Final Launch Verification
+.opencode/commands/ovav-validate.md:6:- Active baseline: B23 Tool Readiness Matrix + Advanced Capability Boundary.
+.opencode/commands/ovav-validate.md:7:- Current phase: Final Launch Verification / OpenCode smoke testing.
+.opencode/commands/ovav-validate.md:9:- User-facing readiness wording: launch verification / launch candidate smoke in progress until final smoke evidence and final tag are complete.
+.opencode/commands/ovav-validate.md:10:- Do not present old segment labels as current authority.
+.opencode/commands/ovav-validate.md:11:- Do not use legacy preview, legacy closure, legacy caution-state, retired deployment-claim, retired closure-gate, or retired release-candidate wording as the current product state.
+.opencode/commands/ovav-status.md:4:## Current Authority — Final Launch Verification
+.opencode/commands/ovav-status.md:6:- Active baseline: B23 Tool Readiness Matrix + Advanced Capability Boundary.
+.opencode/commands/ovav-status.md:7:- Current phase: Final Launch Verification / OpenCode smoke testing.
+.opencode/commands/ovav-status.md:9:- User-facing readiness wording: launch verification / launch candidate smoke in progress until final smoke evidence and final tag are complete.
+.opencode/commands/ovav-status.md:10:- Do not present old segment labels as current authority.
+.opencode/commands/ovav-status.md:11:- Do not use legacy preview, legacy closure, legacy caution-state, retired deployment-claim, retired closure-gate, or retired release-candidate wording as the current product state.
+.opencode/commands/ovav-status.md:22:Use this when you need a compact status card inside OpenCode: current baseline, latest completed segment, next work, visible role routing and blocked surfaces.
+.opencode/commands/ovav-close.md:4:## Current Authority — Final Launch Verification
+.opencode/commands/ovav-close.md:6:- Active baseline: B23 Tool Readiness Matrix + Advanced Capability Boundary.
+.opencode/commands/ovav-close.md:7:- Current phase: Final Launch Verification / OpenCode smoke testing.
+.opencode/commands/ovav-close.md:9:- User-facing readiness wording: launch verification / launch candidate smoke in progress until final smoke evidence and final tag are complete.
+.opencode/commands/ovav-close.md:10:- Do not present old segment labels as current authority.
+.opencode/commands/ovav-close.md:11:- Do not use legacy preview, legacy closure, legacy caution-state, retired deployment-claim, retired closure-gate, or retired release-candidate wording as the current product state.
+.opencode/commands/ovav-work.md:4:## Current Authority — Final Launch Verification
+.opencode/commands/ovav-work.md:6:- Active baseline: B23 Tool Readiness Matrix + Advanced Capability Boundary.
+.opencode/commands/ovav-work.md:7:- Current phase: Final Launch Verification / OpenCode smoke testing.
+.opencode/commands/ovav-work.md:9:- User-facing readiness wording: launch verification / launch candidate smoke in progress until final smoke evidence and final tag are complete.
+.opencode/commands/ovav-work.md:10:- Do not present old segment labels as current authority.
+.opencode/commands/ovav-work.md:11:- Do not use legacy preview, legacy closure, legacy caution-state, retired deployment-claim, retired closure-gate, or retired release-candidate wording as the current product state.
+.opencode/agents/ovav-platform-engineering.md:37:## Current Authority — Final Launch Verification
+.opencode/agents/ovav-platform-engineering.md:39:- Active baseline: B23 Tool Readiness Matrix + Advanced Capability Boundary.
+.opencode/agents/ovav-platform-engineering.md:40:- Current phase: Final Launch Verification / OpenCode smoke testing.
+.opencode/agents/ovav-platform-engineering.md:42:- User-facing readiness wording: launch verification / launch candidate smoke in progress until final smoke evidence and final tag are complete.
+.opencode/agents/ovav-platform-engineering.md:43:- Do not present old segment labels as current authority.
+.opencode/agents/ovav-platform-engineering.md:44:- Do not use legacy preview, legacy closure, legacy caution-state, retired deployment-claim, retired closure-gate, or retired release-candidate wording as the current product state.
+.opencode/agents/ovav-research-intelligence.md:40:## Current Authority — Final Launch Verification
+.opencode/agents/ovav-research-intelligence.md:42:- Active baseline: B23 Tool Readiness Matrix + Advanced Capability Boundary.
+.opencode/agents/ovav-research-intelligence.md:43:- Current phase: Final Launch Verification / OpenCode smoke testing.
+.opencode/agents/ovav-research-intelligence.md:45:- User-facing readiness wording: launch verification / launch candidate smoke in progress until final smoke evidence and final tag are complete.
+.opencode/agents/ovav-research-intelligence.md:46:- Do not present old segment labels as current authority.
+.opencode/agents/ovav-research-intelligence.md:47:- Do not use legacy preview, legacy closure, legacy caution-state, retired deployment-claim, retired closure-gate, or retired release-candidate wording as the current product state.

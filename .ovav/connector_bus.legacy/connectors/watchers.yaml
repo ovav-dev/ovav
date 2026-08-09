@@ -1,0 +1,33 @@
+# OVAV Connector Bus — Watchers
+# ==================================
+# Tipo de slot: config_watcher
+# Monitores de drift para archivos de configuración críticos.
+#
+# CONECTAR:   1 entry acá + módulo watcher
+# DESCONECTAR: borrar entry
+#
+# Schema: slots.yaml → slot_types.config_watcher
+
+version: "1.0.0"
+slot_type: config_watcher
+description: "Monitores de integridad — detectan drift en archivos de configuración"
+
+components:
+
+  host_config_drift:
+    watch_path: .ovav/registry/auto_triggers.yaml
+    module: tools.validators.check_host_config_drift
+    triggers: [on_session_start]
+    labels: [host, drift, security]
+
+  permission_policy:
+    watch_path: .ovav/policy/permission_authority.json
+    module: tools.validators.check_permission_policy_drift
+    triggers: [on_session_start]
+    labels: [permissions, policy, drift]
+
+  gate_self:
+    watch_path: tools/validators/check_host_config_drift.py
+    module: tools.security.gate_self_protection
+    triggers: [on_session_start]
+    labels: [gate, self-protection, integrity]

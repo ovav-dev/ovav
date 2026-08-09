@@ -1,0 +1,5 @@
+#!/bin/bash
+# OVAV Fetch MCP Server Wrapper
+# Uses official @modelcontextprotocol/server-fetch via npx
+
+exec npx -y @modelcontextprotocol/server-fetch

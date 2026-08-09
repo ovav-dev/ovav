@@ -1,0 +1,538 @@
+# OVAV Stabilization & Production Plan — Canonical
+# =============================================================================
+# Generated: 2026-06-15 19:45 UTC-5
+# Author: Thavren (Platform Engineering Lead)
+# Authority: CEO Alexander Salvador
+#
+# Este plan extiende caps.yaml (v6.9, 22 caps completados).
+# Define el trabajo SEG-0 a SEG-7 para llevar OVAV del ~50% al 100%.
+#
+# Principios:
+#   1. NO PARCHES — root-cause fixes, no workarounds
+#   2. CALIDAD PRIMERO — tests abruptos, edge cases, coverage gate
+#   3. MIGRACIÓN LIMPIA — cero residuos, referencias stale eliminadas
+#   4. SEGURIDAD ABSOLUTA — cada fix verificado por Diana
+# =============================================================================
+
+version: 1
+plan_version: "v7.0 — Stabilization & Production"
+canonical_parent: ".ovav/plan/caps.yaml"
+status: "active"
+created_at: "2026-06-15 19:45 UTC-5"
+created_by: "thavren"
+
+# ── State snapshot (from audit 2026-06-15) ──────────────────────────────────
+
+audit_baseline:
+  date: "2026-06-15"
+  auditors: [Helena, Andrés, Irene, Diana]
+  leads_consulted: [Dante, Valeria, Sofía, Uriel]
+  python_files_total: 1059
+  python_files_active: ~340
+  python_files_backup: 299
+  go_files: 69
+  typescript_files: 32
+  caps_completed: 22
+  caps_pending_original: 1
+  global_health_pct: 48
+  critical_issues: 5
+  high_issues: 8
+  medium_issues: 14
+  low_issues: 6
+
+# ── Stale entries in caps.yaml (corrected below) ───────────────────────────
+
+caps_corrections:
+  C3_summary_stale:
+    file: ".ovav/plan/caps.yaml"
+    field: "caps.C3.summary"
+    current: "Cockpit TUI (Python+curses, ahora congelado → Go Cockpit planeado)"
+    corrected: "Cockpit TUI (Python+curses, reemplazado por Go Cockpit ✅ — COCKPIT cap, 18 archivos Go, 8 vistas Bubble Tea)"
+    reason: "Go Cockpit ya está code-complete, mergeado (aa2d8d6) y compilado."
+  CI-CD_summary_misleading:
+    file: ".ovav/plan/caps.yaml"
+    field: "caps.CI-CD.summary"
+    current: "CI/CD 100%: Go test+vet+fmt+coverage gate..."
+    corrected: "CI/CD fase 1: Pre-commit hooks Go + coverage gate ≥30%. CI YAML 199 loc (6 jobs Go test/cross-compile). Frontend deploy pipeline (176 loc). GitHub Actions vivo. Pendiente: staging env, e2e tests, CD automation completa."
+    reason: "El cap dice 100% pero faltan staging environment y CD automation completa. Los workflows existen (375 loc YAML) pero no se han verificado en vivo."
+
+# ── SEG-0: Critical Security & Governance Fixes (HOY) ─────────────────────
+# Bloqueantes — no se puede seguir sin estos fixes
+
+SEG0:
+  name: "Critical Foundation — Security & Governance Root Fixes"
+  priority: "P0 — BLOQUEANTE"
+  estimated_hours: 4
+  tasks:
+    C0-C1:
+      name: "Fix Git command injection in Go cPanel API"
+      file: "go-runtime/cmd/cpanel/git.go:55-60"
+      severity: "CRITICAL"
+      root_cause: "handleGitLog accepts unsanitized 'limit' from URL query, passes to exec.Command as flag"
+      fix: "strconv.Atoi(limit) before use — reject non-integer input with 400"
+      verification: "curl 'https://api.ovav.dev/api/v1/git/log?limit=1;--exec' → 400 Bad Request"
+      verifier: "Diana + Clara"
+      assigned: "Thavren → Andrés"
+
+    C0-C2:
+      name: "Eradicate deprecated memory references from Go runtime"
+      files:
+        - "go-runtime/cmd/cpanel/memory.go"
+        - "go-runtime/cmd/cpanel/validators.go"
+        - "go-runtime/internal/doctor/diagnostic.go"
+      severity: "CRITICAL"
+      root_cause: "AGENTS.md blocks separate memory ledger files."
+      fix: "Reemplazar lecturas por git HEAD + caps.yaml como fuentes canónicas."
+      verification: "Go runtime no references blocked memory files."
+      verifier: "Diana + Thavren"
+      assigned: "Thavren → Marco"
+
+    C0-C3:
+      name: "Initialize OVAV Vault with AES-256-GCM only"
+      files:
+        - "tools/security/secrets_vault.py"
+        - "tools/security/credential_vault.py"
+      severity: "CRITICAL"
+      root_cause: "Vault directory not created. XOR cipher in secrets_vault (cryptographically weak). Go vault exists but Python fallback is insecure."
+      fix: | 
+        1. Create .ovav/vault/ with master.key (PBKDF2 + machine-id salt)
+        2. Remove XOR cipher from secrets_vault.py — require AES-256-GCM
+        3. Run 'ovav vault scan && ovav vault encrypt' to encrypt all assets
+        4. Verify: .ovav/vault/*.enc exists with valid AES-256-GCM
+      verification: "python3 -c 'from tools.security.secrets_vault import _encrypt; assert \"XOR\" not in inspect.getsource(_encrypt)'"
+      verifier: "Diana"
+      assigned: "Diana + Thavren"
+
+    C0-C4:
+      name: "Fix gofmt violation in cmd/ovav/main.go"
+      file: "go-runtime/cmd/ovav/main.go"
+      severity: "HIGH"
+      root_cause: "gofmt not run after cockpit route addition"
+      fix: "gofmt -w cmd/ovav/main.go && go vet ./..."
+      verification: "gofmt -l cmd/ovav/main.go → empty (no output)"
+      verifier: "Thavren"
+      assigned: "Thavren → Lucas"
+      status: "done"  # Already fixed in audit session
+
+    C0-C5:
+      name: "Remove bin/__pycache__/ from repo"
+      file: "bin/__pycache__/ovav.cpython-312.pyc"
+      severity: "MEDIUM"
+      fix: "git rm -r bin/__pycache__/ && echo 'bin/__pycache__/' >> .gitignore (if not already)"
+      verification: "git ls-files bin/__pycache__ → empty"
+      verifier: "Thavren"
+      assigned: "Thavren → Lucas"
+
+# ── SEG-1: Frontend-Backend Integration Fixes (24h) ────────────────────────
+
+SEG1:
+  name: "Web Integration — Frontend-Backend Alignment"
+  priority: "P1 — ALTO"
+  estimated_hours: 8
+  depends_on: [SEG0]
+  tasks:
+    F1-MEMORY:
+      name: "Fix MemorySection fetch paths"
+      files: ["tools/cpanel/src/sections/MemorySection.tsx"]
+      severity: "HIGH"
+      root_cause: "fetch('/api/v1/memory/ledger') — relative path breaks in production. Missing API_BASE."
+      fix: "Use API_BASE from config.ts for all fetch calls in MemorySection"
+      verification: "Build + deploy to staging → Memory tab loads without 404"
+      assigned: "Dante → Elena"
+
+    F1-PROFILES:
+      name: "Fix ProfilesSection Go backend response parsing"
+      files: ["tools/cpanel/src/sections/ProfilesSection.tsx"]
+      severity: "HIGH"
+      root_cause: "UI expects Python string output. Go backend returns JSON with .profiles array."
+      fix: "Rewrite ProfilesSection to parse Go JSON structure: {status, profiles: [{id, name, area, ...}]}"
+      verification: "Build + deploy → Profiles tab shows actual profile data"
+      assigned: "Dante → Elena"
+
+    F1-HEALTH:
+      name: "Fix SystemSection health check response handling"
+      files: ["tools/cpanel/src/sections/SystemSection.tsx"]
+      severity: "MEDIUM"
+      root_cause: "UI checks data.returncode — Go backend doesn't return this field."
+      fix: "Align UI with Go health response: {status, checks: {python, git, git_repo, ...}}"
+      verification: "SystemSection health renders without error"
+      assigned: "Dante → Elena"
+
+    F1-API-BASE:
+      name: "Make API_BASE configurable per environment"
+      files: ["tools/cpanel/src/config.ts", "tools/cpanel/.env.example"]
+      severity: "MEDIUM"
+      root_cause: "config.ts hardcodes 'https://api.ovav.dev'. No dev/prod switching."
+      fix: "Use Vite's import.meta.env.VITE_API_BASE with fallback. Create .env.example."
+      verification: "VITE_API_BASE=http://localhost:5858 pnpm dev → works locally"
+      assigned: "Dante → Elena"
+
+    F1-SSE:
+      name: "Re-enable Server-Sent Events with goroutine"
+      files: ["tools/cpanel/src/services/sse.ts", "go-runtime/cmd/cpanel/status.go"]
+      severity: "MEDIUM"
+      root_cause: "SSE commented out because 'blocks single-threaded server'. Go handles goroutines natively."
+      fix: "Go backend: add /api/v1/events SSE endpoint with goroutine. Frontend: uncomment SSE client."
+      verification: "curl -N localhost:5858/api/v1/events → streaming JSON events"
+      assigned: "Dante → Sergio"
+
+    F1-LEGACY:
+      name: "Remove unused legacy components"
+      files: ["tools/cpanel/src/components/Dashboard.tsx", "Security.tsx", "Validators.tsx", "Profiles.tsx", "Logs.tsx"]
+      severity: "LOW"
+      root_cause: "5 components replaced by /sections/ equivalents. Dead code."
+      fix: "Delete legacy components. Verify no imports reference them."
+      verification: "grep -r 'components/Dashboard' tools/cpanel/src/ → 0 results"
+      assigned: "Dante → Elena"
+
+# ── SEG-2: Infrastructure Hardening (48h) ─────────────────────────────────
+
+SEG2:
+  name: "Infrastructure — CI/CD, Docker, Staging"
+  priority: "P1 — ALTO"
+  estimated_hours: 10
+  depends_on: [SEG0]
+  tasks:
+    I2-DOCKER:
+      name: "Align Dockerfile Go version with go.mod"
+      files: ["Dockerfile.cpanel"]
+      severity: "HIGH"
+      root_cause: "Dockerfile uses golang:1.22-alpine, go.mod requires go 1.24.2"
+      fix: "Update Dockerfile: golang:1.24-alpine. Verify build."
+      verification: "docker build -f Dockerfile.cpanel -t ovav-cpanel:test . → success"
+      assigned: "Uriel"
+
+    I2-DOCKER-STATIC:
+      name: "Copy static/css/ to Docker runtime image"
+      files: ["Dockerfile.cpanel"]
+      severity: "MEDIUM"
+      root_cause: "Design tokens (design-tokens.css) not served in production. Only dist/ is copied."
+      fix: "Add COPY tools/cpanel/static/css/ /app/tools/cpanel/static/css/ to runtime stage"
+      verification: "Container serves /css/design-tokens.css → 200"
+      assigned: "Uriel"
+
+    I2-REPO-ROOT:
+      name: "Fix RepoRoot detection in Docker container"
+      files: ["go-runtime/internal/cli/format.go", "go-runtime/cmd/cpanel/shared.go"]
+      severity: "HIGH"
+      root_cause: "RepoRoot detection uses os.Executable() path. In container, no .git/ exists → all git data shows '?'"
+      fix: "Inject build metadata at compile time (ldflags: GIT_SHA, GIT_BRANCH, BUILD_TIME). Fallback: use injected data if .git/ not found."
+      verification: "curl api.ovav.dev/api/v1/status → git.branch is actual branch, not '?'"
+      assigned: "Uriel + Thavren → Marco"
+
+    I2-STAGING:
+      name: "Create staging environment"
+      severity: "HIGH"
+      root_cause: "No staging.api.ovav.dev. All changes go directly to production."
+      fix: "Create Fly.io app 'ovav-cpanel-staging'. Deploy from 'develop' branch. Add DNS: staging.api.ovav.dev"
+      verification: "curl staging.api.ovav.dev/health → 200"
+      assigned: "Uriel"
+
+    I2-CI-VERIFY:
+      name: "Verify and fix GitHub Actions CI workflows"
+      files: [".github/workflows/ci.yml", ".github/workflows/deploy-cpanel.yml"]
+      severity: "MEDIUM"
+      root_cause: "375 loc YAML exist but were reported as absent. Need live verification."
+      fix: "Trigger CI on push to develop. Verify all 6 jobs run. Fix any failures."
+      verification: "GitHub Actions tab shows green checkmark on latest develop commit"
+      assigned: "Uriel"
+
+    I2-CI-DEPLOY:
+      name: "Add CD: auto-deploy to staging on merge to develop"
+      files: [".github/workflows/deploy-cpanel.yml"]
+      severity: "MEDIUM"
+      root_cause: "Deploy pipeline exists (176 loc) but may not be triggered automatically."
+      fix: "Add trigger: push to develop → deploy to staging. Push to main → deploy to production."
+      verification: "Merge PR to develop → staging auto-deploys within 5 min"
+      assigned: "Uriel"
+
+# ── SEG-3: Go Runtime Quality (72h) ───────────────────────────────────────
+
+SEG3:
+  name: "Go Runtime — Tests, Coverage, Cleanup"
+  priority: "P2 — MEDIO"
+  estimated_hours: 12
+  depends_on: [SEG0]
+  tasks:
+    G3-CONFIG-TESTS:
+      name: "Add tests for internal/config (0% → ≥70% coverage)"
+      files: ["go-runtime/internal/config/"]
+      severity: "MEDIUM"
+      root_cause: "config package has zero tests. Only deploy.go exists."
+      fix: "Create config_test.go with tests for Show(), YAML reading, edge cases."
+      verification: "go test ./internal/config/ -cover → ≥70%"
+      assigned: "Thavren → Andrés"
+
+    G3-DEAD-CODE:
+      name: "Remove dead code: contains() in cmd/ovav/main.go"
+      files: ["go-runtime/cmd/ovav/main.go"]
+      severity: "LOW"
+      root_cause: "contains() function defined but never called."
+      fix: "Delete contains(). go vet to verify no new issues."
+      verification: "grep 'func contains' go-runtime/cmd/ovav/main.go → empty"
+      assigned: "Thavren → Lucas"
+
+    G3-TOOL-CATALOG:
+      name: "Update cockpit-tui status in tools catalog"
+      files: ["go-runtime/internal/tools/catalog.go"]
+      severity: "LOW"
+      root_cause: "cockpit-tui listed as StatusPlanned — code exists and binary is built."
+      fix: "Change status to StatusActive. Add version: '1.0.0'."
+      verification: "go test ./internal/tools/ -run TestCockpit → PASS"
+      assigned: "Thavren → Lucas"
+
+    G3-CROSS-COMPILE:
+      name: "Add cross-compile targets for cPanel and tailor in Makefile"
+      files: ["go-runtime/Makefile"]
+      severity: "LOW"
+      root_cause: "Makefile cross-compiles ovav+cockpit only. cPanel and tailor missing."
+      fix: "Add build-cpanel-all and build-tailor-all targets with same 5-platform matrix."
+      verification: "make build-cpanel-all → 5 binaries in build/"
+      assigned: "Thavren → Marco"
+
+    G3-STRING-REPEAT:
+      name: "Replace custom stringsRepeat with stdlib strings.Repeat"
+      files: ["go-runtime/internal/config/deploy.go"]
+      severity: "LOW"
+      root_cause: "Custom stringsRepeat() reinvents strings.Repeat from stdlib."
+      fix: "Replace with strings.Repeat. Remove custom function."
+      verification: "go test ./internal/config/ → PASS"
+      assigned: "Thavren → Lucas"
+
+# ── SEG-4: Python Debt Reduction (semana 1-2) ─────────────────────────────
+
+SEG4:
+  name: "Python Cleanup — Reduce Active Footprint"
+  priority: "P2 — MEDIO"
+  estimated_hours: 16
+  depends_on: [SEG0, SEG3]
+  tasks:
+    P4-STALE-REFS:
+      name: "Remove stale references to deleted Python files in artifacts"
+      severity: "MEDIUM"
+      root_cause: "6+ artifacts reference ovav_first_run_cockpit.py and ovav_tailor_composer.py (deleted)."
+      fix: "Grep artifacts for deleted file references. Update or remove stale lines."
+      verification: 'grep -r "ovav_first_run_cockpit\|ovav_tailor_composer" .ovav/artifacts/ → 0 results'
+      assigned: "Thavren → Mía"
+
+    P4-DEPRECATED-DIR:
+      name: "Remove empty tools/_deprecated/ directory"
+      severity: "LOW"
+      root_cause: "tools/_deprecated/ exists but only contains __init__.py + README.md"
+      fix: "Delete directory. Verify no imports reference it."
+      verification: "grep -r 'tools._deprecated' . → 0 results"
+      assigned: "Thavren → Lucas"
+
+    P4-SYNC-OPENCODE:
+      name: "Synchronize .opencode/ with clients/opencode/"
+      severity: "MEDIUM"
+      root_cause: "Content nearly identical but duplicated. Maintenance burden."
+      fix: "Audit diff. Determine canonical location. Symlink or sync script."
+      verification: "diff -r .opencode/ clients/opencode/ → minimal, intentional differences only"
+      assigned: "Thavren → Helena"
+
+    P4-AUDIT-MIGRATION:
+      name: "Audit Python → Go migration candidates"
+      severity: "MEDIUM"
+      root_cause: "~340 active Python files. Which are essential vs migratable?"
+      fix: |
+        Classify each Python directory:
+        - CRITICAL (must keep Python): agent_runtime (OpenCode integration), validators (runtime checks)
+        - MIGRATABLE (port to Go): some harnesses, economy, snapshot, research, context
+        - DEPRECATABLE (remove): redundant checks, legacy probes
+      verification: "Document with per-directory recommendation"
+      assigned: "Thavren → Marco + Helena"
+
+# ── SEG-5: Testing Hardening (semana 2-3) ─────────────────────────────────
+
+SEG5:
+  name: "Testing — Coverage, Edge Cases, E2E"
+  priority: "P2 — MEDIO"
+  estimated_hours: 14
+  depends_on: [SEG1, SEG3]
+  tasks:
+    T5-FRONTEND-TESTS:
+      name: "Add smoke tests for React components"
+      severity: "MEDIUM"
+      root_cause: "0 frontend tests."
+      fix: "Add vitest + @testing-library/react. Smoke tests: App renders, Login renders, Dashboard renders."
+      verification: "pnpm test → ≥10 tests PASS"
+      assigned: "Dante → Diego"
+
+    T5-BACKEND-TESTS:
+      name: "Add tests for Go cPanel backend"
+      severity: "MEDIUM"
+      root_cause: "0 tests in go-runtime/cmd/cpanel/. 29 endpoints untested."
+      fix: "Create cpanel_test.go with httptest.Server. Test: /health, /api/v1/status, /api/v1/auth/login (invalid)."
+      verification: "go test ./cmd/cpanel/ -cover → ≥40%"
+      assigned: "Dante → Sergio"
+
+    T5-EDGE-CASES:
+      name: "Aggressive edge case testing for install gateway"
+      severity: "HIGH"
+      root_cause: "Install gateway is core safety layer. Needs brutal edge case testing."
+      fix: "Add tests for: corrupted manifest, partial backup, disk full, concurrent apply, rollback mid-apply."
+      verification: "go test ./internal/install/ -run TestEdge -v → 15+ edge cases PASS"
+      assigned: "Thavren → Clara + Andrés"
+
+    T5-E2E:
+      name: "End-to-end test: CLI install → verify → rollback"
+      severity: "HIGH"
+      root_cause: "No e2e test validates the full install pipeline."
+      fix: "Script: ovav plan → ovav backup → ovav apply --consent → ovav verify → ovav rollback. Run in sandbox mode."
+      verification: "bash tests/e2e/install_pipeline.sh → exit 0"
+      assigned: "Thavren → Clara"
+
+# ── SEG-6: Cross-Area Activation (semana 3-6) ─────────────────────────────
+
+SEG6:
+  name: "Cross-Area — Education, Health, Commercial, Evidence"
+  priority: "P3 — MEDIO-BAJO"
+  estimated_hours: 40
+  depends_on: [SEG0, SEG1, SEG2]
+  tasks:
+    X6-EDU-SANDBOX:
+      name: "Build education sandbox for student code execution"
+      severity: "HIGH"
+      root_cause: "Valeria cannot execute student code without isolated sandbox."
+      fix: "Docker-based sandbox: isolated container per student, network disabled, time-limited, resource-capped."
+      verification: "Sandbox runs Python/Node/Go code safely with output capture"
+      assigned: "Thavren → Marco + Valeria"
+
+    X6-EDU-TOOLS:
+      name: "Implement core education tools (gap detector, curriculum engine)"
+      severity: "MEDIUM"
+      root_cause: "6 education tools are planned but 0% implemented."
+      fix: "Phase 1: gap_detector.py (RPKT assessment) + curriculum_engine.py (generates learning path)."
+      verification: "gap_detector identifies skill gaps from self-assessment. curriculum_engine outputs valid YAML plan."
+      assigned: "Valeria → Carmen + Felipe"
+
+    X6-COMMERCIAL:
+      name: "Define OVAV business model and pricing"
+      severity: "MEDIUM"
+      root_cause: "No business model defined. Sofía needs strategic direction."
+      fix: "Workshop: OVAV value prop → pricing tiers (free/pro/enterprise) → go-to-market strategy."
+      verification: "Document: .ovav/plan/business_model.yaml with tiers, pricing, market analysis"
+      assigned: "Sofía → Gabriela + Julián"
+
+    X6-EVIDENCE:
+      name: "Evidence audit and benchmark OVAV against competitors"
+      severity: "MEDIUM"
+      root_cause: "Eidren's area has structure but no active benchmarks."
+      fix: "Run competitive analysis: OVAV vs Cursor vs Copilot vs Continue.dev. Publish benchmark brief."
+      verification: "Document: docs/research/competitive_analysis_2026.md"
+      assigned: "Eidren → Sara + Paula"
+
+    X6-HEALTH:
+      name: "Audit Health & Performance Science area"
+      severity: "LOW"
+      root_cause: "Renata's area not audited. State unknown."
+      fix: "Same deep audit as other areas. Identify tools, content, gaps."
+      verification: "Health area audit report"
+      assigned: "Thavren → Renata"
+
+# ── SEG-7: Production Launch (semana 6-12) ─────────────────────────────────
+
+SEG7:
+  name: "Production — Monitoring, Docs, Release v2.0"
+  priority: "P3 — MEDIO-BAJO"
+  estimated_hours: 30
+  depends_on: [SEG0, SEG1, SEG2, SEG3, SEG5]
+  tasks:
+    P7-MONITORING:
+      name: "24/7 monitoring + alerting"
+      severity: "MEDIUM"
+      root_cause: "No production monitoring. No alerts for downtime."
+      fix: "Fly.io health checks + UptimeRobot + status.ovav.dev page."
+      verification: "Downtime > 60s → alert to CEO"
+      assigned: "Uriel"
+
+    P7-BACKUP:
+      name: "Automated vault backup"
+      severity: "MEDIUM"
+      root_cause: "Vault not initialized. No backup strategy."
+      fix: "Cron job: weekly ovav vault encrypt → backup to encrypted S3/GCS."
+      verification: "Restore from backup → all .enc files decryptable"
+      assigned: "Uriel + Diana"
+
+    P7-DOCS:
+      name: "Public documentation site"
+      severity: "LOW"
+      root_cause: "docs/ exists but no public-facing docs site."
+      fix: "docs.ovav.dev with: getting started, architecture, API reference, security."
+      verification: "docs.ovav.dev loads with searchable content"
+      assigned: "Nadia"
+
+    P7-RELEASE:
+      name: "OVAV v2.0.0 Release"
+      severity: "MEDIUM"
+      root_cause: "Current version is 2.0.0-dev (Launch Candidate)."
+      fix: "After SEG0-5 complete: tag v2.0.0, release binaries, changelog, migration guide from 1.x."
+      verification: "All 8 Go tests pass, Go cross-compile 5 platforms, frontend build, Docker deploy."
+      assigned: "Thavren (release manager)"
+
+# ── Metrics & Gates per Segment ────────────────────────────────────────────
+
+gates:
+  SEG0_exit:
+    - "Zero critical security issues (Diana confirmed)"
+    - "Go runtime no references blocked memory files"
+    - ".ovav/vault/ exists with .enc files"
+    - "gofmt -l go-runtime/ → empty"
+    - "Go tests: 8/8 PASS"
+  SEG1_exit:
+    - "MemorySection, ProfilesSection, SystemSection render without errors"
+    - "API_BASE configurable via .env"
+    - "pnpm build → success"
+    - "Legacy components deleted"
+  SEG2_exit:
+    - "Docker build → success"
+    - "staging.api.ovav.dev → 200"
+    - "CI green on develop"
+    - "RepoRoot detection works in container"
+  SEG3_exit:
+    - "Go coverage: all packages ≥40% (config ≥70%)"
+    - "Dead code removed"
+    - "Makefile has all targets"
+  SEG4_exit:
+    - "Zero stale references to deleted Python files"
+    - "Migration audit document complete"
+  SEG5_exit:
+    - "Frontend tests ≥10"
+    - "Backend tests ≥40% coverage"
+    - "Edge case tests ≥15 scenarios"
+    - "E2E pipeline PASS"
+  SEG6_exit:
+    - "Sandbox functional"
+    - "Education tools v0.1"
+    - "Business model documented"
+    - "Competitive analysis published"
+  SEG7_exit:
+    - "Monitoring active"
+    - "Backup automated"
+    - "docs.ovav.dev live"
+    - "v2.0.0 tagged and released"
+
+# ── Risk Register ──────────────────────────────────────────────────────────
+
+risks:
+  R1:
+    risk: "Python cleanup breaks agent runtime"
+    probability: "MEDIUM"
+    impact: "HIGH"
+    mitigation: "Never delete agent_runtime/ validators/ governor/ — classify as CRITICAL keep-Python"
+  R2:
+    risk: "Docker changes break Fly.io deploy"
+    probability: "LOW"
+    impact: "HIGH"
+    mitigation: "Deploy to staging first. Validate before production."
+  R3:
+    risk: "Removal of deprecated memory references breaks cPanel dashboard"
+    probability: "LOW"
+    impact: "MEDIUM"
+    mitigation: "cPanel memory.go updated. Test all cPanel sections."
+  R4:
+    risk: "Cross-area work stalls due to lead unavailability"
+    probability: "MEDIUM"
+    impact: "LOW"
+    mitigation: "SEG6-7 are P3 priority. Core SEG0-5 are Platform Engineering only."

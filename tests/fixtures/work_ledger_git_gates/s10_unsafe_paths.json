@@ -1,0 +1,9 @@
+{
+  "paths": [
+    "~/.config/opencode/opencode.jsonc",
+    "/tmp/outside/secret.env",
+    "../outside.txt",
+    ".env",
+    ".pytest_cache/state.json"
+  ]
+}

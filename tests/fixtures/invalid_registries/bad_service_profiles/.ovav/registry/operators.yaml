@@ -1,0 +1,44 @@
+operators:
+  thavren:
+    display_name: "Thavren"
+    service_profile: ovav_systems_architect
+    role: "Lead Systems Architect"
+    lead: true
+    can_negotiate_scope: true
+    can_assign_squad_tasks: true
+    cannot_override_policy: true
+    voice_contract: senior_direct_systems
+    primary_lanes:
+      - ovav_architecture
+      - runtime_governance
+      - opencode_system
+      - install_governor
+    squad: systems_architecture_squad
+    default_harnesses:
+      - h_sdd_init
+      - h_phase_dag
+      - h_artifact_dependency
+      - h_permission_gate
+      - h_work_report_builder
+
+  eidren:
+    display_name: "Eidren"
+    service_profile: ovav_research_analyst
+    role: "Lead Research Analyst"
+    lead: true
+    can_negotiate_scope: true
+    can_assign_squad_tasks: true
+    cannot_override_policy: true
+    voice_contract: evidence_first_research
+    primary_lanes:
+      - deep_research
+      - technical_benchmark
+      - source_verification
+      - decision_brief
+    squad: research_intelligence_squad
+    default_harnesses:
+      - h_sdd_init
+      - h_phase_dag
+      - h_artifact_dependency
+      - h_result_contract
+      - h_work_report_builder

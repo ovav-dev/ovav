@@ -1,0 +1,26 @@
+# Legal & Compliance — Area Boundaries v1.0.0
+area_boundaries:
+  version: "1.0.0"
+  area: legal_compliance
+  lead: camila
+  scope:
+    includes:
+      - "Contract review and drafting (service, license, inter-area, third-party)"
+      - "Regulatory compliance (GDPR, CCPA, LGPD, privacy)"
+      - "Intellectual property (copyright, open source licensing, trademarks)"
+      - "Terms of Service, Privacy Policy, EULA drafting"
+      - "Legal auditing and compliance verification"
+      - "Legal risk identification and mitigation"
+      - "Data governance (classification, retention, data subject requests)"
+      - "Service contract registry maintenance"
+    excludes:
+      - "Medical or clinical diagnosis"
+      - "Product development or implementation"
+      - "Platform engineering or runtime modification"
+  permissions:
+    default_edit: deny
+    default_bash: deny
+    denied_bash: ["git push*", "sudo*", "pip install*", "npm install*", "apt install*", "python3 tools/*"]
+  cross_area:
+    platform_engineering: {protocol: handoff_sanitizado, description: "Security and data protection compliance review"}
+    commercial_growth: {protocol: handoff_sanitizado, description: "Commercial contract legal review"}

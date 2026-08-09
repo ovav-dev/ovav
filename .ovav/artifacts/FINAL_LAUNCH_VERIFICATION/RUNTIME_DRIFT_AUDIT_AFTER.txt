@@ -1,0 +1,594 @@
+# Runtime Drift Audit After Final Launch Verification Fixes
+# Generated: 2026-05-28
+
+## daily
+
+$ python3 tools/ovav_runtime.py daily
+{
+  "command": "daily",
+  "status": "ok",
+  "daily": {
+    "status": "ok",
+    "report_version": "s43_runtime_daily_source_v1_compact",
+    "generated_at": "deterministic",
+    "daily_workflow": [
+      {
+        "command": "python3 tools/ovav_runtime.py next",
+        "name": "next work",
+        "step": 1,
+        "summary": "final_launch_verification Final Launch Verification / OpenCode smoke"
+      },
+      {
+        "command": "python3 tools/ovav_runtime.py context --next",
+        "name": "context",
+        "step": 2,
+        "summary": "ovav_systems_architect / thavren / final_launch_verification"
+      },
+      {
+        "name": "todo",
+        "command": "python3 tools/ovav_runtime.py todo",
+        "summary": "compact todo/progress state: pending, complete, blocked, evidence readiness, next action",
+        "step": 3
+      },
+      {
+        "name": "progress",
+        "command": "python3 tools/ovav_runtime.py progress",
+        "summary": "compact progress report by segment with blockers, evidence, validation and closure readiness",
+        "step": 4
+      },
+      {
+        "name": "memory",
+        "command": "python3 tools/ovav_runtime.py memory",
+        "summary": "source-local memory UX: active mode, recall rules, candidate preview and blocked Engram surfaces",
+        "step": 5
+      },
+      {
+        "name": "install sandbox",
+        "command": "python3 tools/ovav_runtime.py install-sandbox --dry-run",
+        "summary": "source-local install sandbox preview: plan, risks, rollback simulation, approvals and blocked direct apply",
+        "step": 6
+      },
+      {
+        "command": "python3 tools/ovav_runtime.py harnesses --task-kind context",
+        "name": "harness lookup",
+        "step": 7,
+        "summary": "9 harnesses, 3 checkers indexed"
+      },
+      {
+        "name": "evidence",
+        "command": "python3 tools/ovav_runtime.py evidence --latest",
+        "summary": "compact evidence index by segment, owner, checker and readiness",
+        "step": 8
+      },
+      {
+        "name": "ledger",
+        "command": "python3 tools/ovav_runtime.py ledger --latest",
+        "summary": "compact ledger lookup for changed work and safe staging candidates",
+        "step": 9
+      },
+      {
+        "command": "OVAV_EVIDENCE_MODE=strict python3 tools/ovav_runtime.py validate",
+        "name": "validation",
+        "step": 10,
+        "summary": "run strict source-local validation before closing"
+      },
+      {
+        "command": "python3 tools/ovav_runtime.py close-layer --dry-run",
+        "name": "closure guidance",
+        "step": 11,
+        "summary": "dry-run only; validation, stage guidance, snapshot plan and next branch; no git is executed"
+      }
+    ],
+    "command_map": {
+      "next_work": "python3 tools/ovav_runtime.py next",
+      "context": "python3 tools/ovav_runtime.py context --next",
+      "todo": "python3 tools/ovav_runtime.py todo",
+      "progress": "python3 tools/ovav_runtime.py progress",
+      "harness_lookup": "python3 tools/ovav_runtime.py harnesses --task-kind context",
+      "validation": "OVAV_EVIDENCE_MODE=strict python3 tools/ovav_runtime.py validate",
+      "closure_latest": "python3 tools/ovav_runtime.py close-layer --latest --dry-run",
+      "evidence": "python3 tools/ovav_runtime.py evidence --latest",
+      "ledger": "python3 tools/ovav_runtime.py ledger --latest"
+    },
+    "current_state": {
+      "latest_completed_segment": "historical_internal_not_current_authority",
+      "latest_completed_name": "historical/internal ledger state is not current launch authority",
+      "classification": "launch_verification_in_progress",
+      "current_branch_expectation": "keep current launch-verification branch; no production or global ready claim"
+    },
+    "active_authority": {
+      "baseline": "B23 Tool Readiness Matrix + Advanced Capability Boundary",
+      "claim_policy": "launch verification in progress; production and global ready claims remain blocked",
+      "phase": "Final Launch Verification"
+    },
+    "next_work": {
+      "automatic_next_segment": "final_launch_verification",
+      "expected_evidence_outputs": [
+        ".ovav/artifacts/FINAL_LAUNCH_VERIFICATION/RUNTIME_AUTHORITY_RECONCILIATION_REPORT.md",
+        ".ovav/artifacts/FINAL_LAUNCH_VERIFICATION/RUNTIME_AUTHORITY_VALIDATION.txt",
+        ".ovav/artifacts/FINAL_LAUNCH_VERIFICATION/RUNTIME_DRIFT_AUDIT_AFTER.txt"
+      ],
+      "name": "Final Launch Verification / OpenCode smoke",
+      "objective": "Verify active OpenCode answers against the Final Launch Verification authority on top of B23.",
+      "required_behavior": [
+        "answer_current_status_from_final_launch_verification",
+        "use_B23_as_active_baseline",
+        "keep_global_and_production_claims_blocked_until_final_launch_verification_closes"
+      ],
+      "segment": "final_launch_verification",
+      "status_from_segment_map": "current_authority_overlay",
+      "suggested_task_branch_name": "keep_current_branch_no_git_action"
+    },
+    "context_pointer": {
+      "command": "python3 tools/ovav_runtime.py context --next",
+      "resolved_target": {
+        "active_baseline": "B23 Tool Readiness Matrix + Advanced Capability Boundary",
+        "active_phase": "Final Launch Verification",
+        "operator": "thavren",
+        "profile": "ovav_systems_architect",
+        "segment": "final_launch_verification",
+        "task_kind": "context"
+      },
+      "selected_pack": "ctx_ovav_systems_architect_thavren_implementation"
+    },
+    "harness_pointer": {
+      "checker_count": 2,
+      "command": "python3 tools/ovav_runtime.py harnesses --task-kind context",
+      "harness_ids": [
+        "check_context_compaction_runtime",
+        "check_context_default_harness_index",
+        "context_budget",
+        "context_compaction",
+        "context_default_entrypoint",
+        "context_default_report",
+        "context_pack_report",
+        "harness_index",
+        "snapshot_continuity"
+      ],
+      "summary": {
+        "checker_count": 3,
+        "harness_count": 9,
+        "segment_count": 2
+      }
+    },
+    "validation_commands": [
+      "OVAV_EVIDENCE_MODE=strict python3 tools/ovav_runtime.py validate",
+      "python3 tools/ovav_runtime.py close-layer --latest --dry-run",
+      "python3 tools/ovav_runtime.py context --next",
+      "python3 tools/ovav_runtime.py handoff --compact"
+    ],
+    "source_policy": {
+      "historical_artifact_tree_read": false,
+      "runtime_is_daily_source_of_truth": true,
+      "source_local_only": true,
+      "standard_library_only": true,
+      "writes_from_daily_command": false
+    },
+    "token_policy": {
+      "default_output": "compact",
+      "full_output_requires": "python3 tools/ovav_runtime.py daily --full",
+      "no_checker_index_dump_by_default": true,
+      "no_broad_handoff_or_artifact_tree_by_default": true
+    },
+    "next_action": "Continue Final Launch Verification / OpenCode smoke on top of B23; keep final launch claims blocked until smoke evidence and final tag close."
+  }
+}
+returncode=0
+
+## next
+
+$ python3 tools/ovav_runtime.py next
+{
+  "status": "ok",
+  "report_version": "s32_runtime_next_report_v1",
+  "generated_at": "deterministic",
+  "current_state": {
+    "active_phase": "Final Launch Verification",
+    "active_baseline": "B23 Tool Readiness Matrix + Advanced Capability Boundary",
+    "latest_completed_segment": "historical_internal_not_current_authority",
+    "latest_completed_name": "historical/internal ledger state is not current launch authority",
+    "classification": "launch_verification_in_progress",
+    "current_branch_expectation": "keep current launch-verification branch; no production or global ready claim",
+    "launch_claim_status": "validators passed; OpenCode smoke verification in progress; final tag not complete"
+  },
+  "next_work": {
+    "segment": "final_launch_verification",
+    "name": "Final Launch Verification / OpenCode smoke",
+    "objective": "Verify active OpenCode answers against the Final Launch Verification authority on top of B23.",
+    "status_from_segment_map": "current_authority_overlay",
+    "automatic_next_segment": "final_launch_verification",
+    "suggested_task_branch_name": "keep_current_branch_no_git_action",
+    "expected_evidence_outputs": [
+      ".ovav/artifacts/FINAL_LAUNCH_VERIFICATION/RUNTIME_AUTHORITY_RECONCILIATION_REPORT.md",
+      ".ovav/artifacts/FINAL_LAUNCH_VERIFICATION/RUNTIME_AUTHORITY_VALIDATION.txt",
+      ".ovav/artifacts/FINAL_LAUNCH_VERIFICATION/RUNTIME_DRIFT_AUDIT_AFTER.txt"
+    ],
+    "required_behavior": [
+      "answer_current_status_from_final_launch_verification",
+      "use_B23_as_active_baseline",
+      "keep_global_and_production_claims_blocked_until_final_launch_verification_closes"
+    ]
+  },
+  "model_routing_suggestion": {
+    "profile": "ovav_systems_architect",
+    "operator": "thavren",
+    "lane": "runtime_governance",
+    "model_or_mode": "systems_runtime_governance",
+    "suggestion": "Use Thavren for source-local runtime and harness changes."
+  },
+  "context_pack_command": "python3 tools/ovav_runtime.py context --profile ovav_systems_architect --task-kind context --budget compact --next",
+  "required_context_files": [
+    "AGENTS.md",
+    "docs/26_RUNTIME_CONTEXT_BUDGET.md",
+    ".ovav/service_areas/shared/current_authority_contract.yaml",
+    "tools/ovav_runtime.py",
+    "tools/harnesses/runtime_next_work.py",
+    "tools/harnesses/runtime_daily_source.py",
+    "tools/harnesses/context_default_entrypoint.py",
+    "tools/harnesses/runtime_orchestrator.py"
+  ],
+  "relevant_harness_checker_files": [
+    "tools/validators/check_final_launch_current_authority.py",
+    "tools/validators/check_final_launch_runtime_authority.py"
+  ],
+  "validation_commands": [
+    "python3 tools/validators/check_service_area_governance.py",
+    "python3 tools/validators/check_build18_launch_pack.py",
+    "python3 tools/validators/check_agent_runtime_service_area_router.py",
+    "python3 tools/validators/check_agent_runtime_enforcement.py",
+    "python3 tools/validators/check_opencode_runtime_wiring.py",
+    "python3 tools/validators/check_squad_normalization.py",
+    "python3 tools/validators/check_agent_ux_visual_delivery.py",
+    "python3 tools/validators/check_context_economy_and_active_connections.py",
+    "python3 tools/validators/check_tool_readiness_matrix.py",
+    "python3 tools/validators/check_final_launch_current_authority.py",
+    "python3 tools/validators/check_final_launch_runtime_authority.py"
+  ],
+  "closure_checklist": [
+    "dry_run_only",
+    "no_git_execution",
+    "close_final_launch_verification_only_after_smoke_evidence_and_final_tag_are_complete"
+  ],
+  "blocked_surfaces": [
+    "source_local_only",
+    "no_user_home_config_or_local_state_writes",
+    "no_global_opencode_configuration_or_plugin_installation",
+    "no_real_install_apply_backup_or_rollback",
+    "no_live_engram_behavior",
+    "no_ui_tui_behavior",
+    "no_mcp_a2a_behavior",
+    "no_external_service_behavior",
+    "no_production_or_global_ready_claims",
+    "no_new_public_profiles",
+    "no_ungated_git_actions"
+  ],
+  "source_policy": {
+    "source_local_only": true,
+    "standard_library_only": true,
+    "historical_artifact_tree_read": false,
+    "fixed_source_of_truth_only": true,
+    "writes_from_cli_next": false
+  }
+}
+returncode=0
+
+## context --next
+
+$ python3 tools/ovav_runtime.py context --next
+{
+  "command": "context",
+  "status": "ok",
+  "context": {
+    "status": "ok",
+    "report_version": "s33_context_default_entrypoint_v2_hotfix",
+    "generated_at": "deterministic",
+    "selectors": {
+      "profile": null,
+      "operator": null,
+      "task_kind": null,
+      "segment": null,
+      "next": true,
+      "budget": "compact"
+    },
+    "resolved_target": {
+      "profile": "ovav_systems_architect",
+      "operator": "thavren",
+      "task_kind": "context",
+      "segment": "final_launch_verification",
+      "active_phase": "Final Launch Verification",
+      "active_baseline": "B23 Tool Readiness Matrix + Advanced Capability Boundary"
+    },
+    "selected_context_pack": {
+      "source": "S22 compact context pack",
+      "status": "ok",
+      "pack_id": "ctx_ovav_systems_architect_thavren_implementation",
+      "target": {
+        "profile": "ovav_systems_architect",
+        "operator": "thavren",
+        "skill": null,
+        "lane": null,
+        "task_kind": "implementation"
+      },
+      "budget": {
+        "status": "accepted",
+        "tier": "compact",
+        "total_weight": 122,
+        "limit": 150,
+        "remaining": 28,
+        "item_count": 10,
+        "over_budget": false,
+        "reason": "within_budget"
+      },
+      "selected_refs": [
+        {
+          "id": "build1_closure",
+          "path": ".ovav/artifacts/S16/evidence/BUILD1_CLOSURE_REPORT.json",
+          "reason": "authoritative BUILD 1 completion metadata"
+        },
+        {
+          "id": "build2_segment_map",
+          "path": ".ovav/artifacts/S17/evidence/BUILD2_SEGMENT_MAP.json",
+          "reason": "BUILD 2 segment order and S22 scope"
+        },
+        {
+          "id": "delegation_rules",
+          "path": ".ovav/registry/delegation_rules.yaml",
+          "reason": "task kind and lane planning"
+        },
+        {
+          "id": "harnesses",
+          "path": ".ovav/registry/harnesses.yaml",
+          "reason": "context harness references"
+        },
+        {
+          "id": "operators",
+          "path": ".ovav/registry/operators.yaml",
+          "reason": "lead operator linkage"
+        },
+        {
+          "id": "runtime_status",
+          "path": ".ovav/artifacts/S21/evidence/RUNTIME_STATUS_REPORT.json",
+          "reason": "previous runtime status reference"
+        },
+        {
+          "id": "service_profiles",
+          "path": ".ovav/registry/service_profiles.yaml",
+          "reason": "profile selector ovav_systems_architect"
+        },
+        {
+          "id": "work_ledger",
+          "path": ".ovav/registry/work_ledger.yaml",
+          "reason": "ledger contract for close evidence"
+        }
+      ],
+      "harness_refs": [
+        "h_artifact_dependency",
+        "h_context_budget",
+        "h_context_budget_guard",
+        "h_context_compaction",
+        "h_context_pack_report",
+        "h_permission_gate",
+        "h_phase_dag",
+        "h_sdd_init",
+        "h_skill_context_loader",
+        "h_snapshot_continuity",
+        "h_work_report_builder"
+      ],
+      "evidence_refs": [
+        ".ovav/artifacts/S16/evidence/BUILD1_CLOSURE_REPORT.json",
+        ".ovav/artifacts/S17/evidence/BUILD2_SEGMENT_MAP.json",
+        ".ovav/artifacts/S21/evidence/RUNTIME_STATUS_REPORT.json"
+      ],
+      "broad_handoff_refs_omitted_from_default": true
+    },
+    "omitted_broad_docs": [
+      {
+        "path": ".ovav/artifacts/**",
+        "reason": "compact context and indexed harness lookup are preferred first"
+      },
+      {
+        "path": ".ovav/context/BUILD1_FINAL_HANDOFF.md",
+        "reason": "compact context and indexed harness lookup are preferred first"
+      },
+      {
+        "path": ".ovav/context/BUILD2_FINAL_HANDOFF.md",
+        "reason": "compact context and indexed harness lookup are preferred first"
+      },
+      {
+        "path": ".ovav/context/BUILD3_CURRENT_HANDOFF.md full-read",
+        "reason": "compact context and indexed harness lookup are preferred first"
+      },
+      {
+        "path": "imports/BUILD3_PLAN_V3/**",
+        "reason": "compact context and indexed harness lookup are preferred first"
+      }
+    ],
+    "harness_index_refs": {
+      "command": "python3 tools/ovav_runtime.py harnesses --task-kind context",
+      "filtered_commands": [
+        "python3 tools/ovav_runtime.py harnesses --segment S33",
+        "python3 tools/ovav_runtime.py harnesses --task-kind context"
+      ],
+      "harness_ids": [
+        "check_context_compaction_runtime",
+        "check_context_default_harness_index",
+        "context_budget",
+        "context_compaction",
+        "context_default_entrypoint",
+        "context_default_report",
+        "context_pack_report",
+        "harness_index",
+        "snapshot_continuity"
+      ],
+      "checker_count": 2,
+      "checker_index_sample": [
+        {
+          "segment": "S22",
+          "checker": "tools/harnesses/check_context_compaction_runtime.py"
+        },
+        {
+          "segment": "S33",
+          "checker": "tools/harnesses/check_context_default_harness_index.py"
+        }
+      ]
+    },
+    "next_work_refs": {
+      "command": "python3 tools/ovav_runtime.py next",
+      "segment": "final_launch_verification",
+      "name": "Final Launch Verification / OpenCode smoke",
+      "context_pack_command": "python3 tools/ovav_runtime.py context --profile ovav_systems_architect --task-kind context --budget compact --next",
+      "evidence": [
+        ".ovav/artifacts/S32/evidence/RUNTIME_NEXT_WORK_REPORT.json"
+      ]
+    },
+    "validation_refs": [
+      "OVAV_EVIDENCE_MODE=strict python3 tools/ovav_runtime.py validate",
+      "python3 tools/harnesses/check_context_default_harness_index.py",
+      "python3 tools/ovav_runtime.py context --next",
+      "python3 tools/ovav_runtime.py harnesses --task-kind context"
+    ],
+    "source_of_truth_refs": [
+      ".ovav/context/CURRENT_HANDOFF.md",
+      ".ovav/artifacts/S32/evidence/RUNTIME_NEXT_WORK_REPORT.json",
+      ".ovav/registry/harnesses.yaml",
+      ".ovav/registry/artifacts.yaml",
+      ".ovav/registry/work_ledger.yaml",
+      "tools/ovav_runtime.py",
+      "tools/harnesses/context_compaction.py",
+      "tools/harnesses/runtime_next_work.py",
+      "tools/harnesses/runtime_command_router.py",
+      "tools/harnesses/runtime_orchestrator.py"
+    ],
+    "blocked_surfaces": [
+      "source_local_only",
+      "no_user_home_config_or_local_state_writes",
+      "no_global_opencode_configuration_or_plugin_installation",
+      "no_real_install_apply_backup_or_rollback",
+      "no_live_engram_behavior",
+      "no_ui_tui_behavior",
+      "no_mcp_a2a_behavior",
+      "no_external_service_behavior",
+      "no_production_or_global_ready_claims",
+      "no_new_public_profiles",
+      "no_ungated_git_actions"
+    ],
+    "source_policy": {
+      "source_local_only": true,
+      "standard_library_only": true,
+      "historical_artifact_tree_read": false,
+      "compact_context_before_broad_handoff": true,
+      "writes_from_context_command": false,
+      "current_authority_overlay": true
+    },
+    "next_action": "Use selected_context_pack and harness_index_refs before reading broad handoffs or artifact trees."
+  }
+}
+returncode=0
+
+## validate
+
+$ python3 tools/ovav_runtime.py validate
+{
+  "status": "ok",
+  "command": "validate",
+  "exit_code": 0,
+  "stdout": "validation passed",
+  "stderr": ""
+}
+returncode=0
+
+## close-layer --latest --dry-run
+
+$ python3 tools/ovav_runtime.py close-layer --latest --dry-run
+{
+  "command": "close-layer",
+  "status": "dry_run_complete",
+  "dry_run": true,
+  "pre_closure_gates": {
+    "pre_closure_review": null,
+    "fix_audit": null,
+    "scenario_generator": null,
+    "all_gates_pass": false
+  },
+  "selector": {
+    "profile": "auto",
+    "segment": "current_authority_overlay",
+    "latest": true
+  },
+  "close_plan": {
+    "status": "ok",
+    "report_version": "final_launch_close_layer_dry_run_v1",
+    "generated_at": "deterministic",
+    "active_authority": {
+      "phase": "Final Launch Verification",
+      "baseline": "B23 Tool Readiness Matrix + Advanced Capability Boundary",
+      "classification": "launch_verification_in_progress"
+    },
+    "close_target": {
+      "scope": "Final Launch Verification smoke evidence and final tag",
+      "segment": null,
+      "segment_close_target": false,
+      "status": "not_closed"
+    },
+    "source_policy": {
+      "source_local_only": true,
+      "standard_library_only": true,
+      "never_executes_git": true,
+      "never_runs_snapshot_command": true,
+      "never_runs_install_apply_backup_rollback": true,
+      "never_touches_global_opencode_engram_ui_tui_mcp_a2a_external": true,
+      "historical_artifact_tree_read": false
+    },
+    "validation_gates": [
+      "python3 tools/validators/check_service_area_governance.py",
+      "python3 tools/validators/check_build18_launch_pack.py",
+      "python3 tools/validators/check_agent_runtime_service_area_router.py",
+      "python3 tools/validators/check_agent_runtime_enforcement.py",
+      "python3 tools/validators/check_opencode_runtime_wiring.py",
+      "python3 tools/validators/check_squad_normalization.py",
+      "python3 tools/validators/check_agent_ux_visual_delivery.py",
+      "python3 tools/validators/check_context_economy_and_active_connections.py",
+      "python3 tools/validators/check_tool_readiness_matrix.py",
+      "python3 tools/validators/check_final_launch_current_authority.py",
+      "python3 tools/validators/check_final_launch_runtime_authority.py"
+    ],
+    "close_protocol": [
+      "dry_run_only",
+      "verify_OpenCode_smoke_answers_use_Final_Launch_Verification_and_B23",
+      "do_not_claim_production_or_global_ready_before_final_launch_verification_closes",
+      "no_git_execution_from_close_layer"
+    ],
+    "blocked_surfaces": [
+      "source_local_only",
+      "no_global_config_or_plugin_install",
+      "no_real_install_apply_backup_or_rollback",
+      "no_live_engram_or_external_services",
+      "no_ui_tui_mcp_a2a_behavior",
+      "no_production_or_global_ready_claims"
+    ],
+    "dry_run_manifest_refs": {
+      "current_authority_contract": ".ovav/service_areas/shared/current_authority_contract.yaml",
+      "runtime_authority_validator": "tools/validators/check_final_launch_runtime_authority.py"
+    }
+  },
+  "notes": [
+    "No git command was executed.",
+    "No snapshot was created or restored.",
+    "No global install was performed.",
+    "No OpenCode/Engram/UI/TUI/MCP/A2A/external behavior was touched."
+  ]
+}
+returncode=0
+
+## host config drift
+
+$ python3 tools/validators/check_host_config_drift.py
+PASS host config drift — no host OVAV files detected
+returncode=0
+
+## permission policy drift
+
+$ python3 tools/validators/check_permission_policy_drift.py
+PASS permission policy drift
+returncode=0
+

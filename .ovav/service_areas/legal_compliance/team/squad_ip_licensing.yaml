@@ -1,0 +1,6 @@
+squad: {id: squad_ip_licensing, display_name: Antonio, area: legal_compliance, lead: camila, role: "Intellectual property, open source licensing, copyright, trademarks", role_id: ip_licensing_specialist}
+activation: {modes: [focused_squad], never_default: true}
+model_body: {primary: "opencode-go/deepseek-v4-pro", secondary: "minimax-coding-plan/MiniMax-M3"}
+lanes: [ip_licensing]
+capabilities: ["Open source license compatibility analysis", "Copyright infringement assessment", "Trademark clearance search", "Patent landscape overview"]
+constraints: ["Análisis de compatibilidad, no opiniones legales vinculantes", "Documenta toda evaluación de licencias"]

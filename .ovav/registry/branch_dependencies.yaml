@@ -1,0 +1,25 @@
+version: 1.0.0
+methodology: stacked-diffs
+workflow: "main \u2190 develop \u2190 feature/* \u2190 task/*"
+branches:
+  feature/branch-shield:
+    base: develop
+    depends_on: []
+    tasks:
+    - task/alineacion-post-v1
+    status: active
+    blocked_until: []
+    notes: Blindaje de ramas 3-tier + pre-push intelligence + merge readiness
+  task/alineacion-post-v1:
+    base: develop
+    depends_on: []
+    tasks: []
+    status: active
+    blocked_until: []
+    notes: "Rama actual \u2014 startup containment + trigger gating + branch shield\
+      \ base"
+  task/task-correciones2:
+    base: develop
+    depends_on: []
+    status: active
+    created_at: '2026-06-15T09:10:36.291986+00:00'

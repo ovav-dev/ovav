@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ovav.dev/schemas/surface_validator_map.schema.json",
+  "title": "OVAV Surface → Validator Map",
+  "description": "Schema for .ovav/registry/surface_validator_map.yaml — Layer 2 Harness Router configuration.",
+  "type": "object",
+  "required": ["surfaces", "lane_validators", "always_run"],
+  "properties": {
+    "surfaces": {
+      "type": "object",
+      "description": "Repo surface paths mapped to validator groups",
+      "patternProperties": {
+        "^[a-zA-Z0-9_./-]+/$": {
+          "type": "object",
+          "required": ["description", "families", "validators"],
+          "properties": {
+            "description": { "type": "string" },
+            "families": {
+              "type": "array",
+              "items": { "type": "string" },
+              "minItems": 1
+            },
+            "validators": {
+              "type": "array",
+              "items": { "type": "string" },
+              "minItems": 1
+            },
+            "priority_order": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "lane_validators": {
+      "type": "object",
+      "description": "Session lane → validators for proactive triggering",
+      "patternProperties": {
+        "^[a-z_]+$": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1
+        }
+      }
+    },
+    "always_run": {
+      "type": "array",
+      "description": "Validators that always run regardless of surface",
+      "items": { "type": "string" }
+    }
+  }
+}

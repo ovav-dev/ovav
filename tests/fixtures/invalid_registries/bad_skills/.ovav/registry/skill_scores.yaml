@@ -1,0 +1,16 @@
+skill_scores:
+  formula: "sum(dimensions)"
+  dimensions:
+    owner_present: 15
+    eval_passed: 20
+    risk_low: 15
+    provenance_trusted: 15
+    last_validated_recent: 10
+    permission_bounded: 15
+    examples_present: 5
+    anti_patterns_present: 5
+  thresholds:
+    trusted: 85
+    allowed_with_caution: 65
+    experimental: 45
+    blocked: 0

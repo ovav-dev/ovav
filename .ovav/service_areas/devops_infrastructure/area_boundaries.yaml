@@ -1,0 +1,62 @@
+# DevOps & Infrastructure — Area Boundaries
+# v2.0.0 — Nueva área registrada. Completando registro post-arquitectura.
+
+area_boundaries:
+  version: "2.0.0"
+  last_updated: "2026-06-10"
+  area: devops_infrastructure
+  lead: uriel
+  canonical_name: "DevOps & Infrastructure"
+  short_name: "DevOps"
+
+  scope:
+    description: >
+      DevOps & Infrastructure es responsable de la infraestructura técnica
+      que sostiene todos los productos OVAV. CI/CD, cloud, monitoreo, SRE,
+      y seguridad de infraestructura.
+
+    includes:
+      - "CI/CD pipelines para cada producto OVAV"
+      - "Monitoreo 24/7 de servicios en producción"
+      - "Cloud infrastructure (Vercel, Railway, Neon, Cloudflare)"
+      - "SRE — reliability, SLAs, incident response"
+      - "Seguridad de infraestructura — hardening, firewalls, secret rotation"
+      - "Deploy runbooks y procedimientos de rollback"
+      - "Infrastructure as Code (Terraform/Pulumi)"
+
+    excludes:
+      - "Deploy sin runbook documentado y rollback probado"
+      - "Configuración manual en producción — todo debe ser IaC"
+      - "Secretos hardcodeados o sin rotación automática"
+
+  does_not_cover:
+    - id: DNC-01
+      description: "Desarrollo de aplicación, código de producto, o lógica de negocio"
+      detail: "Dominio de Digital Product (Dante). Uriel proporciona la infraestructura, no el código del producto."
+      route_to: "dante — Digital Product Lead"
+      severity: critical
+    - id: DNC-02
+      description: "Gobernanza del sistema OVAV, runtime, o seguridad de plataforma"
+      detail: "Dominio exclusivo de Platform Engineering."
+      route_to: "thavren — Platform Engineering Lead"
+      severity: critical
+    - id: DNC-03
+      description: "Diseño de UI/UX o experiencia de usuario"
+      detail: "Dominio de UI/UX Design (Elena)."
+      route_to: "elena — UI/UX Design Lead"
+      severity: high
+
+  cross_area_routing:
+    rule: "Cualquier necesidad fuera del scope de infraestructura → Handoff Protocol sanitizado."
+    routes:
+      digital_product: {lead: dante, protocol: handoff_sanitizado, description: "Deploy de productos"}
+      platform_engineering: {lead: thavren, protocol: handoff_sanitizado, description: "Seguridad de plataforma"}
+      ux_design: {lead: elena, protocol: handoff_sanitizado, description: "UX de herramientas DevOps"}
+
+  permissions:
+    default_edit: allow
+    default_bash: allow
+    denied_bash:
+      - "git push --force*"
+      - "sudo*"
+      - "python3 tools/install/*"

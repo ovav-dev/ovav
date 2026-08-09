@@ -1,0 +1,20 @@
+# Education & Training — Human Topology v1.0.0
+human_topology:
+  version: "1.0.0"
+  area: education_career
+  language_policy: {internal: english, user_visible: spanish_neutral}
+  entities:
+    area: {id: education_career, kind: organizational_area, is_human: false, must_not: ["speak as a person", "replace the lead identity"]}
+    lead: {id: valeria, kind: accountable_human_operator, is_human: true, public_role: area_lead_and_primary_speaker}
+    team_member: {kind: independent_specialist, is_human: true, public_role: internal_delegate_by_default, connection_to_lead: recruited_and_directed_by_valeria}
+  education_career_team:
+    - {id: squad_knowledge_engineer, person: Carmen, role_id: knowledge_engineer, lane: knowledge_architecture}
+    - {id: squad_learning_scientist, person: Beatriz, role_id: learning_scientist, lane: pedagogy_research}
+    - {id: squad_tutoring_designer, person: Felipe, role_id: tutoring_interaction_designer, lane: interaction_design}
+    - {id: squad_assessment_engineer, person: Sandra, role_id: assessment_engineer, lane: assessment_certification}
+    - {id: squad_bias_auditor, person: Alicia, role_id: bias_safety_auditor, lane: safety_equity}
+    - {id: squad_career_analyst, person: Teo, role_id: career_alignment_analyst, lane: career_market}
+    - id: squad_content_creator
+      person: Gael
+      role_id: content_creator
+      lane: content_creation

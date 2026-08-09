@@ -1,0 +1,340 @@
+// Package license implements license key binding and verification.
+//
+// C9.4: Deriva vault.key de PBKDF2(license_key, machine_id).
+// Verifica expiración. Usa crypto/sha256 y crypto/pbkdf2 de stdlib.
+package license
+
+import (
+	"crypto/hmac"
+	"crypto/sha256"
+	"crypto/subtle"
+	"encoding/base64"
+	"encoding/hex"
+	"fmt"
+	"hash"
+	"os"
+	"os/exec"
+	"runtime"
+	"strings"
+	"time"
+
+	"github.com/ovav/ovav/internal/vault"
+)
+
+const (
+	// PBKDF2 parameters
+	pbkdf2Iterations = 600_000 // OWASP 2024 recommendation
+	pbkdf2SaltLen    = 32
+	keyLen           = vault.KeySize // 32 bytes for AES-256
+)
+
+// ── Machine ID ───────────────────────────────────────────────────────────────
+
+// readFileFn is the function used to read files; overridable in tests.
+var readFileFn = os.ReadFile
+
+// MachineID returns a unique identifier for the current machine.
+// Linux: /etc/machine-id. Darwin: ioreg. Windows: registry.
+// Falls back to hostname if machine-id is unavailable.
+func MachineID() (string, error) {
+	switch runtime.GOOS {
+	case "linux":
+		data, err := readFileFn("/etc/machine-id")
+		if err == nil {
+			return strings.TrimSpace(string(data)), nil
+		}
+		// Fallback: /var/lib/dbus/machine-id
+		data, err = readFileFn("/var/lib/dbus/machine-id")
+		if err == nil {
+			return strings.TrimSpace(string(data)), nil
+		}
+	case "darwin":
+		out, err := exec.Command("ioreg", "-rd1", "-c", "IOPlatformExpertDevice").Output()
+		if err == nil {
+			for _, line := range strings.Split(string(out), "\n") {
+				if strings.Contains(line, "IOPlatformUUID") {
+					parts := strings.Split(line, `"`)
+					if len(parts) >= 4 {
+						return parts[3], nil
+					}
+				}
+			}
+		}
+	case "windows":
+		out, err := exec.Command("reg", "query", `HKLM\SOFTWARE\Microsoft\Cryptography`, "/v", "MachineGuid").Output()
+		if err == nil {
+			for _, line := range strings.Split(string(out), "\n") {
+				if strings.Contains(line, "MachineGuid") {
+					fields := strings.Fields(line)
+					if len(fields) >= 4 {
+						return fields[len(fields)-1], nil
+					}
+				}
+			}
+		}
+	}
+
+	// Universal fallback: hostname
+	hostname, err := os.Hostname()
+	if err != nil {
+		return "", fmt.Errorf("license: cannot determine machine ID: %w", err)
+	}
+	return hostname, nil
+}
+
+// ── Key derivation ───────────────────────────────────────────────────────────
+
+// DeriveKey derives a 32-byte AES-256 key from license key + machine ID.
+// Uses PBKDF2-HMAC-SHA256 with 600,000 iterations.
+func DeriveKey(licenseKey, machineID string) ([]byte, error) {
+	if licenseKey == "" {
+		return nil, fmt.Errorf("license: license key is empty")
+	}
+	if machineID == "" {
+		var err error
+		machineID, err = MachineID()
+		if err != nil {
+			return nil, fmt.Errorf("license: machine ID unavailable: %w", err)
+		}
+	}
+
+	// Salt = SHA256(machine_id)[:32]
+	saltHash := sha256.Sum256([]byte(machineID))
+	salt := saltHash[:pbkdf2SaltLen]
+
+	key := pbkdf2Key([]byte(licenseKey), salt, pbkdf2Iterations, keyLen, sha256.New)
+	return key, nil
+}
+
+// ── License structure ────────────────────────────────────────────────────────
+
+// License represents an OVAV license.
+type License struct {
+	Key       string    `json:"key"`
+	Holder    string    `json:"holder"`
+	Email     string    `json:"email"`
+	IssuedAt  time.Time `json:"issued_at"`
+	ExpiresAt time.Time `json:"expires_at"`
+	Tier      string    `json:"tier"` // "pro", "enterprise", "trial"
+	Features  []string  `json:"features"`
+}
+
+// ── Binding ───────────────────────────────────────────────────────────────────
+
+// BindResult holds the result of binding a license to a machine.
+type BindResult struct {
+	Bound     bool   `json:"bound"`
+	MachineID string `json:"machine_id"`
+	VaultHash string `json:"vault_key_hash"` // SHA256(derived key) — never expose raw key
+	ExpiresAt string `json:"expires_at"`
+}
+
+// Bind binds a license to the current machine.
+// Derives the vault key and returns a BindResult.
+// The derived key should be stored securely (never logged or displayed).
+func Bind(lic *License) (*BindResult, error) {
+	machineID, err := MachineID()
+	if err != nil {
+		return nil, fmt.Errorf("license: bind failed: %w", err)
+	}
+
+	vaultKey, err := DeriveKey(lic.Key, machineID)
+	if err != nil {
+		return nil, fmt.Errorf("license: bind failed: %w", err)
+	}
+
+	// Hash the key for storage/verification (never store raw key)
+	vaultKeyHash := sha256.Sum256(vaultKey)
+
+	result := &BindResult{
+		Bound:     true,
+		MachineID: machineID,
+		VaultHash: hex.EncodeToString(vaultKeyHash[:]),
+		ExpiresAt: lic.ExpiresAt.UTC().Format(time.RFC3339),
+	}
+
+	return result, nil
+}
+
+// ── Verification ─────────────────────────────────────────────────────────────
+
+// VerifyResult holds the result of license verification.
+type VerifyResult struct {
+	Valid     bool   `json:"valid"`
+	MachineID string `json:"machine_id"`
+	Message   string `json:"message"`
+	ExpiresAt string `json:"expires_at,omitempty"`
+	DaysLeft  int    `json:"days_left,omitempty"`
+}
+
+// Verify checks if a license is valid for the current machine.
+// Compares derived key hash against the stored hash.
+// Checks expiration.
+func Verify(lic *License, expectedVaultHash string) *VerifyResult {
+	machineID, err := MachineID()
+	if err != nil {
+		return &VerifyResult{
+			Valid:     false,
+			MachineID: "unknown",
+			Message:   fmt.Sprintf("Cannot determine machine ID: %v", err),
+		}
+	}
+
+	// Check expiration
+	now := time.Now().UTC()
+	if now.After(lic.ExpiresAt) {
+		daysAgo := int(now.Sub(lic.ExpiresAt).Hours() / 24)
+		return &VerifyResult{
+			Valid:     false,
+			MachineID: machineID,
+			Message:   fmt.Sprintf("License expired %d days ago", daysAgo),
+			ExpiresAt: lic.ExpiresAt.Format(time.RFC3339),
+			DaysLeft:  -daysAgo,
+		}
+	}
+
+	// Derive key and compare hash
+	vaultKey, err := DeriveKey(lic.Key, machineID)
+	if err != nil {
+		return &VerifyResult{
+			Valid:     false,
+			MachineID: machineID,
+			Message:   fmt.Sprintf("Key derivation failed: %v", err),
+		}
+	}
+
+	vaultKeyHash := sha256.Sum256(vaultKey)
+	actualHash := hex.EncodeToString(vaultKeyHash[:])
+
+	if subtle.ConstantTimeCompare([]byte(actualHash), []byte(expectedVaultHash)) != 1 {
+		return &VerifyResult{
+			Valid:     false,
+			MachineID: machineID,
+			Message:   "License not valid for this machine (hash mismatch)",
+		}
+	}
+
+	daysLeft := int(lic.ExpiresAt.Sub(now).Hours() / 24)
+
+	return &VerifyResult{
+		Valid:     true,
+		MachineID: machineID,
+		Message:   fmt.Sprintf("License valid. %d days remaining.", daysLeft),
+		ExpiresAt: lic.ExpiresAt.Format(time.RFC3339),
+		DaysLeft:  daysLeft,
+	}
+}
+
+// ── PBKDF2 (stdlib-only implementation) ──────────────────────────────────────
+
+// pbkdf2Key implements PBKDF2 using only stdlib crypto/hmac.
+// This avoids importing golang.org/x/crypto/pbkdf2, keeping zero external deps.
+func pbkdf2Key(password, salt []byte, iter, keyLen int, h func() hash.Hash) []byte {
+	prf := hmac.New(h, password)
+	hashLen := prf.Size()
+	numBlocks := (keyLen + hashLen - 1) / hashLen
+
+	dk := make([]byte, 0, numBlocks*hashLen)
+	buf := make([]byte, 4)
+
+	for block := 1; block <= numBlocks; block++ {
+		// U_1 = PRF(password, salt || BE32(block))
+		prf.Reset()
+		prf.Write(salt)
+		buf[0] = byte(block >> 24)
+		buf[1] = byte(block >> 16)
+		buf[2] = byte(block >> 8)
+		buf[3] = byte(block)
+		prf.Write(buf)
+		u := prf.Sum(nil)
+		t := make([]byte, len(u))
+		copy(t, u)
+
+		// U_i = PRF(password, U_{i-1}) for i=2..iter
+		for i := 2; i <= iter; i++ {
+			prf.Reset()
+			prf.Write(u)
+			u = prf.Sum(nil)
+			for j := range t {
+				t[j] ^= u[j]
+			}
+		}
+
+		dk = append(dk, t...)
+	}
+
+	return dk[:keyLen]
+}
+
+// ── Encoding helpers ─────────────────────────────────────────────────────────
+
+// licenseHMACKey is the secret key used to sign license keys.
+// In production, this should be set via OVAV_LICENSE_HMAC_KEY env var.
+var licenseHMACKey = []byte("ovav-license-hmac-key-v1")
+
+func init() {
+	if key := os.Getenv("OVAV_LICENSE_HMAC_KEY"); key != "" {
+		licenseHMACKey = []byte(key)
+	}
+}
+
+// EncodeLicenseKey encodes license data as a base64 key with HMAC signature.
+// Format: base64(payload|hmac_hex) where hmac covers the payload.
+func EncodeLicenseKey(lic *License) string {
+	payload := fmt.Sprintf("%s|%s|%s|%s|%s",
+		lic.Key, lic.Holder, lic.Email,
+		lic.IssuedAt.Format(time.RFC3339),
+		lic.ExpiresAt.Format(time.RFC3339))
+
+	mac := hmac.New(sha256.New, licenseHMACKey)
+	mac.Write([]byte(payload))
+	sig := hex.EncodeToString(mac.Sum(nil))
+
+	signed := payload + "|" + sig
+	return base64.URLEncoding.EncodeToString([]byte(signed))
+}
+
+// DecodeLicenseKey decodes a base64 license key and verifies HMAC signature.
+func DecodeLicenseKey(encoded string) (*License, error) {
+	data, err := base64.URLEncoding.DecodeString(encoded)
+	if err != nil {
+		return nil, fmt.Errorf("license: invalid encoding: %w", err)
+	}
+
+	content := string(data)
+
+	// Find the last pipe — the HMAC signature is after it
+	lastPipe := strings.LastIndex(content, "|")
+	if lastPipe < 0 {
+		return nil, fmt.Errorf("license: invalid format, no HMAC signature")
+	}
+
+	payload := content[:lastPipe]
+	sigHex := content[lastPipe+1:]
+
+	// Verify HMAC signature
+	mac := hmac.New(sha256.New, licenseHMACKey)
+	mac.Write([]byte(payload))
+	expectedSig := hex.EncodeToString(mac.Sum(nil))
+
+	if !hmac.Equal([]byte(sigHex), []byte(expectedSig)) {
+		return nil, fmt.Errorf("license: invalid signature — license may be forged")
+	}
+
+	parts := strings.Split(payload, "|")
+	if len(parts) < 5 {
+		return nil, fmt.Errorf("license: invalid format, expected 5 fields, got %d", len(parts))
+	}
+
+	issuedAt, _ := time.Parse(time.RFC3339, parts[3])
+	expiresAt, _ := time.Parse(time.RFC3339, parts[4])
+
+	return &License{
+		Key:       parts[0],
+		Holder:    parts[1],
+		Email:     parts[2],
+		IssuedAt:  issuedAt,
+		ExpiresAt: expiresAt,
+		Tier:      "pro",
+	}, nil
+}

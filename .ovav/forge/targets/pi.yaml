@@ -1,0 +1,18 @@
+# OVAV Forge — Pi (Personal AI) Target Manifest
+# Canonical source: .ovav/forge/targets/pi.yaml
+# Generated: 2026-06-03
+
+target:
+  id: pi
+  name: Pi (Personal AI assistant)
+  type: personal_ai
+  projection_root: .pi
+  surfaces:
+    agents:
+      source: .ovav/source/agents
+      adapter: pi.agents
+      target: .pi/agents
+  gates:
+    - ovav_law_compliance
+    - integrity_mesh
+    - version_pack

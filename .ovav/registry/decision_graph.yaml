@@ -1,0 +1,111 @@
+# OVAV Decision Knowledge Graph
+# Pattern absorbed from Semantica (knowledge graphs + reasoning + governance)
+# Purpose: Track architectural decisions, their rationale, and impact chains
+# Created: 2026-07-17
+
+schema: ovav_decision_graph.v1
+created_at: 2026-07-17T23:50:00-0500
+created_by: thavren
+
+# Decision nodes — each decision has rationale, alternatives, and impact
+decisions:
+
+  D-DIRECT-01:
+    title: "Direct connection OVAV ↔ MiMoCode/OpenCode"
+    date: 2026-07-05
+    rationale: "Braka: 'mimocode y opencode tengan una conexion directa con ovav'. NO Product layer."
+    alternatives_rejected:
+      - "cPanel intermediario (too complex, single point of failure)"
+      - "Product layer (withdrawn: 0% identity guard, 0 validators)"
+    impact:
+      - "OVAV canonical YAML → convert_agents → 4 runtime targets"
+      - "Skills via symlink: ~/.mimocode/skills → .opencode/skills"
+      - "All Product-related decisions SUPERSEDED"
+    status: ACTIVE
+    confidence: HIGH
+
+  D-INTELLIGENCE-ABSORPTION-01:
+    title: "Absorb MiMoCode intelligence into OVAV brain"
+    date: 2026-07-17
+    rationale: "MiMoCode beat OpenCode with 14 novel capabilities. OVAV should absorb patterns, not replace."
+    alternatives_rejected:
+      - "Rewrite OVAV in MiMoCode (OVAV is a layer ABOVE, not a fork)"
+      - "Copy MiMoCode wholesale (different architecture goals)"
+    impact:
+      - "Adversarial jury pattern → OWS validators"
+      - "Model groups → permission_authority.json"
+      - "Cron/loop → governance monitoring"
+      - "Progressive disclosure → skill loading"
+    status: ACTIVE
+    confidence: HIGH
+
+  D-STABILIZE-BEFORE-ADVANCE-01:
+    title: "Stabilization gate before new features"
+    date: 2026-07-17
+    rationale: "Braka: 'primero antes de avanzar vamos a pulir sistema completa'. Quality gate."
+    alternatives_rejected:
+      - "Continue feature work (risks accumulating debt)"
+      - "Skip stabilization (guarantees regression)"
+    impact:
+      - "3-phase cleanup: Fase1 (phantoms) → Fase2 (powerup) → Fase3 (innovation)"
+      - "No new sprints until stabilization passes"
+    status: ACTIVE
+    confidence: HIGH
+
+  D-CAPA1-BEFORE-CAPA2-01:
+    title: "OVAV Systems stabilization before OVAV Product"
+    date: 2026-07-15
+    rationale: "Braka: 'una vez estabiliza OVAV SYSTEMS → preparar el producto'."
+    alternatives_rejected:
+      - "Parallel development (risk of contaminated Product)"
+      - "Product first (no foundation)"
+    impact:
+      - "Phase 2 (Product) POSTERGADO until L0-L6 ≥ 90%"
+      - "Current focus: Capa 1 stabilization"
+    status: ACTIVE
+    confidence: HIGH
+
+  D-OWS-V3-COMMAND-01:
+    title: "OWS v3 uses ovav git {start,status,save,push,merge,release}"
+    date: 2026-07-15
+    rationale: "Consolidation of 11 commands into 6 verb-based interface."
+    alternatives_rejected:
+      - "Keep 11 separate commands (too many to remember)"
+      - "Single monolithic command (too complex)"
+    impact:
+      - "Legacy owc/owd references in docs need mapping"
+      - "bin/ovav-ow-runtime.sh is the actual implementation"
+    status: ACTIVE
+    confidence: HIGH
+
+# Impact chains — how decisions affect each other
+impact_chains:
+
+  intel_absorption_enables_stabilization:
+    from: D-INTELLIGENCE-ABSORPTION-01
+    to: D-STABILIZE-BEFORE-ADVANCE-01
+    relationship: "enables"
+    description: "Absorbed patterns (model groups, cron, adversarial) make stabilization verifiable"
+
+  stabilization_enables_capa2:
+    from: D-STABILIZE-BEFORE-ADVANCE-01
+    to: D-CAPA1-BEFORE-CAPA2-01
+    relationship: "prerequisite_for"
+    description: "Stabilization must complete before Capa 2 can open"
+
+  direct_connection_enables_multi_cli:
+    from: D-DIRECT-01
+    to: D-OWS-V3-COMMAND-01
+    relationship: "enables"
+    description: "Direct connection means OWS commands work across all 4 CLI targets"
+
+# Decision health metrics
+health:
+  total_decisions: 5
+  active: 5
+  superseded: 0
+  deprecated: 0
+  confidence_high: 5
+  confidence_medium: 0
+  confidence_low: 0
+  last_reviewed: 2026-07-17T23:50:00-0500

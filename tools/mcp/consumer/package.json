@@ -1,0 +1,16 @@
+{
+  "name": "ovav-mcp-consumer-local",
+  "version": "1.0.0",
+  "description": "Local OVAV MCP Consumer Servers",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Tests coming soon\""
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "figma-mcp": "^0.1.4"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

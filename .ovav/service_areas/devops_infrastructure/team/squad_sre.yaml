@@ -1,0 +1,7 @@
+squad:
+  id: squad_sre
+  name: "SRE Squad"
+  area: devops_infrastructure
+  lead: uriel
+  scope: "Reliability, SLAs, incident response, post-mortems, chaos engineering"
+  status: active

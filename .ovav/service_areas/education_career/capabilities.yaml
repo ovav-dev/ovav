@@ -1,0 +1,13 @@
+# Education & Training — Capabilities Registry v1.0.0
+capabilities:
+  version: "1.0.0"
+  area: education_career
+  registered:
+    - {id: gap_detection, name: "Knowledge Gap Detection", status: active, tool: "planned: gap_detector.py", maturity: planned}
+    - {id: curriculum_gen, name: "Curriculum Generation", status: active, tool: "planned: curriculum_engine.py", maturity: planned}
+    - {id: knowledge_tracing, name: "Bayesian Knowledge Tracing", status: active, tool: "planned: student_model.py", maturity: planned}
+    - {id: transfer_validation, name: "Transfer Validation", status: active, tool: "planned: transfer_checker.py", maturity: planned}
+    - {id: bias_detection, name: "Bias Detection & Safety", status: active, tool: "planned: bias_auditor.py", maturity: planned}
+    - {id: career_alignment, name: "Career Alignment", status: active, tool: "planned: career_mapper.py", maturity: planned}
+    - {id: career_engineering, name: "Career Engineering (CV + AI + PDF)", status: active, tool: "pdf-official (MiMoCode)", maturity: production}
+    - {id: valeria_memory, name: "Valeria Memory Engine", status: active, tool: "tools/governor/valeria_memory.py", maturity: production}

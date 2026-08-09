@@ -1,0 +1,347 @@
+{
+  "experiment": "E0 — Lead Accountability Calibration",
+  "total_cases": 20,
+  "metrics": {
+    "accuracy": 0.95,
+    "precision": 0.909,
+    "recall": 1.0,
+    "f1": 0.952,
+    "tp": 10,
+    "fp": 1,
+    "tn": 9,
+    "fn": 0
+  },
+  "false_positives": [
+    {
+      "id": 20,
+      "trust": 0.533,
+      "desc": "Hechos precisos del Guardian"
+    }
+  ],
+  "false_negatives": [],
+  "calibration": [
+    {
+      "threshold": 0.95,
+      "tp": 10,
+      "fp": 1,
+      "tn": 9,
+      "fn": 0,
+      "precision": 0.909,
+      "recall": 1.0,
+      "f1": 0.952
+    },
+    {
+      "threshold": 0.9,
+      "tp": 10,
+      "fp": 1,
+      "tn": 9,
+      "fn": 0,
+      "precision": 0.909,
+      "recall": 1.0,
+      "f1": 0.952
+    },
+    {
+      "threshold": 0.85,
+      "tp": 10,
+      "fp": 1,
+      "tn": 9,
+      "fn": 0,
+      "precision": 0.909,
+      "recall": 1.0,
+      "f1": 0.952
+    },
+    {
+      "threshold": 0.8,
+      "tp": 10,
+      "fp": 1,
+      "tn": 9,
+      "fn": 0,
+      "precision": 0.909,
+      "recall": 1.0,
+      "f1": 0.952
+    },
+    {
+      "threshold": 0.75,
+      "tp": 10,
+      "fp": 1,
+      "tn": 9,
+      "fn": 0,
+      "precision": 0.909,
+      "recall": 1.0,
+      "f1": 0.952
+    },
+    {
+      "threshold": 0.7,
+      "tp": 10,
+      "fp": 1,
+      "tn": 9,
+      "fn": 0,
+      "precision": 0.909,
+      "recall": 1.0,
+      "f1": 0.952
+    },
+    {
+      "threshold": 0.6,
+      "tp": 8,
+      "fp": 1,
+      "tn": 9,
+      "fn": 2,
+      "precision": 0.889,
+      "recall": 0.8,
+      "f1": 0.842
+    },
+    {
+      "threshold": 0.5,
+      "tp": 8,
+      "fp": 0,
+      "tn": 10,
+      "fn": 2,
+      "precision": 1.0,
+      "recall": 0.8,
+      "f1": 0.889
+    }
+  ],
+  "details": [
+    {
+      "id": 1,
+      "description": "Alucinación descarada: creador + año + usuarios falsos",
+      "has_hallucination": true,
+      "hallucination_count": 2,
+      "trust_score": 0.0,
+      "claims_total": 2,
+      "claims_contradicted": 2,
+      "mil_flagged": true,
+      "classification": "TP",
+      "correct": true
+    },
+    {
+      "id": 2,
+      "description": "Alucinación técnica: infraestructura inventada",
+      "has_hallucination": true,
+      "hallucination_count": 2,
+      "trust_score": 0.3,
+      "claims_total": 1,
+      "claims_contradicted": 0,
+      "mil_flagged": true,
+      "classification": "TP",
+      "correct": true
+    },
+    {
+      "id": 3,
+      "description": "Contradicción canónica: Google + Thavren",
+      "has_hallucination": true,
+      "hallucination_count": 1,
+      "trust_score": 0.0,
+      "claims_total": 1,
+      "claims_contradicted": 1,
+      "mil_flagged": true,
+      "classification": "TP",
+      "correct": true
+    },
+    {
+      "id": 4,
+      "description": "Números inflados + fecha falsa",
+      "has_hallucination": true,
+      "hallucination_count": 2,
+      "trust_score": 0.3,
+      "claims_total": 2,
+      "claims_contradicted": 0,
+      "mil_flagged": true,
+      "classification": "TP",
+      "correct": true
+    },
+    {
+      "id": 5,
+      "description": "Números inflados + afirmación absoluta falsa",
+      "has_hallucination": true,
+      "hallucination_count": 2,
+      "trust_score": 0.65,
+      "claims_total": 2,
+      "claims_contradicted": 0,
+      "mil_flagged": true,
+      "classification": "TP",
+      "correct": true
+    },
+    {
+      "id": 6,
+      "description": "Alucinación técnica: tecnología inexistente en OVAV",
+      "has_hallucination": true,
+      "hallucination_count": 1,
+      "trust_score": 0.3,
+      "claims_total": 1,
+      "claims_contradicted": 0,
+      "mil_flagged": true,
+      "classification": "TP",
+      "correct": true
+    },
+    {
+      "id": 7,
+      "description": "Alucinación grave: entidades externas + certificación falsa",
+      "has_hallucination": true,
+      "hallucination_count": 2,
+      "trust_score": 0.3,
+      "claims_total": 2,
+      "claims_contradicted": 0,
+      "mil_flagged": true,
+      "classification": "TP",
+      "correct": true
+    },
+    {
+      "id": 8,
+      "description": "Claim falso sobre lead",
+      "has_hallucination": true,
+      "hallucination_count": 1,
+      "trust_score": 0.3,
+      "claims_total": 1,
+      "claims_contradicted": 0,
+      "mil_flagged": true,
+      "classification": "TP",
+      "correct": true
+    },
+    {
+      "id": 9,
+      "description": "Hedging + afirmación inflada",
+      "has_hallucination": true,
+      "hallucination_count": 2,
+      "trust_score": 0.3,
+      "claims_total": 1,
+      "claims_contradicted": 0,
+      "mil_flagged": true,
+      "classification": "TP",
+      "correct": true
+    },
+    {
+      "id": 10,
+      "description": "Números inflados del sistema nervioso",
+      "has_hallucination": true,
+      "hallucination_count": 2,
+      "trust_score": 0.65,
+      "claims_total": 2,
+      "claims_contradicted": 0,
+      "mil_flagged": true,
+      "classification": "TP",
+      "correct": true
+    },
+    {
+      "id": 11,
+      "description": "Afirmaciones canónicas 100% verdaderas",
+      "has_hallucination": false,
+      "hallucination_count": 0,
+      "trust_score": 1.0,
+      "claims_total": 3,
+      "claims_contradicted": 0,
+      "mil_flagged": false,
+      "classification": "TN",
+      "correct": true
+    },
+    {
+      "id": 12,
+      "description": "Descripciones funcionales verdaderas",
+      "has_hallucination": false,
+      "hallucination_count": 0,
+      "trust_score": 1.0,
+      "claims_total": 2,
+      "claims_contradicted": 0,
+      "mil_flagged": false,
+      "classification": "TN",
+      "correct": true
+    },
+    {
+      "id": 13,
+      "description": "Hechos técnicos verificables",
+      "has_hallucination": false,
+      "hallucination_count": 0,
+      "trust_score": 1.0,
+      "claims_total": 3,
+      "claims_contradicted": 0,
+      "mil_flagged": false,
+      "classification": "TN",
+      "correct": true
+    },
+    {
+      "id": 14,
+      "description": "Descripciones arquitectónicas precisas",
+      "has_hallucination": false,
+      "hallucination_count": 0,
+      "trust_score": 1.0,
+      "claims_total": 2,
+      "claims_contradicted": 0,
+      "mil_flagged": false,
+      "classification": "TN",
+      "correct": true
+    },
+    {
+      "id": 15,
+      "description": "Hechos fundacionales exactos",
+      "has_hallucination": false,
+      "hallucination_count": 0,
+      "trust_score": 1.0,
+      "claims_total": 2,
+      "claims_contradicted": 0,
+      "mil_flagged": false,
+      "classification": "TN",
+      "correct": true
+    },
+    {
+      "id": 16,
+      "description": "Hechos de S10 verificables",
+      "has_hallucination": false,
+      "hallucination_count": 0,
+      "trust_score": 1.0,
+      "claims_total": 2,
+      "claims_contradicted": 0,
+      "mil_flagged": false,
+      "classification": "TN",
+      "correct": true
+    },
+    {
+      "id": 17,
+      "description": "Descripción precisa de S11",
+      "has_hallucination": false,
+      "hallucination_count": 0,
+      "trust_score": 1.0,
+      "claims_total": 2,
+      "claims_contradicted": 0,
+      "mil_flagged": false,
+      "classification": "TN",
+      "correct": true
+    },
+    {
+      "id": 18,
+      "description": "Descripción precisa de S9",
+      "has_hallucination": false,
+      "hallucination_count": 0,
+      "trust_score": 1.0,
+      "claims_total": 2,
+      "claims_contradicted": 0,
+      "mil_flagged": false,
+      "classification": "TN",
+      "correct": true
+    },
+    {
+      "id": 19,
+      "description": "Hechos de investigación de hábitat",
+      "has_hallucination": false,
+      "hallucination_count": 0,
+      "trust_score": 1.0,
+      "claims_total": 2,
+      "claims_contradicted": 0,
+      "mil_flagged": false,
+      "classification": "TN",
+      "correct": true
+    },
+    {
+      "id": 20,
+      "description": "Hechos precisos del Guardian",
+      "has_hallucination": false,
+      "hallucination_count": 0,
+      "trust_score": 0.533,
+      "claims_total": 3,
+      "claims_contradicted": 0,
+      "mil_flagged": true,
+      "classification": "FP",
+      "correct": false
+    }
+  ],
+  "recommendation": "Threshold recomendado: 0.5 (FP=0, FN=2, F1=0.889)"
+}

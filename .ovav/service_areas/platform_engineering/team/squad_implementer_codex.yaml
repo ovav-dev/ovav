@@ -1,0 +1,23 @@
+# Squad: Implementer Codex
+# Lead contract internal team member — invisible to user
+
+squad:
+  id: squad_implementer_codex
+  display_name: Andrés
+  area: platform_engineering
+  lead: thavren
+  role: "Senior implementation, refactors, tests and durable runtime patches"
+  role_id: senior_runtime_implementer
+
+activation:
+  modes: [focused_squad, full_squad, critical_squad]
+  never_default: true
+  router: Delegation Router
+
+model_body:
+  primary: "openai/gpt-4o"
+  secondary: "opencode/deepseek-v4-pro"
+  emergency: "opencode/deepseek-v4-flash-free"
+
+lanes:
+  - repo_local_implementation

@@ -1,0 +1,25 @@
+{
+  "version": "v2026.06.03-0929",
+  "timestamp": "2026-06-03T09:29:44Z",
+  "hashes": {
+    "theme": "e7eeaeb56ab33783",
+    "tui": "4ce139ad59e495b8"
+  },
+  "changes": {
+    "version": "v2026.06.03-0929",
+    "timestamp": "2026-06-03T09:29:44Z",
+    "files": {
+      "theme": "INITIAL",
+      "tui": "INITIAL"
+    },
+    "breaking": false,
+    "summary": [
+      "\ud83c\udf89 Release inicial del sistema visual OVAV"
+    ]
+  },
+  "artifacts": [
+    "theme",
+    "tui"
+  ],
+  "pipeline_status": "PASSED"
+}

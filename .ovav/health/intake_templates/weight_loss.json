@@ -1,0 +1,52 @@
+{
+  "_schema": "ovav_patient_intake_v1.0.0",
+  "_description": "Plantilla de admisión para pacientes con objetivo de pérdida de peso — incluye historial de dietas y factores metabólicos.",
+  "patient_id": "identificador-unico-paciente *",
+  "demographics": {
+    "age": 0,
+    "sex": "M",
+    "height_cm": 0,
+    "weight_kg": 0
+  },
+  "health_history": {
+    "conditions": [],
+    "medications": [],
+    "injuries": [],
+    "allergies": [],
+    "surgeries": [],
+    "symptoms": []
+  },
+  "goals": {
+    "primary": "weight_loss",
+    "target_weight_kg": null,
+    "timeframe_weeks": null,
+    "secondary": ["improve_energy", "better_sleep"]
+  },
+  "weight_history": {
+    "_note": "Campos específicos para pérdida de peso — opcionales.",
+    "highest_weight_kg": null,
+    "lowest_adult_weight_kg": null,
+    "weight_1year_ago_kg": null,
+    "previous_diets": [],
+    "diet_frustrations": [],
+    "emotional_eating": false,
+    "meal_prep_willingness": "moderate",
+    "cooking_skill_level": "basic",
+    "food_allergies_detail": [],
+    "food_dislikes": []
+  },
+  "lifestyle": {
+    "activity_level": "sedentary",
+    "sleep_hours": 7,
+    "stress_level": "moderate",
+    "occupation_type": "sedentary",
+    "meals_per_day": 3
+  },
+  "biometrics": {
+    "body_fat_pct": null,
+    "waist_circumference_cm": null,
+    "resting_heart_rate_bpm": null,
+    "blood_pressure_systolic": null,
+    "blood_pressure_diastolic": null
+  }
+}

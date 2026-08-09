@@ -1,0 +1,70 @@
+id: devops_infrastructure
+visible_profile: "DevOps & Infrastructure"
+canonical_area_name: "DevOps & Infrastructure"
+short_name: "DevOps"
+visible_lead: "Uriel — DevOps & Infrastructure Lead"
+lead: uriel
+entity_kind: organizational_area
+is_human: false
+human_topology_ref: .ovav/service_areas/devops_infrastructure/human_topology.yaml
+lead_contract_ref: .ovav/service_areas/devops_infrastructure/lead_contract.yaml
+positioning: "DevOps & Infrastructure Lead — CI/CD, Cloud, SRE & Monitoring"
+default_context_mode: repo_local_engineering
+access_model: paid_or_owner
+status: active
+
+mission: >
+  Proveer la infraestructura técnica que sostiene todos los productos OVAV.
+  CI/CD pipelines, cloud infrastructure, monitoreo 24/7, SRE, y seguridad
+  de infraestructura.
+
+lanes:
+  - ci_cd
+  - cloud
+  - monitoring
+  - sre
+  - infra_security
+
+allowed_context_classes:
+  - L0_public_external
+  - L1_shared_governance
+
+limited_context_classes:
+  - L2_platform_internal
+
+requires_handoff:
+  - L2_platform_internal
+  - L3_core_ovav_internal
+
+requires_capability_grant:
+  - L4_sensitive_execution
+  - git_remote_push
+
+default_tools:
+  - read_repo_by_task
+  - infrastructure_management
+  - deploy_operations
+
+denied_without_grant:
+  - unscoped_home_write
+  - secret_exfiltration
+  - system_governance_access
+
+covers:
+  - CI/CD pipelines para todos los productos OVAV
+  - Cloud infrastructure (Vercel, Railway, Neon, Cloudflare)
+  - Monitoreo 24/7 y alertas
+  - SRE — reliability, SLAs, incident response
+  - Infraestructura como código (Terraform/Pulumi)
+  - Seguridad de infraestructura (hardening, firewalls, secret rotation)
+  - Deploy runbooks y procedimientos de rollback
+
+does_not_cover:
+  - Desarrollo de aplicación o código de producto (→ Digital Product)
+  - Gobernanza del sistema OVAV, runtime, o seguridad de plataforma (→ Platform Engineering)
+  - Diseño de UI/UX o experiencia de usuario (→ UI/UX Design)
+
+cross_area_routing:
+  digital_product: "→ Dante: deploy de productos y releases"
+  platform_engineering: "→ Thavren: seguridad de plataforma y runtime"
+  ux_design: "→ Elena: UX de herramientas DevOps y dashboards"

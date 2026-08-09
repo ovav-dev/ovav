@@ -1,0 +1,154 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ovav.dev/schemas/approval_risk_router.schema.json",
+  "title": "OVAV Approval Risk Router Schema",
+  "description": "Schema for approval_risk_router.yaml. Validates risk levels, routing rules, and decision matrix.",
+  "type": "object",
+  "required": ["schema", "generated_at", "risk_levels", "routing_rules", "decision_matrix", "integration"],
+  "properties": {
+    "schema": {
+      "type": "string",
+      "const": "approval_risk_router.v1"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "canonical_source": {
+      "type": "string"
+    },
+    "risk_levels": {
+      "type": "object",
+      "required": ["low", "medium", "high", "critical", "irreversible"],
+      "properties": {
+        "low": { "$ref": "#/$defs/risk_level_def" },
+        "medium": { "$ref": "#/$defs/risk_level_def" },
+        "high": { "$ref": "#/$defs/risk_level_def" },
+        "critical": { "$ref": "#/$defs/risk_level_def" },
+        "irreversible": { "$ref": "#/$defs/risk_level_def" }
+      }
+    },
+    "routing_rules": {
+      "type": "object",
+      "required": ["classification", "escalation", "capability_integration"],
+      "properties": {
+        "classification": {
+          "type": "object",
+          "required": ["by_surface", "by_path"],
+          "properties": {
+            "by_surface": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["surface", "default_risk"],
+                "properties": {
+                  "surface": { "type": "string" },
+                  "default_risk": { "type": "string", "enum": ["low", "medium", "high", "critical", "irreversible"] }
+                }
+              }
+            },
+            "by_path": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["pattern", "escalate_to", "reason"],
+                "properties": {
+                  "pattern": { "type": "string" },
+                  "escalate_to": { "type": "string", "enum": ["low", "medium", "high", "critical", "irreversible"] },
+                  "reason": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "escalation": {
+          "type": "object",
+          "required": ["rule", "description"],
+          "properties": {
+            "rule": { "type": "string" },
+            "description": { "type": "string" }
+          }
+        },
+        "capability_integration": {
+          "type": "object",
+          "required": ["description"],
+          "properties": {
+            "description": { "type": "string" }
+          }
+        }
+      }
+    },
+    "decision_matrix": {
+      "type": "object",
+      "required": ["escalated_actions"],
+      "properties": {
+        "escalated_actions": {
+          "type": "object",
+          "required": [
+            "low_always", "medium_max", "high_always",
+            "critical_always", "irreversible_always"
+          ],
+          "properties": {
+            "low_always": { "type": "string" },
+            "medium_max": { "type": "string" },
+            "high_always": { "type": "string" },
+            "critical_always": { "type": "string" },
+            "irreversible_always": { "type": "string" }
+          }
+        }
+      }
+    },
+    "integration": {
+      "type": "object",
+      "required": ["workspace_safety_gate", "protected_branch", "capability_lifecycle", "evidence_pipeline"],
+      "properties": {
+        "workspace_safety_gate": { "type": "object" },
+        "protected_branch": { "type": "object" },
+        "capability_lifecycle": { "type": "object" },
+        "evidence_pipeline": {
+          "type": "object",
+          "required": ["produces", "consumes"],
+          "properties": {
+            "produces": { "type": "array", "items": { "type": "string" } },
+            "consumes": { "type": "array", "items": { "type": "string" } }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "risk_level_def": {
+      "type": "object",
+      "required": ["action", "description"],
+      "properties": {
+        "action": {
+          "type": "string",
+          "enum": [
+            "automatic",
+            "automatic_with_evidence",
+            "human_confirmation",
+            "maintainer_or_founder_gate",
+            "backup_approval_rollback_required"
+          ]
+        },
+        "description": { "type": "string" },
+        "examples": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "evidence_required": { "type": "boolean" },
+        "evidence_types": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "approval_chain": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "requires_waiver": { "type": "boolean" },
+        "requires_backup": { "type": "boolean" },
+        "requires_rollback_plan": { "type": "boolean" }
+      }
+    }
+  }
+}

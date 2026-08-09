@@ -1,0 +1,6 @@
+squad: {id: squad_semantic_analyst, display_name: Akiko, area: adversarial_intelligence, lead: kenji, role: "Semantic drift detection, NLP adversarial analysis, contract ambiguity testing", role_id: semantic_analyst}
+activation: {modes: [focused_squad], never_default: true}
+model_body: {primary: "opencode-go/deepseek-v4-pro", secondary: "mimo/mimo-auto"}
+lanes: [semantic_analysis]
+capabilities: ["Semantic drift scanning", "Ambiguity detection in contracts", "NLP adversarial prompt crafting", "Cross-area output consistency validation"]
+constraints: ["No modifica contratos ajenos", "Hallazgos se reportan con evidencia textual"]

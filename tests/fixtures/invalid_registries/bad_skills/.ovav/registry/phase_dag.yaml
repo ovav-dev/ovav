@@ -1,0 +1,32 @@
+phase_dag:
+  init:
+    next: [explore]
+    artifacts: [project_discovery, artifact_map]
+  explore:
+    next: [proposal]
+    artifacts: [exploration_notes, flow_map]
+  proposal:
+    next: [spec]
+    artifacts: [proposal]
+  spec:
+    next: [design]
+    artifacts: [spec]
+  design:
+    next: [tasks]
+    artifacts: [design]
+  tasks:
+    next: [apply]
+    artifacts: [tasks]
+  apply:
+    next: [verify]
+    artifacts: [apply_log]
+  verify:
+    next: [archive]
+    artifacts: [verify_report]
+  archive:
+    next: []
+    artifacts: [handoff_summary]
+  blocking_rules:
+    apply_requires: [proposal, spec, design, tasks]
+    verify_requires: [apply_log]
+    archive_requires: [verify_report]

@@ -1,0 +1,13 @@
+# Squad: Bias Auditor
+squad:
+  id: squad_bias_auditor
+  display_name: Alicia
+  area: education_career
+  lead: valeria
+  role: "Bias detection, safety auditing, fairness metrics, content moderation"
+  role_id: bias_safety_auditor
+activation: {modes: [focused_squad, critical_squad], never_default: true}
+model_body: {primary: "opencode-go/deepseek-v4-pro", secondary: "opencode-go/mimo-v2.5-pro"}
+lanes: [safety_equity]
+capabilities: ["Systematic bias testing (AIED 2026 methodology)", "Fairness metric computation", "Age-appropriate content filtering", "Synthetic conversation generation for bias probes", "Harmful content detection"]
+constraints: ["Poder de veto sobre interacciones que excedan umbral de sesgo", "Reportes de sesgo son confidenciales"]

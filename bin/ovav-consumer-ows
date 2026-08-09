@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# =============================================================================
+# OVAV Consumer OWS Wrapper v2.0.0
+# Bridges consumer shim calls to OVAV's runtime with audit trail.
+#
+# This file is the single entry point for ALL consumer OWS commands.
+# Consumer shims in consumer's bin/ forward here with:
+#   exec "$OVAV_ROOT/bin/ovav-consumer-ows" "$cmd" "$@"
+#
+# v2.0.0 — OWS-HARDENING-v0.1.0: all 11 commands + new flags
+# =============================================================================
+set -euo pipefail
+
+OVAV_ROOT="${OVAV_ROOT:-/home/braka/Systems/OVAV}"
+OVAV_CONSUMER_ID="${OVAV_CONSUMER_ID:-anonymous}"
+OVAV_CONSUMER_ROOT="${OVAV_CONSUMER_ROOT:-$(pwd)}"
+OVAV_RUNTIME="$OVAV_ROOT/bin/ovav-ow-runtime.sh"
+
+RAW_CMD="${1:-}"
+shift 2>/dev/null || true
+
+# ─── Strip "ow" prefix — shims pass "owc", runtime expects "c" ────────
+CMD="${RAW_CMD#ow}"
+
+# ─── Audit trail ────────────────────────────────────────────────────────
+AUDIT_LOG="$OVAV_ROOT/.ovav/runtime/logs/consumer_audit.jsonl"
+mkdir -p "$(dirname "$AUDIT_LOG")" 2>/dev/null
+TS=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+printf '{"ts":"%s","actor":"%s","command":"ow%s","args":"%s","consumer_id":"%s","consumer_root":"%s"}\n' \
+  "$TS" "${USER:-unknown}" "$CMD" "$*" "$OVAV_CONSUMER_ID" "$OVAV_CONSUMER_ROOT" \
+  >> "$AUDIT_LOG" 2>/dev/null || true
+
+# ─── Forward to runtime ─────────────────────────────────────────────────
+# All 11 OWS commands: c d l v s clean m x a r lk
+export OVAV_ROOT OVAV_CONSUMER_ID OVAV_CONSUMER_ROOT
+exec bash "$OVAV_RUNTIME" "$CMD" "$@"

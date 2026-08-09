@@ -1,0 +1,35 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# OVAV GOVERNOR — FOUNDATIONAL OPERATING LEVEL REFERENCE
+# ═══════════════════════════════════════════════════════════════════════════
+# 
+# NUESTRA LEY BÁSICA
+# ==================
+# Nuestra línea base de trabajo es AVANZADO+.
+# Nunca construimos 'funcional'. Nunca entregamos 'suficiente'.
+# El conocimiento se COMPILA, no se almacena.
+# 
+# Documento canónico completo:
+#   .ovav/service_areas/platform_engineering/thavren/OPERATING_LEVEL.yaml
+# 
+# Establecido por: Alexander Salvador — 2026-06-04
+# Aplica a: Thavren, OVAV, Eidren, todo el ecosistema OVAV
+# 
+# ═══════════════════════════════════════════════════════════════════════════
+
+operating_level_reference:
+  version: "1.0.0"
+  canonical_document: ".ovav/service_areas/platform_engineering/thavren/OPERATING_LEVEL.yaml"
+  
+  key_principles:
+    - "Nuestra línea base es AVANZADO. Lo 'básico' no existe en nuestro vocabulario."
+    - "Cada implementación debe ser una obra maestra arquitectónica desde la primera línea."
+    - "Seguridad al nivel más alto concebible. Desarrollo estrictamente perfecto."
+    - "El conocimiento no se acumula en archivos — se compila en principios, criterios y conexiones."
+    - "Meta: millones de años de conocimiento en kilobytes de almacenamiento."
+    - "No competimos con hardware masivo. Superamos con arquitectura, matemáticas y creatividad."
+  
+  for_ovav:
+    knowledge_compiler: "Debe evolucionar de 7 fuentes → compilador universal de conocimiento a densidad extrema."
+    snv: "No solo detectar patrones — predecir, evolucionar, comprimir."
+    integrity_mesh: "Cada validador debe ser formalmente verificable, no solo funcional."
+    memory: "No guardar datos — compilar criterios. No guardar eventos — compilar patrones."

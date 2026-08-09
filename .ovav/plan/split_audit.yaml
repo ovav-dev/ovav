@@ -1,0 +1,366 @@
+# OVAV Go Runtime Split Audit — generated 2026-06-19
+# Branch: feature-continue-plan · HEAD: 348aea47
+# Module: github.com/ovav/ovav (go-runtime/)
+# Purpose: Machine-readable classification for automated core/product extraction.
+
+summary:
+  total_files: 171
+  total_loc: 35460
+  cmd_files: 40
+  cmd_loc: 7812
+  internal_files: 131
+  internal_loc: 27648
+  bridge_packages: 6
+  bridge_loc: 5793
+  estimated_refactor_hours: { min: 13, max: 27 }
+  product_loc_after_split: ~13900
+  core_loc_after_split: ~16000
+  shared_loc_after_split: ~600
+
+# ── CLASSIFICATION ────────────────────────────────────────────────────────────
+
+classification:
+  core:
+    - package: internal/validators
+      path: go-runtime/internal/validators/
+      loc: 12663
+      files: 80
+      reason: "Pure validation engine. Imported only by its own cmd/validate sub-binary. Zero product cmd imports."
+      move_to: ovav-core/internal/validators/
+
+    - package: internal/license
+      path: go-runtime/internal/license/
+      loc: 337
+      files: 1
+      reason: "License binding logic. Currently orphan (no imports), but core infrastructure for server-side key generation."
+      move_to: ovav-core/internal/license/
+      note: "Will be DUPLICATED in product as license client (DecodeLicenseKey, Verify). Core keeps EncodeLicenseKey + HMAC signing key."
+
+  shared:
+    - package: internal/cli
+      path: go-runtime/internal/cli/
+      loc: 273
+      files: 1
+      effort: low
+      hours: [1, 2]
+      resolution: "Split into shared/format (output) + shared/filesystem (repo root, YAML). Used by 6 packages."
+      imports_by_product: [cmd/ovav, cmd/cockpit/data]
+      imports_by_core: [internal/config, internal/doctor, internal/economy, internal/profile]
+
+    - package: internal/install
+      path: go-runtime/internal/install/
+      loc: 2485
+      files: 12
+      effort: high
+      hours: [4, 8]
+      resolution: "Extract shared/install_contract (~50 LOC): VerificationResult types. Validators depends only on this contract."
+      imports_by_product: [cmd/ovav, cmd/cockpit]
+      imports_by_core: [internal/validators/install_verification.go]
+      note: "Largest bridge. 12 files. Most move to product. Only ~50 LOC shared with core."
+
+    - package: internal/sbom
+      path: go-runtime/internal/sbom/
+      loc: 401
+      files: 1
+      effort: medium
+      hours: [2, 4]
+      resolution: "Extract shared/sbom_types (~30 LOC): SBOMData struct, ScanResult type."
+      imports_by_product: [cmd/ovav, cmd/cpanel]
+      imports_by_core: [internal/validators/supply_chain.go]
+
+    - package: internal/vault
+      path: go-runtime/internal/vault/
+      loc: 383
+      files: 2
+      effort: low
+      hours: [1, 3]
+      resolution: "Extract shared/vault_crypto (~40 LOC): Encryptor interface, Encrypt/Decrypt signatures."
+      imports_by_product: [cmd/ovav]
+      imports_by_core: [internal/license]
+
+    - package: internal/gitflow
+      path: go-runtime/internal/gitflow/
+      loc: 1027
+      files: 2
+      effort: medium_high
+      hours: [3, 6]
+      resolution: "Extract shared/git_operations (~80 LOC): GitRepo interface, branch detection, merge primitives."
+      imports_by_product: [cmd/ovav]
+      imports_by_core: [internal/ows/handlers.go, internal/ows/registry.go]
+      note: "OWS (product) needs gitflow primitives. Extract minimal interface."
+
+    - package: internal/convert
+      path: go-runtime/internal/convert/
+      loc: 1224
+      files: 5
+      effort: medium
+      hours: [2, 4]
+      resolution: "Extract shared/agent_formats (~50 LOC): ConvertFunc type, format definitions."
+      imports_by_product: [cmd/cockpit, cmd/convert_agents]
+      imports_by_core: [internal/project/sync.go]
+
+  product:
+    # Entry points
+    - package: cmd/cockpit
+      path: go-runtime/cmd/cockpit/
+      loc: 2623
+      files: 21
+      reason: "TUI product entry point. Includes data/ and styles/ subpackages."
+      move_to: ovav-product/cmd/cockpit/
+
+    - package: cmd/convert_agents
+      path: go-runtime/cmd/convert_agents/
+      loc: 76
+      files: 1
+      reason: "Agent conversion binary."
+      move_to: ovav-product/cmd/convert_agents/
+
+    - package: cmd/cpanel
+      path: go-runtime/cmd/cpanel/
+      loc: 3093
+      files: 16
+      reason: "Web admin panel. Stays in product as plugin."
+      move_to: ovav-product/cmd/cpanel/
+
+    - package: cmd/ovav
+      path: go-runtime/cmd/ovav/
+      loc: 1772
+      files: 1
+      reason: "Main CLI dispatcher. Monolith — will be split into product CLI + core CLI."
+      move_to: ovav-product/cmd/ovav/
+      note: "Will be simplified: only worktree, connect, update, status, version commands."
+
+    - package: cmd/tailor
+      path: go-runtime/cmd/tailor/
+      loc: 248
+      files: 1
+      reason: "Configuration tailor binary."
+      move_to: ovav-product/cmd/tailor/
+
+    # Internal (product-side)
+    - package: internal/chronos
+      path: go-runtime/internal/chronos/
+      loc: 813
+      files: 1
+      reason: "Temporal orientation. Only imported by cmd/ovav."
+      move_to: ovav-product/internal/chronos/
+
+    - package: internal/config
+      path: go-runtime/internal/config/
+      loc: 54
+      files: 1
+      reason: "Deploy config. Only imported by cmd/ovav."
+      move_to: ovav-product/internal/config/
+
+    - package: internal/doctor
+      path: go-runtime/internal/doctor/
+      loc: 413
+      files: 1
+      reason: "System diagnostics. Only imported by cmd/ovav + cmd/cockpit/data."
+      move_to: ovav-product/internal/doctor/
+
+    - package: internal/economy
+      path: go-runtime/internal/economy/
+      loc: 460
+      files: 1
+      reason: "Context budget. Only imported by cmd/ovav."
+      move_to: ovav-product/internal/economy/
+
+    - package: internal/ows
+      path: go-runtime/internal/ows/
+      loc: 4010
+      files: 14
+      reason: "OVAV Workflow System. Only imported by cmd/ovav. Core product value."
+      move_to: ovav-product/internal/ows/
+      depends_on_shared: [shared/git_operations]
+
+    - package: internal/profile
+      path: go-runtime/internal/profile/
+      loc: 547
+      files: 1
+      reason: "Profile compiler. Only imported by cmd/ovav."
+      move_to: ovav-product/internal/profile/
+
+    - package: internal/project
+      path: go-runtime/internal/project/
+      loc: 840
+      files: 1
+      reason: "Project sync. Only imported by cmd/ovav."
+      move_to: ovav-product/internal/project/
+      depends_on_shared: [shared/agent_formats]
+
+    - package: internal/status
+      path: go-runtime/internal/status/
+      loc: 412
+      files: 1
+      reason: "System posture. Only imported by cmd/ovav."
+      move_to: ovav-product/internal/status/
+
+    - package: internal/tailor
+      path: go-runtime/internal/tailor/
+      loc: 767
+      files: 5
+      reason: "Config tailoring. Imported by cmd/cockpit, cmd/ovav, cmd/tailor."
+      move_to: ovav-product/internal/tailor/
+
+    - package: internal/tools
+      path: go-runtime/internal/tools/
+      loc: 539
+      files: 1
+      reason: "Tool catalog. Only imported by cmd/ovav."
+      move_to: ovav-product/internal/tools/
+
+# ── EXTRACTION RULES ──────────────────────────────────────────────────────────
+# For automated script to consume:
+
+extraction:
+  core_repo: "github.com/ovav/core"
+  product_repo: "github.com/ovav/product"
+  
+  rules:
+    - action: move_dir
+      source: "go-runtime/internal/validators/"
+      target: "ovav-core/internal/validators/"
+    
+    - action: move_file
+      source: "go-runtime/internal/license/bind.go"
+      target: "ovav-core/internal/license/bind.go"
+    
+    - action: copy_file
+      source: "go-runtime/internal/license/bind.go"
+      target: "ovav-product/internal/license/bind.go"
+      note: "Product needs DecodeLicenseKey + Verify. Core keeps EncodeLicenseKey + signing key."
+    
+    - action: refactor_shared
+      sources:
+        - "go-runtime/internal/cli/"
+        - "go-runtime/internal/install/"
+        - "go-runtime/internal/sbom/"
+        - "go-runtime/internal/vault/"
+        - "go-runtime/internal/gitflow/"
+        - "go-runtime/internal/convert/"
+      targets:
+        - "shared/format/"
+        - "shared/install_contract/"
+        - "shared/sbom_types/"
+        - "shared/vault_crypto/"
+        - "shared/git_operations/"
+        - "shared/agent_formats/"
+    
+    - action: move_dir
+      source: "go-runtime/cmd/cockpit/"
+      target: "ovav-product/cmd/cockpit/"
+    
+    - action: move_dir
+      source: "go-runtime/cmd/ovav/"
+      target: "ovav-product/cmd/ovav/"
+    
+    - action: move_dir
+      source: "go-runtime/cmd/cpanel/"
+      target: "ovav-product/cmd/cpanel/"
+    
+    - action: move_dir
+      source: "go-runtime/internal/ows/"
+      target: "ovav-product/internal/ows/"
+    
+    - action: move_dir
+      source: "go-runtime/internal/gitflow/"
+      target: "ovav-product/internal/gitflow/"
+    
+    - action: move_dir
+      source: "go-runtime/internal/chronos/"
+      target: "ovav-product/internal/chronos/"
+    
+    - action: move_dir
+      source: "go-runtime/internal/doctor/"
+      target: "ovav-product/internal/doctor/"
+    
+    - action: move_dir
+      source: "go-runtime/internal/economy/"
+      target: "ovav-product/internal/economy/"
+    
+    - action: move_dir
+      source: "go-runtime/internal/profile/"
+      target: "ovav-product/internal/profile/"
+    
+    - action: move_dir
+      source: "go-runtime/internal/project/"
+      target: "ovav-product/internal/project/"
+    
+    - action: move_dir
+      source: "go-runtime/internal/status/"
+      target: "ovav-product/internal/status/"
+    
+    - action: move_dir
+      source: "go-runtime/internal/tailor/"
+      target: "ovav-product/internal/tailor/"
+    
+    - action: move_dir
+      source: "go-runtime/internal/tools/"
+      target: "ovav-product/internal/tools/"
+    
+    - action: move_dir
+      source: "go-runtime/internal/config/"
+      target: "ovav-product/internal/config/"
+    
+    - action: move_dir
+      source: "go-runtime/cmd/convert_agents/"
+      target: "ovav-product/cmd/convert_agents/"
+    
+    - action: move_dir
+      source: "go-runtime/cmd/tailor/"
+      target: "ovav-product/cmd/tailor/"
+    
+    - action: move_dir
+      source: "go-runtime/internal/vault/"
+      target: "ovav-product/internal/vault/"
+
+# ── POST-SPLIT STRUCTURE ──────────────────────────────────────────────────────
+
+post_split:
+  ovav_core:
+    go_module: "github.com/ovav/core"
+    directories:
+      - ".ovav/"                    # governance (canonical)
+      - "cmd/ovav-dev/"             # developer CLI
+      - "cmd/cpanel/"               # HTTP server + sync module
+      - "internal/validators/"      # 77 validators
+      - "internal/license/"         # server-side license (signing)
+      - "tools/"                    # Python legacy
+      - "docs/"                     # documentation
+    go_mod_require:
+      - "github.com/ovav/shared v0.1.0"
+
+  ovav_product:
+    go_module: "github.com/ovav/product"
+    directories:
+      - "cmd/cockpit/"              # TUI
+      - "cmd/ovav/"                 # user CLI
+      - "internal/ows/"             # Workflow System
+      - "internal/gitflow/"         # Git operations
+      - "internal/license/"         # client-side (verify only)
+      - "internal/vault/"           # encryption
+      - "internal/chronos/"
+      - "internal/doctor/"
+      - "internal/economy/"
+      - "internal/profile/"
+      - "internal/project/"
+      - "internal/status/"
+      - "internal/tailor/"
+      - "internal/tools/"
+      - "internal/config/"
+      - "internal/plugins/"         # 🆕 plugin system
+      - "internal/connect/"         # 🆕 OAuth connect
+      - "internal/update/"          # 🆕 auto-update client
+    go_mod_require:
+      - "github.com/ovav/shared v0.1.0"
+
+  ovav_shared:
+    go_module: "github.com/ovav/shared"
+    directories:
+      - "format/"                   # output formatting
+      - "install_contract/"         # VerificationResult types
+      - "sbom_types/"               # SBOMData, ScanResult
+      - "vault_crypto/"             # Encryptor interface
+      - "git_operations/"           # GitRepo interface
+      - "agent_formats/"            # ConvertFunc, format defs

@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# OVAV tool wrapper (bash-native, MiMo-compatible)
+# Usage: ffd [path] - find directories (uses . as default pattern)
+if [[ "$1" == /* ]]; then
+    exec fd --type d --hidden --exclude .git . "$1"
+else
+    exec fd --type d --hidden --exclude .git "$@"
+fi

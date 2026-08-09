@@ -1,0 +1,15 @@
+{
+  "paths": [
+    "tools/harnesses/work_ledger_runtime.py",
+    "tools/harnesses/change_manifest.py",
+    "tools/harnesses/git_safety_gate.py",
+    "tools/harnesses/human_delivery_translator.py",
+    "tools/harnesses/check_work_ledger_git_gates.py",
+    "registry/artifacts.yaml",
+    ".ovav/artifacts/S10/S10_WORK_LEDGER_GIT_GATES.md",
+    ".ovav/artifacts/S10/evidence/WORK_LEDGER_REPORT.json",
+    "tests/fixtures/work_ledger_git_gates/s10_safe_paths.json",
+    ".ovav/context/CURRENT_HANDOFF.md",
+    "CHECKLIST_0_TO_100.md"
+  ]
+}

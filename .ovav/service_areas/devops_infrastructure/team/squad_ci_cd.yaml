@@ -1,0 +1,7 @@
+squad:
+  id: squad_ci_cd
+  name: "CI/CD Squad"
+  area: devops_infrastructure
+  lead: uriel
+  scope: "CI/CD pipelines, GitHub Actions, build automation, deploy workflows"
+  status: active

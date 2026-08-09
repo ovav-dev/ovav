@@ -1,0 +1,32 @@
+# Education & Training — Service Lanes v1.0.0
+lanes:
+  version: "1.0.0"
+  area: education_career
+  definitions:
+    - {id: knowledge_architecture, name: "Knowledge Architecture", operator: valeria, delegate: Carmen, tools: ["knowledge_graph_manager"], risk: low}
+    - {id: pedagogy_research, name: "Pedagogy Research", operator: valeria, delegate: Beatriz, tools: ["learning_scientist_workbench"], risk: low}
+    - {id: interaction_design, name: "Tutoring Interaction Design", operator: valeria, delegate: Felipe, tools: ["tutoring_orchestrator"], risk: low}
+    - {id: assessment_certification, name: "Assessment & Certification", operator: valeria, delegate: Sandra, tools: ["assessment_engine"], risk: medium}
+    - {id: safety_equity, name: "Bias & Safety Auditing", operator: valeria, delegate: Alicia, tools: ["bias_detector"], risk: medium}
+    - {id: career_market, name: "Career & Market Alignment", operator: valeria, delegate: Teo, tools: ["career_mapper"], risk: low}
+    - {id: career_engineering, name: "Career Engineering", operator: valeria, delegate: Torben, tools: ["career_mapper", "pdf-official", "cv_analyzer"], risk: low}
+  routing:
+    default_lane: knowledge_architecture
+    task_based:
+      diagnose: knowledge_architecture
+      curriculum: knowledge_architecture
+      teach: interaction_design
+      tutor: interaction_design
+      assess: assessment_certification
+      certify: assessment_certification
+      bias: safety_equity
+      safety: safety_equity
+      career: career_market
+      job: career_market
+      market: career_market
+      cv: career_engineering
+      resume: career_engineering
+      interview: career_engineering
+      ats: career_engineering
+      method: pedagogy_research
+      research: pedagogy_research

@@ -1,0 +1,82 @@
+absorptions:
+  claude_subagent_isolation:
+    observed_advantage: task-specific subagents with tools/permissions/context
+    ovav_adaptation: squad context packs + delegation thresholds
+    source: claude_code
+    status: partial
+    note: "harnesses registered in harnesses.yaml; Python implementation pending"
+    target_evals:
+    - eval_delegation_threshold_4_files
+    target_harnesses:
+    - h_subagent_context_pack
+    - h_subagent_result_absorber
+  gentle_sdd_init:
+    observed_advantage: detects stack and testing capabilities before work
+    ovav_adaptation: h_sdd_init auto-triggered by chat interaction
+    source: gentle_ai
+    status: planned
+    target_evals:
+    - eval_sdd_init_auto_trigger
+    - eval_sdd_init_detects_stack
+    target_harnesses:
+    - h_sdd_init
+  gentle_skill_registry_refresh:
+    observed_advantage: refreshes installed skills and project conventions
+    ovav_adaptation: skill manager discovery + scoring + rule packs
+    source: gentle_ai
+    status: planned
+    target_evals:
+    - eval_skill_without_owner_blocked
+    target_harnesses:
+    - h_skill_registry_refresh
+    - h_skill_score_gate
+  model_fallback_detector:
+    acceptance_criteria:
+    - "Detect active model programmatically \u2705 (detect_current_provider)"
+    - "Detect token exhaustion / rate limit signals \u2705 (SWITCH_TRIGGERS": 6 types)
+    - "Maintain ordered fallback model list \u2705 (build_fallback_ladder, 14 modelos\
+      \ Go v4)"
+    - "Auto-switch without losing context \u2705 (orchestrate_switch": "capture\u2192\
+        switch\u2192verify)"
+    - "Log model switch event to runtime log \u2705 (git HEAD + caps.yaml integration)"
+    - "Works for both Thavren and Eidren profiles \u2705 (provider-agnostic detection)"
+    commit: 8c3266c
+    completed: '2026-06-07'
+    description: "If the active model runs out of tokens, OVAV automatically detects\
+      \ it, triggers fallback via model_body_router.py \u2192 provider_abstraction.py,\
+      \ and continues work. Implemented as L3 Model Body Router with real opencode.json\
+      \ switching. Fallback ladder limited to opencode-go models exclusively (no OpenAI,\
+      \ Anthropic, Google per no_external_providers rule).\n"
+    id: BL-007
+    phase: completed
+    priority: high
+    requested_by: User (2026-05-22)
+    status: completed
+    title: Automatic Model Fallback & Successor Detection
+  ovav_git_branch_workflow:
+    capabilities:
+    - create_task_branch (from develop, with naming convention, optional push)
+    - validate_merge_gates (protected_branch, workspace_safety, model_policy, ovav_law)
+    - merge_to_develop (with gate validation, pull-before-merge, push after)
+    - delete_task_branch (local + remote, protected branch safety)
+    - sync_handoff (git HEAD (sync engine eliminated) + head_integrity)
+    - "full_branch_lifecycle (orchestrated merge\u2192cleanup\u2192sync)"
+    - check_workflow_status (readiness diagnostic)
+    commit: pending
+    completed: '2026-06-07'
+    harness_file: tools/harnesses/h_git_branch_workflow.py
+    observed_advantage: "main\u2192develop\u2192task\u2192merge\u2192delete flow with\
+      \ automated branch lifecycle"
+    ovav_adaptation: h_git_branch_workflow harness for full branch lifecycle (create
+      task from develop, validate gates, merge back, auto-delete task branch, update
+      handoff)
+    pending_evals: true
+    source: internal_gap
+    status: implemented
+    target_evals:
+    - eval_git_branch_workflow_main_develop_task
+    - eval_git_branch_auto_delete
+    - eval_git_branch_gate_enforcement
+    target_harnesses:
+    - h_git_branch_workflow
+    target_segment: S73_or_BUILD6_gap

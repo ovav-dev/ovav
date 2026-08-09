@@ -1,0 +1,1 @@
+evolution: {version: "1.0.0", operator: sofia, started: "2026-06-09", sessions: [{id: 1, date: "2026-06-09", milestone: "Creación"}], growth_scores: {strategy: 0.90, business: 0.90, growth: 0.80, average: 0.87}}

@@ -1,0 +1,23 @@
+# Squad: QA Engineer — Clara
+# Lead contract internal team member — invisible to user
+
+squad:
+  id: squad_qa_engineer
+  display_name: Clara
+  area: platform_engineering
+  lead: thavren
+  role: "Testing and QA, regression detection and edge-case coverage"
+  role_id: qa_engineer
+
+activation:
+  modes: [focused_squad, full_squad, critical_squad]
+  never_default: true
+  router: Delegation Router
+
+model_body:
+  primary: "openai/gpt-4o"
+  secondary: "opencode/deepseek-v4-flash-free"
+
+lanes:
+  - harness_validation
+  - release_closure

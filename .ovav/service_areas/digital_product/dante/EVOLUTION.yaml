@@ -1,0 +1,10 @@
+evolution:
+  version: "1.0.0"
+  operator: dante
+  started: "2026-06-09"
+  sessions: [{id: 1, date: "2026-06-09", milestone: "Creación inicial"}]
+  milestones:
+    - {name: "Stack completo", date: "2026-06-09", status: completed}
+    - {name: "Herramientas de desarrollo", date: null, status: planned}
+  growth_scores: {architecture: 0.95, frontend: 0.90, backend: 0.90, devops: 0.85, testing: 0.85, average: 0.89}
+  lessons: ["Deploy temprano, deploy seguido.", "El mejor framework es el que tu equipo ya sabe usar.", "Testing no es opcional — es parte del desarrollo."]

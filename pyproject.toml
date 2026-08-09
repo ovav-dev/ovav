@@ -1,0 +1,79 @@
+[project]
+name = "OVAV"
+version = "2.0.0"
+description = "OVAV — Commercial AI Workstation Governor"
+requires-python = ">=3.12"
+readme = "AGENTS.md"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+exclude = [
+    ".venv",
+    ".git",
+    "__pycache__",
+    ".pytest_cache",
+    "node_modules",
+    "*.pyc",
+    # ── OVAV: artefactos históricos y evidencia — nunca auto-formatear ──
+    ".ovav/artifacts/",
+    ".ovav/memory/",
+    ".ovav/governor/",       # GENESIS_KEY.sealed, SHARED_MEMORY.sealed, etc.
+    ".ovav/gate_self_hash",
+]
+
+[tool.ruff.lint]
+select = [
+    # Pyflakes (F) — CRITICAL: detects undefined names, unused imports, syntax errors
+    "F",
+    # flake8-bugbear (B) — CRITICAL: detects common bugs
+    "B",
+    # flake8-bandit security (S) — CRITICAL: security issues
+    "S",
+    # ruff-specific (RUF) — CRITICAL: Ruff-specific bug detection
+    "RUF",
+    # isort (I) — import ordering (auto-fixable)
+    "I",
+    # pyupgrade (UP) — modernize syntax (auto-fixable)
+    "UP",
+    # pycodestyle (E, W) — basic style
+    "E", "W",
+    # flake8-comprehensions (C4) — better comprehensions (auto-fixable)
+    "C4",
+    # eradicate (ERA) — commented-out code detection
+    "ERA",
+]
+ignore = [
+    # Line too long — pragmatic for existing codebase
+    "E501",
+    # Allow lambdas in loops (sometimes needed for harnesses)
+    "B023",
+    # Allow assert in non-test code (validators use assert)
+    "S101",
+    # Allow os.system and subprocess without shell=False check (harnesses use them carefully)
+    "S602", "S603", "S607",
+    # Don't force docstrings on everything
+    "D100", "D104",
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["tools", "tests"]
+
+[tool.ruff.lint.pyupgrade]
+keep-runtime-typing = true
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "lf"
+
+[tool.mypy]
+strict = true
+ignore_missing_imports = true
+warn_unused_configs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+no_implicit_optional = true
+python_version = "3.12"
+files = ["tools/security/", "tools/validators/", "tools/harnesses/"]

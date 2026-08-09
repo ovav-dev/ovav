@@ -1,0 +1,3 @@
+squad: {id: "squad_uiux", display_name: "Laura", area: digital_product, lead: dante, role: "Interface design and UX", role_id: "ui_ux_designer"}
+activation: {modes: [focused_squad], never_default: true}
+model_body: {primary: "opencode-go/deepseek-v4-pro"}

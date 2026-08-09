@@ -1,0 +1,205 @@
+{
+  "index_version": "s70_skill_resource_index_v2",
+  "generated_at": "2026-05-22T11:14:59.053922+00:00",
+  "policy": {
+    "name": "Skill/Resource Index & Progressive Loading Policy",
+    "compact_router_limit": 50,
+    "rules": [
+      "Every skill has an exact file path in this index.",
+      "SKILL.md files act as compact routers, ≤ 50 lines.",
+      "Detail lives in references/ subdirectories under each skill path.",
+      "Index refreshes automatically via h_skill_registry_refresh on .ovav/source/skills/ changes.",
+      "No lossy summaries. Exact-path resolution only.",
+      "Skill without owner = blocked.",
+      "Skill without eval = experimental.",
+      "Skill that writes memory = gateway only.",
+      "Skill that changes voice = denied unless voice-scoped."
+    ],
+    "progressive_loading": {
+      "description": "Context budget tiers mapped from routing labels",
+      "tiers": {
+        "T1_minimal": {
+          "task_classes": [
+            "greeting",
+            "identity_check"
+          ],
+          "context": "session_baseline + identity"
+        },
+        "T2_compact": {
+          "task_classes": [
+            "direct_answer",
+            "simple_query"
+          ],
+          "context": "+ lane_context"
+        },
+        "T3_standard": {
+          "task_classes": [
+            "mini_plan",
+            "diagnosis"
+          ],
+          "context": "+ implementation_context + registry_guard"
+        },
+        "T4_full": {
+          "task_classes": [
+            "implementation",
+            "multi_file"
+          ],
+          "context": "+ full_artifact_chain + skill_context"
+        },
+        "T5_closure": {
+          "task_classes": [
+            "validation",
+            "close",
+            "handoff"
+          ],
+          "context": "+ strict_evidence + drift_check + git_safety"
+        }
+      }
+    }
+  },
+  "inventory": {
+    "total_skills": 10,
+    "compact_compliant": 10,
+    "non_compliant": 0,
+    "compliance_percentage": 100.0,
+    "skills": [
+      {
+        "name": "ovav-artifact-flow",
+        "path": ".ovav/source/skills/ovav-artifact-flow/SKILL.md",
+        "lines": 46,
+        "compact_compliant": true,
+        "has_references": false,
+        "reference_files": [],
+        "progressive_loading_tier": "T3",
+        "build6_action": "reuse"
+      },
+      {
+        "name": "ovav-context-pack",
+        "path": ".ovav/source/skills/ovav-context-pack/SKILL.md",
+        "lines": 26,
+        "compact_compliant": true,
+        "has_references": false,
+        "reference_files": [],
+        "progressive_loading_tier": "T3",
+        "build6_action": "reuse"
+      },
+      {
+        "name": "ovav-identity-guard",
+        "path": ".ovav/source/skills/ovav-identity-guard/SKILL.md",
+        "lines": 38,
+        "compact_compliant": true,
+        "has_references": false,
+        "reference_files": [],
+        "progressive_loading_tier": "T3",
+        "build6_action": "reuse"
+      },
+      {
+        "name": "ovav-platform-session",
+        "path": ".ovav/source/skills/ovav-platform-session/SKILL.md",
+        "lines": 44,
+        "compact_compliant": true,
+        "has_references": true,
+        "reference_files": [
+          "examples.md",
+          "harness-governance.md",
+          "identity-model.md",
+          "lane-routing.md",
+          "language-contract.md"
+        ],
+        "progressive_loading_tier": "T1",
+        "build6_action": "reuse"
+      },
+      {
+        "name": "ovav-repo-local-work-loop",
+        "path": ".ovav/source/skills/ovav-repo-local-work-loop/SKILL.md",
+        "lines": 50,
+        "compact_compliant": true,
+        "has_references": true,
+        "reference_files": [
+          "context-work-validate-close.md",
+          "local-git-closure.md",
+          "professional-area-parity.md",
+          "visible-surface-cleanup.md"
+        ],
+        "progressive_loading_tier": "T4",
+        "build6_action": "reuse"
+      },
+      {
+        "name": "ovav-research-evidence",
+        "path": ".ovav/source/skills/ovav-research-evidence/SKILL.md",
+        "lines": 45,
+        "compact_compliant": true,
+        "has_references": true,
+        "reference_files": [
+          "evidence-methods.md"
+        ],
+        "progressive_loading_tier": "T3",
+        "build6_action": "reuse"
+      },
+      {
+        "name": "ovav-research-session",
+        "path": ".ovav/source/skills/ovav-research-session/SKILL.md",
+        "lines": 42,
+        "compact_compliant": true,
+        "has_references": true,
+        "reference_files": [
+          "evidence-style.md",
+          "harness-governance.md",
+          "identity-model.md",
+          "language-contract.md",
+          "research-routing.md"
+        ],
+        "progressive_loading_tier": "T1",
+        "build6_action": "reuse"
+      },
+      {
+        "name": "ovav-response-contract",
+        "path": ".ovav/source/skills/ovav-response-contract/SKILL.md",
+        "lines": 31,
+        "compact_compliant": true,
+        "has_references": true,
+        "reference_files": [
+          "visual-response-style.md"
+        ],
+        "progressive_loading_tier": "T3",
+        "build6_action": "reuse"
+      },
+      {
+        "name": "ovav-runtime-gates",
+        "path": ".ovav/source/skills/ovav-runtime-gates/SKILL.md",
+        "lines": 24,
+        "compact_compliant": true,
+        "has_references": false,
+        "reference_files": [],
+        "progressive_loading_tier": "T5",
+        "build6_action": "reuse"
+      },
+      {
+        "name": "ovav-sdd-init",
+        "path": ".ovav/source/skills/ovav-sdd-init/SKILL.md",
+        "lines": 46,
+        "compact_compliant": true,
+        "has_references": false,
+        "reference_files": [],
+        "progressive_loading_tier": "T3",
+        "build6_action": "reuse"
+      }
+    ]
+  },
+  "exact_path_index": {
+    "ovav-artifact-flow": ".ovav/source/skills/ovav-artifact-flow/SKILL.md",
+    "ovav-context-pack": ".ovav/source/skills/ovav-context-pack/SKILL.md",
+    "ovav-identity-guard": ".ovav/source/skills/ovav-identity-guard/SKILL.md",
+    "ovav-platform-session": ".ovav/source/skills/ovav-platform-session/SKILL.md",
+    "ovav-repo-local-work-loop": ".ovav/source/skills/ovav-repo-local-work-loop/SKILL.md",
+    "ovav-research-evidence": ".ovav/source/skills/ovav-research-evidence/SKILL.md",
+    "ovav-research-session": ".ovav/source/skills/ovav-research-session/SKILL.md",
+    "ovav-response-contract": ".ovav/source/skills/ovav-response-contract/SKILL.md",
+    "ovav-runtime-gates": ".ovav/source/skills/ovav-runtime-gates/SKILL.md",
+    "ovav-sdd-init": ".ovav/source/skills/ovav-sdd-init/SKILL.md"
+  },
+  "source_policy": {
+    "source_local_only": true,
+    "standard_library_only": true
+  }
+}

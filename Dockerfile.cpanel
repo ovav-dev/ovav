@@ -1,0 +1,84 @@
+# OVAV cPanel Backend — Dockerfile v2.0 (Tunnel Edition)
+# =============================================================================
+# Multi-stage build with Cloudflare Tunnel (cloudflared) for zero public IP.
+# Backend listens on localhost:5858. cloudflared bridges to Cloudflare Edge.
+# No open ports on the container. No public IP. No server to scan.
+#
+# Build:
+#   docker build -t ovav-cpanel -f Dockerfile.cpanel \
+#     --build-arg GIT_BRANCH=$(git branch --show-current) \
+#     --build-arg GIT_SHA=$(git rev-parse --short HEAD) .
+#
+# Run:
+#   docker run -e CF_TUNNEL_TOKEN=<token> ovav-cpanel
+# =============================================================================
+
+FROM golang:1.26-alpine AS builder
+
+ARG GIT_BRANCH=unknown
+ARG GIT_SHA=unknown
+ARG VERSION=unknown
+
+WORKDIR /build
+COPY go-runtime/go.mod go-runtime/go.sum* ./
+RUN go mod download 2>/dev/null || true
+COPY go-runtime/ ./
+
+# Static binary — no libc dependency, build metadata injected via ldflags
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
+    -ldflags="-s -w -X main.GitBranch=${GIT_BRANCH} -X main.GitSHA=${GIT_SHA} -X main.Version=${VERSION} -X main.Build=cPanel-v2-Go-Runtime" \
+    -o /cpanel ./cmd/cpanel/
+
+# ── Cloudflared downloader ────────────────────────────────────────────────────
+FROM alpine:3.20 AS cloudflared-fetcher
+ARG CLOUDFLARED_VERSION=2025.5.0
+RUN wget -q "https://github.com/cloudflare/cloudflared/releases/download/${CLOUDFLARED_VERSION}/cloudflared-linux-amd64" \
+    -O /cloudflared && chmod +x /cloudflared
+
+# ── Runtime stage ────────────────────────────────────────────────────────────
+FROM alpine:3.20
+
+RUN apk add --no-cache ca-certificates tzdata
+RUN adduser -D -h /app ovav
+
+WORKDIR /app
+
+# Go binary
+COPY --from=builder /cpanel /app/cpanel
+
+# Cloudflared tunnel client
+COPY --from=cloudflared-fetcher /cloudflared /usr/local/bin/cloudflared
+
+# Entrypoint script (starts tunnel + cPanel)
+# COPY go-runtime/cmd/cpanel/entrypoint.sh /app/entrypoint.sh
+# RUN chmod +x /app/entrypoint.sh
+
+# Static frontend — SPA served by Go backend on same origin (no CORS issues)
+COPY tools/cpanel/static/dist/ /app/tools/cpanel/static/dist/
+COPY tools/cpanel/static/css/ /app/tools/cpanel/static/css/
+
+# OVAV runtime config — required by Go native cPanel
+RUN mkdir -p /app/.ovav/registry /app/.ovav/policy /app/.ovav/security /app/.ovav/economy /app/.ovav/runtime
+RUN chown -R ovav:ovav /app/.ovav
+
+USER ovav
+
+# ── NO EXPOSE — no open ports on container surface ────────────────────────────
+# cloudflared handles all inbound traffic. cPanel listens on localhost only.
+# Container has ZERO publicly accessible ports.
+
+ENV PORT=5858
+ENV GIN_MODE=release
+ENV OVAV_ROOT=/app
+
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
+    CMD wget -qO- http://localhost:${PORT}/health || exit 1
+
+# GOV-010: Inline entrypoint — starts tunnel if TUNNEL_TOKEN is set
+RUN echo '#!/bin/sh' > /app/entrypoint.sh && \
+    echo 'if [ -n "${TUNNEL_TOKEN}" ]; then' >> /app/entrypoint.sh && \
+    echo '  /usr/local/bin/cloudflared tunnel --no-autoupdate run --token "${TUNNEL_TOKEN}" &' >> /app/entrypoint.sh && \
+    echo 'fi' >> /app/entrypoint.sh && \
+    echo 'exec /app/cpanel' >> /app/entrypoint.sh && \
+    chmod +x /app/entrypoint.sh
+ENTRYPOINT ["/app/entrypoint.sh"]

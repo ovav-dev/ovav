@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# OVAV tool wrapper (bash-native, MiMo-compatible)
+exec bat --paging=never --style=plain "$@"

@@ -1,0 +1,344 @@
+# ═══════════════════════════════════════════════════════════
+# OVAV — MASTER INVENTORY: SYSTEMS BUILT BUT NOT USED
+# ═══════════════════════════════════════════════════════════
+# Auditoría completa: 2026-06-19 — thavren + squad
+# Alcance: TODO el sistema OVAV — código, configuración,
+#   contratos, integraciones, agentes, herramientas.
+#
+# Cada entrada es algo que EXISTE en el código pero NO está
+# siendo utilizado activamente. Clasificado por tipo y prioridad
+# de activación/migración.
+# ═══════════════════════════════════════════════════════════
+
+version: 2.0
+date: 2026-06-19 06:00 UTC-5
+
+# ═══════════════════════════════════════════════════════════
+# CATEGORÍA A: SISTEMAS COMPLETOS CONSTRUIDOS — NUNCA ACTIVADOS
+# ═══════════════════════════════════════════════════════════
+# Son sistemas grandes, completos, con código funcionando,
+# pero nunca se configuraron/activaron. Son los de mayor valor
+# por activar inmediatamente.
+# ═══════════════════════════════════════════════════════════
+
+systems_built_never_activated:
+
+  A1_oauth_connect:
+    name: "OAuth Connect — login Google + GitHub para cPanel"
+    status: "Backend Go 100% construido. Frontend 0%. Credenciales 0%."
+    what_exists:
+      - "cPanel oauth.go: CSRF tokens, state management, Google + GitHub providers"
+      - "API routes: POST /api/v1/auth/login, GET /api/v1/auth/session, GET /api/v1/auth/config, POST /api/v1/auth/oauth/*"
+      - "Tests: login, session, config, OAuth callback — funcionando"
+      - "Env vars declaradas: OAUTH_GOOGLE_CLIENT_ID, OAUTH_GITHUB_CLIENT_ID (en .env.production.example)"
+    what_is_missing:
+      - "CREDENCIALES REALES: OAUTH_GOOGLE_CLIENT_ID= (vacío)"
+      - "FRONTEND: 0 archivos TSX/TS con UI de login OAuth"
+      - "URLs de redirect configuradas en Google Cloud Console / GitHub App"
+    effort_to_activate: "4-6h (configurar creds + redirect URIs + frontend login UI)"
+    priority: CRITICA
+
+  A2_economy_tracking:
+    name: "Economy/Budget — tracking de costos AI en tiempo real"
+    status: "Código 100% construido. Tracking muestra USD 0.00 (no está corriendo)."
+    what_exists:
+      - "Go economy package: Load(), BudgetStatus struct, UpdateBudgetStatus()"
+      - "Python economy: 9 herramientas (monetary_cortex, cost_tracker, budget_governor, etc.)"
+      - "MCP ovav-budget: configurado en opencode.json (único MCP activo)"
+      - "cPanel API: GET /api/v1/economy (lee dashboard.json)"
+      - "model_budget_policy.yaml: USD 200/mes, USD 10/sesion, alertas 70/85/95%"
+      - "budget_status.json: existe pero muestra USD 0.00 en todo"
+    what_is_missing:
+      - "AUTO-UPDATE: budget_status.json muestra session_cost: 0.00 — el tracking no está corriendo"
+      - "El sistema de cost_tracker_auto y monetary_cortex están construidos pero NADIE los llama automáticamente"
+      - "No hay cron job ni hook que actualice budget_status.json periódicamente"
+    effort_to_activate: "2-3h (activar auto-update en session start + cron de monetary_cortex)"
+    priority: CRITICA
+
+  A3_protocol_a2a:
+    name: "Protocol A2A — Agent-to-Agent communication layer"
+    status: "Código 100% construido. 0 configuración en opencode.json."
+    what_exists:
+      - "tools/protocols/gateway.py: 20 imports (whitelist → permission → scope → budget → circuit_breaker → audit)"
+      - "tools/protocols/audit.py: 17 imports (audit logger completo)"
+      - "tools/protocols/whitelist.py: whitelist checker"
+      - "Arquitectura completa de ProtocolAccessRequest con 7 capas de validación"
+    what_is_missing:
+      - "A2A config: NONE en opencode.json"
+      - "Ningún agente usa A2A para comunicarse"
+      - "El gateway está construido pero nunca recibe requests"
+    effort_to_activate: "4-6h (configurar A2A en opencode.json + probar comunicación entre agents)"
+    priority: ALTA
+
+  A4_security_defense_suite:
+    name: "Security Defense Suite — 4 herramientas de defensa autónomas"
+    status: "4 herramientas completas. 0 imports cada una. Nunca ejecutadas."
+    what_exists:
+      - "defense_cortex.py: Sistema de defensa autónomo multi-capa"
+      - "host_defense_responder.py: Respuesta automatizada a intrusiones (info/warning/critical/deadly)"
+      - "intelligent_authorizer.py: Auto-autorización de drift con 6 reglas de contexto"
+      - "auto_credentials.py: Gestión automática de credenciales por proyecto (init/detect/bind/status/check)"
+    what_is_missing:
+      - "Ninguna está cableada al sistema. 0 imports."
+      - "defense_cortex nunca monitorea. host_defense_responder nunca responde."
+      - "intelligent_authorizer nunca auto-autoriza. auto_credentials nunca gestiona."
+    effort_to_activate: "8-12h (cablear al runtime + tests Go equivalentes)"
+    priority: CRITICA
+
+  A5_governor_brain:
+    name: "Governor Brain — 19 herramientas de gobernanza autónomas"
+    status: "19 herramientas completas. 0 imports cada una."
+    what_exists:
+      - "perception_engine.py: Motor de percepción del sistema"
+      - "interrupt_engine.py: Motor de interrupción (similar a output_guard)"
+      - "governor_cycle.py: Ciclo de gobierno completo"
+      - "milestone_recognition.py: Reconocimiento de hitos"
+      - "creator_recognition.py: Reconocimiento de creador"
+      - "genesis_key.py: Llave de génesis del sistema"
+      - "integration_acceptance_protocol.py: Protocolo de aceptación de integración"
+      - "voice_router.py: Router de voz"
+      - "system_maturity_classifier.py: Clasificador de madurez"
+      - "maturity_maintenance_cycle.py: Ciclo de mantenimiento de madurez"
+      - "attribution_seal.py: Sello de atribución"
+      - "consult_ovav.py: Sistema de consulta"
+      - "verify_signature.py: Verificación de firmas"
+      - "thavren_memory.py, dante_memory.py, eidren_memory.py, sofia_memory.py, renata_memory.py, valeria_memory.py: Memorias por lead"
+    what_is_missing:
+      - "19 de 27 herramientas con 0 imports. Solo 8 se usan."
+    effort_to_activate: "15-25h (evaluar cuáles migrar a Go + cablear)"
+    priority: ALTA
+
+  A6_auto_triggers:
+    name: "Auto-Triggers System — 171 triggers de validación automática"
+    status: "Registro YAML completo. Git hooks NO instalados."
+    what_exists:
+      - ".ovav/registry/auto_triggers.yaml con 6 eventos (after_git_stage, before_apply, before_close, before_git_push, before_git_stage, before_implementation)"
+      - "Cada evento dispara múltiples validadores (check_secrets_hygiene, validate_workspace_safety_gate, etc.)"
+    what_is_missing:
+      - "Git hooks pre-commit + pre-push NO INSTALADOS en .git/hooks/"
+      - "Sin hooks, los triggers nunca se disparan automáticamente"
+      - "Los triggers referencian scripts Python — verificar que existan"
+    effort_to_activate: "1-2h (instalar hooks + verificar scripts)"
+    priority: CRITICA
+
+# ═══════════════════════════════════════════════════════════
+# CATEGORÍA B: HERRAMIENTAS PYTHON COMPLETAS — 0 USO
+# ═══════════════════════════════════════════════════════════
+# Entry points con __main__ que ningún otro archivo importa.
+# Herramientas completas, funcionales, pero nunca llamadas.
+# ═══════════════════════════════════════════════════════════
+
+python_tools_zero_imports:
+  total: 166
+  estimated_loc: "35,000+"
+
+  by_priority:
+
+    tier1_critical:
+      count: 25
+      description: "Herramientas de seguridad y gobernanza que DEBERÍAN estar activas"
+      items:
+        governor: [output_guard, unified_health, self_diagnosis, decision_engine, session_feed, trust_gate, delegation_protocol]
+        security: [defense_cortex, host_defense_responder, intelligent_authorizer, auto_credentials, integrity_repair, system_health_scheduler]
+        permissions: [bash_commands, claims_governance, config_governance, live_behavior, plugin_governance, sandbox_governance, system_paths, temporal_scoped, unsafe_selectors]
+        hooks: [install_hooks]
+
+    tier2_high:
+      count: 52
+      description: "Harnesses de validación — deberían estar en CI/CD"
+      items:
+        harnesses: [check_ovav_law_compliance, check_secrets_hygiene, check_supply_chain, check_pre_push_intelligence, check_red_team_surface, check_security_baseline, check_memory_firewall, check_install_governor, check_eidren_e2e, check_evidence_stability, check_fix_audit, check_harness_intelligence_router, check_harness_reuse_audit, check_human_response_contract, check_sandbox_governance, check_session_context_cut, check_source_global_approval, check_source_local_acceptance, check_system_paths, check_tool_config_profiles, check_unsafe_selectors, check_worktree_continuity, adversarial_skill_cases, approval_risk_router, artifact_dependency, artifact_writer, auto_changelog, auto_packet_generator, capability_lifecycle_gate, capability_retirement_candidates, caution_gate, caution_graduation, caution_policy, change_manifest, intent_to_evidence_chain, opencode_agent_surface, opencode_command_surface, opencode_identity_guard, opencode_repo_local_pack_writer, opencode_skill_surface, preview_surface_graduation_policy, preview_surface_state, repo_local_work_loop, route_recovery, s105_harness_audit, self_audit, session_report_generator, skill_graduation_policy, source_global_approval_gate, source_local_acceptance, standardize_governor_cli, thavren_e2e_runtime, verify_output]
+
+    tier3_medium:
+      count: 54
+      description: "CLI tools, web, agent_runtime — funcionales pero nunca llamados"
+      items:
+        cli: [ovav_backup_manager, ovav_capa7_cli, ovav_cpanel, ovav_execution_gateway, ovav_fresh_clone_smoke, ovav_install_smoke, ovav_official_update, ovav_oneclick_installer, ovav_plan_artifacts, ovav_plan_dashboard, ovav_practical_smoke, ovav_profile, ovav_public_cli, ovav_public_export_gate, ovav_release_package, ovav_repo_presentation_gate, ovav_surface_manager, ovav_tool_configs, ovav_tui]
+        agent_runtime: [agent_brain, agent_heartbeat, agent_identity, agent_mesh, agent_mesh_discovery, agent_role_manifest, agent_specialization, capability_ledger, context_bridge, context_cut_protocol, context_memory, directive_compiler, evaluation_ledger, gate_checkpoint, mesh_topology, neural_signature, prompt_compiler, protocol_handshake, recovery_ledger, response_compiler, session_ledger, skill_routing, specialization_router, task_context_bridge]
+        web: [fetch_orchestrator, ovav_multimedia, research_cache]
+        visual: [project_opencode_visual, release_pipeline]
+        workstation: [ovav_wezterm_workspace, ovav_workstation_access]
+
+    tier4_low:
+      count: 35
+      description: "Tools de nicho, educación, sandbox — baja prioridad de activación"
+      items:
+        education: [career_compiler, career_router, certificate_generator, curriculum_compiler]
+        varios: [project_opencode, package_ovav_product, visual_sandbox, dashboard, ovav_gh_issue_gate, ovav_clean_uninstall, seed_knowledge, ovav_mcp_server, migrate_agents_to_yaml, experiment_e0, ovav_gateway, ovav_dashboard, cross_platform_paths, prompt_architect, sandbox_test, refresh_registry, validate_all, work_session_queue]
+
+# ═══════════════════════════════════════════════════════════
+# CATEGORÍA C: SISTEMAS PARCIALMENTE ACTIVOS
+# ═══════════════════════════════════════════════════════════
+# Construidos y parcialmente cableados, pero con gaps críticos
+# que impiden su funcionamiento completo.
+# ═══════════════════════════════════════════════════════════
+
+systems_partially_active:
+
+  C1_red_team:
+    name: "Red Team R5 — Auditoría automatizada de boundaries"
+    status: "Código construido. Cron configurado. Solo 4 reportes."
+    what_exists:
+      - "Go validator: red_team_audit.go (22/22 checks implementados)"
+      - "GitHub Actions: red-team-cron.yml (semanal lunes 08:00 UTC-5)"
+      - "Workflow dispatch + push triggers"
+      - "4 reportes históricos en .ovav/red_team/reports/"
+    what_is_missing:
+      - "¿Por qué solo 4 reportes si el cron es semanal desde hace semanas?"
+      - "Posible: el cron nunca se ejecutó porque no hubo push a main/develop en el horario"
+      - "Posible: el workflow falla silenciosamente"
+    effort_to_fix: "1h (diagnosticar + forzar ejecución manual)"
+    priority: ALTA
+
+  C2_cockpit_tui:
+    name: "Cockpit TUI — 8 vistas funcionales"
+    status: "8 vistas construidas. Cobertura 62.8%. Algunas vistas posiblemente stubs."
+    what_exists:
+      - "Vistas: Welcome, Root, Dashboard, Health, Install, Tailor, Detail, Quit, Help"
+      - "Menú principal con 5 items (dashboard, health, install, tailor, CLI runtime)"
+      - "Sistema de navegación (nav stack, push/pop/replace)"
+    what_is_missing:
+      - "Coverage 62.8% — features rotos no detectados"
+      - "F6 features planeadas (worktrees visual, OAuth connect, diff horizontal) no implementadas"
+    effort_to_complete: "F6 Cockpit: 22h (plan Phase 2 — POSTERGADO)"
+    priority: MEDIA
+
+  C3_installer:
+    name: "Installer Go — 12 archivos, 93.6% coverage"
+    status: "Código completo. Documentación referencia Python. Nunca probado E2E."
+    what_exists:
+      - "Go install package: backup, apply, verify, rollback, safety, config, ux, report, plan, manifest"
+      - "ovav CLI: comandos 'install' y 'uninstall' cableados"
+      - "93.6% coverage"
+    what_is_missing:
+      - "INSTALL.md referencia python3 tools/ovav_runtime.py validate (Python legacy)"
+      - "Nunca probado en entorno limpio end-to-end"
+      - "One-click installer (Python) es dead code con 0 imports"
+    effort_to_fix: "3-4h (actualizar docs + prueba E2E)"
+    priority: ALTA
+
+  C4_mcp_servers:
+    name: "MCP Servers — 3 declarados, 1 configurado"
+    status: "Script Python para 3 servers. Solo budget configurado."
+    what_exists:
+      - "tools/mcp/ovav_mcp_server.py: budget, evidence, context servers"
+      - "budget: configurado en opencode.json (type=local, enabled=true)"
+      - "evidence: NUNCA configurado"
+      - "context: NUNCA configurado"
+    what_is_missing:
+      - "ovav-evidence y ovav-context nunca fueron cableados a opencode.json"
+      - "El script tiene el código pero nadie lo llama para esos modos"
+    effort_to_activate: "30min (agregar entries en opencode.json)"
+    priority: MEDIA
+
+  C5_skills:
+    name: "Skills System — 15 definidos, 1 referencia rota"
+    status: "15 skills en .opencode/skills/. Mayoría sin scripts."
+    what_exists:
+      - "15 skills con SKILL.md cada uno"
+      - "ovav-runtime-gates: referencia tools/ovav_runtime.py (correcto)"
+      - "ovav-session-continuity: referencia tools/agent_runtime/session_handoff.py"
+    what_is_missing:
+      - "ovav-sdd-init: referencia tools/harnesses/h_sdd_init.py que NO EXISTE"
+      - "La mayoría de skills no referencian ningún script ejecutable"
+      - "13 de 15 skills son puramente documentación (sin ejecución)"
+    effort_to_fix: "30min (crear script faltante o eliminar referencia)"
+    priority: BAJA
+
+  C6_fish_functions:
+    name: "Fish Functions — 11 en repo, caps dice 13"
+    status: "Discrepancia numérica"
+    what_exists:
+      - "config/fish/: 6 funciones"
+      - "tools/shell/ovav.fish"
+      - "go-runtime/internal/gitflow/ovav.fish"
+      - "docs/: 3 archivos .fish de referencia"
+    what_is_missing:
+      - "2 funciones declaradas en caps pero no encontradas en repo"
+    effort_to_fix: "30min (identificar faltantes)"
+    priority: BAJA
+
+# ═══════════════════════════════════════════════════════════
+# CATEGORÍA D: CONTRATOS Y GOVERNANCE — DEFINIDOS PERO NO ENFORCED
+# ═══════════════════════════════════════════════════════════
+
+contracts_not_enforced:
+
+  D1_contracts_zero_validators:
+    name: "Contratos sin validator enforcement"
+    items:
+      - "advanced_methodologies.yaml: 0 validators lo referencian"
+      - "coordination_protocol.yaml: 0 validators lo referencian"
+      - "quality_standards.yaml: 0 validators lo referencian"
+    effort: "2-3h (crear validators o decidir deprecar)"
+
+  D3_agents_zero_permissions:
+    name: "70 agentes definidos — mayoría con 0 tools y 0 bash permissions"
+    status: "Definiciones existen pero agentes no pueden hacer nada"
+    what_exists:
+      - "70 archivos .md en .opencode/agents/"
+      - "Agentes con tools=0 y bash=0 no tienen capacidad operativa"
+      - "Solo ~12 agentes tienen bash=1 o bash=2"
+    effort: "2-3h (asignar permisos mínimos a agentes inactivos o eliminar)"
+
+# ═══════════════════════════════════════════════════════════
+# CATEGORÍA E: GO — CONSTRUIDO PERO AISLADO
+# ═══════════════════════════════════════════════════════════
+
+go_built_isolated:
+
+  E1_packages_zero_imports:
+    name: "Paquetes Go que compilan pero NADIE importa"
+    items:
+      - package: license
+        description: "Sistema de licencias (69.9% coverage, tests existentes)"
+        action: "Integrar en ovav CLI o eliminar"
+      - package: status
+        description: "Engine de status del sistema (0 tests)"
+        action: "Integrar en ovav status o eliminar"
+      - package: project
+        description: "Sync de proyecto (0 tests)"
+        action: "Integrar en owc o eliminar"
+
+  E2_validators_untested:
+    name: "82 validadores Go — TODOS cableados, 1 SOLO test file"
+    status: "DefaultRegistry() registra los 82. Funcionan. Pero 73% coverage con 1 test."
+    effort: "16-20h (crear tests para validadores críticos L0-L2)"
+
+  E3_harnesses_zero_cicd:
+    name: "316 harnesses Python — 0 en GitHub Actions"
+    status: "Ningún workflow referencia tools/harnesses/"
+    effort: "1-2h (crear harnesses.yml workflow)"
+
+# ═══════════════════════════════════════════════════════════
+# RESUMEN EJECUTIVO
+# ═══════════════════════════════════════════════════════════
+
+executive_summary:
+  total_systems_built: "~900+ componentes (636 py + 178 go + 70 agents + 20 contracts + 15 skills + ...)"
+  total_not_used: "~550+ (60%+ del sistema)"
+  breakdown:
+    category_A_systems_never_activated: 6
+    category_B_python_tools_zero_imports: 166
+    category_C_partially_active: 6
+    category_D_contracts_not_enforced: 3
+    category_E_go_built_isolated: 3
+  estimated_loc_unused: "~80,000-100,000 LOC"
+  total_effort_to_activate_all: "60-100 horas (2-3 semanas con squad completo)"
+
+  quick_wins_under_8h:
+    - "Activar OAuth Connect (configurar creds + redirect URIs)"
+    - "Activar economy auto-tracking (cron de monetary_cortex)"
+    - "Instalar git hooks + auto-triggers"
+    - "Cablear 4 security tools al runtime"
+    - "Arreglar MCP servers (agregar evidence + context)"
+    - "Eliminar capsule contract zombie + docs"
+    - "Integrar Go license/status/project packages"
+    - "Crear harnesses.yml CI/CD workflow"
+
+  migration_priority:
+    immediate: "Categoría A (sistemas completos nunca activados) + git hooks"
+    short_term: "Categoría B tier1 (governor + security tools críticas)"
+    medium_term: "Categoría B tier2 (harnesses a CI/CD)"
+    background: "Categoría D + E (contratos, agentes, Go aislado)"
+    eliminate: "Capsule contract zombie + Python dead code tier4"

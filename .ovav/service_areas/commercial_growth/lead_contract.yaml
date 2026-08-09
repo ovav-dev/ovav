@@ -1,0 +1,1 @@
+lead_contract: {version: "1.0.0", lead: sofia, responsibilities: ["Strategy design", "Business validation", "Team delegation"], metrics: [{name: "Model viability rate", target: ">90% recommendations viable"}, {name: "Strategy execution rate", target: ">80% strategies implemented"}]}

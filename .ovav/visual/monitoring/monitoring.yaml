@@ -1,0 +1,163 @@
+# OVAV Visual Monitoring — Canonical Source
+# =============================================================================
+# Define QUÉ monitorear, con qué thresholds y cómo representarlo visualmente.
+# El monitoring engine (tools/visual/monitor_engine.py) lee estas reglas
+# y genera el plugin OpenCode + cualquier otra superficie de monitoreo.
+#
+# Schema: ovav.visual.monitoring.v1
+# Location: .ovav/visual/monitoring/monitoring.yaml
+# =============================================================================
+
+schema: ovav.visual.monitoring.v1
+version: "1.0.0"
+description: "Reglas de monitoreo visual OVAV — agente, tokens, presupuesto, memoria, sistema"
+
+# ══════════════════════════════════════════════════════════════════════════════
+# WATCHERS — Qué observar en tiempo real
+# ══════════════════════════════════════════════════════════════════════════════
+watchers:
+
+  # ── Agente Activo ──────────────────────────────────────────────────────────
+  active_agent:
+    description: "Qué lead está respondiendo ahora mismo"
+    source: "session.status → agent name"
+    display:
+      format: "{icon} {label} · {model}"
+      update_frequency: "on_change"
+    visual:
+      thavren: { icon: "✦", color: "thavren", pulse: true }
+      eidren:  { icon: "✦", color: "eidren", pulse: true }
+
+  # ── Modelo Actual ──────────────────────────────────────────────────────────
+  current_model:
+    description: "Modelo de lenguaje en uso por el agente activo"
+    source: "session.status → model"
+    display:
+      format: "🧠 {model_short}"
+      update_frequency: "on_change"
+    visual:
+      show_provider: true
+      abbreviate: true        # "deepseek-v4-pro" → "DSv4"
+
+  # ── Tokens y Costo ─────────────────────────────────────────────────────────
+  token_usage:
+    description: "Tokens usados en la sesión actual con barra de progreso"
+    source: "session.status → tokens"
+    display:
+      format: "📊 {used}/{total} · ${cost}"
+      update_frequency: "every_5_seconds"
+    visual:
+      show_bar: true           # Barra de progreso visual
+      bar_width: 20            # Caracteres de ancho
+      bar_filled: "█"
+      bar_empty: "░"
+
+  # ── Presupuesto ────────────────────────────────────────────────────────────
+  budget:
+    description: "Porcentaje de presupuesto mensual consumido"
+    source: "OVAV budget tracker → monthly_usage"
+    display:
+      format: "{icon} {percent}% · ${remaining} restante"
+      update_frequency: "on_change"
+    visual:
+      thresholds: "budget.thresholds"   # Referencia al theme.yaml
+      show_remaining: true
+
+  # ── Memoria OVAV ──────────────────────────────────────────────────────────
+  ovav_memory:
+    description: "Indicador de integridad del sistema OVAV"
+    source: "git HEAD + caps.yaml"
+    display:
+      format: "{icon} OVAV Runtime: {status}"
+      update_frequency: "on_change"
+    visual:
+      active:   { icon: "🟢", text: "ACTIVO — integridad verificada", color: "success" }
+      inactive: { icon: "⚪", text: "INACTIVA — sesión sin persistencia", color: "text_muted" }
+      degraded: { icon: "🟡", text: "DEGRADADA — memoria parcial", color: "warning" }
+
+  # ── Sesión ─────────────────────────────────────────────────────────────────
+  session:
+    description: "Duración de la sesión y fase actual"
+    source: "session.created → elapsed time"
+    display:
+      format: "⏱️ {elapsed} · {phase}"
+      update_frequency: "every_30_seconds"
+
+  # ── Git ────────────────────────────────────────────────────────────────────
+  git_status:
+    description: "Branch actual y estado del working tree"
+    source: "git branch + git status"
+    display:
+      format: "🔀 {branch} · {modified}M {staged}S {untracked}U"
+      update_frequency: "every_60_seconds"
+
+# ══════════════════════════════════════════════════════════════════════════════
+# ALERTAS — Condiciones que disparan notificaciones visuales
+# ══════════════════════════════════════════════════════════════════════════════
+alerts:
+
+  agent_switch:
+    trigger: "active_agent cambia"
+    severity: "info"
+    toast: "🔄 {from} → {to}"
+    duration_ms: 3000
+
+  model_switch:
+    trigger: "current_model cambia"
+    severity: "info"
+    toast: "🧠 Modelo cambiado: {from} → {to}"
+    duration_ms: 3000
+
+  budget_warning:
+    trigger: "budget supera 75%"
+    severity: "warning"
+    toast: "⚠️ Presupuesto al {percent}% — quedan ${remaining}"
+    duration_ms: 5000
+
+  budget_critical:
+    trigger: "budget supera 90%"
+    severity: "error"
+    toast: "🔴 PRESUPUESTO CRÍTICO: {percent}% — ¡solo ${remaining}!"
+    duration_ms: 8000
+
+  memory_activated:
+    trigger: "ovav_memory se activa"
+    severity: "success"
+    toast: "🟢 Memoria OVAV activada — continuidad local garantizada"
+    duration_ms: 3000
+
+  memory_degraded:
+    trigger: "ovav_memory se degrada"
+    severity: "warning"
+    toast: "🟡 Memoria OVAV degradada — revisar git HEAD + caps.yaml"
+    duration_ms: 5000
+
+  integrity_fail:
+    trigger: "Integrity Mesh detecta fallo"
+    severity: "error"
+    toast: "🔴 INTEGRITY MESH: {detail}"
+    duration_ms: 0   # Persistente hasta resolución
+
+# ══════════════════════════════════════════════════════════════════════════════
+# PROYECCIÓN — Cómo se proyecta este monitoreo a cada cliente
+# ══════════════════════════════════════════════════════════════════════════════
+projection:
+  opencode:
+    type: "plugin_js"
+    template: "tools/visual/templates/opencode_monitor_plugin.js.j2"
+    events:
+      - "session.status"
+      - "session.idle"
+      - "session.created"
+      - "message.updated"
+    output: ".ovav/source/plugins/opencode/monitor/ovav-monitor.js"
+
+  terminal:
+    type: "rich_panel"
+    template: "tools/visual/templates/terminal_status_panel.py.j2"
+    output_mode: "tmux_pane | inline"
+
+  dashboard:
+    type: "python_native"
+    source: "tools/ovav_dashboard.py"
+    mode: "--watch"

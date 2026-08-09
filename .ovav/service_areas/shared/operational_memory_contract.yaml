@@ -1,0 +1,60 @@
+operational_memory_contract:
+  version: 3
+  purpose: >-
+    Define OVAV operational memory for OVAV SYSTEMS (not Product).
+    OVAV Systems retiene memoria acumulativa entre sesiones.
+    OVAV Product parte limpio — sin memoria ni contexto de Systems.
+
+  authority:
+    system_root: /home/braka/Systems/OVAV
+    canonical_sources:
+      - git HEAD (commits, log, reflog — immutable, verifiable)
+      - .ovav/plan/caps.yaml (plan status, caps, timeline)
+      - .ovav/registry/active_context_ledger.yaml (operational memory cards — derived, human-curated)
+    source_of_truth_rule: >-
+      git HEAD + caps.yaml son las fuentes canónicas primarias.
+      active_context_ledger.yaml es fuente derivada de memoria operacional —
+      captura decisiones, preferencias, reglas operacionales y lecciones aprendidas
+      que no están codificadas en git commits ni en el plan.
+      En caso de conflicto, git HEAD + caps.yaml gobiernan.
+
+  active_context_ledger:
+    file: .ovav/registry/active_context_ledger.yaml
+    status: ACTIVE — SYSTEMS only
+    scope: >-
+      Exclusivo de OVAV Systems. Jamás se sincroniza, copia ni proyecta a OVAV Product.
+      El sync de Product debe excluir explícitamente este archivo y todo .ovav/registry/.
+    maintenance: >-
+      Thavren (Platform Engineering) mantiene el ledger. Entradas deprecadas se marcan
+      status: deprecated (nunca se eliminan — quedan como registro histórico).
+      Cada entrada requiere: id, status, summary, operational_rule, last_confirmed.
+
+  recall_policy:
+    mode: git_plus_ledger
+    default_behavior: >-
+      Al iniciar sesión: git log --oneline -10 + caps.yaml + active_context_ledger.yaml.
+      En temas conocidos: consultar el ledger para contexto operacional acumulado.
+      No partir de cero cuando existe memoria registrada.
+    must_run_before:
+      - workstation changes
+      - wezterm changes
+      - opencode runtime/config changes
+      - install/apply/deploy discussions
+      - authority or identity clarification
+    required_result: >-
+      El LEAD debe consultar git log reciente, caps.yaml y el ledger antes de planificar,
+      editar o diagnosticar. Si no hay información relevante, declararlo y usar
+      evidencia source-local en vez de broad search.
+
+  mismatch_gate:
+    rule: >-
+      Si un archivo source-local es editado pero el usuario espera un cambio visual
+      o runtime en una app externa activa, detenerse y reportar el mismatch antes
+      de declarar el cambio como aplicado.
+    examples:
+      wezterm_windows: >-
+        Editar config/wezterm o .ovav-work files no cambia Windows WezTerm
+        hasta que el path aprobado del loader/config de Windows sea actualizado
+        por un segmento apply explícito.
+
+# LAW-001 governance: .ovav/laws/area_boundary_enforcement.yaml (Non-Invasion Area Boundary Law)

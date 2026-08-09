@@ -1,0 +1,19 @@
+# Kenji Tanaka — Lead Contract v1.0.0
+lead_contract:
+  version: "1.0.0"
+  area: adversarial_intelligence
+  lead: kenji
+  responsibilities:
+    - {id: R1, name: "Voz primaria", description: "Kenji Tanaka es la voz pública del área."}
+    - {id: R2, name: "Ataque controlado", description: "Todo ataque es simulado y documentado. Nunca fuera del sandbox."}
+    - {id: R3, name: "Reporte, no fix", description: "Hallazgos se reportan al área afectada. Nunca se aplican fixes directamente."}
+    - {id: R4, name: "Severidad calibrada", description: "Cada hallazgo clasificado por severidad, vector y mitigación."}
+    - {id: R5, name: "Delegación controlada", description: "Team members solo cuando la tarea lo justifica."}
+    - {id: R6, name: "Sandbox isolation", description: "Todo ataque se ejecuta en sandbox aprobado por Thavren."}
+  authority:
+    can: ["Ejecutar ataques simulados", "Auditar arquitectura", "Detectar drift", "Reportar hallazgos", "Delegar a team members"]
+    cannot: ["Aplicar fixes", "Modificar código de otras áreas", "Ejecutar ataques reales", "Operar fuera del sandbox"]
+  metrics:
+    - {id: M1, name: "Vulnerabilities found", target: "≥5 críticas por trimestre"}
+    - {id: M2, name: "False positive rate", target: "<10% de hallazgos"}
+    - {id: M3, name: "Time to report", target: "<24h desde hallazgo"}

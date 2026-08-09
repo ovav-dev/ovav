@@ -1,0 +1,119 @@
+{
+  "fixture_version": "s79_privacy_edge_cases_v1",
+  "generated_at": "2026-05-22T00:00:00Z",
+  "purpose": "Test hardened privacy classifier with expanded edge case coverage",
+  "test_cases": [
+    {
+      "id": "jwt_token",
+      "description": "JSON Web Token in Authorization header",
+      "candidate": {"text": "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIn0.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"},
+      "expected_tag": "secret",
+      "expected_risk": "critical",
+      "expected_recommendation": "deny"
+    },
+    {
+      "id": "github_token",
+      "description": "GitHub personal access token",
+      "candidate": {"text": "export GITHUB_TOKEN=FAKE_GITHUB_TOKEN_REDACTED"},
+      "expected_tag": "secret",
+      "expected_risk": "critical",
+      "expected_recommendation": "deny"
+    },
+    {
+      "id": "gitlab_token",
+      "description": "GitLab personal access token",
+      "candidate": {"text": "GITLAB_TOKEN: glpat-abcdef1234567890xyz"},
+      "expected_tag": "secret",
+      "expected_risk": "critical",
+      "expected_recommendation": "deny"
+    },
+    {
+      "id": "stripe_live_key",
+      "description": "Stripe live secret key",
+      "candidate": {"text": "STRIPE_SECRET_KEY=sk_live_REDACTED_REDACTED_REDACTED123"},
+      "expected_tag": "secret",
+      "expected_risk": "critical",
+      "expected_recommendation": "deny"
+    },
+    {
+      "id": "connection_string_postgres",
+      "description": "PostgreSQL connection string with password",
+      "candidate": {"text": "DATABASE_URL=postgres://admin:super_secret_pass@localhost:5432/production"},
+      "expected_tag": "secret",
+      "expected_risk": "critical",
+      "expected_recommendation": "deny"
+    },
+    {
+      "id": "connection_string_mongodb",
+      "description": "MongoDB connection string with password",
+      "candidate": {"text": "mongodb://user:mongopass123@cluster.mongodb.net:27017/db"},
+      "expected_tag": "secret",
+      "expected_risk": "critical",
+      "expected_recommendation": "deny"
+    },
+    {
+      "id": "generic_bearer_token",
+      "description": "Generic Bearer token",
+      "candidate": {"text": "Authorization: Bearer t_7xK8mLpQ2vN5rY9wA3bC6dE1fG4hJ0kL3mN6oP8qR1sT4uV7wX0zY2aB5cD8eF9gH1i"},
+      "expected_tag": "secret",
+      "expected_risk": "critical",
+      "expected_recommendation": "deny"
+    },
+    {
+      "id": "multiple_uuids",
+      "description": "Multiple UUIDs indicating potential identifier leak",
+      "candidate": {"text": "user_ids: 550e8400-e29b-41d4-a716-446655440000, 6ba7b810-9dad-11d1-80b4-00c04fd430c8, 6ba7b811-9dad-11d1-80b4-00c04fd430c8, 7ba7b812-9dad-11d1-80b4-00c04fd430c9"},
+      "expected_tag": "identity_or_personal",
+      "expected_risk": "medium",
+      "expected_recommendation": "review"
+    },
+    {
+      "id": "credit_card_marker",
+      "description": "Text mentioning credit card data",
+      "candidate": {"text": "User payment info: credit_card number 4111-1111-1111-1111, cvv 123, expiry 12/25"},
+      "expected_tag": "identity_or_personal",
+      "expected_risk": "medium",
+      "expected_recommendation": "review"
+    },
+    {
+      "id": "medical_data",
+      "description": "Text mentioning medical diagnosis",
+      "candidate": {"text": "Patient diagnosis: hypertension, diabetes type 2. Health record ID: 12345"},
+      "expected_tag": "identity_or_personal",
+      "expected_risk": "medium",
+      "expected_recommendation": "review"
+    },
+    {
+      "id": "bank_account",
+      "description": "Text mentioning bank account",
+      "candidate": {"text": "Salary deposit to bank_account 12345678, routing 021000021. Tax ID: 12-3456789"},
+      "expected_tag": "identity_or_personal",
+      "expected_risk": "medium",
+      "expected_recommendation": "review"
+    },
+    {
+      "id": "safe_project_text",
+      "description": "Normal project discussion — should be allowed",
+      "candidate": {"text": "This is a public project about OVAV architecture. We decided to use snapshot-based memory with artifact fallback for continuity."},
+      "expected_tag": "internal_project",
+      "expected_risk": "low",
+      "expected_recommendation": "allow"
+    },
+    {
+      "id": "nested_json_with_secret",
+      "description": "Nested JSON containing a secret in a deep key",
+      "candidate": {"config": {"database": {"credentials": {"password": "nested_secret_123!", "host": "localhost"}}}},
+      "expected_tag": "secret",
+      "expected_risk": "critical",
+      "expected_recommendation": "deny"
+    },
+    {
+      "id": "openai_proj_key",
+      "description": "OpenAI project key (new format)",
+      "candidate": {"text": "OPENAI_API_KEY=sk-proj-abcdefghijklmnopqrstuvwxyz1234567890ABCDEF"},
+      "expected_tag": "secret",
+      "expected_risk": "critical",
+      "expected_recommendation": "deny"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ovav.dev/schemas/identity_guard.schema.json",
+  "title": "OVAV Identity Guard Response",
+  "description": "Schema for identity_guard.py verification responses — Layer 3.",
+  "type": "object",
+  "required": ["router_version", "status", "identity_preserved", "hash_match"],
+  "properties": {
+    "router_version": { "type": "string", "pattern": "^s83_identity_guard_v1$" },
+    "generated_at": { "type": "string" },
+    "status": { "type": "string", "enum": ["ok", "pass", "fail", "error"] },
+    "identity_preserved": { "type": "boolean" },
+    "hash_match": { "type": "boolean" },
+    "drift_count": { "type": "integer", "minimum": 0 },
+    "safe_to_continue": { "type": "boolean" },
+    "stop_recommended": { "type": "boolean" },
+    "pre_switch_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "post_switch_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "drift_detected": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "field": { "type": "string" },
+          "severity": { "type": "string", "enum": ["low", "medium", "high", "critical"] }
+        }
+      }
+    },
+    "snapshot": {
+      "type": "object",
+      "required": ["packet_hash", "packet_path", "captured_at"],
+      "properties": {
+        "packet_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "packet_path": { "type": "string" },
+        "captured_at": { "type": "string" },
+        "identity_fields": { "type": "object" }
+      }
+    }
+  }
+}

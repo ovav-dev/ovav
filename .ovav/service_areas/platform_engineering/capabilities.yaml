@@ -1,0 +1,79 @@
+# Platform Engineering — Capabilities Registry
+# Defines the tool, context, and execution capabilities of this area.
+
+area: platform_engineering
+lead: thavren
+version: "1.0.0"
+
+# ── Default Tools ────────────────────────────────────────────────────────
+default_tools:
+  - read_repo_by_task:
+      description: Lectura de repositorio scoped a la tarea activa
+      context_tier: T2_compact
+  - edit_repo_by_task:
+      description: Edición de archivos del repo scoped a la tarea activa
+      requires_gate: workspace_safety_gate
+  - run_source_local_validators:
+      description: Ejecución de validadores source-local
+      examples: [check_host_config_drift.py, check_permission_policy_drift.py]
+  - inspect_git_status:
+      description: Inspección de estado de git (status, diff, log)
+  - build_snapshot:
+      description: Construcción de snapshots de estado
+  - create_sanitized_handoff:
+      description: Creación de handoffs sanitizados cross-area
+
+# ── Denied Without Grant ─────────────────────────────────────────────────
+denied_without_grant:
+  - unscoped_home_write:
+      description: Escrituras no scoped en HOME del usuario
+      grant_mechanism: "CEO waiver explícito"
+  - secret_exfiltration:
+      description: Exfiltración de secretos o tokens
+      grant_mechanism: "NUNCA — bloqueado permanentemente"
+  - uncontrolled_global_install:
+      description: Instalación global sin gobernanza
+      grant_mechanism: "Install Governor + snapshot + backup previo"
+  - broad_git_staging:
+      description: Staging amplio sin selección precisa de archivos
+      grant_mechanism: "git add con archivos exactos + pre-commit review"
+
+# ── Context Classes ──────────────────────────────────────────────────────
+context_classes:
+  allowed:
+    - L1_shared_governance:
+        description: Contratos de gobierno compartidos entre áreas
+        examples: [lead_work_method_contract, context_economy_contract]
+    - L2_platform_internal:
+        description: Archivos internos de Platform Engineering
+        examples: [lead_contract, model_body_ladder, area_boundaries]
+    - L3_core_ovav_internal:
+        description: Archivos core internos de OVAV
+        examples: [AGENTS.md, permission_authority.json, runtime core]
+  limited:
+    - L0_public_external:
+        description: Fuentes públicas/externas — acceso limitado para investigación interna
+    - L2_research_internal:
+        description: Archivos internos de Research Intelligence
+        note: "Requiere handoff sanitizado"
+
+# ── Execution Capabilities ───────────────────────────────────────────────
+execution:
+  source_local:
+    - read: full
+    - write: scoped_by_task
+    - execute: validators_and_harnesses
+  git:
+    - status_diff_log: allowed
+    - stage_commit_push: allowed_with_gates
+    - force_operations: denied
+    - branch_delete: denied
+  system:
+    - home_read: allowed
+    - home_write: scoped_to_ovav_paths
+    - global_config: allowed (CEO-authorized)
+    - package_install: denied
+  external:
+    - tmp_opencode: allowed
+    - ovav_state_dirs: allowed
+    - other: denied

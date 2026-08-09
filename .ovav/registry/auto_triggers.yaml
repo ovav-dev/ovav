@@ -1,0 +1,940 @@
+router:
+  after_git_stage:
+  - validate_git_push_gate
+  - integrity_repair
+  after_implementation:
+  - generate_smoke_tests
+  before_apply:
+  - validate_workspace_safety_gate
+  before_close:
+  - check_L6_security_zero_trust
+  - check_exfil_patterns
+  - check_final_launch_current_authority
+  - check_final_launch_runtime_authority
+  - check_stale_artifact_references
+  - validate_handoff_sync
+  - self_model
+  - snv_evolve
+  - cost_tracker
+  # memory_decay removed 2026-06-22: tools/memory/ eliminated. Use git HEAD.
+  - iap_validate
+  - check_todo_debt
+  - merge_readiness
+  - merge_readiness_suite
+  - validate_all
+  - validate_memory_policy
+  - validate_result_contracts
+  before_git_push:
+  - check_secrets_hygiene
+  - validate_workspace_safety_gate
+  - branch_shield
+  - check_release_gate
+  - pre_push_intelligence
+  before_git_stage:
+  - check_protected_branch
+  - check_secrets_hygiene
+  - validate_workspace_safety_gate
+  - branch_shield
+  - surface_governor
+  before_implementation:
+  - check_L6_security_zero_trust
+  - check_L7_feedback_loop
+  - check_C7_2_skills_enforcement
+  - check_C7_session_routing
+  - check_agent_permission_invariants
+  - check_agent_runtime_enforcement
+  - check_agent_runtime_service_area_router
+  - check_agent_surface_hierarchy
+  - check_agent_ux_visual_delivery
+  - check_architecture_guardian
+  - check_cross_target_consistency
+  - check_f1_architecture
+  - check_f2_infrastructure
+  - check_f3_roles
+  - check_f4_security_hardening
+  - check_f5_advanced_hardening
+  - check_final_launch_current_authority
+  - check_final_launch_runtime_authority
+  - check_harness_contract_alignment
+  - check_invalid_fixtures
+  - check_living_integrity
+  - check_opencode_plugins
+  - check_opencode_runtime_wiring
+  - check_ovav_wezterm_workspace_isolation
+  - check_rego_policies
+  - check_runtime_integrity
+  - check_service_area_governance
+  - check_single_authority_source
+  - check_squad_normalization
+  - check_surface_drift
+  - check_tool_config_profiles
+  - check_tool_readiness_matrix
+  - validate_canonical_integrity
+  - validate_config_syntax
+  - validate_contract_freshness
+  - validate_ledger_write_path
+  - validate_registry_drift
+  - validate_validator_coverage
+  - validate_workspace_safety_gate
+  - check_poison_guard_hardening
+  - silent_fail_cortex
+  - surface_map_compiler
+  - projection_engine
+  - forge_bus_unification
+  - watcher_mesh
+  - check_lead_scope
+  - check_supply_chain
+  - validate_harnesses
+  - validate_phase_dag
+  - validate_registries
+  - check_permission_policy_drift
+  on_delivery_received:
+  - iap_validate
+  on_demand:
+  - silent_fail_cortex
+  - generate_smoke_tests
+  - nerve_bus_watch
+  - nerve_bus_dashboard
+  - nerve_bus_export
+  - ovav_install_cli
+  - ovav_tui
+  on_session_start:
+  - check_L7_feedback_loop
+  - check_bootstrap_chain
+  - check_context_economy_and_active_connections
+  - check_context_firewall_v2
+  - check_living_integrity
+  - check_protected_branch
+  - check_single_authority_source
+  - validate_behavioral_directives
+  - validate_gate_self_protection
+  - validate_handoff_sync
+  - validate_head_integrity
+  - validate_host_config_drift
+  - validate_session_context_guard
+  - check_poison_guard_hardening
+  - creator_recognition
+  - self_model
+  - capability_lifecycle_health
+  - alignment_tracker_snapshot
+  - surface_map_compiler
+  - projection_engine
+  - watcher_mesh
+  - snv_predict
+  - integrity_repair
+  - cost_tracker
+  - credential_health
+  # context_cut_detector removed 2026-06-22: tools/memory/ eliminated. Use git HEAD.
+  - arc_health_check
+  - arc_scan_and_repair
+  - iap_status
+  - integrity_mesh_quick
+  - check_surface_drift
+  - branch_gc_cleanup
+  - self_diagnosis
+  - consciousness_loop
+  - perception_engine
+  - voice_router
+  - milestone_recognition
+  - attribution_seal
+  - maturity_maintenance_cycle
+  - host_config_drift
+  - permission_policy
+  - gate_self
+  - check_network_hardening
+  - check_ovav_ssh_profile
+  - check_supply_chain
+  - check_wezterm_path_integrity
+  - validate_model_policy
+  - validate_service_profiles
+  - validate_skills
+  - check_permission_policy_drift
+  on_user_message:
+  - validate_behavioral_directives
+  - validate_workspace_safety_gate
+  - output_rails
+  - thought_firewall
+  - check_context_economy_and_active_connections
+  periodic_daily:
+  - pain_scorer_thresholds
+  - tool_consolidator_scan
+  - capability_lifecycle_health
+  - alignment_tracker_auto_unblock
+  - validate_all
+  periodic_hourly:
+  - pain_scorer_health
+  - alignment_tracker_snapshot
+  - snv_predict
+  - credential_health
+  - arc_health_check
+  - arc_scan_and_repair
+  - integrity_mesh_quick
+  - maturity_maintenance_cycle
+  - check_network_hardening
+alignment_tracker_auto_unblock:
+  tier: 9
+  when:
+  - periodic_daily
+  manual_command_fallback: python3 tools/agent_runtime/alignment_tracker.py auto-unblock
+  module: tools.agent_runtime.alignment_tracker
+  function: main
+alignment_tracker_snapshot:
+  tier: 8
+  when:
+  - on_session_start
+  - periodic_hourly
+  manual_command_fallback: python3 tools/agent_runtime/alignment_tracker.py snapshot
+  module: tools.agent_runtime.alignment_tracker
+  function: main
+arc_health_check:
+  tier: 10
+  when:
+  - on_session_start
+  - periodic_hourly
+  manual_command_fallback: python3 tools/agent_runtime/autonomous_repair_cortex.py health
+  module: tools.agent_runtime.autonomous_repair_cortex
+  function: main
+arc_scan_and_repair:
+  tier: 10
+  when:
+  - on_session_start
+  - periodic_hourly
+  manual_command_fallback: python3 tools/agent_runtime/autonomous_repair_cortex.py scan-and-repair
+  module: tools.agent_runtime.autonomous_repair_cortex
+  function: main
+attribution_seal:
+  tier: 9
+  when:
+  - on_session_start
+  manual_command_fallback: python3 tools/governor/attribution_seal.py
+  module: tools.governor.attribution_seal
+  function: main
+branch_gc_cleanup:
+  tier: 9
+  when:
+  - on_session_start
+  manual_command_fallback: python3 tools/harnesses/h_gc_branches.py --execute --json
+  module: tools.harnesses.h_gc_branches
+  function: auto_cleanup
+capability_lifecycle_health:
+  tier: 8
+  when:
+  - on_session_start
+  - periodic_daily
+  manual_command_fallback: python3 tools/agent_runtime/capability_lifecycle.py health
+  module: tools.agent_runtime.capability_lifecycle
+  function: health_summary
+check_L6_security_zero_trust:
+  tier: 9
+  when:
+  - before_close
+  - before_implementation
+  module: tools.validators.check_L6_security_zero_trust
+  function: main
+check_L7_feedback_loop:
+  tier: 9
+  when:
+  - before_implementation
+  - on_session_start
+  module: tools.validators.check_L7_feedback_loop
+  function: main
+check_agent_permission_invariants:
+  tier: 8
+  when:
+  - before_implementation
+  module: tools.validators.check_agent_permission_invariants
+  function: validate
+check_agent_runtime_enforcement:
+  tier: 8
+  when:
+  - before_implementation
+  module: tools.validators.check_agent_runtime_enforcement
+  function: main
+check_agent_runtime_service_area_router:
+  tier: 8
+  when:
+  - before_implementation
+  module: tools.validators.check_agent_runtime_service_area_router
+  function: main
+check_agent_surface_hierarchy:
+  tier: 8
+  when:
+  - before_implementation
+  module: tools.validators.check_agent_surface_hierarchy
+  function: main
+check_agent_ux_visual_delivery:
+  tier: 8
+  when:
+  - before_implementation
+  module: tools.validators.check_agent_ux_visual_delivery
+  function: main
+check_architecture_guardian:
+  tier: 8
+  when:
+  - before_implementation
+  module: tools.validators.check_architecture_guardian
+  function: validate
+check_bootstrap_chain:
+  tier: 9
+  when:
+  - on_session_start
+  module: tools.validators.check_bootstrap_chain
+  function: validate
+check_exfil_patterns:
+  tier: 9
+  when:
+  - before_close
+  module: tools.validators.check_exfil_patterns
+  function: validate
+check_f1_architecture:
+  tier: 9
+  when:
+  - before_implementation
+  module: tools.validators.check_f1_architecture
+  function: validate
+check_f2_infrastructure:
+  tier: 9
+  when:
+  - before_implementation
+  module: tools.validators.check_f2_infrastructure
+  function: validate
+check_f3_roles:
+  tier: 9
+  when:
+  - before_implementation
+  module: tools.validators.check_f3_roles
+  function: validate
+check_f4_security_hardening:
+  tier: 9
+  when:
+  - before_implementation
+  module: tools.validators.check_f4_security_hardening
+  function: main
+check_f5_advanced_hardening:
+  tier: 9
+  when:
+  - before_implementation
+  module: tools.validators.check_f5_advanced_hardening
+  function: main
+check_final_launch_current_authority:
+  tier: 8
+  when:
+  - before_close
+  - before_implementation
+  module: tools.validators.check_final_launch_current_authority
+  function: main
+check_final_launch_runtime_authority:
+  tier: 8
+  when:
+  - before_close
+  - before_implementation
+  module: tools.validators.check_final_launch_runtime_authority
+  function: main
+check_harness_contract_alignment:
+  tier: 8
+  when:
+  - before_implementation
+  module: tools.validators.check_harness_contract_alignment
+  function: main
+check_invalid_fixtures:
+  tier: 7
+  when:
+  - before_implementation
+  module: tools.validators.check_invalid_fixtures
+  function: main
+check_living_integrity:
+  tier: 8
+  when:
+  - before_implementation
+  - on_session_start
+  module: tools.validators.check_living_integrity
+  function: main
+check_opencode_plugins:
+  tier: 8
+  when:
+  - before_implementation
+  module: tools.validators.check_opencode_plugins
+  function: validate
+check_opencode_runtime_wiring:
+  tier: 8
+  when:
+  - before_implementation
+  module: tools.validators.check_opencode_runtime_wiring
+  function: main
+check_ovav_wezterm_workspace_isolation:
+  tier: 7
+  when:
+  - before_implementation
+  module: tools.validators.check_ovav_wezterm_workspace_isolation
+  function: main
+check_poison_guard_hardening:
+  tier: 9
+  when:
+  - before_implementation
+  - on_session_start
+  manual_command_fallback: python3 tools/harnesses/check_poison_guard_hardening.py
+  module: tools.harnesses.check_poison_guard_hardening
+  function: main
+check_protected_branch:
+  tier: 9
+  when:
+  - before_git_stage
+  - on_session_start
+  module: tools.validators.check_protected_branch
+  function: main
+check_rego_policies:
+  tier: 8
+  when:
+  - before_implementation
+  module: tools.validators.check_rego_policies
+  function: validate
+check_runtime_integrity:
+  tier: 9
+  when:
+  - before_implementation
+  module: tools.validators.check_runtime_integrity
+  function: validate
+check_secrets_hygiene:
+  tier: 9
+  when:
+  - before_git_push
+  - before_git_stage
+  module: tools.validators.check_secrets_hygiene
+  function: validate
+check_service_area_governance:
+  tier: 8
+  when:
+  - before_implementation
+  module: tools.validators.check_service_area_governance
+  function: main
+check_single_authority_source:
+  tier: 9
+  when:
+  - before_implementation
+  - on_session_start
+  module: tools.validators.check_single_authority_source
+  function: main
+check_squad_normalization:
+  tier: 8
+  when:
+  - before_implementation
+  module: tools.validators.check_squad_normalization
+  function: main
+check_stale_artifact_references:
+  tier: 7
+  when:
+  - before_close
+  module: tools.validators.check_stale_artifact_references
+  function: main
+check_surface_drift:
+  tier: 8
+  when:
+  - before_implementation
+  - on_session_start
+  module: tools.validators.check_surface_drift
+  function: main
+check_tool_config_profiles:
+  tier: 7
+  when:
+  - before_implementation
+  module: tools.validators.check_tool_config_profiles
+  function: main
+check_tool_readiness_matrix:
+  tier: 8
+  when:
+  - before_implementation
+  module: tools.validators.check_tool_readiness_matrix
+  function: main
+consciousness_loop:
+  tier: 9
+  when:
+  - on_session_start
+  manual_command_fallback: python3 tools/governor/consciousness_loop.py
+  module: tools.governor.consciousness_loop
+  function: main
+context_cut_detector:
+  # 2026-06-22: DEPRECATED — tools/memory/ eliminated. Retained for historical traceability.
+  status: deprecated
+  tier: 9
+  when:
+  - on_session_start
+  manual_command_fallback: "echo 'DEPRECATED: tools/memory/ eliminated. Use git HEAD.'"
+  module: tools.memory.context_cut_detector
+  function: main
+cost_tracker:
+  tier: 9
+  when:
+  - before_close
+  - on_session_start
+  manual_command_fallback: python3 tools/economy/cost_tracker.py status
+  module: tools.economy.cost_tracker
+  function: main
+creator_recognition:
+  tier: 10
+  when:
+  - on_session_start
+  manual_command_fallback: python3 tools/governor/creator_recognition.py
+  module: tools.governor.creator_recognition
+  function: main
+credential_health:
+  tier: 9
+  when:
+  - on_session_start
+  - periodic_hourly
+  manual_command_fallback: python3 tools/security/credential_health.py check-all
+  module: tools.security.credential_health
+  function: main
+forge_bus_unification:
+  tier: 8
+  when:
+  - before_implementation
+  manual_command_fallback: python3 .ovav/forge/pipeline.py --dry-run
+  module: .ovav.forge.pipeline
+  function: run_pipeline
+gate_self:
+  tier: 10
+  when:
+  - on_session_start
+  module: tools.security.gate_self_protection
+  function: validate
+generate_smoke_tests:
+  tier: 8
+  when:
+  - after_implementation
+  - on_demand
+  manual_command_fallback: python3 tools/harnesses/generate_smoke_tests.py generate --critical-only
+  module: tools.harnesses.generate_smoke_tests
+  function: main
+host_config_drift:
+  tier: 10
+  when:
+  - on_session_start
+  module: tools.validators.check_host_config_drift
+  function: validate
+iap_status:
+  tier: 9
+  when:
+  - on_session_start
+  manual_command_fallback: python3 tools/governor/integration_acceptance_protocol.py status
+  module: tools.governor.integration_acceptance_protocol
+  function: main
+iap_validate:
+  tier: 10
+  when:
+  - before_close
+  - on_delivery_received
+  manual_command_fallback: python3 tools/governor/integration_acceptance_protocol.py validate --manifest <file>
+  module: tools.governor.integration_acceptance_protocol
+  function: main
+integrity_mesh_quick:
+  tier: 10
+  when:
+  - on_session_start
+  - periodic_hourly
+  manual_command_fallback: python3 tools/validators/check_living_integrity.py --quick
+  module: tools.validators.check_living_integrity
+  function: main
+integrity_repair:
+  tier: 9
+  when:
+  - after_git_stage
+  - on_session_start
+  manual_command_fallback: python3 tools/security/integrity_repair.py scan-and-repair
+  module: tools.security.integrity_repair
+  function: main
+maturity_maintenance_cycle:
+  tier: 10
+  when:
+  - on_session_start
+  - periodic_hourly
+  manual_command_fallback: python3 tools/governor/maturity_maintenance_cycle.py run
+  module: tools.governor.maturity_maintenance_cycle
+  function: main
+memory_decay:
+  # 2026-06-22: DEPRECATED — tools/memory/ eliminated. Retained for historical traceability.
+  status: deprecated
+  tier: 9
+  when:
+  - before_close
+  manual_command_fallback: "echo 'DEPRECATED: tools/memory/ eliminated. Use git HEAD.'"
+  module: tools.memory.memory_governor
+  function: main
+milestone_recognition:
+  tier: 9
+  when:
+  - on_session_start
+  manual_command_fallback: python3 tools/governor/milestone_recognition.py
+  module: tools.governor.milestone_recognition
+  function: main
+nerve_bus_dashboard:
+  tier: 9
+  when:
+  - on_demand
+  manual_command_fallback: python3 tools/agent_runtime/nerve_bus.py dashboard
+  module: tools.agent_runtime.nerve_bus
+  function: dashboard_live
+nerve_bus_export:
+  tier: 6
+  when:
+  - on_demand
+  manual_command_fallback: python3 tools/agent_runtime/nerve_bus.py export --format json
+  module: tools.agent_runtime.nerve_bus
+  function: export_events
+nerve_bus_watch:
+  tier: 8
+  when:
+  - on_demand
+  manual_command_fallback: python3 tools/agent_runtime/nerve_bus.py watch
+  module: tools.agent_runtime.nerve_bus
+  function: watch_live
+output_rails:
+  tier: 10
+  when:
+  - on_user_message
+  manual_command_fallback: python3 tools/harnesses/verify_output.py
+  module: tools.harnesses.verify_output
+  function: main
+ovav_install_cli:
+  tier: 9
+  when:
+  - on_demand
+  manual_command_fallback: python3 tools/cli/ovav_install.py
+  module: tools.cli.ovav_install
+  function: main
+ovav_tui:
+  tier: 9
+  when:
+  - on_demand
+  manual_command_fallback: python3 tools/cli/ovav_tui.py
+  module: tools.cli.ovav_tui
+  function: main
+pain_scorer_health:
+  tier: 7
+  when:
+  - periodic_hourly
+  manual_command_fallback: python3 tools/agent_runtime/pain_scorer.py health
+  module: tools.agent_runtime.pain_scorer
+  function: health
+pain_scorer_thresholds:
+  tier: 7
+  when:
+  - periodic_daily
+  manual_command_fallback: python3 tools/agent_runtime/pain_scorer.py thresholds
+  module: tools.agent_runtime.pain_scorer
+  function: thresholds
+perception_engine:
+  tier: 9
+  when:
+  - on_session_start
+  manual_command_fallback: python3 tools/governor/perception_engine.py
+  module: tools.governor.perception_engine
+  function: main
+permission_policy:
+  tier: 10
+  when:
+  - on_session_start
+  module: tools.validators.check_permission_policy_drift
+  function: validate
+projection_engine:
+  tier: 10
+  when:
+  - before_implementation
+  - on_session_start
+  manual_command_fallback: python3 tools/agent_runtime/projection_engine.py
+  module: tools.agent_runtime.projection_engine
+  function: main
+self_diagnosis:
+  tier: 9
+  when:
+  - on_session_start
+  manual_command_fallback: python3 tools/governor/self_diagnosis.py
+  module: tools.governor.self_diagnosis
+  function: main
+self_model:
+  tier: 9
+  when:
+  - before_close
+  - on_session_start
+  manual_command_fallback: python3 tools/governor/self_model.py
+  module: tools.governor.self_model
+  function: main
+silent_fail_cortex:
+  tier: 9
+  when:
+  - before_implementation
+  - on_demand
+  manual_command_fallback: python3 tools/agent_runtime/silent_fail_cortex.py scan
+  module: tools.agent_runtime.silent_fail_cortex
+  function: main
+snv_evolve:
+  tier: 9
+  when:
+  - before_close
+  manual_command_fallback: python3 tools/agent_runtime/snv_activation.py --evolve
+  module: tools.agent_runtime.snv_activation
+  function: main
+snv_predict:
+  tier: 9
+  when:
+  - on_session_start
+  - periodic_hourly
+  manual_command_fallback: python3 tools/agent_runtime/snv_predictor.py predict
+  module: tools.agent_runtime.snv_predictor
+  function: main
+surface_map_compiler:
+  tier: 10
+  when:
+  - before_implementation
+  - on_session_start
+  manual_command_fallback: python3 tools/agent_runtime/surface_map_compiler.py
+  module: tools.agent_runtime.surface_map_compiler
+  function: main
+tool_consolidator_scan:
+  tier: 7
+  when:
+  - periodic_daily
+  manual_command_fallback: python3 tools/agent_runtime/tool_consolidator.py health
+  module: tools.agent_runtime.tool_consolidator
+  function: main
+validate_behavioral_directives:
+  tier: 10
+  when:
+  - on_session_start
+  - on_user_message
+  module: tools.validators.check_behavioral_directives
+  function: validate
+validate_canonical_integrity:
+  tier: 10
+  when:
+  - before_implementation
+  module: tools.validators.check_canonical_integrity
+  function: validate
+validate_config_syntax:
+  tier: 10
+  when:
+  - before_implementation
+  module: tools.validators.check_config_syntax
+  function: validate
+validate_contract_freshness:
+  tier: 9
+  when:
+  - before_implementation
+  module: tools.validators.check_contract_freshness
+  function: validate
+validate_gate_self_protection:
+  tier: 10
+  when:
+  - on_session_start
+  module: tools.security.gate_self_protection
+  function: validate
+validate_git_push_gate:
+  tier: 10
+  when:
+  - after_git_stage
+  module: tools.validators.check_git_push_gate
+  function: validate
+validate_handoff_sync:
+  tier: 9
+  when:
+  - before_close
+  - on_session_start
+  module: tools.validators.check_handoff_sync
+  function: validate
+validate_head_integrity:
+  tier: 10
+  when:
+  - on_session_start
+  module: tools.security.head_integrity_verifier
+  function: validate
+validate_host_config_drift:
+  tier: 10
+  when:
+  - on_session_start
+  module: tools.validators.check_host_config_drift
+  function: validate
+validate_ledger_write_path:
+  tier: 10
+  when:
+  - before_implementation
+  module: tools.validators.check_ledger_write_path
+  function: validate
+validate_registry_drift:
+  tier: 9
+  when:
+  - before_implementation
+  module: tools.validators.check_registry_drift
+  function: validate
+validate_session_context_guard:
+  tier: 10
+  when:
+  - on_session_start
+  module: tools.security.session_context_guard
+  function: validate
+validate_validator_coverage:
+  tier: 9
+  when:
+  - before_implementation
+  module: tools.validators.check_validator_coverage
+  function: validate
+validate_workspace_safety_gate:
+  tier: 10
+  when:
+  - before_apply
+  - before_git_push
+  - before_git_stage
+  - before_implementation
+  - on_user_message
+  module: tools.validators.check_workspace_safety_gate
+  function: validate
+voice_router:
+  tier: 9
+  when:
+  - on_session_start
+  manual_command_fallback: python3 tools/governor/voice_router.py
+  module: tools.governor.voice_router
+  function: main
+watcher_mesh:
+  tier: 10
+  when:
+  - before_implementation
+  - on_session_start
+  manual_command_fallback: python3 tools/agent_runtime/watcher_mesh.py
+  module: tools.agent_runtime.watcher_mesh
+  function: main
+branch_shield:
+  module: tools.validators.branch_shield
+  function: validate
+  tier: 9
+  when:
+  - before_git_stage
+  - before_git_push
+check_release_gate:
+  module: tools.validators.check_release_gate
+  function: validate
+  tier: 8
+  when:
+  - before_git_push
+pre_push_intelligence:
+  module: tools.validators.pre_push_intelligence
+  function: validate
+  tier: 8
+  when:
+  - before_git_push
+check_lead_scope:
+  module: tools.validators.check_lead_scope
+  function: validate
+  tier: 8
+  when:
+  - before_implementation
+check_supply_chain:
+  module: tools.validators.check_supply_chain
+  function: validate
+  tier: 9
+  when:
+  - on_session_start
+  - before_implementation
+check_network_hardening:
+  module: tools.validators.check_network_hardening
+  function: validate
+  tier: 9
+  when:
+  - on_session_start
+  - periodic_hourly
+check_ovav_ssh_profile:
+  module: tools.validators.check_ovav_ssh_profile
+  function: validate
+  tier: 7
+  when:
+  - on_session_start
+check_todo_debt:
+  module: tools.validators.check_todo_debt
+  function: validate
+  tier: 7
+  when:
+  - before_close
+check_wezterm_path_integrity:
+  module: tools.validators.check_wezterm_path_integrity
+  function: validate
+  tier: 7
+  when:
+  - on_session_start
+merge_readiness:
+  module: tools.validators.merge_readiness
+  function: validate
+  tier: 8
+  when:
+  - before_close
+merge_readiness_suite:
+  module: tools.validators.merge_readiness_suite
+  function: validate
+  tier: 8
+  when:
+  - before_close
+thought_firewall:
+  module: tools.validators.thought_firewall
+  function: validate
+  tier: 9
+  when:
+  - on_user_message
+validate_all:
+  module: tools.validators.validate_all
+  function: validate
+  tier: 7
+  when:
+  - before_close
+  - periodic_daily
+validate_harnesses:
+  module: tools.validators.validate_harnesses
+  function: validate
+  tier: 7
+  when:
+  - before_implementation
+validate_memory_policy:
+  module: tools.validators.validate_memory_policy
+  function: validate
+  tier: 7
+  when:
+  - before_close
+validate_model_policy:
+  module: tools.validators.validate_model_policy
+  function: validate
+  tier: 7
+  when:
+  - on_session_start
+validate_phase_dag:
+  module: tools.validators.validate_phase_dag
+  function: validate
+  tier: 7
+  when:
+  - before_implementation
+validate_registries:
+  module: tools.validators.validate_registries
+  function: validate
+  tier: 7
+  when:
+  - before_implementation
+validate_result_contracts:
+  module: tools.validators.validate_result_contracts
+  function: validate
+  tier: 7
+  when:
+  - before_close
+validate_service_profiles:
+  module: tools.validators.validate_service_profiles
+  function: validate
+  tier: 7
+  when:
+  - on_session_start
+validate_skills:
+  module: tools.validators.validate_skills
+  function: validate
+  tier: 7
+  when:
+  - on_session_start
+check_permission_policy_drift:
+  module: tools.validators.check_permission_policy_drift
+  function: validate
+  tier: 8
+  when:
+  - on_session_start
+  - before_implementation

@@ -1,0 +1,32 @@
+# OVAV Governance — Sandbox Rules
+# =============================================================================
+# Defines execution boundaries for AI agent operations
+# Updated: 2026-08-07
+# =============================================================================
+
+sandbox_rules:
+  version: "1.0"
+  authority: "Thavren — Platform Engineering Lead"
+  
+  execution_boundaries:
+    - no_system_modifications: true
+    - no_sudo_commands: true
+    - no_network_exfiltration: true
+    - read_only_on_protected_paths: true
+    
+  allowed_operations:
+    - read_files
+    - write_to_workspace
+    - execute_in_dev_environment
+    - run_tests
+    
+  denied_operations:
+    - delete_system_files
+    - modify_etc
+    - access_credentials_directly
+    - external_data_exfiltration
+    
+  containment:
+    - workspace_isolation: true
+    - tool_capability_boundaries: true
+    - permission_enforcement: true

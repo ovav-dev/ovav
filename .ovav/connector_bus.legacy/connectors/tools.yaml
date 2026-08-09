@@ -1,0 +1,83 @@
+# OVAV Connector Bus — Tools
+# ==================================
+# Tipo de slot: tool
+# Comandos CLI expuestos al usuario o a otros componentes.
+#
+# CONECTAR:   1 entry + command funcional
+# DESCONECTAR: borrar entry
+
+version: "1.0.0"
+slot_type: tool
+description: "Comandos ejecutables — CLI, validación, proyección, release"
+
+components:
+
+  ovav_validate:
+    command: go run -C go-runtime ./cmd/ovav doctor --quick
+    alias: validate
+    category: system
+    risk: low
+    labels: [cli, validation, go-native]
+
+  ovav_validate_all:
+    command: go run -C go-runtime ./cmd/ovav doctor
+    alias: validate-all
+    category: system
+    risk: low
+    labels: [cli, validation, full-scan, go-native]
+
+  ovav_doctor:
+    command: go run -C go-runtime ./cmd/ovav doctor
+    alias: doctor
+    category: system
+    risk: low
+    labels: [cli, diagnostics, go-native]
+
+  ovav_status:
+    command: go run -C go-runtime ./cmd/ovav status --write-markers
+    alias: status
+    category: system
+    risk: low
+    labels: [cli, monitoring, dashboard]
+
+  project_agents:
+    command: python3 tools/agents/project_opencode.py
+    alias: project-agents
+    category: projection
+    risk: low
+    labels: [projection, agents, opencode]
+
+  project_visual:
+    command: python3 tools/visual/project_opencode_visual.py
+    alias: project-visual
+    category: projection
+    risk: low
+    labels: [projection, visual, theme, plugins]
+
+  release_pipeline:
+    command: python3 .ovav/forge/pipeline.py
+    alias: release
+    category: release
+    risk: medium
+    labels: [release, pipeline, forge]
+
+  discover_skills:
+    command: python3 tools/skills/discover_skills.py
+    alias: discover-skills
+    category: skills
+    risk: low
+    labels: [skills, discovery, registry]
+
+  head_integrity_update:
+    command: python3 tools/security/head_integrity_verifier.py --update
+    alias: trust-head
+    category: security
+    risk: low
+    labels: [security, integrity, git]
+
+  knowledge_compiler:
+    command: python3 tools/agent_runtime/knowledge_compiler.py --inject
+    alias: compile-knowledge
+    category: intelligence
+    risk: low
+    labels: [knowledge, compiler, p0, session-continuity]

@@ -1,0 +1,87 @@
+advanced_capability_boundary:
+  version: BUILD23_advanced_capability_boundary
+  purpose: >-
+    Keep OVAV premium and safe by separating core runtime governance from advanced,
+    external, blocked, historical and future capability surfaces.
+
+  core_independence:
+    ovav_core_does_not_depend_on_advanced_tools: true
+    statement: >-
+      OVAV core remains functional through service-area routing, Session Capsule,
+      Context Gateway, Tool Gateway, Delegation Router, artifact-first governance,
+      source-local validators, Safe Stop Contract and Visual Delivery Contract.
+      Engram, MCP, A2A, UI/TUI, external adapters, web/API connectors,
+      vector/RAG stores, plugin installation, global config writes and real
+      install/apply/deploy are not core dependencies.
+
+  user_facing_policy:
+    no_future_gated_or_blocked_tool_as_active_opencode: true
+    historical_reference_allowed_only_as:
+      - evidence
+      - roadmap
+      - boundary_note
+    boundary_language_required: true
+    statement: >-
+      No future, gated, blocked, historical or deprecated capability may appear
+      as active available behavior in user-facing OpenCode. Active surfaces may
+      mention those capabilities only to state boundaries, gates or historical
+      evidence.
+
+  activation_gate:
+    explicit_gate_required: true
+    security_review_required: true
+    context_economy_impact_required: true
+    rollback_path_required: true
+    validator_required: true
+    consent_required_for_external_or_stateful_behavior: true
+    no_default_context_growth: true
+    requirements:
+      - Source-local design or evidence artifact.
+      - Threat/security review for external, stateful or install-like behavior.
+      - Context economy tier and cost impact.
+      - Rollback path and failure mode.
+      - Validator or harness proving the boundary.
+      - Explicit user approval for high-risk behavior.
+
+  non_bypass_contracts:
+    must_not_bypass:
+      - Context Gateway
+      - Tool Gateway
+      - Delegation Router
+      - Session Capsule
+      - Safe Stop Contract
+      - Visual Delivery Contract
+      - Identity Guard
+      - Handoff Protocol
+    statement: >-
+      Advanced capabilities are subordinate to runtime governance. They cannot
+      bypass context isolation, capability permissioning, delegation routing,
+      safe-stop reporting, visual delivery, identity protection or sanitized handoff.
+
+  context_economy:
+    advanced_capabilities_must_not_increase_default_context_loading: true
+    default_tier_impact: none
+    escalation_rule: >-
+      Advanced capability context loads only after explicit task need, risk review
+      and Context Gateway approval. Exact files and validators are preferred over
+      broad context dumps, RAG hydration or raw snapshots.
+
+  blocked_now:
+    - live Engram behavior
+    - plugin installation
+    - global config writes
+    - OpenCode global config writes
+    - package manager installs
+    - real install/apply/deploy without gate
+    - MCP/A2A execution
+    - UI/TUI implementation
+    - external adapters or connectors without explicit gate
+    - vector/RAG stores as default context
+    - memory writes
+
+  launch_decision:
+    blocked_future_or_historical_capabilities_are_launch_dependencies: false
+    rationale: >-
+      Launch readiness depends on governed internal runtime behavior, evidence,
+      validators and UX contracts. Advanced external or stateful tools are optional
+      candidates and must not be required for OVAV to deliver safe source-local value.

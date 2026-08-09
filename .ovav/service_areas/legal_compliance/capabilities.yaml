@@ -1,0 +1,11 @@
+# Legal & Compliance — Capabilities Registry v1.0.0
+capabilities:
+  version: "1.0.0"
+  area: legal_compliance
+  registered:
+    - {id: contract_review, name: "Contract Review & Drafting", status: active, maturity: production}
+    - {id: compliance_gdpr, name: "GDPR/CCPA/LGPD Compliance", status: active, maturity: production}
+    - {id: ip_management, name: "IP & Licensing Management", status: active, maturity: production}
+    - {id: legal_audit, name: "Legal Auditing", status: active, maturity: planned}
+    - {id: data_governance, name: "Data Governance Legal", status: active, maturity: planned}
+    - {id: camila_memory, name: "Camila Memory Engine", status: active, maturity: planned}

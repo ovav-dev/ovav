@@ -1,0 +1,184 @@
+═══════════════════════════════════════════════════════════════════════════════
+PLAN DE TRASLADO WEZTERM → POWERSHELL — RESUMEN EJECUTIVO BRaka
+═══════════════════════════════════════════════════════════════════════════════
+
+📅 FECHA: 2026-07-09
+🎯 OBJETIVO: Eliminar exit 15 WSL + mejorar rendimiento + desacoplar wezterm
+👤 PARA: CEO Braka
+
+──────────────────────────────────────────────────────────────────────────────
+DETECCIÓN INICIAL DEL HOST
+───────────────────────────────────────────────────────────────────────────────
+
+  ❌ PowerShell 7.6.3 (pwsh) .......... NO INSTALADO
+  ✅ PowerShell 5.1 (built-in) ........ Disponible en C:\Windows\System32
+  ❌ Windows Terminal ................. NO INSTALADO
+  ✅ WezTerm ........................... Instalado (mantener como ssh tool)
+  ✅ WSL2 Ubuntu-24.04 ................. Running
+  ✅ fish 4.7.1 ........................ Instalado en Ubuntu
+
+──────────────────────────────────────────────────────────────────────────────
+COMPONENTES A INSTALAR (Fase 0 — ~10 min)
+───────────────────────────────────────────────────────────────────────────────
+
+  1. PowerShell 7.6.3 LTS (latest stable, publicado 16 Jun 2026)
+     winget install --id Microsoft.PowerShell --version 7.6.3 --source winget
+     O MSI: https://github.com/PowerShell/PowerShell/releases/download/v7.6.3/PowerShell-7.6.3-win-x64.msi
+
+  2. Microsoft Windows Terminal (1.24+)
+     winget install --id Microsoft.WindowsTerminal --source winget
+     O desde Microsoft Store
+
+  3. JetBrainsMono Nerd Font (para ligaduras + iconos en lsd/eza)
+     winget install --id NerdFonts.JetBrainsMono --source winget
+
+──────────────────────────────────────────────────────────────────────────────
+ARQUITECTURA FINAL
+───────────────────────────────────────────────────────────────────────────────
+
+  Windows 11/10
+   │
+   ├─ Windows Terminal 1.24+           ← UI unificada, panes nativos
+   │   │
+   │   └─ Ubuntu-24.04 (WSL2)          ← Default profile
+   │       │
+   │       └─ fish 4.7.1               ← Shell interactivo (alias OVAV)
+   │           │
+   │           └─ bash on logout        ← Fallback
+   │
+   └─ PowerShell 7.6.3 (pwsh.exe)      ← Scripts admin Windows + bridge binarios .exe
+
+──────────────────────────────────────────────────────────────────────────────
+PERSONALIZACIÓN UI (Fase 3 — Windows Terminal settings.json)
+───────────────────────────────────────────────────────────────────────────────
+
+  Font:                 JetBrainsMono Nerd Font 12pt
+  Background:           #000000 (negro puro)
+  Foreground:           #FFFFFF
+  Scheme:               Tango Dark
+  Cursor:               filledBox blanco
+  Padding:              8px todos lados
+  Acrylic:              85% opacity
+  Iconos:               Profile icons MS
+
+  Keybindings custom:
+    Ctrl+Shift+T        nueva tab
+    Ctrl+Shift+W        cerrar tab
+    Alt+Shift++         split horizontal
+    Alt+Shift+-         split vertical
+    Alt+Arrow           mover entre panes
+    Ctrl+PageUp/Down    navegar tabs
+    Ctrl+~              quake mode (dropdown)
+
+  Quake mode habilitado:
+    windowingBehavior:  useExisting
+    minimized:          false
+
+──────────────────────────────────────────────────────────────────────────────
+PERSONALIZACIÓN POWERSHELL 7 (Fase 1 — $PROFILE)
+───────────────────────────────────────────────────────────────────────────────
+
+  $PROFILE = ~/Documents/PowerShell/Microsoft.PowerShell_profile.ps1
+
+  Módulos PS:
+    PSReadLine       (history, predictions, key bindings)
+    Terminal-Icons   (iconos vscode-style)
+    posh-git         (git integration en prompt)
+    oh-my-posh       (prompt powerlevel10k-style, theme paradox)
+
+  Instalación:
+    Install-Module PSReadLine,Terminal-Icons,posh-git,oh-my-posh -Force
+
+  Configuración:
+    BellStyle None
+    EditMode Windows
+    Tab = MenuComplete
+    UpArrow/DownArrow = HistorySearch
+    Predictions Source = History
+
+  Bridge aliases hacia fish/WSL:
+    function owc { wsl -d Ubuntu-24.04 -- fish -c "owc $args" }
+    function owd { wsl -d Ubuntu-24.04 -- fish -c "owd $args" }
+    function owl { wsl -d Ubuntu-24.04 -- fish -c "owl $args" }
+    function owv { wsl -d Ubuntu-24.04 -- fish -c "owv $args" }
+    (idem ows, owr, owx, owa, obc)
+
+  Atajos locales:
+    Set-Alias g git
+    Set-Alias gs 'git status --short --branch'
+    Set-Alias ga 'git add'
+    Set-Alias gc 'git commit'
+    Set-Alias gp 'git push'
+    Set-Alias gd 'git diff'
+
+──────────────────────────────────────────────────────────────────────────────
+LIMPIEZA FISH CONFIG (Fase 2 — desde Ubuntu)
+───────────────────────────────────────────────────────────────────────────────
+
+  Backup hooks wezterm:
+    mkdir -p ~/.config/fish/_archive_20260709_wezterm
+    mv ~/.config/fish/conf.d/20-ovav-wezterm-osc7.fish  ~/.config/fish/_archive_20260709_wezterm/
+    mv ~/.config/fish/conf.d/25-ovav-wezterm-git.fish    ~/.config/fish/_archive_20260709_wezterm/
+
+  Desactivar OVAV_TERMINAL=wezterm:
+    sed -i 's|set -gx OVAV_TERMINAL wezterm|# OVAV_TERMINAL deshabilitado — PowerShell migration 2026-07-09|' \
+        ~/.config/fish/conf.d/30-ovav-runtime-tools.fish
+
+  Limpiar config.fish bloque wezterm (líneas 53-57):
+    sed -i '/^# OVAV: report CWD to wezterm via OSC 0 title sequence$/,/^__wezterm_report_cwd$/d' \
+        ~/.config/fish/config.fish
+    sed -i '/^printf "\\e\]7;file/d' ~/.config/fish/config.fish
+
+──────────────────────────────────────────────────────────────────────────────
+VALIDACIÓN (Fase 4)
+───────────────────────────────────────────────────────────────────────────────
+
+  Tests:
+    pwsh --version                           → 7.6.3
+    wt --help                                → Help rendered
+    wsl -d Ubuntu-24.04 -- fish --version    → 4.7.1
+    wsl -d Ubuntu-24.04 -- fish -c 'owc'    → Help de owc
+    wsl -d Ubuntu-24.04 -- fish -l -c 'exit 0'   → rc=0
+
+  Checklist aceptación:
+    [ ] pwsh retorna 7.6.3
+    [ ] WT abre con Ubuntu default
+    [ ] Split panes funcionan
+    [ ] OVAV aliases (owc/owd/owl/owv) ejecutan
+    [ ] exit code limpio (sin 15)
+    [ ] git, pnpm, node, go, python disponibles
+    [ ] Nerd Font renderiza iconos
+
+──────────────────────────────────────────────────────────────────────────────
+VERSIÓN DE POWERSHELL: ¿CUÁL ES LA RECOMENDADA?
+───────────────────────────────────────────────────────────────────────────────
+
+  ÚLTIMA ESTABLE:  PowerShell 7.6.3 (LTS, 16 Jun 2026)
+  STABLE STS:       PowerShell 7.5.x (no LTS, fin soporte antes)
+  PREVIEW:          PowerShell 7.7.0-preview.x (no para prod)
+
+  RECOMENDACIÓN: PowerShell 7.6.3 LTS
+
+  Razones:
+  - .NET SDK 10.0.301 base (más rápido)
+  - LTS recibe updates hasta 2028+
+  - Soporte oficial Microsoft full
+  - Compatibilidad con módulos PSGallery probada
+  - Instalación via winget/MSI/store oficial
+
+──────────────────────────────────────────────────────────────────────────────
+TIMELINE ESTIMADO
+───────────────────────────────────────────────────────────────────────────────
+
+  Fase 0 (instalar) .............. 10 min
+  Fase 1 (PS profile) ............ 15 min
+  Fase 2 (fish cleanup) ........... 10 min
+  Fase 3 (Windows Terminal) ....... 15 min
+  Fase 4 (validación) ............  5 min
+  ──────────────────────────────────
+  TOTAL SECUENCIAL:               55 min
+  TOTAL EN PARALELO:              30 min
+
+═══════════════════════════════════════════════════════════════════════════════
+CEO: ejecutar Fase 0 primero, después avisame y armo handoff para Fase 1-4.
+═══════════════════════════════════════════════════════════════════════════════

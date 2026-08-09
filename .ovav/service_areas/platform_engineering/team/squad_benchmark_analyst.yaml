@@ -1,0 +1,22 @@
+# Squad: Benchmark Analyst
+# Lead contract internal team member — invisible to user
+
+squad:
+  id: squad_benchmark_analyst
+  display_name: Sara
+  area: research_intelligence
+  lead: eidren
+  role: "Benchmark analysis, competitive comparison, evidence-scored decision briefs"
+  role_id: benchmark_analyst
+  note: "Primary assignment is Research Intelligence (Eidren). Available to Platform Engineering (Thavren) via cross-area handoff."
+
+activation:
+  modes: [focused_squad, full_squad]
+  never_default: true
+  router: Delegation Router
+
+model_body:
+  primary: "openai/gpt-4o"
+
+lanes:
+  - architecture_contracts

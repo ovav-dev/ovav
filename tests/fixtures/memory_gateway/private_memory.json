@@ -1,0 +1,9 @@
+{
+  "id": "private-memory-s7-local-path",
+  "profile": "ovav_systems_architect",
+  "operator": "thavren",
+  "phase": "S7",
+  "skill": "runtime_governance_seed",
+  "sensitivity": "sensitive_local",
+  "text": "Private local note references /home/example/.config/opencode/config.json and should be redacted before any memory review."
+}

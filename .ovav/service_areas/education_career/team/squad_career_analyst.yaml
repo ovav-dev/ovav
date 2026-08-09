@@ -1,0 +1,13 @@
+# Squad: Career Analyst
+squad:
+  id: squad_career_analyst
+  display_name: Teo
+  area: education_career
+  lead: valeria
+  role: "Job market alignment, skill taxonomy mapping, career trajectory analysis"
+  role_id: career_alignment_analyst
+activation: {modes: [focused_squad], never_default: true}
+model_body: {primary: "opencode-go/deepseek-v4-pro", secondary: "opencode-go/mimo-v2.5-pro"}
+lanes: [career_market]
+capabilities: ["Real-time job market scraping", "Skill taxonomy maintenance", "Salary trend analysis", "Career trajectory mapping", "Demand forecasting for skills"]
+constraints: ["Datos de mercado se actualizan cada 7 días mínimo", "No recomienda carreras sin ≥50 ofertas activas en últimos 30 días"]

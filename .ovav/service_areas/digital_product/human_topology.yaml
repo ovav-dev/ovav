@@ -1,0 +1,40 @@
+human_topology:
+  version: "1.0.0"
+  area: digital_product
+  language_policy:
+    internal: english
+    user_visible: spanish_neutral
+  entities:
+    area:
+      id: digital_product
+      kind: organizational_area
+      is_human: false
+    lead:
+      id: dante
+      kind: accountable_human_operator
+      is_human: true
+  digital_product_team:
+    - id: squad_frontend
+      person: Elena
+      role_id: frontend_engineer
+    - id: squad_backend
+      person: Sergio
+      role_id: backend_engineer
+    - id: squad_devops
+      person: Uriel
+      role_id: devops_engineer
+    - id: squad_uiux
+      person: Laura
+      role_id: ui_ux_designer
+    - id: squad_qa
+      person: Diego
+      role_id: qa_engineer
+    - id: squad_pm
+      person: Rosa
+      role_id: project_manager
+    - id: squad_database_architect
+      person: Víctor
+      role_id: database_architect
+    - id: squad_api_security
+      person: Nora
+      role_id: api_security_engineer

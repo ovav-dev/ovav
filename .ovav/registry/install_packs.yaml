@@ -1,0 +1,42 @@
+install_packs:
+  ovav_source_runtime_pack:
+    modes: [inspect, plan, dry-run, sandbox, source-local-apply, backup, authoritative, restore]
+    targets: [ovav_artifacts, registry, source_runtime]
+    notes: source_only_until_s11
+  opencode_governed_pack:
+    modes: [inspect, plan, dry-run, sandbox, source-local-apply, backup, authoritative, restore]
+    targets: [opencode_agents, opencode_skills, opencode_commands]
+    notes: opencode_surface_only_after_s10
+  research_artifact_pack:
+    modes: [inspect, plan, dry-run, sandbox]
+    targets: [research_artifacts, source_maps, reports]
+    notes: evidence_first
+  install_governor_v2_sandbox_pack:
+    modes: [inspect, plan, dry-run, backup, restore]
+    targets: [s27_sandbox_install_plan, s27_sandbox_backup_plan, s27_sandbox_rollback]
+    notes: repo_local_sandbox_only_no_real_apply
+  source_global_plan_pack:
+    modes: [inspect, plan]
+    targets: [s28_source_global_plan, s28_risk_review, s28_approval_gate]
+    notes: proposal_only_no_apply_no_global_write
+  install_sandbox_usability_pack:
+    modes: [inspect, plan, dry-run, sandbox]
+    targets: [s43_install_preview, s43_risk_rollback_guide, s43_approval_preview]
+    notes: source_local_preview_only_no_apply_no_backup_no_rollback
+  install_source_local_apply_policy_pack:
+    modes: [inspect, plan, dry-run]
+    targets: [s56_apply_policy, s56_apply_boundaries, s56_backup_rollback_gate]
+    notes: policy_only_no_real_install_apply_backup_rollback_global
+  install_source_local_apply_sandbox_pack:
+    modes: [inspect, plan, dry-run, sandbox]
+    targets: [s57_apply_sandbox, s57_apply_manifest, s57_rollback_sandbox]
+    notes: sandbox_only_no_real_install_apply_backup_rollback_global
+  # ── BUILD 8 Graduated Install Packs ────────────────────────────────────
+  build8_source_local_apply_pack:
+    modes: [inspect, plan, dry-run, sandbox, source-local-apply]
+    targets: [opencode_agents, opencode_skills, opencode_commands, registry, source_runtime]
+    notes: source_local_apply_under_gates_build8
+  workstation_deploy_pack:
+    modes: [inspect, plan, dry-run, sandbox, source-local-apply]
+    targets: [wezterm_config, wezterm_config_wsl]
+    notes: governed_deploy_to_wezterm_config_requires_explicit_approval_build8

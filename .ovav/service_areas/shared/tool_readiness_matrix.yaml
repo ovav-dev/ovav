@@ -1,0 +1,384 @@
+tool_readiness_matrix:
+  version: BUILD23_tool_readiness_boundary
+  purpose: >-
+    Classify prepared, blocked, gated, historical and future capability
+    surfaces so OVAV activates only the right capability at the right time.
+  allowed_states:
+    - active_internal
+    - active_internal_gated
+    - blocked
+    - gated_candidate
+    - future_candidate
+    - historical_only
+    - deprecated
+  default_rule: >-
+    No advanced capability is user-facing or active by default. Advanced
+    activation requires explicit gate, Context Gateway, Tool Gateway,
+    Delegation Router, rollback path and validator proof.
+  capabilities:
+    operational_memory:
+      current_state: active_internal
+      product_value: Continuity via git HEAD + caps.yaml — always accurate, no sync needed.
+      token_context_cost: low
+      security_risk: low
+      dependency_risk: low
+      user_experience_impact: High trust value; data is verifiable against git.
+      launch_dependency: false
+      activation_requirements:
+        - Memory state derived from git HEAD + caps.yaml (canonical sources).
+        - No external memory subsystem needed.
+        - Context economy impact review before any context loading increase.
+      rollback_requirements:
+        - Disable memory route and remove active surface wiring.
+        - Preserve historical evidence; do not delete prior snapshots.
+        - Verify no memory write or live read command remains reachable.
+      validator_requirements:
+        - validate_memory_policy.py
+        - check_tool_readiness_matrix.py
+        - check_agent_runtime_enforcement.py
+      recommended_phase: post_launch_security_review
+      active_surface_policy: >-
+        Active OpenCode may mention Engram only as blocked, simulated/source-local,
+        historical evidence or gated-candidate boundary. It must not claim live
+        Engram read/write/config/install availability.
+
+    memory_gateway:
+      current_state: active_internal_gated
+      product_value: Governs memory-related evidence, candidate review and recall boundaries.
+      token_context_cost: medium
+      security_risk: medium
+      dependency_risk: medium
+      user_experience_impact: Improves continuity discipline without exposing memory as a product promise.
+      launch_dependency: false
+      activation_requirements:
+        - Gateway-only use; memory_write remains false unless separately gated.
+        - Context Gateway and Tool Gateway approval for scoped evidence reads.
+        - Redaction and privacy classifier proof for any candidate material.
+      rollback_requirements:
+        - Return to no-memory mode.
+        - Keep generated evidence as historical records only.
+        - Re-run memory and runtime validators.
+      validator_requirements:
+        - validate_memory_policy.py
+        - check_tool_readiness_matrix.py
+      recommended_phase: internal_governance_now
+      active_surface_policy: >-
+        Internal governance capability only. It may not create default context loading,
+        live memory writes or a visible memory product identity.
+
+    mcp:
+      current_state: gated_candidate
+      product_value: Potential protocol integration surface for future controlled interoperability.
+      token_context_cost: high
+      security_risk: high
+      dependency_risk: high
+      user_experience_impact: Useful only after strict scoping; confusing if exposed by default.
+      launch_dependency: false
+      activation_requirements:
+        - Explicit protocol gate and security review.
+        - Source-local test harness proving no external execution by default.
+        - Context economy budget and rollback plan.
+      rollback_requirements:
+        - Remove active MCP wiring and deny protocol commands.
+        - Re-run OpenCode runtime wiring and tool readiness validators.
+      validator_requirements:
+        - check_tool_readiness_matrix.py
+        - check_opencode_runtime_wiring.py
+        - check_agent_runtime_enforcement.py
+      recommended_phase: future_protocol_gate
+      active_surface_policy: >-
+        MCP may appear only as gated/blocked boundary or historical evidence. It
+        must not be presented as available active OpenCode behavior.
+
+    a2a:
+      current_state: future_candidate
+      product_value: Possible future agent-to-agent interoperability after product maturity.
+      token_context_cost: high
+      security_risk: high
+      dependency_risk: high
+      user_experience_impact: High complexity; should not be visible before a user-safe flow exists.
+      launch_dependency: false
+      activation_requirements:
+        - Separate design artifact and security threat model.
+        - Explicit gate proving no autonomous external agent execution.
+        - Validator coverage before any active surface wiring.
+      rollback_requirements:
+        - Remove A2A wiring and return to Delegation Router only.
+        - Archive evidence as historical-only.
+      validator_requirements:
+        - check_tool_readiness_matrix.py
+        - check_agent_runtime_enforcement.py
+      recommended_phase: roadmap_after_mcp_gate
+      active_surface_policy: >-
+        A2A is future-only. Active OpenCode may mention it only as blocked,
+        future candidate or historical boundary.
+
+    sdd_artifact_first:
+      current_state: active_internal_gated
+      product_value: Keeps implementation governed by artifacts, dependencies and validators.
+      token_context_cost: medium
+      security_risk: low
+      dependency_risk: medium
+      user_experience_impact: Increases reliability while remaining mostly invisible to users.
+      launch_dependency: true
+      activation_requirements:
+        - Use artifact dependency checks before apply work.
+        - Keep SDD skills as internal capability, not a primary product identity.
+        - Do not bypass Context Gateway, Tool Gateway or Delegation Router.
+      rollback_requirements:
+        - Block apply until required upstream artifacts are restored.
+        - Recreate missing artifact evidence without deleting historical records.
+      validator_requirements:
+        - validate_phase_dag.py
+        - validate_registries.py
+        - check_tool_readiness_matrix.py
+      recommended_phase: active_now_internal
+      active_surface_policy: >-
+        Artifact-first SDD is active as internal governed skill behavior only. It
+        must not become noisy visible product identity or bypass user-facing clarity.
+
+    external_adapters:
+      current_state: gated_candidate
+      product_value: Future integration with external systems when scoped and consented.
+      token_context_cost: high
+      security_risk: high
+      dependency_risk: high
+      user_experience_impact: Valuable after trust gates; risky and noisy by default.
+      launch_dependency: false
+      activation_requirements:
+        - Explicit adapter gate, scoped connector inventory and security review.
+        - No external service behavior without consent and allowlist.
+        - Context economy and rollback proof.
+      rollback_requirements:
+        - Disable adapter route and revoke connector permissions.
+        - Verify active OpenCode surfaces return to boundary-only language.
+      validator_requirements:
+        - check_tool_readiness_matrix.py
+        - check_agent_runtime_enforcement.py
+      recommended_phase: gated_after_core_launch
+      active_surface_policy: >-
+        External adapters may be referenced as gated/scoped candidates only. No
+        active OpenCode surface may imply free external service access.
+
+    install_apply_deploy:
+      current_state: active_internal_gated
+      product_value: Governance for inspect, plan, backup, verify and rollback safety.
+      token_context_cost: medium
+      security_risk: high
+      dependency_risk: high
+      user_experience_impact: Builds confidence when framed as safety governance, not free apply.
+      launch_dependency: false
+      activation_requirements:
+        - Governance-only activation in repo-local context.
+        - Real apply/deploy requires explicit consent, backup, verify and rollback path.
+        - No global writes or real install in active OpenCode default behavior.
+      rollback_requirements:
+        - Restore from documented backup when a real approved segment exists.
+        - For current source-local state, remove active apply wiring and re-run validators.
+      validator_requirements:
+        - check_tool_readiness_matrix.py
+        - check_agent_runtime_enforcement.py
+        - check_opencode_runtime_wiring.py
+      recommended_phase: governance_now_real_apply_later_gate
+      active_surface_policy: >-
+        Install/apply/deploy is active only as internal governance and planning.
+        Active surfaces must state that real apply remains gated and never free.
+
+    plugin_installation:
+      current_state: blocked
+      product_value: Could extend OpenCode later, but not required for core OVAV.
+      token_context_cost: medium
+      security_risk: high
+      dependency_risk: high
+      user_experience_impact: High confusion and supply-chain risk if exposed early.
+      launch_dependency: false
+      activation_requirements:
+        - Not activatable in current scope.
+        - Future work requires explicit security and supply-chain review.
+      rollback_requirements:
+        - Remove plugin wiring and package changes.
+        - Verify no global or project plugin installation command is allowed.
+      validator_requirements:
+        - check_tool_readiness_matrix.py
+        - check_opencode_runtime_wiring.py
+      recommended_phase: blocked_until_security_program
+      active_surface_policy: Active OpenCode must describe plugin installation as blocked.
+
+    global_config_writes:
+      current_state: blocked
+      product_value: Could support real install later, but current OVAV is source-local.
+      token_context_cost: medium
+      security_risk: high
+      dependency_risk: high
+      user_experience_impact: Dangerous if users believe OVAV changes HOME/global state by default.
+      launch_dependency: false
+      activation_requirements:
+        - Not activatable in current scope.
+        - Later approved install segment must include consent, backup, verify and rollback.
+      rollback_requirements:
+        - Restore prior config from backup in a future approved install segment.
+        - Current scope: prove no HOME/global write path is active.
+      validator_requirements:
+        - check_tool_readiness_matrix.py
+        - check_agent_runtime_enforcement.py
+        - check_opencode_runtime_wiring.py
+      recommended_phase: blocked_source_local
+      active_surface_policy: Active OpenCode must describe global/OpenCode global config writes as blocked.
+
+    web_browser_api_connectors:
+      current_state: gated_candidate
+      product_value: Source verification and connector research when explicitly scoped.
+      token_context_cost: high
+      security_risk: medium
+      dependency_risk: high
+      user_experience_impact: Strong research value only with provenance and consent boundaries.
+      launch_dependency: false
+      activation_requirements:
+        - Explicit source-verification gate and connector allowlist.
+        - Source quality scoring and external service boundary.
+        - No credentials or secrets in prompts, logs or handoffs.
+      rollback_requirements:
+        - Disable connector route and clear scoped external permissions.
+        - Preserve citation evidence without credentials.
+      validator_requirements:
+        - check_tool_readiness_matrix.py
+        - check_agent_runtime_enforcement.py
+      recommended_phase: gated_research_workflow
+      active_surface_policy: >-
+        Web/browser/API connectors may be described as gated research candidates,
+        not as default live connector access.
+
+    vector_rag_stores:
+      current_state: future_candidate
+      product_value: Potential retrieval over curated evidence after privacy and cost controls.
+      token_context_cost: high
+      security_risk: high
+      dependency_risk: high
+      user_experience_impact: Could improve recall, but risks hidden context and stale evidence.
+      launch_dependency: false
+      activation_requirements:
+        - Separate retrieval design, freshness policy and privacy review.
+        - Context economy proof showing no default context bloat.
+        - Validator for source provenance and deletion/rollback semantics.
+      rollback_requirements:
+        - Disable retrieval route and quarantine index metadata.
+        - Fall back to exact artifact reads and source-local validators.
+      validator_requirements:
+        - check_tool_readiness_matrix.py
+        - validate_memory_policy.py
+      recommended_phase: future_retrieval_layer
+      active_surface_policy: >-
+        Vector/RAG stores are future candidates only and must not be implied as
+        current active recall or default context loading.
+
+    observability_evals:
+      current_state: active_internal_gated
+      product_value: Provides trace-ready governance and validator-backed confidence.
+      token_context_cost: low
+      security_risk: medium
+      dependency_risk: medium
+      user_experience_impact: Improves reliability while keeping harness mechanics behind the UX.
+      launch_dependency: true
+      activation_requirements:
+        - Non-trivial work emits trace-ready payload or evidence.
+        - Do not expose raw traces, secrets or chain-of-thought.
+        - Validators remain backend proof, not product UX.
+      rollback_requirements:
+        - Revert to minimal evidence record and re-run governance validators.
+        - Remove any trace field that leaks raw chat, secrets or snapshots.
+      validator_requirements:
+        - check_service_area_governance.py
+        - check_tool_readiness_matrix.py
+      recommended_phase: active_now_internal
+      active_surface_policy: >-
+        Active internal evaluation and observability are allowed when they do not
+        expose hidden reasoning, secrets or raw runtime internals.
+
+    opencode_ux_extensions:
+      current_state: active_internal_gated
+      product_value: Improves visible delivery through commands, agents and skills.
+      token_context_cost: low
+      security_risk: medium
+      dependency_risk: medium
+      user_experience_impact: High clarity when limited to service areas and visual contracts.
+      launch_dependency: true
+      activation_requirements:
+        - Source-local OpenCode files only.
+        - Preserve identity guard and blocked surfaces.
+        - User-facing OpenCode must not claim advanced tools are active.
+      rollback_requirements:
+        - Revert source-local OpenCode changes.
+        - Re-run OpenCode runtime, UX and context validators.
+      validator_requirements:
+        - check_opencode_runtime_wiring.py
+        - check_agent_ux_visual_delivery.py
+        - check_context_economy_and_active_connections.py
+        - check_tool_readiness_matrix.py
+      recommended_phase: active_now_internal
+      active_surface_policy: >-
+        OpenCode UX extensions are active only inside governed source-local surfaces;
+        they must preserve premium simplicity and hidden/internal capability routing.
+
+    tui_ui:
+      current_state: future_candidate
+      product_value: Possible future user interface once core governance is stable.
+      token_context_cost: high
+      security_risk: medium
+      dependency_risk: high
+      user_experience_impact: Could improve adoption, but premature UI increases support burden.
+      launch_dependency: false
+      activation_requirements:
+        - Separate product design and accessibility review.
+        - Validator proving no UI/TUI default behavior in OpenCode runtime.
+        - Rollback and feature flag plan.
+      rollback_requirements:
+        - Disable UI/TUI entry points and return to OpenCode service surfaces.
+        - Preserve design artifacts as roadmap evidence only.
+      validator_requirements:
+        - check_tool_readiness_matrix.py
+        - check_agent_ux_visual_delivery.py
+      recommended_phase: future_product_surface
+      active_surface_policy: Active OpenCode may mention UI/TUI only as blocked or future candidate.
+
+    package_manager_installs:
+      current_state: blocked
+      product_value: Dependency installation may be needed in future controlled setup flows.
+      token_context_cost: low
+      security_risk: high
+      dependency_risk: high
+      user_experience_impact: Risky if users believe package installs are automatic.
+      launch_dependency: false
+      activation_requirements:
+        - Not activatable in current scope.
+        - Future setup requires explicit package plan, lockfile review and consent.
+      rollback_requirements:
+        - Remove installed packages using documented package-specific rollback.
+        - Current scope: verify pip/npm/apt install commands are denied.
+      validator_requirements:
+        - check_tool_readiness_matrix.py
+        - check_agent_runtime_enforcement.py
+      recommended_phase: blocked_source_local
+      active_surface_policy: Active OpenCode and squad agents must deny package manager install commands.
+
+    protected_internal_agent_aliases:
+      current_state: historical_only
+      product_value: Compatibility metadata for historical lead-operator aliases.
+      token_context_cost: low
+      security_risk: medium
+      dependency_risk: low
+      user_experience_impact: Protects continuity only if hidden from primary UI identity.
+      launch_dependency: false
+      activation_requirements:
+        - Must remain hidden, subagent-only and non-primary.
+        - Visible UI identities remain Platform Engineering and Research Intelligence.
+      rollback_requirements:
+        - Remove alias routing from active config if ever promoted by mistake.
+        - Re-run identity and OpenCode runtime validators.
+      validator_requirements:
+        - check_tool_readiness_matrix.py
+        - check_agent_runtime_enforcement.py
+        - check_opencode_runtime_wiring.py
+      recommended_phase: historical_internal_compatibility
+      active_surface_policy: >-
+        `thavren` and `eidren` may exist only as hidden protected metadata aliases,
+        never as primary visible OpenCode UI identities.

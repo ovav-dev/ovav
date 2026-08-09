@@ -1,0 +1,1 @@
+squad: {id: squad_accessibility, name: "Accessibility Squad", area: ux_design, lead: elena, scope: "WCAG 2.1 AA, screen reader testing, contrast, keyboard nav, ARIA", status: active}

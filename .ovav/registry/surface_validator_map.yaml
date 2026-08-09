@@ -1,0 +1,99 @@
+# OVAV surface_validator_map.yaml — AUTO-GENERADO por surface_map_compiler.py (E0.2)
+# Fuente: connectors/validators.yaml via ConnectorBus
+# Generado: 2026-06-08T02:48:36.860121+00:00
+# Superficies: 4 | Validadores: 11 | Always-run: 28
+#
+# NO EDITAR MANUALMENTE.
+# Agregar/quitar validadores en connectors/validators.yaml y re-ejecutar el compilador.
+# Cada validador declara su `surface` — el compilador mapea automáticamente.
+#
+surfaces:
+  .opencode/:
+    description: OpenCode agent config, skills, subagents, plugins, themes
+    validators:
+    - name: validate_model_policy
+      tier: 10
+      module: tools.validators.validate_model_policy
+    priority_order:
+    - validate_model_policy
+  .ovav/:
+    description: 'OVAV surface: .ovav/'
+    validators:
+    - name: check_supply_chain
+      tier: 9
+      module: tools.validators.check_supply_chain
+    priority_order:
+    - check_supply_chain
+  .ovav/policy/:
+    description: Permission policies, authority contracts, governance rules
+    validators:
+    - name: validate_permission_policy_drift
+      tier: 10
+      module: tools.validators.check_permission_policy_drift
+    priority_order:
+    - validate_permission_policy_drift
+  .ovav/registry/:
+    description: Configuration registries, harnesses, SBOM, hashes
+    validators:
+    - name: validate_harnesses
+      tier: 10
+      module: tools.validators.validate_harnesses
+    - name: validate_memory_policy
+      tier: 10
+      module: tools.validators.validate_memory_policy
+    - name: validate_phase_dag
+      tier: 10
+      module: tools.validators.validate_phase_dag
+    - name: validate_registries
+      tier: 10
+      module: tools.validators.validate_registries
+    - name: validate_result_contracts
+      tier: 10
+      module: tools.validators.validate_result_contracts
+    - name: validate_service_profiles
+      tier: 10
+      module: tools.validators.validate_service_profiles
+    - name: validate_skills
+      tier: 10
+      module: tools.validators.validate_skills
+    - name: check_network_hardening
+      tier: 9
+      module: tools.validators.check_network_hardening
+    priority_order:
+    - validate_harnesses
+    - validate_memory_policy
+    - validate_phase_dag
+    - validate_registries
+    - validate_result_contracts
+    - validate_service_profiles
+    - validate_skills
+    - check_network_hardening
+always_run:
+- check_L6_security_zero_trust
+- check_L7_feedback_loop
+- check_bootstrap_chain
+- check_context_firewall_v2
+- check_exfil_patterns
+- check_f1_architecture
+- check_f2_infrastructure
+- check_f3_roles
+- check_f4_security_hardening
+- check_f5_advanced_hardening
+- check_protected_branch
+- check_runtime_integrity
+- check_secrets_hygiene
+- check_single_authority_source
+- validate_behavioral_directives
+- validate_canonical_integrity
+- validate_config_syntax
+- validate_contract_freshness
+- validate_gate_self_protection
+- validate_git_push_gate
+- validate_handoff_sync
+- validate_head_integrity
+- validate_host_config_drift
+- validate_ledger_write_path
+- validate_registry_drift
+- validate_session_context_guard
+- validate_validator_coverage
+- validate_workspace_safety_gate

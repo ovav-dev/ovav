@@ -1,0 +1,26 @@
+# OVAV Governance — Temporal Limits
+# =============================================================================
+# Defines time-based operational limits and session constraints
+# Updated: 2026-08-07
+# =============================================================================
+
+temporal_limits:
+  version: "1.0"
+  authority: "Thavren — Platform Engineering Lead"
+  
+  session_limits:
+    max_session_duration_minutes: 120
+    max_context_window_tokens: 200000
+    compaction_trigger_threshold: 180000
+    
+  worktree_lifecycle:
+    max_worktree_age_days: 14
+    auto_cleanup_after_inactivity_days: 7
+    
+  governance_cycle:
+    validation_interval_minutes: 30
+    integrity_check_interval_hours: 6
+    
+  escalation:
+    timeout_warning_minutes: 100
+    force_compaction_at_minutes: 115

@@ -1,0 +1,28 @@
+{
+  "schema": "ovav.artifact.v1",
+  "segment": "L5",
+  "name": "L5 Context Firewall v2",
+  "status": "implemented",
+  "timestamp": "2026-05-30T09:51:39.168973+00:00",
+  "modules": {
+    "injection_detector": "tools/agent_runtime/injection_detector.py",
+    "budget_enforcer": "tools/agent_runtime/budget_enforcer.py",
+    "context_firewall_v2": "tools/agent_runtime/context_firewall_v2.py",
+    "validator": "tools/validators/check_context_firewall_v2.py"
+  },
+  "capabilities": [
+    "Injection detection (4 vectors: external config, system override, prompt injection, tool manipulation)",
+    "Budget enforcement (T0-T5 tiers with auto-compaction)",
+    "Integrity verification (Living Integrity Model integration)",
+    "Overreach detection (cross-boundary context access)",
+    "Full 5-check pipeline (injection \u2192 budget \u2192 integrity \u2192 overreach \u2192 L1 classification)"
+  ],
+  "validation": {
+    "defense_gate": "PASS",
+    "living_integrity": "CLEAN - 1515 files, 0 drifts",
+    "supply_chain": "PASS",
+    "workspace_safety": "PASS",
+    "l5_context_firewall": "PASS",
+    "ovav_validate": "PASS"
+  }
+}

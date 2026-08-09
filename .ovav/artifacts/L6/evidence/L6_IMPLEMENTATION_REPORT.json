@@ -1,0 +1,58 @@
+{
+  "schema": "ovav.L6_implementation_report.v1",
+  "layer": "L6",
+  "name": "Security / Zero-Trust Runtime",
+  "phase": "Fase 3 — Integración",
+  "status": "COMPLETADO",
+  "completed_at": "2026-05-31T22:00:00-05:00",
+  "commit": "8a8c8df",
+  "branch": "task/implementaciones",
+  "files": {
+    "implemented": [
+      "tools/security/risk_scorer.py (404 líneas)",
+      "tools/security/quarantine.py (442 líneas)",
+      "tools/security/provenance_checker.py (383 líneas)",
+      "tools/validators/check_L6_security_zero_trust.py",
+      ".ovav/artifacts/L6/L6_SECURITY_ZERO_TRUST_SPEC.md"
+    ],
+    "total_loc": 1229
+  },
+  "modules": {
+    "risk_scorer": {
+      "factors": 5,
+      "description": "Scoring compuesto: tool_class + context_tier + dependency_chain + hardening_bonus + operator_profile → 0-100",
+      "threshold_quarantine": 70,
+      "threshold_verification": 55
+    },
+    "quarantine": {
+      "flow": "isolate → verify → release/deny",
+      "registry": ".ovav/quarantine/registry.json",
+      "deny_path": ".ovav/quarantine/denied/"
+    },
+    "provenance_checker": {
+      "sources": {
+        "git_tracked": 95,
+        "sbom_registered": 90,
+        "generated": 70,
+        "external": 10,
+        "unknown": 0
+      }
+    }
+  },
+  "validation": {
+    "validator": "check_L6_security_zero_trust.py",
+    "checks": {
+      "risk_scorer": "PASS",
+      "quarantine": "PASS",
+      "provenance": "PASS",
+      "integration": "PASS"
+    },
+    "total": "4/4 PASS"
+  },
+  "integration": {
+    "F0.1_sbom": "baseline de hashes para verificación",
+    "F0.3_living_integrity": "pre-check de integridad antes de liberar quarantine",
+    "F3.2_sandbox": "sandbox obligatorio para artefactos externos",
+    "F5.2_gate_liberation": "risk score alimenta decisión de gate liberation"
+  }
+}

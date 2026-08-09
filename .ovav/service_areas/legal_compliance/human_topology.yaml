@@ -1,0 +1,27 @@
+human_topology:
+  version: "1.0.0"
+  area: legal_compliance
+  entities:
+    area:
+      id: legal_compliance
+      kind: organizational_area
+      is_human: false
+      responsibility: "Own legal review, compliance, IP, and regulatory scope."
+    lead:
+      id: camila
+      kind: accountable_human_operator
+      is_human: true
+      connection_to_area: leads_legal_compliance
+  legal_compliance_team:
+    - id: squad_contract_specialist
+      person: Bruno
+      role_id: contract_specialist
+      lane: contract_law
+    - id: squad_privacy_compliance
+      person: Marina
+      role_id: privacy_compliance_officer
+      lane: privacy_compliance
+    - id: squad_ip_licensing
+      person: Antonio
+      role_id: ip_licensing_specialist
+      lane: ip_licensing

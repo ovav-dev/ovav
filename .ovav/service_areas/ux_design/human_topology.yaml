@@ -1,0 +1,20 @@
+human_topology:
+  version: "2.0.0"
+  area: ux_design
+  language_policy:
+    internal: english
+    user_visible: spanish_neutral
+  entities:
+    area:
+      id: ux_design
+      kind: organizational_area
+      is_human: false
+    lead:
+      id: elena
+      kind: accountable_human_operator
+      is_human: true
+  ux_design_team:
+    - {id: squad_design_system, person: Elena, role: design_system_lead}
+    - {id: squad_ux_research, person: Elena, role: ux_researcher}
+    - {id: squad_accessibility, person: Elena, role: accessibility_specialist}
+    - {id: squad_prototyping, person: Elena, role: prototyper}

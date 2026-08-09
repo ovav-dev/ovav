@@ -1,0 +1,22 @@
+{
+  "_ovav_note": "OVAV recommended extensions — Cursor prompts on first open",
+  "recommendations": [
+    "golang.go",
+    "redhat.vscode-yaml",
+    "eamodio.gitlens",
+    "usernamehw.errorlens",
+    "tamasfe.even-better-toml",
+    "gruntfuggly.todo-tree",
+    "streetsidesoftware.code-spell-checker",
+    "EditorConfig.EditorConfig",
+    "bierner.markdown-mermaid",
+    "zhuangtongfa.material-theme",
+    "PKief.material-icon-theme",
+    "biomejs.biome",
+    "bradlc.vscode-tailwindcss",
+    "csstools.postcss",
+    "dsznajder.es7-react-js-snippets",
+    "formulahendry.auto-rename-tag",
+    "prisma.prisma"
+  ]
+}

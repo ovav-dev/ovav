@@ -1,0 +1,119 @@
+#!/bin/bash
+# OVAV PostgreSQL MCP Server Wrapper
+# Provides safe database query interface
+
+set -e
+
+# Check for DATABASE_URL
+if [ -z "$DATABASE_URL" ]; then
+  echo "Error: DATABASE_URL environment variable not set" >&2
+  echo "Set it with: export DATABASE_URL=postgresql://user:pass@host/db" >&2
+  exit 1
+fi
+
+# Get the directory of this script
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PACKAGE_DIR="$(dirname "$SCRIPT_DIR")"
+
+# Run the postgres MCP server
+exec node -e "
+import { Server } from '@modelcontextprotocol/sdk/server/index.js';
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import pg from 'pg';
+
+const DATABASE_URL = process.env.DATABASE_URL;
+const pool = new pg.Pool({ connectionString: DATABASE_URL });
+
+const server = new Server(
+  { name: 'ovav-postgres', version: '1.0.0' },
+  { capabilities: { tools: {} } }
+);
+
+// List tools
+server.setRequestHandler('tools/list', async () => ({
+  tools: [
+    {
+      name: 'postgres_query',
+      description: 'Execute a read-only SQL query',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          sql: { type: 'string', description: 'SQL query to execute (SELECT only)' },
+          params: { type: 'array', items: { type: 'string' }, description: 'Query parameters' }
+        },
+        required: ['sql']
+      }
+    },
+    {
+      name: 'postgres_schema',
+      description: 'Get table schema information',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          table: { type: 'string', description: 'Table name to inspect' }
+        },
+        required: ['table']
+      }
+    },
+    {
+      name: 'postgres_tables',
+      description: 'List all tables in the database',
+      inputSchema: { type: 'object', properties: {} }
+    }
+  ]
+}));
+
+// Handle tool calls
+server.setRequestHandler('tools/call', async (request) => {
+  const { name, arguments: args } = request.params;
+  
+  try {
+    let result;
+    
+    switch (name) {
+      case 'postgres_query':
+        // Safety check: only allow SELECT queries
+        const sql = args.sql.trim().toUpperCase();
+        if (!sql.startsWith('SELECT')) {
+          throw new Error('Only SELECT queries are allowed for security');
+        }
+        
+        const queryResult = await pool.query(args.sql, args.params || []);
+        result = { rows: queryResult.rows, rowCount: queryResult.rowCount };
+        break;
+      
+      case 'postgres_schema':
+        const schemaQuery = \`
+          SELECT column_name, data_type, is_nullable, column_default
+          FROM information_schema.columns
+          WHERE table_name = $1
+          ORDER BY ordinal_position
+        \`;
+        const schemaResult = await pool.query(schemaQuery, [args.table]);
+        result = schemaResult.rows;
+        break;
+      
+      case 'postgres_tables':
+        const tablesQuery = \`
+          SELECT table_name, table_type
+          FROM information_schema.tables
+          WHERE table_schema = 'public'
+          ORDER BY table_name
+        \`;
+        const tablesResult = await pool.query(tablesQuery);
+        result = tablesResult.rows;
+        break;
+      
+      default:
+        throw new Error(\`Unknown tool: \${name}\`);
+    }
+    
+    return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+  } catch (error) {
+    return { content: [{ type: 'text', text: \`Error: \${error.message}\` }], isError: true };
+  }
+});
+
+const transport = new StdioServerTransport();
+await server.connect(transport);
+" 2>&1

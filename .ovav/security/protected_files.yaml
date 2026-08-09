@@ -1,0 +1,20 @@
+# OVAV Protected Files Policy
+# Files that require extra validation before commit
+# Format: <relative_path> | <reason>
+
+# Core OVAV entry points - corruption causes total failure
+go-runtime/cmd/ovav/main.go | Core entry point - corruption causes build failure
+go-runtime/cmd/ovav/dispatch.go | Command routing - missing symbols break all commands
+
+# Auth system - security critical
+go-runtime/cmd/ovav/login.go | Authentication system
+
+# Governance - must remain consistent
+go-runtime/cmd/ovav/governor_cli.go | Governor CLI
+go-runtime/cmd/ovav/defense_cli.go | Defense CLI
+
+# Session greeting - protected branch gate
+go-runtime/cmd/session_greeting/main.go | Session greeting gate
+
+# Validators - security enforcement
+go-runtime/internal/validators/git_push.go | Git push gate

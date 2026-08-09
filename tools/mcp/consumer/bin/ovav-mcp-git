@@ -1,0 +1,6 @@
+#!/bin/bash
+# OVAV Git MCP Server Wrapper
+# Uses official @modelcontextprotocol/server-git via npx
+
+REPO="${REPO_PATH:-.}"
+exec npx -y @modelcontextprotocol/server-git --repository "$REPO"

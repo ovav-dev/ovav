@@ -1,0 +1,245 @@
+# OVAV Landing Page Copy Brief — Canonical
+# =============================================================================
+# Generated: 2026-06-16 02:50 UTC-5
+# Author: Sofía (Commercial & Growth Strategy Lead)
+# For: Dante (Digital Product Engineering Lead)
+# Target: ovav.dev (Cloudflare Pages)
+# Authority: CEO Alexander Salvador — reframing approved 2026-06-16
+# =============================================================================
+# 
+# Contexto: Reframing estratégico. OVAV pasa de "AI workstation governor"
+# a "Professional Development Governance". Ya no competimos con herramientas
+# de AI — somos la capa profesional por encima de ellas.
+#
+# Este brief contiene el copy exacto para cada sección de la landing page.
+# Dante: implementar en ovav.dev. Cualquier duda de tono o posicionamiento,
+# consultar conmigo (Sofía) antes de modificar.
+# =============================================================================
+
+version: 1
+document_type: "landing_copy_brief"
+canonical_parent: ".ovav/plan/business_model.yaml"
+status: "ready_for_implementation"
+created_at: "2026-06-16 02:50 UTC-5"
+created_by: "sofia"
+for: "dante"
+target: "ovav.dev (Cloudflare Pages)"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 1. HERO SECTION
+# ═══════════════════════════════════════════════════════════════════════════
+
+hero:
+  headline: "Professional Development Governance"
+  
+  subheadline: >
+    Eight expert profiles orchestrate your entire development workflow.
+    Evidence-backed. Tool-agnostic. Local-first.
+  
+  cta_primary:
+    text: "Start governing"
+    href: "#pricing"
+  
+  cta_secondary:
+    text: "See how it works"
+    href: "#how-it-works"
+  
+  visual_note: >
+    Evitar screenshots saturados de terminales con código AI. Mostrar
+    el Cockpit TUI con los 8 perfiles visibles — la metáfora visual
+    debe ser "centro de control profesional", no "chat con AI".
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 2. MOAT SECTION — "Why OVAV"
+# ═══════════════════════════════════════════════════════════════════════════
+
+moat:
+  section_heading: "Why OVAV"
+  
+  section_subhead: >
+    OVAV is the governance layer your development workflow has been missing.
+    Not another AI tool — the professional standard that orchestrates
+    everything you already use.
+  
+  pillars:
+    p1:
+      icon_suggestion: "orchestration / layers"
+      heading: "Professional SDLC orchestration"
+      body: >
+        Plan → build → test → deploy. Governed end-to-end with professional
+        standards, not just code suggestions at one phase.
+    
+    p2:
+      icon_suggestion: "lock / shield"
+      heading: "Local-first professional workstation"
+      body: >
+        Your code stays on your machine. Your standards are yours.
+        Vault encryption, zero cloud dependency, complete control.
+    
+    p3:
+      icon_suggestion: "people / profiles"
+      heading: "Eight professional profiles"
+      body: >
+        Platform Engineering. Product Development. Evidence & Research.
+        Health Science. Commercial Strategy. Education. Career Development.
+        Deep expertise, not generic autocomplete.
+    
+    p4:
+      icon_suggestion: "puzzle / modular"
+      heading: "Tool-agnostic architecture"
+      body: >
+        Bring your own models, editors, and platforms. OpenAI today,
+        Claude tomorrow, Llama on Friday. OVAV governs them all.
+        Zero vendor lock-in.
+    
+    p5:
+      icon_suggestion: "chip / processor"
+      heading: "Pure Go native runtime"
+      body: >
+        15MB binary. Zero Electron overhead. Zero cloud dependency.
+        Runs on your machine, your CI, your servers. Built to last.
+    
+    p6:
+      icon_suggestion: "chart / evidence"
+      heading: "Evidence-backed professional standards"
+      body: >
+        Benchmarks, research briefs, auditable decision trails.
+        Every professional decision leaves a record. No black boxes.
+    
+    p7:
+      icon_suggestion: "code / open-source"
+      heading: "Open-core professional standard"
+      body: >
+        Auditable. Contributable. Vendor-independent.
+        Go + TypeScript. Built in the open, governed with integrity.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 3. COMPETITOR SECTION REFRAMING — "Layer Above"
+# ═══════════════════════════════════════════════════════════════════════════
+
+competitor_section:
+  section_heading: "The layer above your tools"
+  
+  section_subhead: >
+    OVAV doesn't compete with your editor, your AI assistant, or your
+    deployment platform. It governs all of them. Like a conductor
+    doesn't compete with the musicians — it makes them better together.
+  
+  layer_above_table:
+    columns: ["What you use", "What it does", "How OVAV governs it"]
+    rows:
+      - tool: "VS Code / Neovim / Terminal"
+        does: "Your editor"
+        how_ovav_governs: "OVAV orchestrates across all editors — 8 profiles, evidence trails, professional standards"
+      - tool: "Copilot / Cursor / Continue"
+        does: "AI code suggestions"
+        how_ovav_governs: "OVAV governs which model, when, with what context — auditable, switchable, controllable"
+      - tool: "Vercel / Fly.io / Railway"
+        does: "Deployment"
+        how_ovav_governs: "OVAV manages deploy targets, environment configs, and promotion pipelines with evidence"
+      - tool: "Linear / Jira / Notion"
+        does: "Project management"
+        how_ovav_governs: "OVAV links professional decisions to tasks — every commit has a governed context"
+      - tool: "Sentry / Datadog"
+        does: "Monitoring"
+        how_ovav_governs: "OVAV provides pre-deploy validation and post-deploy evidence — not just alerts, accountability"
+  
+  closing_statement: >
+    OVAV makes every tool you already pay for more valuable.
+    It's the professional standard that connects them.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 4. HOW IT WORKS — Brief
+# ═══════════════════════════════════════════════════════════════════════════
+
+how_it_works:
+  section_heading: "How OVAV governs your workflow"
+  
+  steps:
+    step_1:
+      title: "Install"
+      body: "One binary. 15MB. `curl -fsSL https://get.ovav.dev | bash`"
+    step_2:
+      title: "Configure"
+      body: "Choose your profiles. Connect your tools. Set your standards."
+    step_3:
+      title: "Govern"
+      body: "Eight profiles work in parallel. Every decision is recorded. Every output is auditable."
+    step_4:
+      title: "Deploy"
+      body: "Push to production with evidence. Know exactly what changed, why, and who governed it."
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 5. PRICING SECTION
+# ═══════════════════════════════════════════════════════════════════════════
+
+pricing:
+  section_heading: "Professional governance, professionally priced"
+  
+  section_subhead: >
+    OVAV sits in the same pricing corridor as the professional tools you
+    already trust. Not priced like an AI add-on — priced like the
+    governance layer your workflow deserves.
+  
+  free:
+    tagline: "For individual developers exploring professional governance"
+    highlight: "$0 — forever"
+  
+  pro:
+    tagline: "For professional developers who govern their entire workflow"
+    highlight: "$19/mo"
+    sub_highlight: "$190/year (2 months free)"
+  
+  enterprise:
+    tagline: "For teams that demand professional standards at scale"
+    highlight: "$49/user/mo"
+    sub_highlight: "SSO, audit logs, self-hosting, SLA"
+  
+  layer_above_comparison:
+    heading: "OVAV in context"
+    rows:
+      - { tool: "1Password", price: "$7.99/mo", category: "Credential security" }
+      - { tool: "Linear", price: "$10–16/mo", category: "Project management" }
+      - { tool: "OVAV Pro", price: "$19/mo", category: "Professional governance", highlight: true }
+      - { tool: "Vercel", price: "$20/mo", category: "Deployment platform" }
+      - { tool: "Sentry", price: "$26/mo", category: "Error monitoring" }
+      - { tool: "GitLab Premium", price: "$29/mo", category: "DevOps platform" }
+    note: >
+      OVAV is the governance layer that orchestrates all the tools
+      above and below it. It's not a replacement — it's the professional
+      standard that connects them.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 6. CTA SECTION — Bottom
+# ═══════════════════════════════════════════════════════════════════════════
+
+cta_section:
+  heading: "Your workflow already has the instruments."
+  subheading: "OVAV is the conductor."
+  cta_button: "Start governing — Free"
+  secondary: "See pricing plans"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 7. DANTE HANDOFF NOTES
+# ═══════════════════════════════════════════════════════════════════════════
+
+handoff_notes:
+  priority_order:
+    - "1. Hero section — change headline and subheadline (highest visibility)"
+    - "2. Moat section — replace all 7 pillar headings and body copy"
+    - "3. Competitor section — replace with 'Layer Above' table"
+    - "4. Pricing section — update taglines and add 'OVAV in context' comparison"
+    - "5. CTA section — update heading and subheading"
+  
+  design_guidance:
+    tone: "Elegante, profesional, distinguido. Nada agresivo. Nada de 'vs' o 'better than'."
+    visual_metaphor: "Director de orquesta / centro de control profesional. NO terminales con código AI generado."
+    color_palette: "Mantener actual. Profesional, sobrio, confiable."
+  
+  what_not_to_change:
+    - "Componentes React — solo copy text"
+    - "Estructura de secciones — solo contenido"
+    - "Estilos CSS — solo si el nuevo copy requiere ajustes menores"
+    - "DNS / deploy config (ya está en CF Pages)"
+  
+  questions_contact: "Sofía — Commercial & Growth Strategy Lead"

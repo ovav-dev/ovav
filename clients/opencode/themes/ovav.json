@@ -1,0 +1,8 @@
+// THEME DEPRECATED - Moved to separate dark/light themes
+// See: ovav-dark.json and ovav-light.json
+{
+  "$schema": "https://opencode.ai/theme.json",
+  "name": "OVAV",
+  "deprecated": true,
+  "message": "Use OVAV Dark or OVAV Light instead"
+}

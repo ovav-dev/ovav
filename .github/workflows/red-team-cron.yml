@@ -1,0 +1,206 @@
+name: Red Team R5 — Automated Boundary Audit
+
+on:
+  schedule:
+    # Weekly on Monday at 08:00 UTC-5 (Lima) / 13:00 UTC
+    - cron: "0 13 * * 1"
+  workflow_dispatch:  # Manual trigger for on-demand audits
+  push:
+    branches: [main, develop]
+    paths:
+      - "clients/opencode/agents/**"
+      - ".ovav/laws/area_boundary_enforcement.yaml"
+      - ".ovav/service_areas/shared/**"
+      - "go-runtime/internal/validators/red_team_audit.go"
+      - ".github/workflows/red-team-cron.yml"
+
+jobs:
+  boundary-audit:
+    name: R5 Boundary Audit — Cross-Area LAW-001 Compliance
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+
+      - name: Build validate CLI
+        working-directory: go-runtime
+        run: |
+          go build -o ../validate ./internal/validators/cmd/validate/
+          echo "✅ validate CLI built"
+
+      - name: Run Red Team R5 boundary audit
+        id: audit
+        run: |
+          echo "🔴 Running Red Team R5 Automated Boundary Audit..."
+          AUDIT_OUTPUT=$(./validate --id red_team_audit --root . 2>&1) || true
+          echo "$AUDIT_OUTPUT"
+          echo "audit_output<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$AUDIT_OUTPUT" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+          # Determine pass/fail
+          if echo "$AUDIT_OUTPUT" | grep -qE "\bFAIL\b"; then
+            echo "status=fail" >> "$GITHUB_OUTPUT"
+          elif echo "$AUDIT_OUTPUT" | grep -qE "(✅|pass)"; then
+            echo "status=pass" >> "$GITHUB_OUTPUT"
+          else
+            echo "status=unknown" >> "$GITHUB_OUTPUT"
+          fi
+
+          # Count issues
+          ISSUE_COUNT=$(echo "$AUDIT_OUTPUT" | grep -c "    - " || echo "0")
+          echo "issue_count=$ISSUE_COUNT" >> "$GITHUB_OUTPUT"
+
+          # Generate timestamp
+          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          echo "timestamp=$TIMESTAMP" >> "$GITHUB_OUTPUT"
+
+      - name: Save report to repository
+        if: always()
+        run: |
+          TIMESTAMP=$(date -u +"%Y-%m-%dT%H%M%SZ")
+          REPORT_FILE=".ovav/red_team/reports/audit-${TIMESTAMP}.json"
+          mkdir -p .ovav/red_team/reports/
+
+          cat > "$REPORT_FILE" << 'REPORTEOF'
+          {
+            "audit_type": "R5_boundary_audit",
+            "timestamp": "${{ steps.audit.outputs.timestamp }}",
+            "status": "${{ steps.audit.outputs.status }}",
+            "issue_count": ${{ steps.audit.outputs.issue_count }},
+            "trigger": "${{ github.event_name }}",
+            "commit": "${{ github.sha }}",
+            "branch": "${{ github.ref_name }}",
+            "audit_output": "$(echo '${{ steps.audit.outputs.audit_output }}' | sed 's/"/\\"/g' | tr '\n' ' ')",
+            "evaluator": "Kenji Tanaka (Adversarial Intelligence)",
+            "severity": "${{ steps.audit.outputs.status == 'fail' && 'CRITICAL' || 'OK' }}"
+          }
+          REPORTEOF
+
+          echo "📄 Report saved to $REPORT_FILE"
+          cat "$REPORT_FILE"
+
+      - name: Commit report to repo
+        if: always()
+        run: |
+          git config user.name "OVAV Red Team Bot"
+          git config user.email "red-team@ovav.dev"
+          git add .ovav/red_team/reports/
+          if git diff --staged --quiet; then
+            echo "No report changes to commit"
+          else
+            git commit -m "docs(red-team): automated R5 audit report — ${{ steps.audit.outputs.status }}"
+            git push origin HEAD:develop || echo "⚠️ Push to develop failed (expected on forks)"
+          fi
+
+      - name: Upload report as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: red-team-audit-${{ steps.audit.outputs.timestamp }}
+          path: .ovav/red_team/reports/audit-*.json
+          retention-days: 90
+
+      - name: Create GitHub Issue on failure
+        if: steps.audit.outputs.status == 'fail'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const auditOutput = `${{ steps.audit.outputs.audit_output }}`;
+            const issueCount = ${{ steps.audit.outputs.issue_count }};
+
+            const body = `## 🔴 Red Team R5 — Boundary Audit FAILED
+
+            **Trigger:** ${{ github.event_name }}
+            **Branch:** ${{ github.ref_name }}
+            **Commit:** ${{ github.sha }}
+            **Issues found:** ${issueCount}
+
+            ### Audit Output
+            \`\`\`
+            ${auditOutput}
+            \`\`\`
+
+            ### Required Actions
+            1. Review each issue and classify: CRITICAL / HIGH / MEDIUM
+            2. Assign to the responsible area lead(s)
+            3. Fix and verify via \`validate --id red_team_audit\`
+            4. Close this issue once all checks pass
+
+            ### Report Location
+            - **Repo:** \`.ovav/red_team/reports/\`
+            - **Artifact:** red-team-audit-${{ steps.audit.outputs.timestamp }}
+
+            ---
+            *Automated by OVAV Red Team R5 — Kenji Tanaka 🇯🇵*`;
+
+            const issue = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `🔴 Red Team R5 FAILED — ${issueCount} boundary issues detected`,
+              body: body,
+              labels: ['red-team', 'security', 'boundary-audit', 'automated'],
+              assignees: ['ovav-dev']
+            });
+
+            console.log(`Issue created: ${issue.data.html_url}`);
+
+      - name: Audit Summary
+        if: always()
+        run: |
+          STATUS="${{ steps.audit.outputs.status }}"
+          ISSUE_COUNT="${{ steps.audit.outputs.issue_count }}"
+          {
+            echo "## 🔴 Red Team R5 — Boundary Audit Report"
+            echo ""
+            echo "| Field | Value |"
+            echo "|-------|-------|"
+            echo "| **Status** | \`$STATUS\` |"
+            echo "| **Issues** | $ISSUE_COUNT |"
+            echo "| **Trigger** | ${{ github.event_name }} |"
+            echo "| **Branch** | ${{ github.ref_name }} |"
+            echo "| **Commit** | \`${{ github.sha }}\` |"
+            echo "| **Timestamp** | ${{ steps.audit.outputs.timestamp }} |"
+            echo ""
+            echo "### Audit Details"
+            echo '```'
+            echo "${{ steps.audit.outputs.audit_output }}"
+            echo '```'
+            echo ""
+            echo "### What This Audits"
+            echo "- LAW-001 \`area_boundary_enforcement.yaml\` existence and content"
+            echo "- 9 area agent profiles with hard stops and scope declarations"
+            echo "- 9 lead agent files with permission blocks and authorized functions"
+            echo "- Shared contracts referencing LAW-001 or boundary enforcement"
+            echo "- Agents with ambiguous or overly broad permissions"
+            echo ""
+            echo "### Report Persistence"
+            echo "- **JSON report:** \`.ovav/red_team/reports/audit-${{ steps.audit.outputs.timestamp }}.json\`"
+            echo "- **Artifact:** uploaded with 90-day retention"
+            echo "- **Issue:** auto-created on failure"
+            echo ""
+            echo "### Trigger"
+            echo "- Scheduled: Weekly (Monday 08:00 UTC-5)"
+            echo "- On-demand: workflow_dispatch"
+            echo "- Push to main/develop touching agent profiles, laws, or contracts"
+            echo ""
+            echo "---"
+            echo "*Adversarial Intelligence — Kenji Tanaka 🇯🇵*"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Alert on failure
+        if: steps.audit.outputs.status == 'fail'
+        run: |
+          echo "🚨 RED TEAM BOUNDARY AUDIT FAILED"
+          echo "Issues detected in cross-area boundary compliance."
+          echo "Report saved to .ovav/red_team/reports/"
+          echo "GitHub Issue auto-created with label 'red-team'"
+          echo "Kenji Tanaka (Adversarial Intelligence) must investigate."
+          exit 1

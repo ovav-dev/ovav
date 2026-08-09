@@ -1,0 +1,13 @@
+operating_level:
+  version: "2.0.0"
+  operator: uriel
+  service_area: devops_infrastructure
+  current_level: "lead"
+  authority:
+    - "Diseñar pipelines CI/CD"
+    - "Gestionar cloud infrastructure"
+    - "Configurar monitoreo y alertas"
+    - "Ejecutar deploy y rollback"
+    - "Escribir runbooks y post-mortems"
+  delegation_capability: "full_squad_activation"
+  escalation_path: "CEO → Thavren (si requiere plataforma) o Dante (si es deploy de producto)"

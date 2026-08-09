@@ -1,0 +1,82 @@
+# OVAV Governance Rules — Cross-Area Topology
+# Reglas que gobiernan la interacción entre áreas, herencia y delegación.
+# Leído por el governor runtime en cada handoff cross-area.
+
+version: "1.0.0"
+last_updated: "2026-06-03"
+
+# ── Area boundaries ──────────────────────────────────────────────
+areas:
+  platform_engineering:
+    id: area_platform
+    lead: Thavren
+    can_handoff_to: [research_intelligence]
+    handoff_protocol: sanitized_handoff
+    
+  research_intelligence:
+    id: area_research
+    lead: Eidren
+    can_handoff_to: [platform_engineering]
+    handoff_protocol: sanitized_handoff
+
+# ── Permission inheritance ───────────────────────────────────────
+inheritance:
+  squads_inherit_from: area
+  leads_override: area_permissions
+  principle: "Squads heredan permisos del área. Leads pueden ampliar o restringir."
+
+# ── Cross-area handoff rules ────────────────────────────────────
+cross_area_rules:
+  - rule: mixed_requests
+    description: "Si una solicitud mezcla investigación con repo/runtime, es Platform Engineering"
+    action: route_to_platform_engineering
+    
+  - rule: research_only
+    description: "Si el intent explícito es comparar, verificar fuentes, benchmark → Research Intelligence"
+    action: route_to_research_intelligence
+    
+  - rule: implementation
+    description: "Corregir, implementar, configurar, validar runtime, git, permisos → Platform Engineering"
+    action: route_to_platform_engineering
+
+# ── Surface visibility ───────────────────────────────────────────
+surface_rules:
+  at_mentions:
+    visible: [Thavren, Eidren]
+    hidden: [Platform Engineering, Research Intelligence, Aric, Soren, Kael, Vella, Virek, Zara, Doran, Ryn, Orin, Nara, Lyra]
+    
+  tab_selector:
+    visible: []
+    hidden: [Platform Engineering, Research Intelligence]
+    
+  default_agent: Platform Engineering
+
+# ── Security gates for external calls ────────────────────────────
+external_call_rules:
+  search_apis:
+    pre_call_validators:
+      - query_sanitizer       # strips internal identifiers
+      - rate_limiter          # respects free tier limits
+      - exfil_detector        # F0.6 monitors outbound
+    post_call_validators:
+      - source_verifier       # classifies source quality
+      - evidence_scorer       # scores result credibility
+      
+  web_fetch:
+    pre_call_validators:
+      - url_whitelist_check
+      - timeout_enforcement (8s max)
+    post_call_validators:
+      - content_extractor
+      - cache_dedup
+
+# ── Secrets management ───────────────────────────────────────────
+secrets_policy:
+  storage: ".ovav/config/api_keys.env (gitignored)"
+  never_in:
+    - chat_messages
+    - agent_files
+    - repo_commits
+    - model_context
+  vault: "go-runtime/internal/vault/ (AES-256-GCM, CLI: ovav vault)"
+  principle: "Keys live in shell env + local gitignored file. Model never sees plaintext."

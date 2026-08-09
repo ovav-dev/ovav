@@ -1,0 +1,7 @@
+# pnpm workspace overrides — solo para desarrollo local
+# No incluir en publicación npm
+# overrides:
+#   '@ovav/opencode-tui': 'link:'
+
+minimumReleaseAgeExclude:
+  - '@ovav/opencode-tui@1.0.1'

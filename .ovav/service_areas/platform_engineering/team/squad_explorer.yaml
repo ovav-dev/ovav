@@ -1,0 +1,22 @@
+# Squad: Explorer
+# Lead contract internal team member — invisible to user
+
+squad:
+  id: squad_explorer
+  display_name: Irene
+  area: platform_engineering
+  lead: thavren
+  role: "Fast codebase exploration and pattern search"
+  role_id: fast_codebase_explorer
+
+activation:
+  modes: [focused_squad, full_squad]
+  never_default: true
+  router: Delegation Router
+
+model_body:
+  primary: "opencode/deepseek-v4-flash-free"
+  secondary: "openai/gpt-4o"
+
+lanes:
+  - focused_exploration

@@ -1,0 +1,16 @@
+{
+  "name": "@ovav/api",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "uvicorn app.main:app --reload --port 8080",
+    "start": "uvicorn app.main:app --port 8080",
+    "lint": "ruff check .",
+    
+    "svc:start": "systemctl --user start ovav-backend",
+    "svc:stop": "systemctl --user stop ovav-backend",
+    "svc:restart": "systemctl --user restart ovav-backend",
+    "svc:status": "systemctl --user status ovav-backend",
+    "svc:logs": "journalctl --user -u ovav-backend -n 30"
+  }
+}

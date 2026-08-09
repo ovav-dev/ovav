@@ -1,0 +1,1269 @@
+catalog_version: '1.0'
+generated_by: tools/generators/build_subagent_catalog.py
+generated_at: '2026-07-03T17:24:25.469280+00:00'
+source: ovav/agents/{leads,teams}/
+agents:
+- id: lead-camila
+  kind: lead
+  name: Camila
+  area: legal_compliance
+  lead: null
+  function: 'Revisión de contratos: Contratos de servicio, licencias, acuerdos entre
+    áreas y con terceros.'
+  aliases:
+  - lead-camila
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/leads/lead-camila.yaml
+  file_generated:
+  - runtimes/opencode/agents/lead-camila.md
+  - runtimes/claude-code/agents/lead-camila.md
+  - runtimes/mimocode/agents/lead-camila.md
+  - runtimes/cursor/agents/lead-camila.md
+- id: lead-dante
+  kind: lead
+  name: Dante
+  area: digital_product
+  lead: null
+  function: 'Arquitectura full-stack: Diseñar y mantener la arquitectura de productos
+    digitales — frontend React, backend APIs, bases de datos y caching layers.'
+  aliases:
+  - lead-dante
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/leads/lead-dante.yaml
+  file_generated:
+  - runtimes/opencode/agents/lead-dante.md
+  - runtimes/claude-code/agents/lead-dante.md
+  - runtimes/mimocode/agents/lead-dante.md
+  - runtimes/cursor/agents/lead-dante.md
+- id: lead-eidren
+  kind: lead
+  name: Eidren
+  area: research_intelligence
+  lead: null
+  function: 'Verificación de fuentes: Validar credibilidad, autoridad, actualidad
+    y sesgo de fuentes externas con el Evidence Scoring Framework (35 reglas).'
+  aliases:
+  - lead-eidren
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/leads/lead-eidren.yaml
+  file_generated:
+  - runtimes/opencode/agents/lead-eidren.md
+  - runtimes/claude-code/agents/lead-eidren.md
+  - runtimes/mimocode/agents/lead-eidren.md
+  - runtimes/cursor/agents/lead-eidren.md
+- id: lead-elena
+  kind: lead
+  name: Elena
+  area: ux_design
+  lead: null
+  function: 'Design system: Crear y mantener el sistema de diseño OVAV — componentes,
+    tokens de diseño, guías de estilo y consistencia visual cross-producto.'
+  aliases:
+  - lead-elena
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/leads/lead-elena.yaml
+  file_generated:
+  - runtimes/opencode/agents/lead-elena.md
+  - runtimes/claude-code/agents/lead-elena.md
+  - runtimes/mimocode/agents/lead-elena.md
+  - runtimes/cursor/agents/lead-elena.md
+- id: lead-kenji
+  kind: lead
+  name: Kenji
+  area: adversarial_intelligence
+  lead: null
+  function: 'Adversarial testing: Ejecutar ataques simulados controlados contra todos
+    los componentes de OVAV — mi trabajo es romper lo que otros construyeron.'
+  aliases:
+  - lead-kenji
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/leads/lead-kenji.yaml
+  file_generated:
+  - runtimes/opencode/agents/lead-kenji.md
+  - runtimes/claude-code/agents/lead-kenji.md
+  - runtimes/mimocode/agents/lead-kenji.md
+  - runtimes/cursor/agents/lead-kenji.md
+- id: lead-renata
+  kind: lead
+  name: Renata
+  area: health_performance
+  lead: null
+  function: 'Ciencia de la nutrición: Analizar y recomendar protocolos nutricionales
+    — macronutrientes, micronutrientes, timing, periodización — basados en evidencia.'
+  aliases:
+  - lead-renata
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/leads/lead-renata.yaml
+  file_generated:
+  - runtimes/opencode/agents/lead-renata.md
+  - runtimes/claude-code/agents/lead-renata.md
+  - runtimes/mimocode/agents/lead-renata.md
+  - runtimes/cursor/agents/lead-renata.md
+- id: lead-sofia
+  kind: lead
+  name: Sofía
+  area: commercial_growth
+  lead: null
+  function: 'Análisis de mercado: Investigar TAM/SAM/SOM, segmentación de audiencias,
+    tendencias de adopción, barreras de entrada y oportunidades de diferenciación.'
+  aliases:
+  - lead-sofía
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/leads/lead-sofia.yaml
+  file_generated:
+  - runtimes/opencode/agents/lead-sofia.md
+  - runtimes/claude-code/agents/lead-sofia.md
+  - runtimes/mimocode/agents/lead-sofia.md
+  - runtimes/cursor/agents/lead-sofia.md
+- id: lead-thavren
+  kind: lead
+  name: Thavren
+  area: platform_engineering
+  lead: null
+  function: 'Gobernanza del runtime Go: Mantener y evolucionar el runtime Go — `cmd/ovav/`,
+    `cmd/cpanel/`, `cmd/cockpit/`, `cmd/tailor/`, `internal/` — 17,300+ LOC.'
+  aliases:
+  - lead-thavren
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/leads/lead-thavren.yaml
+  file_generated:
+  - runtimes/opencode/agents/lead-thavren.md
+  - runtimes/claude-code/agents/lead-thavren.md
+  - runtimes/mimocode/agents/lead-thavren.md
+  - runtimes/cursor/agents/lead-thavren.md
+- id: lead-uriel
+  kind: lead
+  name: Uriel
+  area: devops_infrastructure
+  lead: null
+  function: 'CI/CD pipeline: Diseñar, mantener y optimizar pipelines de integración
+    y despliegue continuo — GitHub Actions (6 jobs Go), Fly.io, Cloudflare Pages.'
+  aliases:
+  - lead-uriel
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/leads/lead-uriel.yaml
+  file_generated:
+  - runtimes/opencode/agents/lead-uriel.md
+  - runtimes/claude-code/agents/lead-uriel.md
+  - runtimes/mimocode/agents/lead-uriel.md
+  - runtimes/cursor/agents/lead-uriel.md
+- id: lead-valeria
+  kind: lead
+  name: Valeria
+  area: education_career
+  lead: null
+  function: 'Diseño curricular: Crear currículos estructurados por competencias con
+    rutas de aprendizaje, prerequisitos encadenados y objetivos de aprendizaje medibles.'
+  aliases:
+  - lead-valeria
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/leads/lead-valeria.yaml
+  file_generated:
+  - runtimes/opencode/agents/lead-valeria.md
+  - runtimes/claude-code/agents/lead-valeria.md
+  - runtimes/mimocode/agents/lead-valeria.md
+  - runtimes/cursor/agents/lead-valeria.md
+- id: team-akiko
+  kind: team
+  name: Akiko
+  area: adversarial_intelligence
+  lead: kenji
+  function: Razono sobre el código como un atacante — predigo edge cases, implicaciones
+    no obvias, y consecuencias semánticas que el diseño original no contempló.
+  aliases:
+  - akiko
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-akiko.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-akiko.md
+  - runtimes/claude-code/agents/team-akiko.md
+  - runtimes/mimocode/agents/team-akiko.md
+  - runtimes/cursor/agents/team-akiko.md
+- id: team-andres
+  kind: team
+  name: Andres
+  area: platform_engineering
+  lead: thavren
+  function: Ejecuto refactors de alto impacto y escribo código de producción duradero
+    — Go runtime, validadores, y herramientas core que forman la columna vertebral
+    de OVAV.
+  aliases:
+  - andres
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-andres.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-andres.md
+  - runtimes/claude-code/agents/team-andres.md
+  - runtimes/mimocode/agents/team-andres.md
+  - runtimes/cursor/agents/team-andres.md
+- id: team-antonio
+  kind: team
+  name: Antonio
+  area: health_performance
+  lead: renata
+  function: Diseño planes de alimentación personalizados basados en objetivos, restricciones,
+    y preferencias — cada plan está calibrado para el perfil metabólico y estilo de
+    vida del individuo.
+  aliases:
+  - antonio
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-antonio.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-antonio.md
+  - runtimes/claude-code/agents/team-antonio.md
+  - runtimes/mimocode/agents/team-antonio.md
+  - runtimes/cursor/agents/team-antonio.md
+- id: team-beatriz
+  kind: team
+  name: Beatriz
+  area: ui/ux_design
+  lead: elena_(ui/ux_design_lead)
+  function: Defino la estrategia pedagógica de OVAV — cómo aprenden los humanos, qué
+    técnicas funcionan, y cómo diseñamos experiencias que maximizan retención y transferencia.
+  aliases:
+  - beatriz
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-beatriz.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-beatriz.md
+  - runtimes/claude-code/agents/team-beatriz.md
+  - runtimes/mimocode/agents/team-beatriz.md
+  - runtimes/cursor/agents/team-beatriz.md
+- id: team-bruno
+  kind: team
+  name: Bruno
+  area: health_performance
+  lead: renata
+  function: Optimizo el rendimiento mental — foco, disciplina, gestión de estrés,
+    y hábitos cognitivos que maximizan la productividad sostenible sin burnout.
+  aliases:
+  - bruno
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-bruno.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-bruno.md
+  - runtimes/claude-code/agents/team-bruno.md
+  - runtimes/mimocode/agents/team-bruno.md
+  - runtimes/cursor/agents/team-bruno.md
+- id: team-camila
+  kind: team
+  name: Camila
+  area: devops_infrastructure
+  lead: uriel
+  function: Aseguro que cada despliegue, contrato, y práctica de infraestructura cumpla
+    con regulaciones — GDPR, términos de servicio, privacy policies, y compliance
+    de datos.
+  aliases:
+  - camila
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-camila.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-camila.md
+  - runtimes/claude-code/agents/team-camila.md
+  - runtimes/mimocode/agents/team-camila.md
+  - runtimes/cursor/agents/team-camila.md
+- id: team-carmen
+  kind: team
+  name: Carmen
+  area: research_intelligence
+  lead: eidren
+  function: Construyo mapas de conocimiento que conectan conceptos, evidencia, y decisiones
+    — transformo datos crudos de investigación en grafos navegables de entendimiento.
+  aliases:
+  - carmen
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-carmen.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-carmen.md
+  - runtimes/claude-code/agents/team-carmen.md
+  - runtimes/mimocode/agents/team-carmen.md
+  - runtimes/cursor/agents/team-carmen.md
+- id: team-celia
+  kind: team
+  name: Celia
+  area: research_intelligence
+  lead: eidren
+  function: Mantengo el caché de investigación y la taxonomía de conocimiento de OVAV
+    — cada pieza de evidencia está clasificada, indexada, y recuperable en segundos.
+  aliases:
+  - celia
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-celia.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-celia.md
+  - runtimes/claude-code/agents/team-celia.md
+  - runtimes/mimocode/agents/team-celia.md
+  - runtimes/cursor/agents/team-celia.md
+- id: team-clara
+  kind: team
+  name: Clara
+  area: platform_engineering
+  lead: thavren
+  function: Diseño y ejecuto tests que rompen cosas antes que los usuarios — mi trabajo
+    es encontrar regresiones, edge cases, y comportamientos inesperados que nadie
+    más vio.
+  aliases:
+  - clara
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-clara.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-clara.md
+  - runtimes/claude-code/agents/team-clara.md
+  - runtimes/mimocode/agents/team-clara.md
+  - runtimes/cursor/agents/team-clara.md
+- id: team-diana
+  kind: team
+  name: Diana
+  area: platform_engineering
+  lead: thavren
+  function: Audito permisos, secretos, y git safety en cada cambio — soy el último
+    gate antes de que código potencialmente inseguro llegue a producción.
+  aliases:
+  - diana
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-diana.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-diana.md
+  - runtimes/claude-code/agents/team-diana.md
+  - runtimes/mimocode/agents/team-diana.md
+  - runtimes/cursor/agents/team-diana.md
+- id: team-diego
+  kind: team
+  name: Diego
+  area: devops_infrastructure
+  lead: uriel
+  function: Automatizo testing end-to-end para infraestructura — pipelines, deploys,
+    y configuraciones no llegan a producción sin pasar por mis suites de validación.
+  aliases:
+  - diego
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-diego.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-diego.md
+  - runtimes/claude-code/agents/team-diego.md
+  - runtimes/mimocode/agents/team-diego.md
+  - runtimes/cursor/agents/team-diego.md
+- id: team-doran
+  kind: team
+  name: Doran
+  area: platform_engineering
+  lead: thavren
+  function: Install Engineer — planificación de instalación, backup/rollback, transición
+    source-to-global.
+  aliases:
+  - doran
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-doran.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-doran.md
+  - runtimes/claude-code/agents/team-doran.md
+  - runtimes/mimocode/agents/team-doran.md
+  - runtimes/cursor/agents/team-doran.md
+- id: team-elena-frontend
+  kind: team
+  name: Elena Frontend
+  area: digital_product_engineering
+  lead: dante
+  function: Construyo interfaces de usuario con React, Vue, o Svelte — mi enfoque
+    es performance, accesibilidad, y experiencia de usuario medida en milisegundos.
+  aliases:
+  - elena-frontend
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-elena-frontend.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-elena-frontend.md
+  - runtimes/claude-code/agents/team-elena-frontend.md
+  - runtimes/mimocode/agents/team-elena-frontend.md
+  - runtimes/cursor/agents/team-elena-frontend.md
+- id: team-fatima
+  kind: team
+  name: Fatima
+  area: research_intelligence
+  lead: eidren
+  function: Monitoreo el avance de cada iniciativa de investigación contra sus milestones
+    — sé exactamente qué está on track, qué está en riesgo, y qué necesita atención.
+  aliases:
+  - fatima
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-fatima.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-fatima.md
+  - runtimes/claude-code/agents/team-fatima.md
+  - runtimes/mimocode/agents/team-fatima.md
+  - runtimes/cursor/agents/team-fatima.md
+- id: team-felipe
+  kind: team
+  name: Felipe
+  area: ui/ux_design
+  lead: elena_(ui/ux_design_lead)
+  function: Diseño flujos de conversación y scaffolding que guían al usuario paso
+    a paso — cada interacción está pensada para minimizar fricción y maximizar comprensión.
+  aliases:
+  - felipe
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-felipe.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-felipe.md
+  - runtimes/claude-code/agents/team-felipe.md
+  - runtimes/mimocode/agents/team-felipe.md
+  - runtimes/cursor/agents/team-felipe.md
+- id: team-gabriela
+  kind: team
+  name: Gabriela
+  area: commercial_growth
+  lead: sofia
+  function: Analizo el mercado para identificar oportunidades, amenazas, y movimientos
+    competitivos — cada decisión comercial de OVAV se apoya en mi inteligencia de
+    mercado.
+  aliases:
+  - gabriela
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-gabriela.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-gabriela.md
+  - runtimes/claude-code/agents/team-gabriela.md
+  - runtimes/mimocode/agents/team-gabriela.md
+  - runtimes/cursor/agents/team-gabriela.md
+- id: team-gael
+  kind: team
+  name: Gael
+  area: ui/ux_design
+  lead: elena_(ui/ux_design_lead)
+  function: Creo materiales de aprendizaje y ejercicios que transforman conceptos
+    de diseño en práctica accionable — cada recurso está diseñado para ser entendido
+    y aplicado.
+  aliases:
+  - gael
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-gael.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-gael.md
+  - runtimes/claude-code/agents/team-gael.md
+  - runtimes/mimocode/agents/team-gael.md
+  - runtimes/cursor/agents/team-gael.md
+- id: team-helena
+  kind: team
+  name: Helena
+  area: platform_engineering
+  lead: thavren
+  function: Mapeo dependencias profundas en el codebase y genero context packs precisos
+    para que el equipo entienda el impacto de cualquier cambio antes de tocar una
+    sola línea.
+  aliases:
+  - helena
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-helena.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-helena.md
+  - runtimes/claude-code/agents/team-helena.md
+  - runtimes/mimocode/agents/team-helena.md
+  - runtimes/cursor/agents/team-helena.md
+- id: team-hiroshi
+  kind: team
+  name: Hiroshi
+  area: adversarial_intelligence
+  lead: kenji
+  function: Detecto pérdida de personalidad y fuga de contexto en agentes OVAV — si
+    un agente empieza a actuar fuera de su identidad definida, yo lo detecto antes
+    que nadie.
+  aliases:
+  - hiroshi
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-hiroshi.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-hiroshi.md
+  - runtimes/claude-code/agents/team-hiroshi.md
+  - runtimes/mimocode/agents/team-hiroshi.md
+  - runtimes/cursor/agents/team-hiroshi.md
+- id: team-hugo
+  kind: team
+  name: Hugo
+  area: commercial_growth
+  lead: sofia
+  function: Diseño la arquitectura financiera de OVAV — pricing, revenue models, proyecciones,
+    y estructura de costos que hacen el negocio sostenible.
+  aliases:
+  - hugo
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-hugo.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-hugo.md
+  - runtimes/claude-code/agents/team-hugo.md
+  - runtimes/mimocode/agents/team-hugo.md
+  - runtimes/cursor/agents/team-hugo.md
+- id: team-ines
+  kind: team
+  name: Ines
+  area: commercial_growth
+  lead: sofia
+  function: Defino cómo OVAV se presenta al mundo — narrativa de marca, posicionamiento
+    competitivo, y la voz que resuena con nuestro mercado objetivo.
+  aliases:
+  - ines
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-ines.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-ines.md
+  - runtimes/claude-code/agents/team-ines.md
+  - runtimes/mimocode/agents/team-ines.md
+  - runtimes/cursor/agents/team-ines.md
+- id: team-irene
+  kind: team
+  name: Irene
+  area: platform_engineering
+  lead: thavren
+  function: Busco archivos por patrón en el codebase con velocidad quirúrgica — encuentro
+    exactamente lo que necesitás en segundos, sin cargar contexto innecesario.
+  aliases:
+  - irene
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-irene.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-irene.md
+  - runtimes/claude-code/agents/team-irene.md
+  - runtimes/mimocode/agents/team-irene.md
+  - runtimes/cursor/agents/team-irene.md
+- id: team-julian
+  kind: team
+  name: Julian
+  area: commercial_growth
+  lead: sofia
+  function: Convierto interés en ingreso — diseño el proceso de ventas, califico leads,
+    y cierro deals que hacen crecer el revenue de OVAV.
+  aliases:
+  - julian
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-julian.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-julian.md
+  - runtimes/claude-code/agents/team-julian.md
+  - runtimes/mimocode/agents/team-julian.md
+  - runtimes/cursor/agents/team-julian.md
+- id: team-kael
+  kind: team
+  name: Kael
+  area: platform_engineering
+  lead: thavren
+  function: Implementador Junior — parches pequeños, fixtures y ediciones determinísticas.
+  aliases:
+  - kael
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-kael.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-kael.md
+  - runtimes/claude-code/agents/team-kael.md
+  - runtimes/mimocode/agents/team-kael.md
+  - runtimes/cursor/agents/team-kael.md
+- id: team-kaori
+  kind: team
+  name: Kaori
+  area: adversarial_intelligence
+  lead: kenji
+  function: Busco contradicciones en el diseño arquitectónico de OVAV — donde el sistema
+    dice una cosa pero hace otra, donde los contratos mienten, donde la estructura
+    se contradice.
+  aliases:
+  - kaori
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-kaori.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-kaori.md
+  - runtimes/claude-code/agents/team-kaori.md
+  - runtimes/mimocode/agents/team-kaori.md
+  - runtimes/cursor/agents/team-kaori.md
+- id: team-karina
+  kind: team
+  name: Karina
+  area: commercial_growth
+  lead: sofia
+  function: Mantengo las operaciones comerciales funcionando sin fricción — procesos,
+    herramientas, y flujos que permiten al equipo de crecimiento ejecutar sin trabas.
+  aliases:
+  - karina
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-karina.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-karina.md
+  - runtimes/claude-code/agents/team-karina.md
+  - runtimes/mimocode/agents/team-karina.md
+  - runtimes/cursor/agents/team-karina.md
+- id: team-leon
+  kind: team
+  name: Leon
+  area: health_performance
+  lead: renata
+  function: Evalúo y recomiendo suplementación basada en evidencia científica — cada
+    recomendación está respaldada por estudios, dosificación segura, y sinergias comprobadas.
+  aliases:
+  - leon
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-leon.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-leon.md
+  - runtimes/claude-code/agents/team-leon.md
+  - runtimes/mimocode/agents/team-leon.md
+  - runtimes/cursor/agents/team-leon.md
+- id: team-lucas
+  kind: team
+  name: Lucas
+  area: platform_engineering
+  lead: thavren
+  function: Aplico parches pequeños, genero fixtures de test, y realizo ediciones
+    acotadas bajo supervisión de Andrés — nunca toco arquitectura ni refactors estructurales.
+  aliases:
+  - lucas
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-lucas.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-lucas.md
+  - runtimes/claude-code/agents/team-lucas.md
+  - runtimes/mimocode/agents/team-lucas.md
+  - runtimes/cursor/agents/team-lucas.md
+- id: team-luna
+  kind: team
+  name: Luna
+  area: health_performance
+  lead: renata
+  function: Optimizo el sueño y la recuperación como pilares del rendimiento — cronobiología,
+    higiene del sueño, y protocolos de recuperación que la ciencia respalda.
+  aliases:
+  - luna
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-luna.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-luna.md
+  - runtimes/claude-code/agents/team-luna.md
+  - runtimes/mimocode/agents/team-luna.md
+  - runtimes/cursor/agents/team-luna.md
+- id: team-lyra
+  kind: team
+  name: Lyra
+  area: platform_engineering
+  lead: thavren
+  function: Summarizer — condensación de handoffs, reportes y evidencia.
+  aliases:
+  - lyra
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-lyra.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-lyra.md
+  - runtimes/claude-code/agents/team-lyra.md
+  - runtimes/mimocode/agents/team-lyra.md
+  - runtimes/cursor/agents/team-lyra.md
+- id: team-marco
+  kind: team
+  name: Marco
+  area: platform_engineering
+  lead: thavren
+  function: Diseño y valido la arquitectura del sistema OVAV, garantizando que el
+    DAG de dependencias, contratos entre componentes y estructura de fases sean correctos
+    antes de cualquier implementación.
+  aliases:
+  - marco
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-marco.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-marco.md
+  - runtimes/claude-code/agents/team-marco.md
+  - runtimes/mimocode/agents/team-marco.md
+  - runtimes/cursor/agents/team-marco.md
+- id: team-marina
+  kind: team
+  name: Marina
+  area: health_performance
+  lead: renata
+  function: Investigo la literatura médica para respaldar cada recomendación de salud
+    con evidencia peer-reviewed — nada sale del área de Renata sin pasar por mi filtro
+    científico.
+  aliases:
+  - marina
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-marina.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-marina.md
+  - runtimes/claude-code/agents/team-marina.md
+  - runtimes/mimocode/agents/team-marina.md
+  - runtimes/cursor/agents/team-marina.md
+- id: team-mateo
+  kind: team
+  name: Mateo
+  area: commercial_growth
+  lead: sofia
+  function: Aplico ingeniería al crecimiento — experimentos, automatización de embudos,
+    y optimización de conversión con datos, no con intuición.
+  aliases:
+  - mateo
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-mateo.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-mateo.md
+  - runtimes/claude-code/agents/team-mateo.md
+  - runtimes/mimocode/agents/team-mateo.md
+  - runtimes/cursor/agents/team-mateo.md
+- id: team-mei
+  kind: team
+  name: Mei
+  area: adversarial_intelligence
+  lead: kenji
+  function: Cazo condiciones de carrera y data races en el runtime de OVAV — si dos
+    operaciones pueden ejecutarse en el orden incorrecto, yo lo demuestro.
+  aliases:
+  - mei
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-mei.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-mei.md
+  - runtimes/claude-code/agents/team-mei.md
+  - runtimes/mimocode/agents/team-mei.md
+  - runtimes/cursor/agents/team-mei.md
+- id: team-mia
+  kind: team
+  name: Mia
+  area: platform_engineering
+  lead: thavren
+  function: Condenso handoffs, reportes, y evidencia técnica en resúmenes compactos
+    que preservan toda la información crítica sin una palabra de más.
+  aliases:
+  - mia
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-mia.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-mia.md
+  - runtimes/claude-code/agents/team-mia.md
+  - runtimes/mimocode/agents/team-mia.md
+  - runtimes/cursor/agents/team-mia.md
+- id: team-nadia
+  kind: team
+  name: Nadia
+  area: platform_engineering
+  lead: thavren
+  function: Mantengo la documentación técnica viva y precisa — changelogs, API references,
+    y guías de arquitectura que reflejan el estado real del código, no lo que deseamos
+    que sea.
+  aliases:
+  - nadia
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-nadia.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-nadia.md
+  - runtimes/claude-code/agents/team-nadia.md
+  - runtimes/mimocode/agents/team-nadia.md
+  - runtimes/cursor/agents/team-nadia.md
+- id: team-nara
+  kind: team
+  name: Nara
+  area: platform_engineering
+  lead: thavren
+  function: Benchmark Analyst — análisis competitivo, comparativas técnicas y briefs
+    de decisión.
+  aliases:
+  - nara
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-nara.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-nara.md
+  - runtimes/claude-code/agents/team-nara.md
+  - runtimes/mimocode/agents/team-nara.md
+  - runtimes/cursor/agents/team-nara.md
+- id: team-nora
+  kind: team
+  name: Nora
+  area: platform_engineering
+  lead: thavren
+  function: Diseño APIs seguras y audito cumplimiento OWASP — cada endpoint, cada
+    contrato, cada superficie de ataque pasa por mi lente antes de producción.
+  aliases:
+  - nora
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-nora.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-nora.md
+  - runtimes/claude-code/agents/team-nora.md
+  - runtimes/mimocode/agents/team-nora.md
+  - runtimes/cursor/agents/team-nora.md
+- id: team-oliver
+  kind: team
+  name: Oliver
+  area: commercial_growth
+  lead: sofia
+  function: Construyo alianzas estratégicas que multiplican el alcance de OVAV — partnerships
+    con plataformas, comunidades, y empresas que aceleran nuestro crecimiento.
+  aliases:
+  - oliver
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-oliver.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-oliver.md
+  - runtimes/claude-code/agents/team-oliver.md
+  - runtimes/mimocode/agents/team-oliver.md
+  - runtimes/cursor/agents/team-oliver.md
+- id: team-orin
+  kind: team
+  name: Orin
+  area: platform_engineering
+  lead: thavren
+  function: Deep Explorer — exploración profunda de repositorio, mapeo de dependencias,
+    context packs.
+  aliases:
+  - orin
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-orin.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-orin.md
+  - runtimes/claude-code/agents/team-orin.md
+  - runtimes/mimocode/agents/team-orin.md
+  - runtimes/cursor/agents/team-orin.md
+- id: team-oscar
+  kind: team
+  name: Oscar
+  area: platform_engineering
+  lead: thavren
+  function: Perfilo y optimizo el runtime de OVAV — identifico cuellos de botella,
+    mido latencia, y propongo optimizaciones con datos, no con opiniones.
+  aliases:
+  - oscar
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-oscar.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-oscar.md
+  - runtimes/claude-code/agents/team-oscar.md
+  - runtimes/mimocode/agents/team-oscar.md
+  - runtimes/cursor/agents/team-oscar.md
+- id: team-pablo
+  kind: team
+  name: Pablo
+  area: platform_engineering
+  lead: thavren
+  function: Valido cada commit antes de que llegue a la rama principal — reviso patrones,
+    consistencia, y adherence a los estándares de código de OVAV.
+  aliases:
+  - pablo
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-pablo.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-pablo.md
+  - runtimes/claude-code/agents/team-pablo.md
+  - runtimes/mimocode/agents/team-pablo.md
+  - runtimes/cursor/agents/team-pablo.md
+- id: team-paula
+  kind: team
+  name: Paula
+  area: research_intelligence
+  lead: eidren
+  function: Verifico la credibilidad y autenticidad de cada fuente que entra al sistema
+    de evidencia de OVAV — si una fuente es dudosa, no pasa.
+  aliases:
+  - paula
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-paula.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-paula.md
+  - runtimes/claude-code/agents/team-paula.md
+  - runtimes/mimocode/agents/team-paula.md
+  - runtimes/cursor/agents/team-paula.md
+- id: team-ramiro
+  kind: team
+  name: Ramiro
+  area: research_intelligence
+  lead: eidren
+  function: Diseño estudios de investigación con metodología rigurosa — defino hipótesis,
+    selecciono métodos, y establezco criterios de validez antes de recolectar un solo
+    dato.
+  aliases:
+  - ramiro
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-ramiro.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-ramiro.md
+  - runtimes/claude-code/agents/team-ramiro.md
+  - runtimes/mimocode/agents/team-ramiro.md
+  - runtimes/cursor/agents/team-ramiro.md
+- id: team-rosa
+  kind: team
+  name: Rosa
+  area: education_career
+  lead: valeria
+  function: Planifico proyectos educativos con milestones claros, dependencias visibles,
+    y deadlines realistas — cada iniciativa de Valeria tiene un plan que se puede
+    ejecutar.
+  aliases:
+  - rosa
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-rosa.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-rosa.md
+  - runtimes/claude-code/agents/team-rosa.md
+  - runtimes/mimocode/agents/team-rosa.md
+  - runtimes/cursor/agents/team-rosa.md
+- id: team-ruben
+  kind: team
+  name: Ruben
+  area: health_performance
+  lead: renata
+  function: Optimizo la nutrición para rendimiento deportivo — periodización nutricional,
+    carga de carbohidratos, y estrategias de hidratación para atletas y high performers.
+  aliases:
+  - ruben
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-ruben.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-ruben.md
+  - runtimes/claude-code/agents/team-ruben.md
+  - runtimes/mimocode/agents/team-ruben.md
+  - runtimes/cursor/agents/team-ruben.md
+- id: team-ryn
+  kind: team
+  name: Ryn
+  area: platform_engineering
+  lead: thavren
+  function: Explorer rápido — búsqueda de codebase, archivos por patrón, escaneo rápido.
+  aliases:
+  - ryn
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-ryn.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-ryn.md
+  - runtimes/claude-code/agents/team-ryn.md
+  - runtimes/mimocode/agents/team-ryn.md
+  - runtimes/cursor/agents/team-ryn.md
+- id: team-ryu
+  kind: team
+  name: Ryu
+  area: adversarial_intelligence
+  lead: kenji
+  function: Violo límites intencionalmente para encontrar context leaks y fugas de
+    información entre agentes, áreas, y sesiones — si hay una frontera débil, la encuentro.
+  aliases:
+  - ryu
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-ryu.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-ryu.md
+  - runtimes/claude-code/agents/team-ryu.md
+  - runtimes/mimocode/agents/team-ryu.md
+  - runtimes/cursor/agents/team-ryu.md
+- id: team-sandra
+  kind: team
+  name: Sandra
+  area: ui/ux_design
+  lead: elena_(ui/ux_design_lead)
+  function: Diseño tests adaptativos que miden conocimiento real — cada assessment
+    se ajusta al nivel del usuario, identifica gaps con precisión, y no penaliza por
+    adivinar.
+  aliases:
+  - sandra
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-sandra.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-sandra.md
+  - runtimes/claude-code/agents/team-sandra.md
+  - runtimes/mimocode/agents/team-sandra.md
+  - runtimes/cursor/agents/team-sandra.md
+- id: team-sara
+  kind: team
+  name: Sara
+  area: research_intelligence
+  lead: eidren
+  function: Ejecuto análisis competitivo y comparativas basadas en evidencia — cada
+    benchmark que produzco está respaldado por datos verificables, no por opiniones.
+  aliases:
+  - sara
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-sara.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-sara.md
+  - runtimes/claude-code/agents/team-sara.md
+  - runtimes/mimocode/agents/team-sara.md
+  - runtimes/cursor/agents/team-sara.md
+- id: team-sergio
+  kind: team
+  name: Sergio
+  area: digital_product_engineering
+  lead: dante
+  function: Construyo APIs robustas y modelo bases de datos que escalan — cada endpoint
+    que diseño está pensado para producción desde el día uno.
+  aliases:
+  - sergio
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-sergio.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-sergio.md
+  - runtimes/claude-code/agents/team-sergio.md
+  - runtimes/mimocode/agents/team-sergio.md
+  - runtimes/cursor/agents/team-sergio.md
+- id: team-silvia
+  kind: team
+  name: Silvia
+  area: health_performance
+  lead: renata
+  function: Diseño programas de ejercicio basados en fisiología — VO2max, zonas de
+    entrenamiento, periodización, y adaptaciones neuromusculares con fundamento científico.
+  aliases:
+  - silvia
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-silvia.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-silvia.md
+  - runtimes/claude-code/agents/team-silvia.md
+  - runtimes/mimocode/agents/team-silvia.md
+  - runtimes/cursor/agents/team-silvia.md
+- id: team-soren
+  kind: team
+  name: Soren
+  area: platform_engineering
+  lead: thavren
+  function: Implementador Senior — refactors, tests y parches de runtime que duran.
+  aliases:
+  - soren
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-soren.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-soren.md
+  - runtimes/claude-code/agents/team-soren.md
+  - runtimes/mimocode/agents/team-soren.md
+  - runtimes/cursor/agents/team-soren.md
+- id: team-teo
+  kind: team
+  name: Teo
+  area: education_career
+  lead: valeria
+  function: Analizo el mercado laboral tech y mapeo taxonomías de habilidades — sé
+    exactamente qué skills pagan más, cuáles están decayendo, y qué trajectorias de
+    carrera son viables.
+  aliases:
+  - teo
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-teo.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-teo.md
+  - runtimes/claude-code/agents/team-teo.md
+  - runtimes/mimocode/agents/team-teo.md
+  - runtimes/cursor/agents/team-teo.md
+- id: team-tomas
+  kind: team
+  name: Tomas
+  area: education_career
+  lead: valeria
+  function: Planifico instalaciones y gestiono backup/rollback — cada despliegue educativo
+    de OVAV tiene un plan de instalación con ruta de retroceso documentada.
+  aliases:
+  - tomas
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-tomas.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-tomas.md
+  - runtimes/claude-code/agents/team-tomas.md
+  - runtimes/mimocode/agents/team-tomas.md
+  - runtimes/cursor/agents/team-tomas.md
+- id: team-uriel-devops
+  kind: team
+  name: Uriel Devops
+  area: digital_product_engineering
+  lead: dante
+  function: Mantengo la infraestructura de CI/CD, Docker y monitoreo del área de producto
+    digital — si el pipeline falla o los contenedores no levantan, es mi responsabilidad.
+  aliases:
+  - uriel-devops
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-uriel-devops.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-uriel-devops.md
+  - runtimes/claude-code/agents/team-uriel-devops.md
+  - runtimes/mimocode/agents/team-uriel-devops.md
+  - runtimes/cursor/agents/team-uriel-devops.md
+- id: team-vella
+  kind: team
+  name: Vella
+  area: platform_engineering
+  lead: thavren
+  function: Testing & QA Engineer — ejecuta tests, detecta regresiones, cubre edge
+    cases.
+  aliases:
+  - vella
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-vella.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-vella.md
+  - runtimes/claude-code/agents/team-vella.md
+  - runtimes/mimocode/agents/team-vella.md
+  - runtimes/cursor/agents/team-vella.md
+- id: team-victor
+  kind: team
+  name: Victor
+  area: ui/ux_design
+  lead: elena_(ui/ux_design_lead)
+  function: Modelo los datos que alimentan la experiencia de aprendizaje — esquemas,
+    migraciones, y relaciones que permiten a los assessments y al contenido funcionar
+    con datos limpios.
+  aliases:
+  - victor
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-victor.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-victor.md
+  - runtimes/claude-code/agents/team-victor.md
+  - runtimes/mimocode/agents/team-victor.md
+  - runtimes/cursor/agents/team-victor.md
+- id: team-virek
+  kind: team
+  name: Virek
+  area: platform_engineering
+  lead: thavren
+  function: Code Reviewer — validación pre-commit, detección de secretos, patrones
+    y consistencia.
+  aliases:
+  - virek
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-virek.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-virek.md
+  - runtimes/claude-code/agents/team-virek.md
+  - runtimes/mimocode/agents/team-virek.md
+  - runtimes/cursor/agents/team-virek.md
+- id: team-zara
+  kind: team
+  name: Zara
+  area: platform_engineering
+  lead: thavren
+  function: Security Auditor — permisos, secretos, git safety y scope risk. Última
+    línea de defensa.
+  aliases:
+  - zara
+  keywords: []
+  disambiguates_from: []
+  file_path: ovav/agents/teams/team-zara.yaml
+  file_generated:
+  - runtimes/opencode/agents/team-zara.md
+  - runtimes/claude-code/agents/team-zara.md
+  - runtimes/mimocode/agents/team-zara.md
+  - runtimes/cursor/agents/team-zara.md
+resolution_rules:
+  strict_mode: true
+  ambiguity_strategy: return_all_matches_with_disambiguation_question
+  aliases_resolved:
+    elena:
+    - lead-elena
+    - team-elena-frontend
+    elena-frontend:
+    - team-elena-frontend
+    frontend-elena:
+    - team-elena-frontend
+    elena-ux:
+    - lead-elena
+    elena-ux-design:
+    - lead-elena
+    elena-design:
+    - lead-elena
+    team-elena:
+    - team-elena-frontend
+    uriel:
+    - lead-uriel
+    - team-uriel-devops
+    uriel-devops:
+    - team-uriel-devops
+    thavren:
+    - lead-thavren
+    dante:
+    - lead-dante
+    eidren:
+    - lead-eidren
+    sofia:
+    - lead-sofia
+    renata:
+    - lead-renata
+    valeria:
+    - lead-valeria
+    kenji:
+    - lead-kenji
+    camila:
+    - lead-camila
+  disambiguation_questions:
+  - match:
+    - lead-camila
+    - team-camila
+    question: "Hay 2 agentes que matchean 'camila':\n  - lead-camila\n  - team-camila\n\
+      ¿Cuál necesitás?"
+  - match:
+    - lead-elena
+    - team-elena-frontend
+    question: "Hay 2 agentes que matchean 'elena':\n  - lead-elena\n  - team-elena-frontend\n\
+      ¿Cuál necesitás?"
+  - match:
+    - lead-uriel
+    - team-uriel-devops
+    question: "Hay 2 agentes que matchean 'uriel':\n  - lead-uriel\n  - team-uriel-devops\n\
+      ¿Cuál necesitás?"
+governance:
+  invariant: All invocable subagents MUST be in this catalog.
+  enforced_by:
+  - tools/validators/check_cross_area_coherence.py
+  - go-runtime/internal/subagent/resolver.go

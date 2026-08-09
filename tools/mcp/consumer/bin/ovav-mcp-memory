@@ -1,0 +1,5 @@
+#!/bin/bash
+# OVAV Memory MCP Server Wrapper
+# Uses official @modelcontextprotocol/server-memory via npx
+
+exec npx -y @modelcontextprotocol/server-memory

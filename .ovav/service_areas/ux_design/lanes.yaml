@@ -1,0 +1,18 @@
+lanes:
+  version: "2.0.0"
+  area: ux_design
+  routing:
+    default_lane: design
+    task_based:
+      design: design_system
+      system: design_system
+      component: design_system
+      research: ux_research
+      user: ux_research
+      testing: ux_research
+      accessibility: accessibility
+      a11y: accessibility
+      wcag: accessibility
+      prototype: prototyping
+      interaction: prototyping
+      review: design_review

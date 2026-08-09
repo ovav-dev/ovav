@@ -1,0 +1,28 @@
+# OVAV / Thavren GitHub SSH profile template
+#
+# Source-local template only. Do not paste private keys here.
+# Install target, after explicit approval only:
+#   ~/.ssh/config.d/ovav-thavren.conf
+# or include manually from ~/.ssh/config:
+#   Include ~/.ssh/config.d/*.conf
+#
+# Recommended first setup:
+#   ssh-keygen -t ed25519 -f ~/.ssh/ovav_thavren_ed25519 -C "ovav-thavren-github"
+#
+# Optional higher-security setup with hardware key/FIDO2:
+#   ssh-keygen -t ed25519-sk -f ~/.ssh/ovav_thavren_sk_ed25519 -C "ovav-thavren-github-fido2"
+
+Host github-ovav-thavren
+  HostName github.com
+  User git
+  IdentityFile ~/.ssh/ovav_thavren_ed25519
+  IdentitiesOnly yes
+  PreferredAuthentications publickey
+  AddKeysToAgent yes
+
+# Expected Git remote shape:
+#   git@github-ovav-thavren:ORG/REPO.git
+#
+# Agent lifetime is intentionally not stored in this file because it belongs
+# to the shell/session policy, not to SSH host routing. OVAV should validate
+# the profile and delegate real agent startup to the approved WSL/fish setup.

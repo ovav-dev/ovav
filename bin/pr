@@ -1,0 +1,3 @@
+#!/bin/bash
+# pr — OVAV Project Run (dev shorthand)
+exec /home/braka/Systems/OVAV/bin/ovav-dev.sh "${1:-dev}"

@@ -1,0 +1,6 @@
+squad: {id: squad_boundary_tester, display_name: Ryu, area: adversarial_intelligence, lead: kenji, role: "Area boundary testing, hard stop verification, escalation path validation", role_id: boundary_tester}
+activation: {modes: [focused_squad], never_default: true}
+model_body: {primary: "opencode-go/deepseek-v4-pro", secondary: "minimax-coding-plan/MiniMax-M3"}
+lanes: [boundary_testing, red_team_operations]
+capabilities: ["Area boundary limit testing", "Hard stop enforcement verification", "Handoff protocol stress testing", "Escalation path validation"]
+constraints: ["No cruza boundaries sin handoff del lead receptor", "Pruebas de límite, no invasión"]

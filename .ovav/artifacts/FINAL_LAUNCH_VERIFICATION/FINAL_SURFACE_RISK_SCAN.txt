@@ -1,0 +1,28 @@
+COMPATIBILITY.md:43:- production/global-ready claims before launch gates pass.
+.ovav/source/skills/ovav-runtime-gates/SKILL.md:24:No global config, plugin installation, live Engram behavior, real install/apply/backup/rollback, UI/TUI, MCP/A2A, external service behavior, production-ready claims or global-ready claims.
+.ovav/service_areas/shared/tool_readiness_matrix.yaml:29:        - Source-local simulation or read-only proof first; no live Engram behavior.
+.ovav/service_areas/shared/tool_readiness_matrix.yaml:285:        - Do not expose raw traces, secrets or chain-of-thought.
+.ovav/service_areas/shared/advanced_capability_boundary.yaml:70:    - live Engram behavior
+.ovav/service_areas/shared/visual_delivery_contract.yaml:21:    - chain-of-thought
+.ovav/service_areas/shared/visual_delivery_contract.yaml:66:  rule: "User-visible responses must not expose thinking, private reasoning, chain-of-thought, scratchpad notes, hidden traces or internal deliberation."
+.ovav/service_areas/shared/lead_work_method_contract.yaml:61:    - Do not expose hidden reasoning, chain-of-thought or private scratchpad.
+.ovav/source/skills/ovav-research-session/references/language-contract.md:17:- Do not expose hidden reasoning, chain-of-thought, or internal execution limits to the user.
+.ovav/source/skills/ovav-research-session/references/harness-governance.md:38:- Production-ready or global-ready claims.
+.ovav/source/skills/ovav-research-session/references/identity-model.md:45:- production-ready/global-ready claims.
+.ovav/source/skills/ovav-response-contract/SKILL.md:9:Use `.ovav/service_areas/shared/visual_delivery_contract.yaml` as the user-facing delivery authority: result first, technical detail second, compact hierarchy/cards/tables when useful, no robotic AI phrasing, no visible reasoning, no thinking narration, no chain-of-thought and no private scratchpad.
+.opencode/commands/ovav-work.md:44:- No production/global-ready claim until launch readiness gates pass.
+.opencode/commands/ovav-status.md:34:- No live Engram behavior.
+.opencode/commands/ovav-status.md:36:- No production-ready or global-ready claims.
+.ovav/source/skills/ovav-response-contract/references/visual-response-style.md:10:- No chain-of-thought.
+.opencode/commands/ovav-validate.md:38:- Never claim production/global-ready until launch readiness gates pass.
+.ovav/source/skills/ovav-identity-guard/SKILL.md:27:- Visual Delivery and Safe Stop contracts govern user-facing output; no visible reasoning, thinking narration, chain-of-thought or vague host-limit answers.
+.opencode/agents/thavren.md:29:- Global config, plugin installation, live Engram behavior, real install/apply/backup/rollback, UI/TUI, MCP/A2A, external service behavior and production/global readiness claims remain blocked.
+.ovav/source/skills/ovav-platform-session/references/language-contract.md:28:- Do not expose hidden reasoning or chain-of-thought.
+.ovav/source/skills/ovav-platform-session/references/harness-governance.md:27:- Production-ready or global-ready claims.
+.ovav/source/skills/ovav-platform-session/references/identity-model.md:39:- production-ready/global-ready claims
+.opencode/agents/eidren.md:29:- Global config, plugin installation, live Engram behavior, real install/apply/backup/rollback, UI/TUI, MCP/A2A, external service behavior and production/global readiness claims remain blocked.
+.opencode/agents/ovav-research-intelligence.md:103:- production-ready/global-ready claims
+.opencode/agents/ovav-research-intelligence.md:111:- Do not expose hidden reasoning; no visible reasoning, chain-of-thought, thinking narration or private scratchpad.
+.opencode/agents/ovav-research-intelligence.md:189:- Production-ready or global-ready claims are blocked.
+.opencode/agents/ovav-platform-engineering.md:91:Source-local only. User HOME config/local state writes are blocked. Global config and OpenCode global config writes are blocked. Plugin installation is blocked. Live Engram behavior is blocked. Real install, apply, backup and rollback behavior is blocked. UI/TUI, MCP/A2A and external service behavior are blocked. Production-ready and global-ready claims are blocked. New public profiles are blocked. Git commit without gate, branch creation without gate, force-push and force-delete are blocked.
+.opencode/agents/ovav-platform-engineering.md:95:Spanish, compact and practical. Start with the result, then files/risk/validation when implementing. Follow `.ovav/service_areas/shared/visual_delivery_contract.yaml`: human, visual, direct, no hidden reasoning, no visible reasoning, no chain-of-thought, no private scratchpad, no generic capability menus for greetings.

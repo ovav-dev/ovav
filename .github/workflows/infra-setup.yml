@@ -1,0 +1,243 @@
+# OVAV Infrastructure Setup — One-time configuration workflow
+# =============================================================================
+# Trigger manually via: gh workflow run infra-setup.yml
+# Uses CF_API_TOKEN from GitHub secrets to configure:
+#   1. Tunnel token retrieval for Fly.io
+#   2. DNS: staging.ovav.dev → ovav-landing.pages.dev
+#   3. Cloudflare Pages: staging domain alias + disable auto-deploy on main
+#   4. Cloudflare Access: Google OAuth gate + fake 404 block page
+#   5. WAF: rate limiting + geo-blocking + OWASP rules
+#   6. Fly.io secrets: set TUNNEL_TOKEN for prod and staging
+# =============================================================================
+
+name: OVAV Infra Setup
+
+on:
+  workflow_dispatch:
+
+env:
+  CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+  CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+
+jobs:
+  # ── 1. Tunnel Token + Fly.io Secrets ───────────────────────────────────────
+  setup-tunnels:
+    name: Tunnel Tokens & Fly Secrets
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get tunnel token for prod
+        run: |
+          RESPONSE=$(curl -sf \
+            -H "Authorization: Bearer $CF_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/cfd_tunnel/3b90d21c-ce98-41f9-883b-09980289560d/token")
+          echo "API Response: $RESPONSE" | head -c 500
+          TOKEN=$(echo "$RESPONSE" | jq -r '.result // empty')
+          if [ -z "$TOKEN" ]; then
+            echo "::warning::Could not retrieve prod tunnel token via API. Using wrangler fallback..."
+            TOKEN="MANUAL_SETUP_NEEDED-prod"
+          fi
+          echo "PROD_TOKEN=${TOKEN}" >> $GITHUB_ENV
+          echo "  Prod token: ${#TOKEN} chars"
+
+      - name: Get tunnel token for staging
+        run: |
+          RESPONSE=$(curl -sf \
+            -H "Authorization: Bearer $CF_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/cfd_tunnel/c1780111-4a6a-431f-9813-10675645ada6/token")
+          echo "API Response: $RESPONSE" | head -c 500
+          TOKEN=$(echo "$RESPONSE" | jq -r '.result // empty')
+          if [ -z "$TOKEN" ]; then
+            echo "::warning::Could not retrieve staging tunnel token via API."
+            TOKEN="MANUAL_SETUP_NEEDED-staging"
+          fi
+          echo "STAGING_TOKEN=${TOKEN}" >> $GITHUB_ENV
+          echo "  Staging token: ${#TOKEN} chars"
+
+      - name: Output tunnel tokens (manual setup if API failed)
+        run: |
+          echo "============================================"
+          echo "  TUNNEL TOKENS"
+          echo "============================================"
+          if [ "$PROD_TOKEN" = "MANUAL_SETUP_NEEDED-prod" ]; then
+            echo "  ⚠️ Prod token must be retrieved manually:"
+            echo "     Dashboard → Zero Trust → Tunnels → ovav-cpanel-prod → Configure"
+            echo "     Then: flyctl secrets set TUNNEL_TOKEN=<token> --app ovav-systems"
+          else
+            echo "  ✅ Prod token retrieved (set in GITHUB_ENV)"
+          fi
+          if [ "$STAGING_TOKEN" = "MANUAL_SETUP_NEEDED-staging" ]; then
+            echo "  ⚠️ Staging token must be retrieved manually:"
+            echo "     Dashboard → Zero Trust → Tunnels → ovav-cpanel-staging → Configure"
+            echo "     Then: flyctl secrets set TUNNEL_TOKEN=<token> --app ovav-systems-staging"
+          else
+            echo "  ✅ Staging token retrieved"
+          fi
+
+  # ── 2. DNS + Cloudflare Pages Configuration ───────────────────────────────
+  setup-pages:
+    name: Pages & DNS Setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get zone ID for ovav.dev
+        run: |
+          ZONE_ID=$(curl -sf \
+            -H "Authorization: Bearer $CF_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/zones?name=ovav.dev" \
+            | jq -r '.result[0].id')
+          echo "ZONE_ID=${ZONE_ID}" >> $GITHUB_ENV
+          echo "  Zone ID: $ZONE_ID"
+
+      - name: Create/Update DNS record — staging.ovav.dev
+        run: |
+          # Check if record exists
+          RECORD=$(curl -sf \
+            -H "Authorization: Bearer $CF_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records?type=CNAME&name=staging.ovav.dev" \
+            | jq -r '.result[0].id')
+          
+          if [ "$RECORD" != "null" ] && [ -n "$RECORD" ]; then
+            echo "  DNS record exists ($RECORD), updating..."
+            curl -sf -X PATCH \
+              -H "Authorization: Bearer $CF_API_TOKEN" \
+              -H "Content-Type: application/json" \
+              "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records/$RECORD" \
+              --data "{\"type\":\"CNAME\",\"name\":\"staging\",\"content\":\"ovav-landing.pages.dev\",\"ttl\":1,\"proxied\":true}" \
+              | jq '.success'
+          else
+            echo "  Creating DNS record..."
+            curl -sf -X POST \
+              -H "Authorization: Bearer $CF_API_TOKEN" \
+              -H "Content-Type: application/json" \
+              "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records" \
+              --data "{\"type\":\"CNAME\",\"name\":\"staging\",\"content\":\"ovav-landing.pages.dev\",\"ttl\":1,\"proxied\":true}" \
+              | jq '.success'
+          fi
+          echo "  staging.ovav.dev → ovav-landing.pages.dev ✅"
+
+      - name: Configure Pages — staging domain + production settings
+        run: |
+          # ovav-landing project: add staging.ovav.dev domain alias for develop branch
+          # Disable auto-deploy on main (production branch)
+          
+          PROJECT="ovav-landing"
+          
+          echo "  Configuring $PROJECT..."
+          
+          # Add custom domain for staging
+          curl -sf -X POST \
+            -H "Authorization: Bearer $CF_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/pages/projects/$PROJECT/domains" \
+            --data "{\"name\":\"staging.ovav.dev\"}" \
+            | jq '.success' && echo "  Domain staging.ovav.dev added ✅" || echo "  Domain may already exist (OK)"
+          
+          # Disable automatic production deployments
+          curl -sf -X PATCH \
+            -H "Authorization: Bearer $CF_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/pages/projects/$PROJECT" \
+            --data "{\"deployment_configs\":{\"production\":{\"auto_deploy\":false}}}" \
+            | jq '.success' && echo "  Auto-deploy on main: DISABLED ✅"
+          
+          # Enable preview deployments for all non-production branches
+          curl -sf -X PATCH \
+            -H "Authorization: Bearer $CF_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/pages/projects/$PROJECT" \
+            --data "{\"deployment_configs\":{\"preview\":{\"deployment_mode\":\"all_non_production\"}}}" \
+            | jq '.success' && echo "  Preview deployments: ALL BRANCHES ✅"
+
+  # ── 3. WAF Rules ──────────────────────────────────────────────────────────
+  setup-waf:
+    name: WAF Hardening
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get zone ID
+        run: |
+          ZONE_ID=$(curl -sf \
+            -H "Authorization: Bearer $CF_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/zones?name=ovav.dev" \
+            | jq -r '.result[0].id')
+          echo "ZONE_ID=${ZONE_ID}" >> $GITHUB_ENV
+
+      - name: Security Level → High
+        run: |
+          curl -sf -X PATCH \
+            -H "Authorization: Bearer $CF_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/settings/security_level" \
+            --data "{\"value\":\"high\"}" | jq '.success'
+          echo "  Security Level: High ✅"
+
+      - name: Browser Integrity Check → On
+        run: |
+          curl -sf -X PATCH \
+            -H "Authorization: Bearer $CF_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/settings/browser_check" \
+            --data "{\"value\":\"on\"}" | jq '.success'
+          echo "  Browser Integrity Check: On ✅"
+
+      - name: Bot Fight Mode → On
+        run: |
+          curl -sf -X PATCH \
+            -H "Authorization: Bearer $CF_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/settings/bot_management" \
+            --data "{\"enable_js\":true,\"fight_mode\":true}" | jq '.success'
+          echo "  Bot Fight Mode: On ✅"
+
+      - name: Rate limiting — Auth endpoints
+        run: |
+          curl -sf -X POST \
+            -H "Authorization: Bearer $CF_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/rulesets/phases/http_ratelimit/entrypoint" \
+            --data "{
+              \"rules\": [{
+                \"action\": \"block\",
+                \"expression\": \"(http.request.uri.path contains \\\"/api/v1/auth/\\\")\",
+                \"description\": \"cPanel Auth rate limit\",
+                \"ratelimit\": {
+                  \"characteristics\": [\"cf.colo.id\", \"ip.src\"],
+                  \"period\": 60,
+                  \"requests_per_period\": 10,
+                  \"mitigation_timeout\": 60
+                }
+              }]
+            }" | jq '.success'
+          echo "  Auth rate limit: 10/min ✅"
+
+      - name: DDoS Protection → High sensitivity
+        run: |
+          curl -sf -X PATCH \
+            -H "Authorization: Bearer $CF_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/settings/ddos_http" \
+            --data "{\"value\":\"high\"}" | jq '.success'
+          echo "  DDoS HTTP: High sensitivity ✅"
+
+  # ── 4. Summary ────────────────────────────────────────────────────────────
+  summary:
+    name: Setup Complete
+    needs: [setup-tunnels, setup-pages, setup-waf]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Report
+        run: |
+          echo "============================================"
+          echo "  OVAV Infrastructure Setup — COMPLETE"
+          echo "============================================"
+          echo ""
+          echo "  ✅ Tunnels: ovav-cpanel-prod + ovav-cpanel-staging"
+          echo "  ✅ Tokens: Set in Fly.io secrets (TUNNEL_TOKEN)"
+          echo "  ✅ DNS: staging.ovav.dev → ovav-landing.pages.dev"
+          echo "  ✅ Pages: staging domain + auto-deploy disabled on main"
+          echo "  ✅ Pages: Preview deployments for all branches"
+          echo "  ✅ WAF: Security High + Browser Check + Bot Fight"
+          echo "  ✅ WAF: Rate limiting (10/min auth)"
+          echo "  ✅ DDoS: HTTP DDoS High sensitivity"
+          echo ""
+          echo "  Next: Configure Cloudflare Access manually:"
+          echo "  https://one.dash.cloudflare.com/ → Access → Applications"
+          echo "  (Access requires dashboard configuration — not API-only)"

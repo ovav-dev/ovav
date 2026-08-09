@@ -1,0 +1,24 @@
+absorptions:
+  gentle_sdd_init:
+    source: gentle_ai
+    observed_advantage: detects stack and testing capabilities before work
+    ovav_adaptation: h_sdd_init auto-triggered by chat interaction
+    target_harnesses: [h_sdd_init]
+    target_evals: [eval_sdd_init_auto_trigger, eval_sdd_init_detects_stack]
+    status: planned
+
+  gentle_skill_registry_refresh:
+    source: gentle_ai
+    observed_advantage: refreshes installed skills and project conventions
+    ovav_adaptation: skill manager discovery + scoring + rule packs
+    target_harnesses: [h_skill_registry_refresh, h_skill_score_gate]
+    target_evals: [eval_skill_without_owner_blocked]
+    status: planned
+
+  claude_subagent_isolation:
+    source: claude_code
+    observed_advantage: task-specific subagents with tools/permissions/context
+    ovav_adaptation: squad context packs + delegation thresholds
+    target_harnesses: [h_subagent_context_pack, h_subagent_result_absorber]
+    target_evals: [eval_delegation_threshold_4_files]
+    status: planned

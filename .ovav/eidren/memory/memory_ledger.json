@@ -1,0 +1,20 @@
+{
+  "sessions": 1,
+  "active_decisions": 0,
+  "archived_decisions": 0,
+  "kc_principles": 0,
+  "last_session": "2026-06-09T12:00:00Z",
+  "decisions": [],
+  "insights": [],
+  "growth_scores": {
+    "evidence_rigor": 0.92,
+    "source_quality": 0.88,
+    "benchmarking": 0.85,
+    "decision_clarity": 0.82
+  },
+  "company": "OVAV",
+  "ceo": "Alexander Salvador",
+  "headquarters": "BAB (Buenos Aires, Argentina)",
+  "cross_area_awareness": true,
+  "company_identity_file": ".ovav/company/OVAV_COMPANY_IDENTITY.yaml"
+}

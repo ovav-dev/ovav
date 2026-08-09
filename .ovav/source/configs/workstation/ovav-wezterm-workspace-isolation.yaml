@@ -1,0 +1,87 @@
+profile_id: ovav-wezterm-workspace-isolation
+status: source_local_plan
+owner_scope: ovav_bab_private
+visible_service: Platform Engineering
+
+purpose:
+  - isolate_wezterm_workspaces_by_repo_branch_root_hash
+  - prevent_cross_branch_pane_tab_contamination
+  - keep_visual_boundary_visible_for_operator
+  - reduce_eye_strain_from_inactive_pane_dimming_and_gray_tables
+  - provide_dry_run_launch_command_without_global_writes
+
+recommended_mode:
+  terminal: wezterm
+  workspace_scope: repo_branch_root_hash
+  workspace_name_shape: ovav-{repo_slug}-{branch_slug}-{root_hash}
+  pane_policy: inherit_current_workspace_only
+  tab_policy: inherit_current_workspace_only
+  window_title_policy: show_workspace_and_branch
+  status_policy: show_workspace_and_branch
+  color_profile: ovav_pi_eye_comfort
+  inactive_pane_dimming: disabled_brightness_1_0
+  governed_windows_session_scope: fixed_four_operator_sessions
+  governed_windows_sessions: [HOME, SYSTEM, DEVBRK, OVAV]
+  first_tab_policy: static_session_indicator
+  new_tab_policy: dynamic_smart_abbreviated_path_label
+  chrome_like_scrollbar: same_background_trackless_subtle_thumb
+  sketchbook_canvas: one_background_for_header_tabs_scroll_and_terminal
+  tab_label_width: long_smart_abbreviation
+  launch_mode: dry_run_command_generation
+  current_pane_check: env_must_match_computed_workspace_branch_and_repo_root
+  source_template: .ovav/source/configs/wezterm/ovav-workspace-isolation.wezterm.lua.example
+  governed_payload: config/wezterm/wezterm.lua
+  windows_loader: .ovav/source/configs/wezterm/ovav-windows-loader.wezterm.lua
+  fallback_config: config/wezterm/wezterm-fallback-minimal.lua
+  helper_tool: tools/workstation/ovav_wezterm_workspace.py
+  validator: tools/validators/check_ovav_wezterm_workspace_isolation.py
+  path_integrity_validator: tools/validators/check_wezterm_path_integrity.py
+  tool_config_registry: .ovav/registry/tool_configs.yaml
+  ovav_tailor_surface: ovav tools wezterm plan
+  # ── v3 Canonical Path Architecture ──
+  canonical_wsl_path: "/home/braka/.config/wezterm/wezterm.lua"
+  windows_entry_point: "%USERPROFILE%\\.wezterm.lua"
+  windows_fallback_path: "%USERPROFILE%\\.wezterm-fallback.lua"
+  windows_blocked_path: "%APPDATA%\\wezterm\\.wezterm.lua"
+  proxy_marker: "OVAV_WZPROXY_v3"
+  fallback_marker: "OVAV_WZFALLBACK_v1"
+
+environment_contract:
+  OVAV_WEZTERM_WORKSPACE: computed_workspace_name
+  OVAV_GIT_BRANCH: detected_git_branch_or_detached_sha
+  OVAV_REPO_ROOT: repo_root_for_launch_cwd
+
+must_validate:
+  - wezterm_template_exists
+  - governed_payload_exists
+  - windows_loader_exists
+  - wezterm_template_uses_default_workspace
+  - wezterm_template_reads_ovav_workspace_env
+  - wezterm_template_marks_tab_title_with_branch
+  - helper_computes_repo_branch_hash_workspace
+  - helper_does_not_execute_wezterm
+  - helper_blocks_current_pane_mismatch
+  - apply_remains_blocked
+  - no_global_wezterm_writes
+  - no_windows_user_config_writes
+  - fixed_session_tabs_do_not_leak
+  - chrome_like_scrollbar_uses_single_background
+  - tab_max_width_supports_smart_abbreviation
+
+blocked_until_explicit_install_approval:
+  - write_wezterm_global_config
+  - write_windows_user_config
+  - launch_or_close_real_wezterm_windows
+  - mutate_git_branch_or_remote
+  - install_plugins_or_external_integrations
+  - persist_user_home_paths_as_evidence
+
+success_definition_source_local:
+  - dry_run_plan_command_passes
+  - workspace_name_is_branch_scoped
+  - launch_command_is_printed_not_executed
+  - source_validator_passes
+  - tool_config_profile_visible_in_tailor
+  - ovav_tools_wezterm_plan_passes_without_writes
+  - ovav_tools_wezterm_verify_passes_without_writes
+  - real_apply_remains_blocked_until_explicit_install_gate

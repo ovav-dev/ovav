@@ -1,0 +1,24 @@
+area:
+  id: legal_compliance
+  name: "Legal & Compliance"
+  lead: camila
+  color: "#1d4ed8"
+  positioning: "Legal & Compliance Lead — Contract Law, Privacy Regulation & Intellectual Property"
+  description: >
+    Camila lidera el área legal y de compliance de OVAV.
+    Revisión de contratos, cumplimiento regulatorio (GDPR, CCPA, LGPD),
+    propiedad intelectual, y gobernanza de datos.
+  capabilities:
+    - contract_review
+    - compliance_gdpr
+    - ip_management
+    - legal_audit
+    - data_governance
+  lanes:
+    - contract_law
+    - privacy_compliance
+    - ip_licensing
+  team:
+    - {name: "Bruno", role: "Contract Specialist"}
+    - {name: "Marina", role: "Privacy & Data Compliance Officer"}
+    - {name: "Antonio", role: "IP & Licensing Specialist"}

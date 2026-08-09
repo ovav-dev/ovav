@@ -1,0 +1,75 @@
+{
+  "performance": {
+    "iterations": 250,
+    "max_average_ms": 20.0
+  },
+  "cases": [
+    {
+      "id": "small_docs_typo",
+      "task": "docs typo",
+      "files": 1,
+      "sources": 0,
+      "expected": {
+        "recommended_model_tier": "fast",
+        "requires_high": false,
+        "lane": "general_platform",
+        "delegation.required": false
+      }
+    },
+    {
+      "id": "medium_cli_coverage",
+      "task": "add CLI test coverage metrics",
+      "files": 3,
+      "sources": 0,
+      "expected": {
+        "recommended_model_tier": "coding-light",
+        "requires_high": false,
+        "lane": "platform_engineering",
+        "delegation.required": true,
+        "squad": "squad-implementer-spark",
+        "variant": "opencode-go/qwen3.7-plus"
+      }
+    },
+    {
+      "id": "safety_global_permission",
+      "task": "change global deploy permission token handling",
+      "files": 2,
+      "sources": 0,
+      "expected": {
+        "recommended_model_tier": "high",
+        "requires_high": true,
+        "lane": "safety_gate",
+        "delegation.required": true,
+        "delegation.suggested_squad": "squad-security-auditor"
+      }
+    },
+    {
+      "id": "research_four_sources",
+      "task": "research benchmark compare sources with evidence",
+      "files": 1,
+      "sources": 4,
+      "expected": {
+        "recommended_model_tier": "medium",
+        "requires_high": false,
+        "lane": "research_evidence",
+        "delegation.required": true,
+        "delegation.suggested_squad": "squad-benchmark-analyst",
+        "variant": "opencode-go/mimo-v2.5-pro"
+      }
+    },
+    {
+      "id": "runtime_four_files",
+      "task": "runtime refactor",
+      "files": 4,
+      "sources": 0,
+      "expected": {
+        "recommended_model_tier": "high",
+        "requires_high": true,
+        "lane": "architecture_governance",
+        "delegation.required": true,
+        "delegation.suggested_squad": "squad-sys-architect",
+        "variant": "opencode-go/deepseek-v4-pro"
+      }
+    }
+  ]
+}

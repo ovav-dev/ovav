@@ -1,0 +1,54 @@
+{
+  "_schema": "ovav_patient_intake_v1.0.0",
+  "_description": "Plantilla de admisión para deportistas — incluye historial de entrenamiento y métricas de rendimiento.",
+  "patient_id": "identificador-unico-atleta *",
+  "demographics": {
+    "age": 0,
+    "sex": "M",
+    "height_cm": 0,
+    "weight_kg": 0
+  },
+  "health_history": {
+    "conditions": [],
+    "medications": [],
+    "injuries": [],
+    "allergies": [],
+    "surgeries": [],
+    "symptoms": []
+  },
+  "goals": {
+    "primary": "performance",
+    "target_weight_kg": null,
+    "timeframe_weeks": null,
+    "secondary": ["strength", "speed"]
+  },
+  "lifestyle": {
+    "activity_level": "athlete",
+    "sleep_hours": 8,
+    "stress_level": "moderate",
+    "occupation_type": "sedentary",
+    "meals_per_day": 5
+  },
+  "athletic_profile": {
+    "_note": "Campos específicos para deportistas — opcionales.",
+    "sport": "",
+    "position": "",
+    "training_years": 0,
+    "sessions_per_week": 0,
+    "session_duration_min": 0,
+    "competition_level": "recreational",
+    "recent_1rm_bench_kg": null,
+    "recent_1rm_squat_kg": null,
+    "recent_1rm_deadlift_kg": null,
+    "vo2max_estimated": null,
+    "rpe_typical": 6,
+    "recent_injuries_12months": []
+  },
+  "biometrics": {
+    "body_fat_pct": null,
+    "waist_circumference_cm": null,
+    "resting_heart_rate_bpm": null,
+    "blood_pressure_systolic": null,
+    "blood_pressure_diastolic": null
+  }
+}

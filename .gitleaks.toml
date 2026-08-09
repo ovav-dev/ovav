@@ -1,0 +1,8 @@
+# Gitleaks configuration for OVAV
+# Allowlist patterns used in security test fixtures
+
+[allowlist]
+  description = "OVAV security test fixtures and rego engine patterns"
+  paths = [
+    '''tools/permissions/rego_engine.py''',
+  ]

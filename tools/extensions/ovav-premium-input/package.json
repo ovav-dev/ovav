@@ -1,0 +1,23 @@
+{
+  "name": "ovav-premium-input",
+  "version": "1.0.0",
+  "description": "OVAV Premium Input - Phase 1, 2, 3 complete implementation",
+  "main": "index.ts",
+  "scripts": {
+    "start": "pi"
+  },
+  "keywords": ["ovav", "piagent", "premium", "input", "command-palette"],
+  "ovav": {
+    "extension": true,
+    "phases": [1, 2, 3],
+    "autoLoad": true,
+    "features": [
+      "command-palette",
+      "context-detection",
+      "autocomplete",
+      "shortcuts-overlay",
+      "status-bar",
+      "premium-input"
+    ]
+  }
+}

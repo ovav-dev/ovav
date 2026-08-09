@@ -1,0 +1,13 @@
+# Adversarial Intelligence — Capabilities Registry v1.0.0
+capabilities:
+  version: "1.0.0"
+  area: adversarial_intelligence
+  registered:
+    - {id: red_team_ops, name: "Red Team Operations", status: active, maturity: production}
+    - {id: boundary_testing, name: "Area Boundary Testing", status: active, maturity: production}
+    - {id: semantic_drift, name: "Semantic Drift Detection", status: active, maturity: production}
+    - {id: race_condition, name: "Race Condition Hunting", status: active, maturity: production}
+    - {id: architectural_audit, name: "Architectural Auditing", status: active, maturity: production}
+    - {id: prompt_injection, name: "Prompt Injection Testing", status: active, maturity: production}
+    - {id: supply_chain, name: "Supply Chain Attack Simulation", status: active, maturity: planned}
+    - {id: kenji_memory, name: "Kenji Memory Engine", status: active, maturity: planned}

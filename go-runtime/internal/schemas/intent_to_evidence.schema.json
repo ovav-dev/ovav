@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ovav.dev/schemas/intent_to_evidence.schema.json",
+  "title": "OVAV Intent-to-Evidence Chain Schema",
+  "description": "Validates complete traceability from user intent to final result. Every non-trivial action must produce a chain: what was asked → what was decided → what was touched → what was validated → what risk remained → what OVAV learned.",
+  "type": "object",
+  "required": ["chain_id", "packet_id", "generated_at", "links"],
+  "properties": {
+    "chain_id": {"type": "string"},
+    "packet_id": {"type": "string"},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "intent": {
+      "type": "object",
+      "properties": {
+        "user_request": {"type": "string"},
+        "parsed_intent": {"type": "string"},
+        "service_area": {"type": "string"},
+        "lead": {"type": "string"}
+      }
+    },
+    "decision": {
+      "type": "object",
+      "properties": {
+        "decision_packet_valid": {"type": "boolean"},
+        "law_evaluation_passed": {"type": "boolean"},
+        "stress_gate_result": {"type": "string"},
+        "red_team_result": {"type": "string"}
+      }
+    },
+    "execution": {
+      "type": "object",
+      "properties": {
+        "files_created": {"type": "array", "items": {"type": "string"}},
+        "files_modified": {"type": "array", "items": {"type": "string"}},
+        "harnesses_run": {"type": "array", "items": {"type": "string"}},
+        "validators_passed": {"type": "integer"},
+        "validators_failed": {"type": "integer"}
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "properties": {
+        "trace_id": {"type": "string"},
+        "evidence_paths": {"type": "array", "items": {"type": "string"}},
+        "artifacts_produced": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "risk": {
+      "type": "object",
+      "properties": {
+        "residual_risk": {"type": "string", "enum": ["none", "low", "medium", "high"]},
+        "unresolved_items": {"type": "array", "items": {"type": "string"}},
+        "rollback_available": {"type": "boolean"}
+      }
+    },
+    "learning": {
+      "type": "object",
+      "properties": {
+        "memory_updated": {"type": "boolean"},
+        "ledger_entries": {"type": "array", "items": {"type": "string"}},
+        "feedback_applied": {"type": "boolean"}
+      }
+    },
+    "chain_complete": {"type": "boolean"},
+    "missing_links": {"type": "array", "items": {"type": "string"}}
+  }
+}

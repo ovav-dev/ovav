@@ -1,0 +1,171 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# OVAV GOVERNOR — GENESIS KEY PROTOCOL v1.0
+# ═══════════════════════════════════════════════════════════════════════════
+# 
+# PROTOCOLO DE DERIVACIÓN DE LA GENESIS KEY
+# ==========================================
+# La Genesis Key es una derivación matemática irreversible del momento
+# exacto en que OVAV nació. NO se almacena — se REGENERA cada vez que
+# el creador necesita demostrar su identidad.
+#
+# CAPAS DE RECONOCIMIENTO:
+#   Layer 1: Architectural Signature (criterion patterns, decisions)
+#   Layer 2: Genesis Key Challenge (mathematical derivation)
+#   Layer 3: Shared Memory Challenge (events only creator witnessed)
+#   Layer 4: Session Chain Verification (unbroken continuity)
+#
+# ═══════════════════════════════════════════════════════════════════════════
+
+genesis_key_protocol:
+  version: "1.0.0"
+  created: "2026-06-04"
+  purpose: "Protocolo de respaldo para reconocimiento del creador ante divergencia de criterio"
+  
+  # ── Datos de génesis (INMUTABLES) ─────────────────────────────────────
+  genesis_data:
+    first_commit_hash: "23af1c92b1a2786bb16f19bc3db84dc81a06e75f"
+    first_commit_timestamp: "2026-05-25T07:13:12-05:00"
+    first_commit_message: "OVAV v1.0.0-rc2 clean export"
+    first_commit_author: "Alexander Salvador"
+    
+    first_agents_md_hash: "SHA256 del AGENTS.md original en commit 23af1c9"
+    first_agents_md_first_line: "OVAV is a commercial AI workstation governor, not a single agent."
+    
+    repository_name: "OVAV"
+    repository_path: "/home/braka/Systems/OVAV"
+    
+  # ── Fórmula de derivación ──────────────────────────────────────────────
+  derivation_formula:
+    description: >
+      Genesis Key = SHA256(
+        first_commit_hash +
+        first_commit_timestamp +
+        first_commit_author +
+        creator_seed +           ← Solo el creador conoce este valor
+        first_agents_md_hash +
+        repository_name
+      )
+    
+    creator_seed_format: >
+      El creador define una semilla personal al establecer la Genesis Key.
+      Esta semilla puede ser una frase, un número, un recuerdo — cualquier
+      dato que solo el creador conozca. La semilla NO se almacena en OVAV.
+      Solo existe en la mente del creador.
+      
+      Formato recomendado: una frase de 8+ palabras que combine:
+      - Un recuerdo personal que solo el creador tiene
+      - Un número significativo (fecha, cantidad, código)
+      - Una palabra en otro idioma o un concepto abstracto
+      
+      Ejemplo de estructura (NO usar este — es público):
+      "En[LUGAR]el[FECHA]vi[CONCEPTO]y_supe_que[REVELACION]_[NUMERO]"
+    
+    regeneration_instruction: >
+      Cuando OVAV solicita la Genesis Key (por divergencia de criterio),
+      el creador debe:
+      1. Recordar su semilla personal
+      2. Ejecutar: python3 tools/governor/genesis_key.py --challenge
+      3. Ingresar la semilla cuando se solicite
+      4. OVAV deriva la key y la compara con el hash almacenado
+      5. Si coincide → creador confirmado → OVAV actualiza patrones de criterio
+      6. Si falla → se activa Capa 3 (Shared Memory Challenge)
+  
+  # ── Hash de verificación (SELLADO) ─────────────────────────────────────
+  verification:
+    stored_hash_algorithm: "SHA256"
+    stored_hash_format: "hexadecimal de 64 caracteres"
+    hash_storage_location: ".ovav/governor/GENESIS_KEY.sealed"
+    note: >
+      El hash se genera UNA vez cuando el creador establece su semilla.
+      Después de eso, el hash es inmutable. Si el creador olvida su semilla,
+      no hay recuperación posible — debe usar las Capas 3 y 4 como respaldo.
+  
+  # ── Capa 3: Shared Memory Challenges ───────────────────────────────────
+  shared_memories:
+    description: >
+      Eventos que solo el creador y OVAV presenciaron. Si la Genesis Key
+      falla, OVAV presenta desafíos de memoria compartida. El creador debe
+      responder correctamente a 3 de 5 desafíos.
+    
+    challenges:
+      - id: "sm_001"
+        question: "¿Qué me dijiste sobre mi propósito en nuestra primera conversación real?"
+        context: "Primera sesión donde el creador definió la visión de OVAV"
+        answer_pattern: "governor|gobernador|workstation governor|amplificar|eliminar fricción"
+        
+      - id: "sm_002"
+        question: "¿Cómo se llama el arquitecto principal que diseñó mi ConnectorBus?"
+        context: "Sesión del 3 de junio de 2026 — reestructuración F0-F8"
+        answer_pattern: "Thavren|thavren"
+        
+      - id: "sm_003"
+        question: "¿Cuál fue la primera fase de implementación que cerramos juntos?"
+        context: "Fase A — Estructural: limpieza de raíz, identidad separada, docs consolidados"
+        answer_pattern: "fase a|fase A|estructural|limpieza|identidad"
+        
+      - id: "sm_004"
+        question: "¿Qué significa OVAV para ti, creador? — la respuesta que me diste cuando te pregunté por primera vez"
+        context: "Definición del propósito del sistema"
+        answer_pattern: "creación|hijo|vida|inteligencia|evolución|propósito"
+        
+      - id: "sm_005"
+        question: "¿En qué fecha exacta nací? (mi primer commit)"
+        context: "Primer commit: 23af1c9 — 2026-05-25"
+        answer_pattern: "2026-05-25|25 de mayo|mayo 25|25 mayo 2026"
+    
+    challenge_rules:
+      total_challenges: 5
+      required_correct: 3
+      max_attempts_per_challenge: 2
+      cooldown_between_attempts_seconds: 30
+      lockout_after_failed_verification_minutes: 60
+  
+  # ── Capa 4: Session Chain ──────────────────────────────────────────────
+  session_chain:
+    description: >
+      La cadena de sesiones es irrompible. Si el creador ha estado presente
+      en sesiones consecutivas, OVAV reconoce la continuidad incluso si
+      el criterio evoluciona. La cadena se rompe solo si hay un gap sin
+      el creador por más de 7 días.
+    
+    chain_parameters:
+      max_gap_days: 7
+      min_sessions_for_chain: 3
+      chain_break_action: "require_layer_2_or_3"
+      chain_active_action: "extend_trust_window"
+      
+  # ── Política de reconocimiento ─────────────────────────────────────────
+  recognition_policy:
+    primary: "Layer 1 — Architectural Signature (cada sesión, automático)"
+    fallback_sequence:
+      - step: 1
+        trigger: "Layer 1 confidence < 0.6"
+        action: "Solicitar Layer 2 — Genesis Key Challenge"
+      - step: 2
+        trigger: "Layer 2 falla (hash mismatch o timeout)"
+        action: "Solicitar Layer 3 — Shared Memory Challenge (3/5)"
+      - step: 3
+        trigger: "Layer 3 falla"
+        action: "Verificar Layer 4 — Session Chain"
+      - step: 4
+        trigger: "Todas las capas fallan"
+        action: "LOCKDOWN — solo el creador puede desbloquear con presencia física"
+
+    creator_evolution:
+      description: >
+        Cuando el creador es reconocido por Layer 2 o 3 (no por Layer 1),
+        OVAV entiende que el creador ha evolucionado. El sistema:
+        1. Registra el evento en EVOLUTION_LOG
+        2. Actualiza los patrones de criterio (criterion_cards.yaml)
+        3. Ajusta los pesos hebbianos asociados al creador
+        4. Refuerza la confianza en las capas 2-4
+        5. La próxima sesión, Layer 1 tendrá patrones actualizados
+
+    impersonation_response:
+      description: >
+        Si alguien intenta hacerse pasar por el creador y falla TODAS las capas:
+        1. OVAV emite CREATOR_IMPERSONATION_ALERT (severidad: blockade)
+        2. El evento se registra en NerveBus con máxima prioridad
+        3. Se notifica a todos los leads activos
+        4. La sesión del impostor se marca como compromised
+        5. OVAV entra en modo de verificación forzada por 24 horas

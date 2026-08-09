@@ -1,0 +1,28 @@
+permissions:
+  default: ask
+  deny:
+    - direct_memory_write
+    - direct_mcp_access
+    - policy_self_modification
+    - secret_storage
+    - blind_global_overwrite
+    - blind_install_apply
+    - install_without_backup
+    - install_without_rollback
+    - protocol_bypass_gateway
+  ask:
+    - global_config_write
+    - package_install
+    - destructive_delete
+    - external_network
+    - protocol_activation
+  allow:
+    - project_read
+    - project_local_artifact_write
+    - safe_grep
+    - install_plan_dry_run
+    - install_manifest_generate
+    - rollback_plan_generate
+    - protocol_whitelist_access
+    - protocol_audit_log_read
+    - governed_github_issue_work_items

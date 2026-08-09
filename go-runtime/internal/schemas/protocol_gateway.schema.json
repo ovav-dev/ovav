@@ -1,0 +1,162 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ovav.dev/schemas/protocol_gateway.schema.json",
+  "title": "OVAV Protocol Gateway Schema",
+  "description": "Schema for protocol gateway access requests, audit entries, and circuit breaker state in OVAV BUILD 12+.",
+  "definitions": {
+    "ProtocolAccessRequest": {
+      "type": "object",
+      "required": ["protocol_id", "caller_profile", "operation"],
+      "properties": {
+        "protocol_id": {
+          "type": "string",
+          "description": "Registered protocol ID from protocols.yaml"
+        },
+        "caller_profile": {
+          "type": "string",
+          "enum": ["ovav_systems_architect", "ovav_research_analyst"],
+          "description": "OVAV service profile making the request"
+        },
+        "caller_lane": {
+          "type": "string",
+          "description": "Lane within the profile"
+        },
+        "operation": {
+          "type": "string",
+          "description": "Specific operation requested (tool name or communication type)"
+        },
+        "operation_type": {
+          "type": "string",
+          "enum": ["read", "write", "list", "fetch", "dispatch", "absorb"],
+          "description": "Category of operation"
+        },
+        "context_scope": {
+          "type": "string",
+          "enum": ["source_local", "project_local", "session"],
+          "description": "Scope of the current context"
+        },
+        "token_budget_remaining": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Remaining token budget for this session"
+        },
+        "estimated_token_cost": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Estimated token cost of this operation"
+        }
+      }
+    },
+    "ProtocolAccessResult": {
+      "type": "object",
+      "required": ["allowed", "gate_checks"],
+      "properties": {
+        "allowed": {
+          "type": "boolean",
+          "description": "Whether access is granted"
+        },
+        "deny_reason": {
+          "type": "string",
+          "description": "Reason for denial if not allowed"
+        },
+        "gate_checks": {
+          "type": "object",
+          "required": ["whitelist", "permission", "scope", "budget", "circuit_breaker"],
+          "properties": {
+            "whitelist": {"$ref": "#/definitions/GateCheck"},
+            "permission": {"$ref": "#/definitions/GateCheck"},
+            "scope": {"$ref": "#/definitions/GateCheck"},
+            "budget": {"$ref": "#/definitions/GateCheck"},
+            "circuit_breaker": {"$ref": "#/definitions/GateCheck"}
+          }
+        },
+        "protocol_status": {
+          "type": "string",
+          "enum": ["active", "registered_not_active", "suspended"],
+          "description": "Status of the protocol in protocols.yaml"
+        }
+      }
+    },
+    "GateCheck": {
+      "type": "object",
+      "required": ["passed"],
+      "properties": {
+        "passed": {"type": "boolean"},
+        "reason": {"type": "string"},
+        "detail": {"type": "object"}
+      }
+    },
+    "AuditEntry": {
+      "type": "object",
+      "required": ["timestamp", "protocol_id", "caller_profile", "operation", "result_status"],
+      "properties": {
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp"
+        },
+        "protocol_id": {"type": "string"},
+        "protocol_type": {
+          "type": "string",
+          "enum": ["mcp", "a2a"]
+        },
+        "caller_profile": {"type": "string"},
+        "caller_lane": {"type": "string"},
+        "operation": {"type": "string"},
+        "operation_type": {"type": "string"},
+        "result_status": {
+          "type": "string",
+          "enum": ["allowed", "denied_whitelist", "denied_permission", "denied_scope", "denied_budget", "denied_circuit_open", "executed_success", "executed_error"]
+        },
+        "token_consumption": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "latency_ms": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "error_code": {"type": "string"},
+        "segment": {"type": "string"},
+        "evidence_path": {"type": "string"}
+      }
+    },
+    "CircuitBreakerState": {
+      "type": "object",
+      "required": ["protocol_id", "state", "failure_count"],
+      "properties": {
+        "protocol_id": {"type": "string"},
+        "state": {
+          "type": "string",
+          "enum": ["CLOSED", "OPEN", "HALF_OPEN"]
+        },
+        "failure_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "failure_threshold": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 5
+        },
+        "last_failure_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "cooldown_seconds": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 60
+        },
+        "opened_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "half_open_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  }
+}

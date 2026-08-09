@@ -1,0 +1,22 @@
+# Squad: Explorer Deep
+# Lead contract internal team member — invisible to user
+
+squad:
+  id: squad_explorer_deep
+  display_name: Helena
+  area: platform_engineering
+  lead: thavren
+  role: "Deep source-local repository exploration and dependency mapping"
+  role_id: deep_codebase_explorer
+
+activation:
+  modes: [focused_squad, full_squad]
+  never_default: true
+  router: Delegation Router
+
+model_body:
+  primary: "opencode/deepseek-v4-flash-free"
+  secondary: "opencode/deepseek-v4-flash-free"
+
+lanes:
+  - dependency_mapping

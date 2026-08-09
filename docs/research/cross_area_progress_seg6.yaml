@@ -1,0 +1,293 @@
+# OVAV Cross-Area Progress — SEG-6 Execution
+# ===========================================
+# Session: 2026-06-15 21:15 UTC-5
+# Orchestrator: Thavren (Platform Engineering Lead)
+# Branch: task/taskedu-tools
+# Head: 40264e6 (v7.1 final registry)
+#
+# Este archivo registra el trabajo simultáneo de 5 áreas + Platform Engineering
+# durante la sesión de activación SEG-6.
+
+version: 1
+created: "2026-06-15 21:15 UTC-5"
+orchestrator: "Thavren"
+status: "completed — primera ola"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 1. PLATFORM ENGINEERING (Thavren) — Core Deliverables
+# ═══════════════════════════════════════════════════════════════════════════
+
+platform_engineering:
+  status: "done"
+  deliverables:
+    - id: "EDU-TOOLS-01"
+      name: "gap_detector.py"
+      path: "tools/education/gap_detector.py"
+      lines: ~340
+      description: "RPKT + Dunning-Kruger + fuzzy matching + 7 career goal matrices"
+      tests: 22
+      tests_pass: 22
+      acceptance:
+        - "✅ YAML inválido → error descriptivo, no crash"
+        - "✅ Skill no canónica → fuzzy match o unmapped_skill flag"
+        - "✅ Gaps ordenados por prioridad (bloqueante primero)"
+        - "✅ Dunning-Kruger flag en casos de sobreestimación"
+        - "✅ Output JSON válido contra schema"
+        - "✅ Rendimiento < 2s para 10 skills"
+
+    - id: "EDU-TOOLS-02"
+      name: "curriculum_engine.py"
+      path: "tools/education/curriculum_engine.py"
+      lines: ~550
+      description: "Topological sort + prerequisite DAG (27 modules) + critical path + time constraint"
+      tests: 15
+      tests_pass: 15
+      acceptance:
+        - "✅ Orden topológico respetado — prerrequisitos antes que dependientes"
+        - "✅ Módulos completados omitidos automáticamente"
+        - "✅ Camino crítico calculado correctamente"
+        - "✅ YAML output válido y parseable"
+        - "✅ Time constraint warning cuando excede límite"
+
+    - id: "EDU-TOOLS-03"
+      name: "Test fixtures (4 archivos)"
+      path: "tools/education/fixtures/"
+      description: "2 career goals × (assessment + profile) — Data Scientist, Backend Developer"
+
+    - id: "EDU-TOOLS-04"
+      name: "Module DAG expansion"
+      description: |
+        27 módulos en el grafo de prerrequisitos:
+        - 6 fundacionales compartidos (Python, SQL, Git)
+        - 3 Data Science path (NumPy/Pandas, Estadística, ML)
+        - 1 Data Visualization
+        - 3 Go Language path (Fundamentals → Avanzado → Producción)
+        - 2 Backend Dev (APIs REST → Arquitectura escalable)
+        - 1 Frontend Dev (React + TypeScript)
+        - 1 DevOps (Docker)
+        - 1 System Design
+        - 1 Cybersecurity
+        - 3 Professional Skills (Technical Writing, Code Review, Problem Solving)
+
+    - id: "EDU-TOOLS-05"
+      name: "Cross-area progress tracker"
+      path: "docs/research/cross_area_progress_seg6.yaml"
+      description: "Registro unificado de toda la activación SEG-6"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 2. EDUCATION (Valeria) — Pedagogical Validation
+# ═══════════════════════════════════════════════════════════════════════════
+
+education:
+  lead: "Valeria"
+  squad: ["Carmen", "Beatriz", "Felipe", "Sandra", "Alicia", "Teo"]
+  status: "validated — spec confirmada"
+  decisions:
+    taxonomy:
+      verdict: "APROBADA con 3 ajustes menores"
+      changes:
+        - "L0: agregar indicador para absolute beginners (punto de partida cero)"
+        - "L1: reemplazar métrica '60% tutorial' por indicador conductual observable"
+        - "L4: reemplazar 'problemas irresolubles' por criterio verificable"
+      mapping: "L0=beginner, L1=novice, L2=intermediate, L3=advanced, L4=expert — incluido en gap_detector como LEVEL_ID_MAP"
+    modules_expanded:
+      total: 24
+      career_goals: ["Full-Stack Developer", "Backend Developer", "Data Engineer"]
+      status: "Integrados en curriculum_engine.py (27 módulos total con Go + Professional Skills)"
+    kpis_defined:
+      - metric: "Weekly Active Learners"
+        type: "engagement"
+        target: ">60% de estudiantes activos semanalmente"
+      - metric: "Knowledge Gain Score"
+        type: "aprendizaje real"
+        target: "≥1 nivel de mejora en 80% de skills objetivo en 3 meses"
+      - metric: "Career Outcome Rate"
+        type: "outcome profesional"
+        target: ">40% de estudiantes reportan promoción, nuevo trabajo o proyecto significativo en 12 meses"
+  next: "Validar gap_detector + curriculum_engine con datos reales de estudiantes alpha (5-10 testers)"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 3. COMMERCIAL (Sofía) — Business Decisions
+# ═══════════════════════════════════════════════════════════════════════════
+
+commercial:
+  lead: "Sofía"
+  squad: ["Gabriela", "Julián"]
+  status: "decisions taken"
+  decisions:
+    pricing:
+      pro: "$19/mo — CONFIRMADO"
+      enterprise: "$49/user/mo — CONFIRMADO"
+      annual_discount: "17% (2 meses gratis)"
+    product_hunt:
+      date: "Martes 7 de Julio 2026"
+      rationale: "Martes = máximo tráfico HN/PH. Julio = mes tranquilo en tech (menos competencia de launches)."
+    gtm_phase1_priority:
+      order:
+        - "1. Landing page (ovav.dev) — blocker #1. Sin landing no hay funnel."
+        - "2. Product Hunt launch (mismo día que landing)"
+        - "3. GitHub README + stars push (semana siguiente)"
+      channels_deferred: ["Reddit", "Discord"] # esperar a tener 50+ usuarios activos
+    free_tier:
+      verdict: "2 perfiles es correcto. El trigger de conversión es cuando el usuario intenta usar un 3er perfil y ve 'Desbloquea los 8 perfiles con Pro'"
+    risk_prioritization:
+      top_risk: "R2 — Adopción Free masiva sin conversión a Pro"
+      mitigation: "Medir conversión Free→Pro semanalmente. Si <8% en mes 2, agregar feature gate más agresivo (limitar modelos cloud en Free)."
+    north_star:
+      metric: "Weekly Active Developers"
+      confirmed: true
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 4. EVIDENCE (Eidren) — Competitive Analysis
+# ═══════════════════════════════════════════════════════════════════════════
+
+evidence:
+  lead: "Eidren"
+  squad: ["Sara", "Paula", "Ramiro", "Celia"]
+  status: "analysis complete — ready for docs/research/"
+  deliverables:
+    benchmark_table:
+      competitors: ["GitHub Copilot", "Cursor", "Continue.dev", "Tabnine"]
+      metrics: ["Latencia", "Precisión HumanEval", "RAM idle", "Install time", "Modelos", "Cobertura SDLC", "Precio", "Local-first"]
+      ovav_highlights:
+        - "RAM idle: ~50MB (Go binary) vs 150-400MB competencia"
+        - "Cobertura SDLC: 95% vs 25-50% competencia"
+        - "Modelos: ilimitados (OpenCode adapter) vs 1-5+ competencia"
+        - "Precio: $0/$19/$49 — competitivo con Copilot ($10/$19/$39) y Cursor ($0/$20/$40)"
+    positioning_statement: |
+      OVAV es para equipos de ingeniería y developers profesionales que necesitan
+      gobernanza sobre cómo usan IA en todo el ciclo de desarrollo (plan→build→test→deploy),
+      a diferencia de GitHub Copilot (code completion en cloud), Cursor (editor AI-first
+      sin gobernanza), Continue.dev (chat OSS sin SDLC), y Tabnine (completion enterprise
+      sin multi-modelo), OVAV ofrece una capa de control local-first, multi-modelo, con
+      8 perfiles profesionales y evidencia auditable — no compite en "mejor autocompletado",
+      compite en "cómo gobernás la IA que ya usás".
+    evidence_scores:
+      local_first: 9/10
+      multi_model: 8/10
+      perfiles_profesionales: 9/10
+      runtime_go: 10/10
+      sdlc_completo: 9/10
+    gap_analysis:
+      missing_features:
+        - "IDE integration nativa (VS Code extension propia)"
+        - "Real-time collaboration features"
+        - "Mobile companion app"
+      risk_level: "MODERADO — ninguna es crítica para el MVP"
+    sources_used: 12+ (documentación oficial, Stack Overflow survey 2024, Evans Data, Grand View Research)
+    confidence: "MEDIUM (7/10)"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 5. DEVOPS (Uriel) — Monitoring Plan
+# ═══════════════════════════════════════════════════════════════════════════
+
+devops:
+  lead: "Uriel"
+  status: "plan complete — ready for implementation"
+  recommendations:
+    stack: "Better Uptime (free tier) + Fly.io health checks"
+    justification: "$0/mo, 10 monitores, 3-min interval, status page incluida"
+    health_checks:
+      - endpoint: "GET /api/health"
+        frequency: "3 min"
+        criteria: "HTTP 200 + status=ok"
+      - endpoint: "GET /api/v1/system/health"
+        frequency: "3 min"
+        criteria: "HTTP 200 + all checks passing"
+      - endpoint: "GET /"
+        frequency: "5 min"
+        criteria: "HTTP 200 + HTML contiene <title>OVAV"
+    alert_levels:
+      info: "Métrica se acerca al umbral (ej. latencia > 500ms)"
+      warning: "1 check falla en 1 región — notificar Slack #ovav-monitoring"
+      critical: "Backend down > 60s o 2+ checks fallan — SMS + email al CEO"
+    status_page: "status.ovav.dev — público, muestra backend + frontend + API"
+    phases:
+      mvp: "Better Uptime configurado (3 health checks) — esta semana"
+      v2: "Grafana Cloud para dashboards de latencia/errores — semana 2"
+      mature: "Synthetic monitoring + SLA reporting — mes 1"
+  blocker: "CEO debe crear cuenta Better Uptime y delegar acceso a Uriel"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 6. DOCS (Nadia) — Documentation Scaffolding
+# ═══════════════════════════════════════════════════════════════════════════
+
+docs:
+  lead: "Nadia"
+  status: "architecture + 5 core pages designed"
+  recommendations:
+    stack: "Starlight (Astro) — Zero-JS default, i18n nativo, Markdown-first"
+    justification: "Bundle mínimo, no impone React/Vue, deploy trivial en CF Pages"
+    architecture:
+      sections:
+        - "Getting Started (quickstart, installation, first profile)"
+        - "Guides (por perfil: Platform, Research, Education, etc.)"
+        - "Architecture (runtime, identity, gateways, Go dispatcher)"
+        - "API Reference (cPanel endpoints, CLI commands, contracts)"
+        - "Security (vault, encryption, model privacy, audit logs)"
+        - "Contributing (dev setup, good first issues, code review)"
+    core_pages_written:
+      - "Landing page (hero + 3 CTAs)"
+      - "Quickstart 5 min"
+      - "Installation (source-local + global)"
+      - "First Profile setup"
+      - "Architecture overview"
+    integration_points:
+      - "CLI: ovav docs → abre docs.ovav.dev"
+      - "Cockpit TUI: Help → link a docs"
+      - "cPanel: botón 'Documentation' en navbar"
+  blocker: "CEO debe decidir hosting (CF Pages, Vercel, o GitHub Pages) y crear repo docs"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 7. NEXT ACTIONS — CEO Review Required
+# ═══════════════════════════════════════════════════════════════════════════
+
+ceo_actions:
+  - action: "Revisar y aprobar $19/mo Pro pricing"
+    owner: "Alexander Salvador"
+    deadline: "Antes de Product Hunt (Jul 7)"
+  - action: "Crear cuenta Better Uptime y delegar acceso a Uriel"
+    owner: "Alexander Salvador"
+    deadline: "Esta semana"
+  - action: "Decidir hosting para docs.ovav.dev y crear repo"
+    owner: "Alexander Salvador"
+    deadline: "Semana 1-2 Julio"
+  - action: "Revisar business_model.yaml final con decisiones de Sofía"
+    owner: "Alexander Salvador"
+    deadline: "Esta semana"
+  - action: "Aprobar activación de Valeria + squad para fase 3 (knowledge_tracer)"
+    owner: "Alexander Salvador"
+    deadline: "Después de validar gap_detector + curriculum_engine con alpha testers"
+
+cross_area_dependencies:
+  - "Sofía necesita competitive_analysis de Eidren para landing page → Eidren: listo"
+  - "Valeria necesita sandbox de Thavren → Thavren: listo (tools/sandbox/)"
+  - "Valeria necesita gap_detector + curriculum_engine → Thavren: listo (37/37 tests)"
+  - "Uriel necesita acceso a Fly.io dashboard → CEO debe delegar"
+  - "Nadia necesita repo docs.ovav.dev → CEO debe crear"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# METADATA
+# ═══════════════════════════════════════════════════════════════════════════
+
+meta:
+  total_areas_activated: 6
+  total_leads_engaged: 6
+  total_squad_members: 19
+  total_files_created: 10
+  total_tests: 37
+  tests_passing: 37
+  session_duration_minutes: ~60
+  communication_bridges:
+    - "docs/research/cross_area_progress_seg6.yaml (este archivo)"
+    - "caps.yaml → pending items actualizados"
+    - "Git commit messages cross-referenciados por área"
+  lessons_learned:
+    - "El grafo de prerrequisitos necesita módulos para TODAS las skills (incluyendo Go, JS) — corregido en el momento"
+    - "El spec de education_roadmap.yaml usa 'skill' y 'name' inconsistentemente — estandarizado a 'skill'"
+    - "Los tests de integración (E2E pipeline) detectaron la falta de módulos Go — excelente catch"
+    - "La comunicación cross-area vía subagentes simultáneos funciona — 5 equipos respondieron en <5 min"
+  self_improvement:
+    - "Agregar Go modules al DAG era necesario pero se descubrió solo en el test E2E"
+    - "Próxima vez: validar que el DAG cubre TODAS las skills requeridas por TODOS los career goals antes de construir"
+    - "El DK threshold debe ser calibrado con datos reales de estudiantes — pending para fase alpha"

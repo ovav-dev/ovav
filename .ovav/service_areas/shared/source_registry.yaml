@@ -1,0 +1,93 @@
+sources:
+  public_external:
+    path: "<external>"
+    context_class: L0_public_external
+    owner_area: shared
+    platform_access: limited
+    research_access: allow
+
+  service_area_governance:
+    path: ".ovav/service_areas/"
+    context_class: L1_shared_governance
+    owner_area: shared
+    platform_access: read
+    research_access: read
+
+  opencode_surface:
+    path: ".opencode/"
+    context_class: L3_core_ovav_internal
+    owner_area: platform_engineering
+    platform_access: allow_by_task
+    research_access: deny_by_default
+
+  ovav_context:
+    path: ".ovav/context/"
+    context_class: L3_core_ovav_internal
+    owner_area: platform_engineering
+    platform_access: allow_by_task
+    research_access: deny_by_default
+
+  ovav_snapshots:
+    path: ".ovav/snapshots/"
+    context_class: L3_core_ovav_internal
+    owner_area: platform_engineering
+    platform_access: allow_by_task
+    research_access: deny_by_default
+
+  ovav_memory:
+    path: ".ovav/memory/"
+    context_class: L3_core_ovav_internal
+    owner_area: platform_engineering
+    platform_access: allow_by_task
+    research_access: deny_by_default
+
+  operational_memory:
+    path: "git HEAD + .ovav/plan/caps.yaml"
+    context_class: L1_shared_governance
+    owner_area: shared
+    platform_access: read
+    research_access: read
+    note: "Memory source: git HEAD + caps.yaml. No separate ledger file."
+
+  registry:
+    path: ".ovav/registry/"
+    context_class: L1_shared_governance
+    owner_area: shared
+    platform_access: read
+    research_access: read
+
+  harnesses:
+    path: "tools/harnesses/"
+    context_class: L3_core_ovav_internal
+    owner_area: platform_engineering
+    platform_access: allow_by_task
+    research_access: deny_by_default
+
+  validators:
+    path: "tools/validators/"
+    context_class: L3_core_ovav_internal
+    owner_area: platform_engineering
+    platform_access: allow_by_task
+    research_access: deny_by_default
+
+  install_tools:
+    path: "tools/install/"
+    context_class: L4_sensitive_execution
+    owner_area: platform_engineering
+    platform_access: capability_grant_required
+    research_access: deny
+
+  launch_docs:
+    path: "docs/launch/"
+    context_class: L1_shared_governance
+    owner_area: shared
+    platform_access: read
+    research_access: read
+
+rules:
+  unknown_path: deny_or_requires_permission
+  no_research_repo_root_default: true
+  no_raw_snapshot_cross_area: true
+  no_raw_chat_handoff: true
+
+# LAW-001 governance: .ovav/laws/area_boundary_enforcement.yaml (Non-Invasion Area Boundary Law)

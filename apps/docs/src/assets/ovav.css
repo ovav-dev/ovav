@@ -1,0 +1,170 @@
+/* OVAV Docs — Custom Starlight Theme */
+/* Synced with landing design tokens */
+
+:root {
+  /* Brand colors (from design-tokens) */
+  --ovav-brand: #10b981;
+  --ovav-brand-hover: #34d399;
+  --ovav-accent: #6d9b8e;
+  
+  /* Surface (matching landing) */
+  --ovav-bg: #030712;
+  --ovav-bg-panel: #0a0f1a;
+  
+  /* Text */
+  --ovav-text: #f3f4f6;
+  --ovav-text-secondary: #9ca3af;
+  --ovav-muted: #6b7280;
+  
+  /* Borders */
+  --ovav-border: rgba(255, 255, 255, 0.06);
+  
+  /* Semantic */
+  --ovav-success: #7eb77f;
+  --ovav-error: #d4756b;
+  --ovav-warning: #d4a85c;
+}
+
+/* ── Override Starlight with OVAV colors ── */
+:root[data-theme='dark'] {
+  --sl-color-accent: var(--ovav-brand);
+  --sl-color-accent-high: var(--ovav-brand-hover);
+  --sl-color-white: var(--ovav-text);
+  --sl-color-gray-1: var(--ovav-text);
+  --sl-color-gray-2: var(--ovav-text-secondary);
+  --sl-color-gray-3: var(--ovav-muted);
+  --sl-color-black: var(--ovav-bg);
+  
+  --cp-bg: var(--ovav-bg);
+  --cp-bg-nav: var(--ovav-bg-panel);
+  --cp-bg-sidebar: var(--ovav-bg-panel);
+  --cp-border: var(--ovav-border);
+}
+
+/* ── Content Width ── */
+.content-panel {
+  max-width: 72ch;
+}
+
+/* ── Code Blocks ── */
+pre {
+  background: var(--ovav-bg-panel) !important;
+  border: 1px solid var(--ovav-border);
+  border-radius: 8px;
+}
+
+code {
+  background: var(--ovav-bg-panel);
+  padding: 0.2em 0.4em;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+}
+
+/* ── Links ── */
+a {
+  color: var(--ovav-brand);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--ovav-brand-hover);
+  text-decoration: underline;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--ovav-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--ovav-muted);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ovav-text-secondary);
+}
+
+/* ── Selection ── */
+::selection {
+  background: rgba(16, 185, 129, 0.2);
+  color: var(--ovav-text);
+}
+
+/* ── Focus ── */
+*:focus-visible {
+  outline: 2px solid var(--ovav-brand);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ── Buttons (from landing) ── */
+.sl-button {
+  background: var(--ovav-brand) !important;
+  color: var(--ovav-bg) !important;
+  border: none !important;
+  border-radius: 6px !important;
+  font-weight: 600 !important;
+  transition: all 0.15s ease !important;
+}
+
+.sl-button:hover {
+  background: var(--ovav-brand-hover) !important;
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.2) !important;
+}
+
+/* ── Sidebar ── */
+.sidebar {
+  background: var(--ovav-bg-panel);
+  border-right: 1px solid var(--ovav-border);
+}
+
+.sidebar a {
+  color: var(--ovav-text-secondary);
+}
+
+.sidebar a:hover {
+  color: var(--ovav-brand);
+}
+
+.sidebar a[aria-current="page"] {
+  color: var(--ovav-brand);
+  background: rgba(16, 185, 129, 0.1);
+}
+
+/* ── Header ── */
+.header {
+  background: var(--ovav-bg);
+  border-bottom: 1px solid var(--ovav-border);
+}
+
+/* ── Tables ── */
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th, td {
+  border: 1px solid var(--ovav-border);
+  padding: 8px 12px;
+  text-align: left;
+}
+
+th {
+  background: var(--ovav-bg-panel);
+  font-weight: 600;
+}
+
+tr:hover {
+  background: rgba(255, 255, 255, 0.02);
+}

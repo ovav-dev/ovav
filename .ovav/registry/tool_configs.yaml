@@ -1,0 +1,43 @@
+tool_config_profiles:
+  wezterm_workspace_isolation:
+    schema_version: ovav.tool_config_profile.v1
+    profile_id: wezterm_workspace_isolation
+    display_name: WezTerm Workspace Isolation
+    tool_id: wezterm
+    category: terminal
+    status: source_local_profile
+    owner_scope: ovav_bab_private
+    visible_in:
+      - ovav_tailor
+      - tools_terminal
+    detection:
+      binary: wezterm
+      detected_status: detected
+      missing_status: available_not_installed_by_ovav
+      missing_message: WezTerm is not detected. OVAV can show the config profile, but it will not install WezTerm for you.
+    visible_message: WezTerm detected. OVAV can replace your default WezTerm config with a governed professional workspace profile. OVAV does not install WezTerm. Preview, backup and rollback are required before apply.
+    source_policy: config/workstation/ovav-wezterm-workspace-isolation.yaml
+    source_template: .ovav/source/configs/wezterm/ovav-workspace-isolation.wezterm.lua.example
+    helper_tool: tools/workstation/ovav_wezterm_workspace.py
+    validator: tools/validators/check_ovav_wezterm_workspace_isolation.py
+    cli:
+      plan: ovav tools wezterm plan
+      verify: ovav tools wezterm verify
+      apply: ovav tools wezterm apply
+    apply_posture:
+      default: blocked
+      requires:
+        - preview
+        - backup
+        - explicit_consent
+        - accept_risk
+        - verify
+        - rollback_manifest
+      blocked_until: explicit_install_segment_approval
+    boundaries:
+      ovav_installs_wezterm: false
+      source_local_only_now: true
+      writes_user_home_now: false
+      writes_windows_user_config_now: false
+      launches_real_wezterm_now: false
+      plugin_install_now: false

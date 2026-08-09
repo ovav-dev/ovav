@@ -1,0 +1,48 @@
+delegation_modes:
+  lead_only:
+    use_when:
+      - micro_task
+      - simple_explanation
+      - low_risk_decision
+    squad_usage: none
+
+  skill_only:
+    use_when:
+      - known_repetitive_task
+      - narrow_format_or_contract_needed
+    squad_usage: none
+
+  focused_squad:
+    use_when:
+      - medium_complexity
+      - specialized_review_needed
+      - implementation_or_research_with_multiple_lanes
+    squad_usage: 1_to_3_roles
+
+  full_squad:
+    use_when:
+      - complex_project
+      - multi_file_refactor
+      - launch_readiness
+      - high_risk_architecture
+    squad_usage: 3_to_6_roles
+
+  critical_squad:
+    use_when:
+      - security
+      - install_global_boundary
+      - drift
+      - closure
+      - sensitive_execution
+    squad_usage: focused_critical_roles_plus_validation
+
+decision_packet_required_fields:
+  - service_area
+  - lead
+  - task_size
+  - risk_level
+  - delegation_mode
+  - context_budget
+  - model_tier
+  - validation_mode
+  - delivery_contract

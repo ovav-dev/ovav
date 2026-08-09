@@ -1,0 +1,42 @@
+result_contracts:
+  required_fields:
+    - status
+    - executive_summary
+    - artifacts
+    - evidence
+    - risks
+    - next_action
+    - next_recommended_action
+    - skill_resolution
+    - memory_action
+    - human_response
+  statuses:
+    - done
+    - blocked
+    - needs_approval
+    - needs_artifact
+    - needs_verification
+  human_response_style: compact_operational
+  contracts:
+    human_compact_operational:
+      display_name: "Human Compact Operational"
+      owner_profile: ovav_systems_architect
+      required_fields: [status, executive_summary, artifacts, evidence, risks, next_action, next_recommended_action, skill_resolution, memory_action, human_response]
+      artifacts_required: [verify_report, handoff_summary, result_contract_runtime_report, evidence_verification_report, readiness_evaluation_report]
+      evidence_required:
+        - .ovav/artifacts/S8/evidence/RESULT_CONTRACT_RUNTIME_REPORT.json
+        - .ovav/artifacts/S8/evidence/EVIDENCE_VERIFICATION_REPORT.json
+        - .ovav/artifacts/S8/evidence/READINESS_EVALUATION_REPORT.json
+      eval_refs: [eval_result_contract_requires_evidence, eval_evidence_report_parseable, eval_readiness_preserves_experimental]
+      phases: [verify, archive]
+    human_evidence_operational:
+      display_name: "Human Evidence Operational"
+      owner_profile: ovav_research_analyst
+      required_fields: [status, executive_summary, artifacts, evidence, risks, next_action, next_recommended_action, skill_resolution, memory_action, human_response]
+      artifacts_required: [verify_report, handoff_summary, result_contract_runtime_report, eval_runtime_report, evidence_verification_report]
+      evidence_required:
+        - .ovav/artifacts/S8/evidence/RESULT_CONTRACT_RUNTIME_REPORT.json
+        - .ovav/artifacts/S8/evidence/EVAL_RUNTIME_REPORT.json
+        - .ovav/artifacts/S8/evidence/EVIDENCE_VERIFICATION_REPORT.json
+      eval_refs: [eval_result_contract_requires_evidence, eval_eval_runtime_targets_valid, eval_evidence_report_parseable]
+      phases: [verify, archive]

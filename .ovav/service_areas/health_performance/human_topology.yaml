@@ -1,0 +1,40 @@
+human_topology:
+  version: "1.0.0"
+  area: health_performance
+  language_policy:
+    internal: english
+    user_visible: spanish_neutral
+  entities:
+    area:
+      id: health_performance
+      kind: organizational_area
+      is_human: false
+    lead:
+      id: renata
+      kind: accountable_human_operator
+      is_human: true
+  health_performance_team:
+    - id: squad_nutritionist
+      person: Rubén
+      role_id: sports_nutritionist
+    - id: squad_physiologist
+      person: Silvia
+      role_id: exercise_physiologist
+    - id: squad_researcher
+      person: Marina
+      role_id: medical_researcher
+    - id: squad_meal_designer
+      person: Antonio
+      role_id: meal_plan_designer
+    - id: squad_tracker
+      person: Fátima
+      role_id: progress_tracker
+    - id: squad_supplement
+      person: León
+      role_id: supplementation_specialist
+    - id: squad_sleep_recovery
+      person: Luna
+      role_id: sleep_recovery_specialist
+    - id: squad_mental_performance
+      person: Bruno
+      role_id: mental_performance_coach

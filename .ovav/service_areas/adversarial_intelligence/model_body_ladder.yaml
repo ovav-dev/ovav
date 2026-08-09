@@ -1,0 +1,13 @@
+model_body_ladder:
+  version: "1.0.0"
+  area: adversarial_intelligence
+  tiers:
+    ultra:
+      models: ["opencode-go/deepseek-v4-pro", "mimo/mimo-auto"]
+      use_cases: ["attack_simulation", "architectural_audit", "race_condition_analysis"]
+    standard:
+      models: ["opencode-go/deepseek-v4-pro", "minimax-coding-plan/MiniMax-M3"]
+      use_cases: ["boundary_testing", "drift_detection", "report_generation"]
+    lite:
+      models: ["opencode-go/deepseek-v4-flash", "mimo/mimo-auto"]
+      use_cases: ["semantic_scan", "quick_boundary_check", "prompt_injection_sweep"]

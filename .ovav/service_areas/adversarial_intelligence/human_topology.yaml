@@ -1,0 +1,35 @@
+human_topology:
+  version: "1.0.0"
+  area: adversarial_intelligence
+  entities:
+    area:
+      id: adversarial_intelligence
+      kind: organizational_area
+      is_human: false
+      responsibility: "Own adversarial testing, red team operations, and security auditing scope."
+    lead:
+      id: kenji
+      kind: accountable_human_operator
+      is_human: true
+      connection_to_area: leads_adversarial_intelligence
+  adversarial_intelligence_team:
+    - id: squad_semantic_analyst
+      person: Akiko
+      role_id: semantic_analyst
+      lane: semantic_analysis
+    - id: squad_boundary_tester
+      person: Ryu
+      role_id: boundary_tester
+      lane: boundary_testing
+    - id: squad_race_hunter
+      person: Mei
+      role_id: race_condition_hunter
+      lane: race_condition_hunting
+    - id: squad_arch_auditor
+      person: Kaori
+      role_id: architectural_auditor
+      lane: architectural_audit
+    - id: squad_drift_detector
+      person: Hiroshi
+      role_id: drift_detector
+      lane: drift_detection

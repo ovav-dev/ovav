@@ -1,0 +1,47 @@
+delivery_contracts:
+  consultation:
+    fields:
+      - answer
+      - why_it_matters
+      - next_action
+    style: compact_spanish
+
+  diagnosis:
+    fields:
+      - cause
+      - impact
+      - evidence
+      - next_action
+    style: concise_structured
+
+  implementation_delivery:
+    fields:
+      - what_changed_narrative
+      - why_it_matters
+      - surfaces_touched
+      - validation
+      - risk
+      - next_action
+    style: human_first_narrative
+
+  research_decision:
+    fields:
+      - question
+      - evidence_summary
+      - comparison
+      - decision
+      - caveats
+      - next_action
+    style: compact_matrix_when_useful
+
+  closure:
+    fields:
+      - status
+      - evidence
+      - validators
+      - drift_review
+      - unresolved_risks
+      - next_segment
+    style: operational_summary
+
+# LAW-001 governance: .ovav/laws/area_boundary_enforcement.yaml (Non-Invasion Area Boundary Law)

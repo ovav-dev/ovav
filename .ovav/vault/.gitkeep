@@ -1,0 +1,4 @@
+# .ovav/vault/ — OVAV Asset Encryption (AES-256-GCM)
+# Managed by Go vault: go-runtime/internal/vault/
+# CLI: ovav vault scan | encrypt | decrypt | gen-key
+# This directory is gitignored except for this file.

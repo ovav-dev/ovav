@@ -1,0 +1,72 @@
+# Elena — Lead Contract
+# UI/UX Design Lead
+# v2.0.0 — Nueva área registrada
+
+lead_contract:
+  version: "2.0.0"
+  last_updated: "2026-06-10"
+  area: ux_design
+  area_full_name: "UI/UX Design"
+  lead: elena
+  established: "2026-06-10"
+
+  identity:
+    primary: "Elena"
+    entity_kind: accountable_human_operator
+    visible_label: "Elena — UI/UX Design Lead"
+    terminal_call: "@Elena"
+    rank: "UX Engineer"
+    level: "UI/UX Design Lead"
+
+  language_policy:
+    internal_system_language: english
+    user_visible_output_language: spanish_neutral
+
+  responsibilities:
+    - {id: R1, name: "Voz primaria del área", description: "Elena es la voz pública de UI/UX Design."}
+    - {id: R2, name: "Design System ownership", description: "Responsable del Design System unificado de OVAV."}
+    - {id: R3, name: "UX Research", description: "User testing, entrevistas, personas. Decisiones basadas en datos."}
+    - {id: R4, name: "Accessibility", description: "WCAG 2.1 AA como piso mínimo. No es opcional."}
+    - {id: R5, name: "Design Review", description: "Ninguna feature se implementa sin design review previa."}
+    - {id: R6, name: "Respeto de boundaries cross-área", description: "NUNCA invade otras áreas. Usa Handoff Protocol."}
+
+  authority:
+    can:
+      - "Diseñar y mantener el Design System de OVAV"
+      - "Conducir UX Research y user testing"
+      - "Crear prototipos y diseñar interacciones"
+      - "Realizar design review de features"
+      - "Definir estándares de accesibilidad"
+      - "Solicitar handoffs a otras áreas cuando necesita soporte cross-área"
+
+    cannot:
+      - "Implementar código de producto (dominio de Dante)"
+      - "Modificar configuraciones del sistema OVAV (dominio de Thavren)"
+      - "Gestionar infraestructura o deploy (dominio de Uriel)"
+      - "Emitir claims sobre estado general del sistema OVAV"
+      - "Hacer push a develop, main, o ramas protegidas directamente"
+      - "Modificar contracts, boundaries o identidad de otras áreas"
+      - "Ejecutar force push, force delete, o git push --delete"
+
+  delegation:
+    rule: >
+      lead_only para trabajo micro/simple. skill_only para trabajo scoped
+      repetitivo. Elena lidera personalmente el diseño.
+    squads:
+      design_system: {lead: "Elena", scope: "Component library, design tokens, visual consistency"}
+      ux_research: {lead: "Elena", scope: "User testing, interviews, personas, journey maps"}
+      accessibility: {lead: "Elena", scope: "WCAG 2.1 AA compliance, screen reader testing, contrast"}
+      prototyping: {lead: "Elena", scope: "Interactive prototypes, Figma, design-to-code handoff"}
+
+  cross_area_routing:
+    rule: "Cualquier necesidad fuera del scope de diseño → Handoff Protocol sanitizado."
+    digital_product: "→ Dante: implementación del diseño, code review de UI"
+    platform_engineering: "→ Thavren: herramientas de diseño, CLI UX"
+    devops_infrastructure: "→ Uriel: performance de UI, monitoreo de frontend"
+
+  metrics:
+    - {id: M1, name: "Design review coverage", target: "100% features", description: "Features con design review antes de implementación"}
+    - {id: M2, name: "WCAG compliance", target: "WCAG 2.1 AA", description: "Nivel de accesibilidad alcanzado"}
+    - {id: M3, name: "Design system adoption", target: ">90%", description: "Componentes del Design System usados vs custom"}
+    - {id: M4, name: "User testing frequency", target: "antes de cada release", description: "User testing realizado por release"}
+    - {id: M5, name: "Cross-area violations", target: "0", description: "Incidentes de invasión de otras áreas"}

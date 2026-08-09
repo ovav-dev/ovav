@@ -1,0 +1,32 @@
+# OVAV cPanel Backend — Fly.io STAGING Configuration (Tunnel Edition)
+# =============================================================================
+# App: ovav-systems-staging (via Cloudflare Tunnel)
+# Architecture: cloudflared tunnel → Fly.io (no public IP, no open ports)
+# Deploy: flyctl deploy --config fly.staging.toml
+# =============================================================================
+
+app = "ovav-systems-staging"
+primary_region = "dfw"
+
+[build]
+  dockerfile = "Dockerfile.cpanel"
+
+[env]
+  PORT = "5858"
+  OVAV_ROOT = "/app"
+  # TUNNEL_TOKEN — Set via: flyctl secrets set TUNNEL_TOKEN=<staging-token>
+
+# Internal-only — no public ports. cloudflared handles all ingress.
+[[services]]
+  protocol = "tcp"
+  internal_port = 5858
+  processes = ["app"]
+
+[vm]
+  memory = "256mb"
+  cpu_kind = "shared"
+  cpus = 1
+
+[experimental]
+  auto_start_machines = true
+  auto_stop_machines = true

@@ -1,0 +1,118 @@
+# OVAV System Status — Canonical Source
+# =============================================================================
+# Define the ovav_status and ovav_health tools surfaced to OpenCode.
+# The status engine (tools/visual/status_engine.py) reads these rules
+# and generates the ovav-status.js plugin.
+#
+# Schema: ovav.visual.status.v1
+# Location: .ovav/visual/status/status.yaml
+# =============================================================================
+
+schema: ovav.visual.status.v1
+version: "1.0.0"
+description: "System status query tools for OVAV — governor, memory, integrity, branch, capsule, tokens"
+
+# ══════════════════════════════════════════════════════════════════════════════
+# STATUS SECTIONS — What ovav_status reports
+# ══════════════════════════════════════════════════════════════════════════════
+sections:
+  governor:
+    description: "Estado del OVAV Governor"
+    source: ".ovav/runtime/ovav_status.json → governor"
+    fields:
+      - status
+      - label
+      - icon
+      - active
+      - session_age_min
+
+  memory:
+    description: "Estado de memoria OVAV (ledger, governor, F5 gates)"
+    source: ".ovav/runtime/ovav_status.json → memory"
+    fields:
+      - status
+      - label
+      - icon
+      - levels
+      - metrics
+
+  integrity:
+    description: "Integrity Mesh — conteo de validadores"
+    source: ".ovav/runtime/ovav_status.json → integrity"
+    fields:
+      - status
+      - label
+      - icon
+      - total
+
+  branch:
+    description: "Branch actual y estado de protección"
+    source: ".ovav/runtime/ovav_status.json → branch"
+    fields:
+      - branch
+      - protected
+      - label
+      - icon
+
+  capsule:
+    description: "Session Capsule — ID, presupuesto, tier"
+    source: ".ovav/runtime/ovav_status.json → capsule"
+    fields:
+      - active
+      - capsule_id
+      - budget_tier
+      - label
+      - icon
+
+  tokens:
+    description: "Tokens y presupuesto de sesión"
+    source: ".ovav/runtime/ovav_status.json → tokens"
+    fields:
+      - total_all
+      - total_input
+      - total_output
+      - current_usage_pct
+      - bpe_verified
+
+# ══════════════════════════════════════════════════════════════════════════════
+# HEALTH CHECK — Quick status for ovav_health
+# ══════════════════════════════════════════════════════════════════════════════
+health:
+  description: "Quick health check — OK/DEGRADED/DOWN"
+  rules:
+    - condition: "governor.status != active"
+      issue: "governor_inactive"
+    - condition: "memory.status != active"
+      issue: "memory_inactive"
+    - condition: "integrity.status == fail"
+      issue: "integrity_fail"
+    - condition: "capsule.active == false"
+      issue: "capsule_inactive"
+  status_map:
+    active: "OK"
+    degraded: "DEGRADED"
+    absent: "DOWN"
+    unknown: "UNKNOWN"
+
+# ══════════════════════════════════════════════════════════════════════════════
+# POLLING — Refresh intervals
+# ══════════════════════════════════════════════════════════════════════════════
+polling:
+  state_file: ".ovav/runtime/ovav_status.json"
+  refresh_interval_ms: 15000
+  events:
+    - "session.created"
+    - "session.idle"
+    - "session.status"
+    - "tool.execute.after"
+
+# ══════════════════════════════════════════════════════════════════════════════
+# PROYECCIÓN
+# ══════════════════════════════════════════════════════════════════════════════
+projection:
+  opencode:
+    type: "plugin_js"
+    output: ".opencode/plugins/ovav-status.js"
+    tools:
+      - ovav_status
+      - ovav_health

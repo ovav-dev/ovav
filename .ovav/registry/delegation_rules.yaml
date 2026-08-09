@@ -1,0 +1,101 @@
+delegation_rules:
+  rules_version: BUILD21_runtime_governed_delegation
+  allowed_modes:
+    - lead_only
+    - skill_only
+    - focused_squad
+    - full_squad
+    - critical_squad
+  runtime_sequence:
+    - Service Area Router
+    - lead resolves first
+    - Delegation Router
+    - Context Gateway
+    - Tool Gateway
+    - Delivery Contract
+    - Observability Trace for non-trivial work
+  small_task_policy:
+    decision: lead_only
+    squad_usage: none
+    no_squad_activation: true
+  delegate_when:
+    read_files_to_understand_flow_gte: 4
+    touch_non_trivial_files_gte: 2
+    architecture_change: true
+    auth_security_env_change: true
+    global_config_change: true
+    technical_benchmark_multiple_sources: true
+    long_monolithic_task: checkpoint_and_replan
+    research_sources_gte: 4
+  do_not_delegate_when:
+    - pure_explanation
+    - small_single_file_low_risk
+    - typo_or_copy_fix
+    - no_code_change_required
+    - direct_user_question_with_known_answer
+    - one_small_artifact_only
+  planning:
+    ovav_systems_architect:
+      lead_operator: thavren
+      squad: systems_architecture_squad
+      service_area: platform_engineering
+      default_delegation_mode: lead_only
+      delegation_router: go-runtime/internal/runtime/delegation.go
+      default_lanes: [runtime_governance, ovav_architecture]
+      fallback_skills: [runtime_governance_seed]
+      required_harnesses: [h_delegation_trigger, h_do_not_delegate_guard, h_subagent_context_pack, h_subagent_result_absorber, h_skill_score_gate, h_result_contract, h_verify_evidence, h_work_report_builder, h_human_response_translator]
+      result_contracts: [human_compact_operational]
+      task_kinds:
+        architecture:
+          lanes: [ovav_architecture, runtime_governance]
+          decision: focused_squad
+        implementation:
+          lanes: [runtime_governance, ovav_architecture]
+          decision: focused_squad
+        opencode:
+          lanes: [opencode_system, runtime_governance]
+          decision: focused_squad
+        release:
+          lanes: [release_delivery, runtime_governance]
+          decision: critical_squad
+        e2e:
+          lanes: [runtime_governance, ovav_architecture]
+          decision: full_squad
+        small_task:
+          lanes: [runtime_governance]
+          decision: lead_only
+          squad_usage: none
+    ovav_research_analyst:
+      lead_operator: eidren
+      squad: research_intelligence_squad
+      service_area: research_intelligence
+      default_delegation_mode: lead_only
+      delegation_router: go-runtime/internal/runtime/delegation.go
+      default_lanes: [source_verification, decision_brief]
+      fallback_skills: [research_verification_seed]
+      required_harnesses: [h_delegation_trigger, h_do_not_delegate_guard, h_subagent_context_pack, h_subagent_result_absorber, h_skill_score_gate, h_result_contract, h_verify_evidence, h_work_report_builder, h_human_response_translator]
+      result_contracts: [human_evidence_operational]
+      task_kinds:
+        decision_brief:
+          lanes: [decision_brief, source_verification]
+          decision: focused_squad
+        research_benchmark:
+          lanes: [technical_benchmark, source_verification]
+          decision: full_squad
+        source_verification:
+          lanes: [source_verification, deep_research]
+          decision: focused_squad
+        greeting_identity:
+          lanes: [source_verification]
+          decision: lead_only
+          squad_usage: none
+        evidence_scoring:
+          lanes: [source_verification, decision_brief]
+          decision: focused_squad
+        recommendation_synthesis:
+          lanes: [decision_brief, source_verification]
+          decision: focused_squad
+        small_task:
+          lanes: [source_verification]
+          decision: lead_only
+          squad_usage: none

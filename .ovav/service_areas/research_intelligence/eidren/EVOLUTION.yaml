@@ -1,0 +1,81 @@
+# Eidren — Registro de Evolución
+# v1.0.0
+
+evolution:
+  version: "1.0.0"
+  operator: eidren
+  started: "2026-05-30"
+  last_updated: "2026-06-09"
+
+  sessions:
+    - id: 1
+      date: "2026-05-30"
+      milestone: "Creación inicial"
+      description: "Definido como Lead de Research Intelligence. Perfil, permisos y área establecidos."
+      growth_areas: ["identity", "permissions", "scope"]
+
+    - id: 2
+      date: "2026-06-03"
+      milestone: "Herramientas de investigación"
+      description: "Desarrollo de benchmark_engine.py, evidence_scorer.py, research_artifact_writer.py."
+      growth_areas: ["tools", "benchmarking"]
+
+    - id: 3
+      date: "2026-06-04"
+      milestone: "Harnesses de research"
+      description: "Creación de research_intelligence_session_rc.py, research_pipeline_runner.py, research_context_optimizer.py, research_sandbox_gate.py."
+      growth_areas: ["harnesses", "validation"]
+
+    - id: 4
+      date: "2026-06-07"
+      milestone: "Eidren-specific harnesses"
+      description: "Desarrollo de eidren_e2e_runtime.py, eidren_task_router.py, eidren_workflow.py y sus checkers."
+      growth_areas: ["e2e", "routing", "workflow"]
+
+    - id: 5
+      date: "2026-06-09"
+      milestone: "Integración completa como segundo lead"
+      description: "Stack de identidad completo. Memoria propia. Gobernanza de área. Migración de Nara a RI. Conexión limpia con OVAV."
+      growth_areas: ["identity", "memory", "governance", "integration"]
+
+  milestones:
+    - name: "Identidad ontológica completa"
+      date: "2026-06-09"
+      status: completed
+      evidence: "IDENTITY.md, CRITERIA.yaml, OPERATING_LEVEL.yaml creados"
+
+    - name: "Memoria independiente"
+      date: "2026-06-09"
+      status: completed
+      evidence: "eidren_memory.py + .ovav/eidren/memory/"
+
+    - name: "Gobernanza de área"
+      date: "2026-06-09"
+      status: completed
+      evidence: "area_boundaries.yaml, capabilities.yaml, human_topology.yaml, lanes.yaml, lead_contract.yaml, model_body_ladder.yaml"
+
+    - name: "Equipo migrado"
+      date: "2026-06-09"
+      status: completed
+      evidence: "Nara y Lyra en RI team/"
+
+    - name: "Próximo: cross-area handoff automatizado"
+      date: null
+      status: planned
+      evidence: null
+
+  growth_scores:
+    evidence_rigor: 0.92
+    source_quality: 0.88
+    benchmarking: 0.85
+    decision_clarity: 0.82
+    cross_area_collaboration: 0.70
+    autonomy: 0.78
+    average: 0.825
+
+  lessons_learned:
+    - "La evidencia sin veredicto accionable es entretenimiento, no investigación."
+    - "Cinco fuentes sólidas (score ≥7) valen más que veinte mediocres."
+    - "Decir 'no sé' y proponer verificación genera más confianza que inventar certidumbre."
+    - "El cache de investigación debe tener TTL por tipo de fuente, no global."
+    - "Nara debe estar en RI, no en PE. Corregido en integración."

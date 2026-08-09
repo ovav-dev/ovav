@@ -1,0 +1,141 @@
+# OVAV Agent Canonical Schema v1.0
+# 
+# This file defines the canonical YAML format for OVAV agents.
+# It is the SINGLE SOURCE OF TRUTH for all agents.
+# 
+# CLI-specific formats (OpenCode .md, Claude Code, etc.) are GENERATED
+# from these files by the conversion engine in go-runtime/internal/convert/.
+# 
+# Directory structure:
+#   ovav/agents/
+#     areas/       ← Area definitions (the "storefront")
+#     leads/       ← Lead definitions (the expert + squad)
+#     teams/       ← Team member definitions (the specialists)
+
+# ── AREA SCHEMA ─────────────────────────────────────────────────────────────
+# 
+# An area is the public-facing "professional service" entity.
+# In OpenCode, areas appear as primary agents in the TAB selector.
+# 
+area_schema:
+  required:
+    - id
+    - name
+    - description
+    - lead
+    - color
+    - functions
+    - limitations
+    - hard_stop
+  fields:
+    id:            "machine identifier (e.g., platform_engineering)"
+    name:          "display name (e.g., Platform Engineering)"
+    description:   "one-line description for CLI autocomplete"
+    lead:          "reference to lead id (e.g., thavren)"
+    color:         "hex color (e.g., '#2563eb')"
+    functions:     "list of authorized functions"
+    limitations:   "list of explicit limitations (NO hacer X → Lead Y)"
+    hard_stop:     "hard stop response template"
+    surface:       "one-line surface description"
+    squad_preview: "list of {name, country, specialty} for display"
+    delegation:    "delegation protocol text"
+    law_ref:       "LAW-001 reference"
+    references:    "list of canonical reference paths"
+
+# ── LEAD SCHEMA ─────────────────────────────────────────────────────────────
+# 
+# A lead is the world-class expert running an area.
+# In OpenCode, leads are hidden from TAB but can be invoked by name.
+# 
+lead_schema:
+  required:
+    - id
+    - name
+    - display_name
+    - area
+    - origin
+    - color
+    - authority
+    - functions
+    - limitations
+    - hard_stop
+    - squad
+  fields:
+    id:            "machine identifier (e.g., thavren)"
+    name:          "short name (e.g., Thavren)"
+    display_name:  "full title (e.g., Platform Engineering & Developer Experience)"
+    area:          "reference to area id (e.g., platform_engineering)"
+    origin:        "flag + country (e.g., 🇳🇴 Norway)"
+    color:         "hex color"
+    authority:     "permission authority path"
+    functions:     "list of authorized functions (1st person)"
+    limitations:   "list of explicit limitations"
+    hard_stop:     "hard stop response template"
+    squad:         "list of {name, country, specialty}"
+    delegation:    "delegation protocol text"
+    references:    "list of canonical reference paths"
+
+# ── TEAM SCHEMA ─────────────────────────────────────────────────────────────
+# 
+# A team member is a specialist agent reporting to a lead.
+# In OpenCode, team members are subagents (mode: subagent, hidden: true).
+# 
+team_schema:
+  required:
+    - id
+    - name
+    - area
+    - lead
+    - country
+    - function
+    - actions
+    - hard_stop
+  fields:
+    id:            "machine identifier (e.g., marco)"
+    name:          "display name (e.g., Marco)"
+    area:          "reference to area id"
+    lead:          "reference to lead id (reports_to)"
+    country:       "flag + country"
+    function:      "one-line role description"
+    actions:       "list of authorized actions"
+    hard_stop:     "hard stop response template"
+    response:      "out-of-scope response template"
+
+# ── CONVERSION RULES ────────────────────────────────────────────────────────
+# 
+# These rules define how canonical YAML maps to each CLI runtime.
+# 
+conversion_rules:
+  opencode:
+    agent_types:
+      area:
+        mode: primary
+        hidden: false
+        output_format: markdown
+        filename_pattern: "area-{id}.md"
+      lead:
+        mode: primary
+        hidden: true
+        output_format: markdown
+        filename_pattern: "lead-{id}.md"
+      team:
+        mode: subagent
+        hidden: true
+        output_format: markdown
+        filename_pattern: "team-{id}.md"
+      governor:
+        mode: primary
+        hidden: true
+        output_format: markdown
+        filename_pattern: "ovav.md"
+    prompt_format: |
+      The body of the .md file (after --- frontmatter) is the system prompt.
+    frontmatter_fields:
+      - name
+      - description
+      - mode
+      - hidden
+      - color
+    config_file: "opencode.json"
+    output_dir: "runtimes/opencode/agents/"
+    symlink_target: ".opencode/agents/ → runtimes/opencode/agents/"

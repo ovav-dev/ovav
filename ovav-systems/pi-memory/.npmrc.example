@@ -1,0 +1,4 @@
+// npm publish authentication
+// Replace with your NPM_TOKEN from https://www.npmjs.com/settings/tokens
+// Then run: npm publish --access public
+// Or set CI: export NPM_TOKEN=your_token

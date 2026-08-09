@@ -1,0 +1,22 @@
+# Squad: Code Reviewer
+# Lead contract internal team member — invisible to user
+
+squad:
+  id: squad_code_reviewer
+  display_name: Pablo
+  area: platform_engineering
+  lead: thavren
+  role: "Code review, secrets detection and pattern consistency"
+  role_id: code_reviewer
+
+activation:
+  modes: [focused_squad, full_squad]
+  never_default: true
+  router: Delegation Router
+
+model_body:
+  primary: "openai/gpt-4o"
+  secondary: "opencode/deepseek-v4-flash-free"
+
+lanes:
+  - review_quality

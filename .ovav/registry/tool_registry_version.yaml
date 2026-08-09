@@ -1,0 +1,2416 @@
+changes:
+  deleted: []
+  modified:
+  - tools/agent_runtime/session_greeting.py
+  new: []
+  version_changed: true
+last_scan: '2026-06-10T14:00:15.064518+00:00'
+previous_hash: cdeeffccc3def100
+tool_count: 604
+tools:
+  tools/agent_runtime/agent_teams.py:
+    hash: 2ff049a17058fed1
+    mtime: '2026-06-10T12:29:19.199682+00:00'
+    size: 3474
+  tools/agent_runtime/alignment_bridge.py:
+    hash: 353e61b67d676fc9
+    mtime: '2026-06-10T12:29:19.199682+00:00'
+    size: 6780
+  tools/agent_runtime/alignment_tracker.py:
+    hash: c4026bfe211ed3e8
+    mtime: '2026-06-10T12:29:19.203682+00:00'
+    size: 19921
+  tools/agent_runtime/area_context_filter.py:
+    hash: d1586b113e880664
+    mtime: '2026-06-10T13:46:37.504858+00:00'
+    size: 15942
+  tools/agent_runtime/auto_delegation_router.py:
+    hash: 1e6025822622c899
+    mtime: '2026-06-10T12:29:19.203682+00:00'
+    size: 10132
+  tools/agent_runtime/autonomous_repair_cortex.py:
+    hash: 74b90a6b99bdf7ec
+    mtime: '2026-06-10T12:29:19.203682+00:00'
+    size: 48485
+  tools/agent_runtime/background_agents.py:
+    hash: 3e0526ef3469d481
+    mtime: '2026-06-10T12:29:19.203682+00:00'
+    size: 4136
+  tools/agent_runtime/belief_manager.py:
+    hash: da2823ae147fe195
+    mtime: '2026-06-10T12:29:19.203682+00:00'
+    size: 11898
+  tools/agent_runtime/budget_enforcer.py:
+    hash: 220867d7aae065ef
+    mtime: '2026-06-10T12:29:19.203682+00:00'
+    size: 1543
+  tools/agent_runtime/canonical_budget_enforcer.py:
+    hash: a53d61c2899bb9d7
+    mtime: '2026-06-10T12:29:19.203682+00:00'
+    size: 27874
+  tools/agent_runtime/capability_lifecycle.py:
+    hash: bbfa1dcb0fedacf8
+    mtime: '2026-06-10T12:29:19.203682+00:00'
+    size: 19736
+  tools/agent_runtime/context_firewall.py:
+    hash: bb7b50d0218d539a
+    mtime: '2026-06-10T12:29:19.203682+00:00'
+    size: 15721
+  tools/agent_runtime/context_firewall_v2.py:
+    hash: 72c02323a39ccac0
+    mtime: '2026-06-10T12:29:19.203682+00:00'
+    size: 25346
+  tools/agent_runtime/context_gateway.py:
+    hash: b2539356bff8a6bf
+    mtime: '2026-06-10T12:29:19.203682+00:00'
+    size: 3105
+  tools/agent_runtime/contract_integrity.py:
+    hash: c1b2908462d21729
+    mtime: '2026-06-10T12:29:19.203682+00:00'
+    size: 5628
+  tools/agent_runtime/criterion_compiler.py:
+    hash: 65274f0a1793efe7
+    mtime: '2026-06-10T12:29:19.203682+00:00'
+    size: 13520
+  tools/agent_runtime/delegation_router.py:
+    hash: ad298080937e51f9
+    mtime: '2026-06-10T12:29:19.203682+00:00'
+    size: 1546
+  tools/agent_runtime/evidence_writer.py:
+    hash: 00f4745d167b2a63
+    mtime: '2026-06-10T12:29:19.203682+00:00'
+    size: 8759
+  tools/agent_runtime/feedback_loop.py:
+    hash: ee1da2f2b7a1dee7
+    mtime: '2026-06-10T12:29:19.203682+00:00'
+    size: 9600
+  tools/agent_runtime/generate_vocab.py:
+    hash: 57ab4eb2a63a1adf
+    mtime: '2026-06-10T12:29:19.207682+00:00'
+    size: 5000
+  tools/agent_runtime/handoff_protocol.py:
+    hash: bdc626608b711502
+    mtime: '2026-06-10T12:29:19.207682+00:00'
+    size: 1861
+  tools/agent_runtime/harness_router.py:
+    hash: 6125c1b0ed26d92f
+    mtime: '2026-06-10T12:29:19.207682+00:00'
+    size: 22651
+  tools/agent_runtime/hebbian_weights.py:
+    hash: 9cc192636c385b4e
+    mtime: '2026-06-10T12:29:19.207682+00:00'
+    size: 18147
+  tools/agent_runtime/identity_guard.py:
+    hash: 444507acfa8e012e
+    mtime: '2026-06-10T12:29:19.207682+00:00'
+    size: 11434
+  tools/agent_runtime/identity_packet_compiler.py:
+    hash: a8c762413db45246
+    mtime: '2026-06-10T12:29:19.207682+00:00'
+    size: 15385
+  tools/agent_runtime/injection_detector.py:
+    hash: c173c70492c47ab6
+    mtime: '2026-06-10T12:29:19.211682+00:00'
+    size: 17381
+  tools/agent_runtime/kc_integration_bridge.py:
+    hash: d7907083e359f32a
+    mtime: '2026-06-10T12:29:19.211682+00:00'
+    size: 8249
+  tools/agent_runtime/knowledge_compiler.py:
+    hash: 237a81133f5e7b86
+    mtime: '2026-06-10T12:29:19.211682+00:00'
+    size: 17297
+  tools/agent_runtime/knowledge_graph.py:
+    hash: bcbdc78ac59f9c61
+    mtime: '2026-06-10T12:29:19.211682+00:00'
+    size: 18941
+  tools/agent_runtime/license_validator.py:
+    hash: e6ce0b5fe4f4878d
+    mtime: '2026-06-10T12:29:19.211682+00:00'
+    size: 6502
+  tools/agent_runtime/living_compiler_loop.py:
+    hash: 2556c98f71855974
+    mtime: '2026-06-10T12:29:19.211682+00:00'
+    size: 6892
+  tools/agent_runtime/model_body_router.py:
+    hash: 261a02f822e64bc7
+    mtime: '2026-06-10T12:29:19.211682+00:00'
+    size: 21582
+  tools/agent_runtime/model_watchdog.py:
+    hash: 19e77dff0505e365
+    mtime: '2026-06-10T12:29:19.211682+00:00'
+    size: 5775
+  tools/agent_runtime/nerve_bus.py:
+    hash: 105d3c339f0e6419
+    mtime: '2026-06-10T12:29:19.211682+00:00'
+    size: 39733
+  tools/agent_runtime/observability_engine.py:
+    hash: 2235d3d518580635
+    mtime: '2026-06-10T12:29:19.211682+00:00'
+    size: 11142
+  tools/agent_runtime/observability_trace.py:
+    hash: 22cbfe5efb70fd2f
+    mtime: '2026-06-10T12:29:19.211682+00:00'
+    size: 1361
+  tools/agent_runtime/pain_scorer.py:
+    hash: e7ebd6f90a67206b
+    mtime: '2026-06-10T12:29:19.215682+00:00'
+    size: 44148
+  tools/agent_runtime/pattern_detector.py:
+    hash: 752cb0bfe339334a
+    mtime: '2026-06-10T12:29:19.215682+00:00'
+    size: 23991
+  tools/agent_runtime/pattern_learner.py:
+    hash: 7bba7c1f2350bab5
+    mtime: '2026-06-10T12:29:19.215682+00:00'
+    size: 28669
+  tools/agent_runtime/projection_engine.py:
+    hash: 41d7416dc9c88889
+    mtime: '2026-06-10T12:29:19.215682+00:00'
+    size: 12065
+  tools/agent_runtime/provider_abstraction.py:
+    hash: fcd6efaf7591f78d
+    mtime: '2026-06-10T12:29:19.215682+00:00'
+    size: 12275
+  tools/agent_runtime/runtime_safety_governor.py:
+    hash: cf4b86f216f02141
+    mtime: '2026-06-10T12:29:19.215682+00:00'
+    size: 28943
+  tools/agent_runtime/self_diagnosis.py:
+    hash: 63d91677f7fc7142
+    mtime: '2026-06-10T12:29:19.215682+00:00'
+    size: 6435
+  tools/agent_runtime/semantic_query.py:
+    hash: c1e92e61ee837aa5
+    mtime: '2026-06-10T12:29:19.215682+00:00'
+    size: 7081
+  tools/agent_runtime/service_area_router.py:
+    hash: 8c00f03f05dbb3bf
+    mtime: '2026-06-10T12:29:19.215682+00:00'
+    size: 5909
+  tools/agent_runtime/session_greeting.py:
+    hash: ee5f58374f605b15
+    mtime: '2026-06-10T13:59:22.231258+00:00'
+    size: 71772
+  tools/agent_runtime/session_handoff.py:
+    hash: ad66442bde219553
+    mtime: '2026-06-10T12:29:19.219682+00:00'
+    size: 11124
+  tools/agent_runtime/signal_bus.py:
+    hash: f086d68572f6e120
+    mtime: '2026-06-10T13:55:30.403718+00:00'
+    size: 12745
+  tools/agent_runtime/silent_fail_cortex.py:
+    hash: 462b5526013b2372
+    mtime: '2026-06-10T12:29:19.219682+00:00'
+    size: 17603
+  tools/agent_runtime/snv_activation.py:
+    hash: 5ee36e88e768bba7
+    mtime: '2026-06-10T12:29:19.219682+00:00'
+    size: 13443
+  tools/agent_runtime/snv_integration.py:
+    hash: 505607236e8c943d
+    mtime: '2026-06-10T12:29:19.219682+00:00'
+    size: 32966
+  tools/agent_runtime/snv_predictor.py:
+    hash: 566317dc3570db79
+    mtime: '2026-06-10T12:29:19.219682+00:00'
+    size: 27232
+  tools/agent_runtime/snv_state_store.py:
+    hash: 36a70326553bf3c9
+    mtime: '2026-06-10T12:29:19.219682+00:00'
+    size: 33533
+  tools/agent_runtime/surface_map_compiler.py:
+    hash: 36c09039814e889d
+    mtime: '2026-06-10T12:29:19.223682+00:00'
+    size: 8427
+  tools/agent_runtime/temporal_cortex.py:
+    hash: d97aa8e90f07de69
+    mtime: '2026-06-10T12:29:19.227682+00:00'
+    size: 27498
+  tools/agent_runtime/token_budget_enforcer.py:
+    hash: b9898ccd150e992e
+    mtime: '2026-06-10T12:29:19.227682+00:00'
+    size: 1439
+  tools/agent_runtime/token_counter.py:
+    hash: 8154e3ca1f7185d5
+    mtime: '2026-06-10T12:29:19.227682+00:00'
+    size: 17701
+  tools/agent_runtime/tool_consolidator.py:
+    hash: 32e4495ff02b013e
+    mtime: '2026-06-10T12:29:19.227682+00:00'
+    size: 24579
+  tools/agent_runtime/tool_gateway.py:
+    hash: 9cf030504caf5826
+    mtime: '2026-06-10T12:29:19.227682+00:00'
+    size: 2582
+  tools/agent_runtime/tool_registry.py:
+    hash: 8b0b19c1b7ba001f
+    mtime: '2026-06-10T13:58:58.838677+00:00'
+    size: 11720
+  tools/agent_runtime/trigger_compiler.py:
+    hash: 1c71305200233a7f
+    mtime: '2026-06-10T12:29:19.227682+00:00'
+    size: 7981
+  tools/agent_runtime/trigger_engine.py:
+    hash: 7e9952b6a2f3116d
+    mtime: '2026-06-10T12:29:19.227682+00:00'
+    size: 12922
+  tools/agent_runtime/watcher_mesh.py:
+    hash: 8d128cd7eacbf347
+    mtime: '2026-06-10T12:29:19.251682+00:00'
+    size: 7842
+  tools/economy/budget_governor.py:
+    hash: e8b6b2e9b94d2d17
+    mtime: '2026-06-10T12:29:19.263682+00:00'
+    size: 15338
+  tools/economy/cost_estimator.py:
+    hash: e84eb917fb0697d4
+    mtime: '2026-06-10T12:29:19.263682+00:00'
+    size: 13012
+  tools/economy/cost_tracker.py:
+    hash: 5a29ea4bb66d009e
+    mtime: '2026-06-10T12:29:19.263682+00:00'
+    size: 23223
+  tools/economy/cost_tracker_auto.py:
+    hash: 2a1aa54158712b8b
+    mtime: '2026-06-10T12:29:19.267682+00:00'
+    size: 7152
+  tools/economy/dashboard.py:
+    hash: 90c8108682a5aebe
+    mtime: '2026-06-10T12:29:19.267682+00:00'
+    size: 6097
+  tools/economy/monetary_cortex.py:
+    hash: a8f9885e93305d16
+    mtime: '2026-06-10T12:29:19.271682+00:00'
+    size: 14877
+  tools/github/ovav_gh_issue_gate.py:
+    hash: c56b827a8401527e
+    mtime: '2026-06-10T12:29:19.271682+00:00'
+    size: 4728
+  tools/github/ovav_git_push_gate.py:
+    hash: c15212223b60bbe0
+    mtime: '2026-06-10T12:29:19.271682+00:00'
+    size: 11027
+  tools/governor/attribution_seal.py:
+    hash: 8c18f0bf90e89048
+    mtime: '2026-06-10T12:29:19.271682+00:00'
+    size: 10512
+  tools/governor/consciousness_loop.py:
+    hash: f090d711c0f16202
+    mtime: '2026-06-10T12:29:19.271682+00:00'
+    size: 14890
+  tools/governor/consult_ovav.py:
+    hash: ed8431f3e9b41d32
+    mtime: '2026-06-10T12:29:19.275682+00:00'
+    size: 22583
+  tools/governor/creator_recognition.py:
+    hash: 85610628e2144fe2
+    mtime: '2026-06-10T12:29:19.275682+00:00'
+    size: 18976
+  tools/governor/dante_memory.py:
+    hash: 5557be4b20b52352
+    mtime: '2026-06-10T12:29:19.275682+00:00'
+    size: 10337
+  tools/governor/decision_engine.py:
+    hash: c87cb4fcbd7494e8
+    mtime: '2026-06-10T13:32:06.860388+00:00'
+    size: 19742
+  tools/governor/delegation_protocol.py:
+    hash: b70f2ec42134a1cf
+    mtime: '2026-06-10T12:29:19.275682+00:00'
+    size: 13767
+  tools/governor/eidren_memory.py:
+    hash: 4e26585dbd61ce1d
+    mtime: '2026-06-10T12:29:19.275682+00:00'
+    size: 10365
+  tools/governor/genesis_key.py:
+    hash: ea046bd9bf2983db
+    mtime: '2026-06-10T12:29:19.275682+00:00'
+    size: 6370
+  tools/governor/governor_cycle.py:
+    hash: 8086e6bd63aa1d56
+    mtime: '2026-06-10T12:29:19.275682+00:00'
+    size: 7140
+  tools/governor/integration_acceptance_protocol.py:
+    hash: 62f9cfdca324583e
+    mtime: '2026-06-10T12:29:19.275682+00:00'
+    size: 39461
+  tools/governor/interrupt_engine.py:
+    hash: 1b55ba92b1a3c4b5
+    mtime: '2026-06-10T12:29:19.275682+00:00'
+    size: 18295
+  tools/governor/maturity_maintenance_cycle.py:
+    hash: 303c3b18498c01a7
+    mtime: '2026-06-10T12:29:19.275682+00:00'
+    size: 6746
+  tools/governor/milestone_recognition.py:
+    hash: b4c9e979ba74cc71
+    mtime: '2026-06-10T12:29:19.275682+00:00'
+    size: 14833
+  tools/governor/output_guard.py:
+    hash: 9a015f127569d53d
+    mtime: '2026-06-10T13:45:13.357061+00:00'
+    size: 12336
+  tools/governor/perception_engine.py:
+    hash: bc5164557bba9ebd
+    mtime: '2026-06-10T13:31:01.255324+00:00'
+    size: 21210
+  tools/governor/renata_memory.py:
+    hash: b8209b28d3cce06d
+    mtime: '2026-06-10T12:29:19.279682+00:00'
+    size: 10362
+  tools/governor/self_diagnosis.py:
+    hash: 3b61baacff9d8c47
+    mtime: '2026-06-10T12:29:19.279682+00:00'
+    size: 23083
+  tools/governor/self_model.py:
+    hash: 860005a016a30734
+    mtime: '2026-06-10T12:29:19.279682+00:00'
+    size: 8771
+  tools/governor/session_feed.py:
+    hash: ecb35f2020a00ba5
+    mtime: '2026-06-10T12:29:19.279682+00:00'
+    size: 9040
+  tools/governor/sofia_memory.py:
+    hash: f892afb1a90bf1ab
+    mtime: '2026-06-10T12:29:19.279682+00:00'
+    size: 10347
+  tools/governor/system_maturity_classifier.py:
+    hash: d0ebabe5f1f55ce9
+    mtime: '2026-06-10T12:29:19.279682+00:00'
+    size: 32991
+  tools/governor/thavren_memory.py:
+    hash: 1168d0c44a88ae2f
+    mtime: '2026-06-10T12:29:19.279682+00:00'
+    size: 22282
+  tools/governor/trust_gate.py:
+    hash: b30633fa38cc6498
+    mtime: '2026-06-10T12:29:19.279682+00:00'
+    size: 11050
+  tools/governor/unified_health.py:
+    hash: d0142904e8452306
+    mtime: '2026-06-10T12:29:19.279682+00:00'
+    size: 6999
+  tools/governor/valeria_memory.py:
+    hash: 6b6321ebd23dcd8c
+    mtime: '2026-06-10T12:29:19.279682+00:00'
+    size: 10381
+  tools/governor/verify_signature.py:
+    hash: 4db924c69b44111d
+    mtime: '2026-06-10T12:29:19.279682+00:00'
+    size: 1484
+  tools/governor/voice_router.py:
+    hash: e7108bb0db2b6b70
+    mtime: '2026-06-10T12:29:19.279682+00:00'
+    size: 13022
+  tools/harnesses/adversarial_skill_cases.py:
+    hash: 5d87c1660f3b9d62
+    mtime: '2026-06-10T12:29:19.283682+00:00'
+    size: 14177
+  tools/harnesses/approval_risk_router.py:
+    hash: c512a5a18696c34e
+    mtime: '2026-06-10T12:29:19.283682+00:00'
+    size: 14534
+  tools/harnesses/artifact_dependency.py:
+    hash: 9ac20b1a01a513d6
+    mtime: '2026-06-10T12:29:19.283682+00:00'
+    size: 8075
+  tools/harnesses/artifact_writer.py:
+    hash: c5e3e8920eda6c0e
+    mtime: '2026-06-10T12:29:19.283682+00:00'
+    size: 3326
+  tools/harnesses/auto_changelog.py:
+    hash: 3d35230ae7644a46
+    mtime: '2026-06-10T12:29:19.283682+00:00'
+    size: 6622
+  tools/harnesses/auto_packet_generator.py:
+    hash: d1f6f866f4a5d212
+    mtime: '2026-06-10T12:29:19.283682+00:00'
+    size: 23543
+  tools/harnesses/build1_closure_report.py:
+    hash: e5a6d71f74dab745
+    mtime: '2026-06-10T12:29:19.283682+00:00'
+    size: 8610
+  tools/harnesses/build1_readiness.py:
+    hash: 60bd82a69044b8a6
+    mtime: '2026-06-10T12:29:19.283682+00:00'
+    size: 26017
+  tools/harnesses/build2_closure.py:
+    hash: 8476b37a6b1d475c
+    mtime: '2026-06-10T12:29:19.287682+00:00'
+    size: 13123
+  tools/harnesses/build2_closure_report.py:
+    hash: 7f89d2344048207e
+    mtime: '2026-06-10T12:29:19.287682+00:00'
+    size: 9983
+  tools/harnesses/build2_e2e_rc1.py:
+    hash: 953dd63a778d226f
+    mtime: '2026-06-10T12:29:19.287682+00:00'
+    size: 13296
+  tools/harnesses/build2_e2e_report.py:
+    hash: '1314875301369769'
+    mtime: '2026-06-10T12:29:19.287682+00:00'
+    size: 4429
+  tools/harnesses/build2_final_readiness.py:
+    hash: 7980a9030a685734
+    mtime: '2026-06-10T12:29:19.287682+00:00'
+    size: 9212
+  tools/harnesses/build2_rc1_readiness.py:
+    hash: c52bd72f9b077b00
+    mtime: '2026-06-10T12:29:19.287682+00:00'
+    size: 3022
+  tools/harnesses/build2_routing_matrix.py:
+    hash: a3efac507f25140e
+    mtime: '2026-06-10T12:29:19.287682+00:00'
+    size: 5651
+  tools/harnesses/build2_scope_boundaries.py:
+    hash: f92f9484f614e7a5
+    mtime: '2026-06-10T12:29:19.287682+00:00'
+    size: 4237
+  tools/harnesses/build2_segment_map.py:
+    hash: ffe29441f67d1ca3
+    mtime: '2026-06-10T12:29:19.291682+00:00'
+    size: 11129
+  tools/harnesses/build3_auto_trigger_matrix.py:
+    hash: a3aa308911041237
+    mtime: '2026-06-10T12:29:19.291682+00:00'
+    size: 5153
+  tools/harnesses/build3_closure_report.py:
+    hash: 7c3642ac9b135e40
+    mtime: '2026-06-10T12:29:19.291682+00:00'
+    size: 9076
+  tools/harnesses/build3_final_readiness.py:
+    hash: 528adf5d91e3a51b
+    mtime: '2026-06-10T12:29:19.291682+00:00'
+    size: 2745
+  tools/harnesses/build3_friction_score.py:
+    hash: cd58e6dc2834f36a
+    mtime: '2026-06-10T12:29:19.291682+00:00'
+    size: 4188
+  tools/harnesses/build3_rc2_closure.py:
+    hash: 8b66207b32e4e4d2
+    mtime: '2026-06-10T12:29:19.291682+00:00'
+    size: 20350
+  tools/harnesses/build3_runtime_ux_requirements.py:
+    hash: f6c9cf6dfe76e52c
+    mtime: '2026-06-10T12:29:19.291682+00:00'
+    size: 4451
+  tools/harnesses/build3_scope_boundaries.py:
+    hash: bda08ae653206c8f
+    mtime: '2026-06-10T12:29:19.291682+00:00'
+    size: 4456
+  tools/harnesses/build3_segment_map.py:
+    hash: 96312a31d20b2edc
+    mtime: '2026-06-10T12:29:19.291682+00:00'
+    size: 12096
+  tools/harnesses/build3_use_friction_e2e.py:
+    hash: e354f96435e24909
+    mtime: '2026-06-10T12:29:19.291682+00:00'
+    size: 16529
+  tools/harnesses/build3_use_friction_report.py:
+    hash: ff27f1f2c5f0bd72
+    mtime: '2026-06-10T12:29:19.291682+00:00'
+    size: 5979
+  tools/harnesses/build4_activation_order.py:
+    hash: e858c5dbc51c16d2
+    mtime: '2026-06-10T12:29:19.291682+00:00'
+    size: 4596
+  tools/harnesses/build4_blocked_surface_audit.py:
+    hash: c25ceeffe0578629
+    mtime: '2026-06-10T12:29:19.295682+00:00'
+    size: 10183
+  tools/harnesses/build4_closure.py:
+    hash: 784c5e2772a7a674
+    mtime: '2026-06-10T12:29:19.295682+00:00'
+    size: 7898
+  tools/harnesses/build4_closure_report.py:
+    hash: 19f03d4217c4faef
+    mtime: '2026-06-10T12:29:19.295682+00:00'
+    size: 10983
+  tools/harnesses/build4_final_baseline.py:
+    hash: a4cf1769de92366d
+    mtime: '2026-06-10T12:29:19.295682+00:00'
+    size: 11216
+  tools/harnesses/build4_final_readiness.py:
+    hash: 49e228d7d800fd85
+    mtime: '2026-06-10T12:29:19.295682+00:00'
+    size: 10148
+  tools/harnesses/build4_final_readiness_report.py:
+    hash: 9de3d46dad440247
+    mtime: '2026-06-10T12:29:19.295682+00:00'
+    size: 12058
+  tools/harnesses/build4_graduation_e2e.py:
+    hash: 53700cffedafe7c1
+    mtime: '2026-06-10T12:29:19.295682+00:00'
+    size: 10951
+  tools/harnesses/build4_graduation_e2e_report.py:
+    hash: 2510728d660d5a13
+    mtime: '2026-06-10T12:29:19.295682+00:00'
+    size: 9886
+  tools/harnesses/build4_graduation_readiness.py:
+    hash: af66ec651d4e6b62
+    mtime: '2026-06-10T12:29:19.295682+00:00'
+    size: 3990
+  tools/harnesses/build4_scope_boundaries.py:
+    hash: 403533d5692cfdba
+    mtime: '2026-06-10T12:29:19.295682+00:00'
+    size: 4586
+  tools/harnesses/build4_segment_map.py:
+    hash: d01c638088d4e033
+    mtime: '2026-06-10T12:29:19.295682+00:00'
+    size: 13608
+  tools/harnesses/build4_surface_readiness_matrix.py:
+    hash: d730646fa8de8f88
+    mtime: '2026-06-10T12:29:19.299682+00:00'
+    size: 8171
+  tools/harnesses/build5_closure.py:
+    hash: 57ec1701b5d8853e
+    mtime: '2026-06-10T12:29:19.299682+00:00'
+    size: 11090
+  tools/harnesses/build5_opencode_ux_report.py:
+    hash: a0bbf7a79957ba74
+    mtime: '2026-06-10T12:29:19.299682+00:00'
+    size: 3182
+  tools/harnesses/build5_opencode_ux_scope.py:
+    hash: 4d2e709dc29a5718
+    mtime: '2026-06-10T12:29:19.299682+00:00'
+    size: 4716
+  tools/harnesses/build6_e2e_validation.py:
+    hash: a23d45651a26fe94
+    mtime: '2026-06-10T12:29:19.299682+00:00'
+    size: 8000
+  tools/harnesses/build6_planning_report.py:
+    hash: 3039415b11f4428b
+    mtime: '2026-06-10T12:29:19.299682+00:00'
+    size: 3235
+  tools/harnesses/build6_scope_boundaries.py:
+    hash: 302c1f12f2de2f2e
+    mtime: '2026-06-10T12:29:19.299682+00:00'
+    size: 4255
+  tools/harnesses/build6_segment_map.py:
+    hash: d99ef1e68818e193
+    mtime: '2026-06-10T12:29:19.299682+00:00'
+    size: 11801
+  tools/harnesses/build7_e2e_validation.py:
+    hash: 7aa795a238af6b53
+    mtime: '2026-06-10T12:29:19.299682+00:00'
+    size: 7445
+  tools/harnesses/capability_lifecycle_gate.py:
+    hash: 027cebf92096a489
+    mtime: '2026-06-10T12:29:19.299682+00:00'
+    size: 14129
+  tools/harnesses/capability_retirement_candidates.py:
+    hash: 9fef0e9e409f2616
+    mtime: '2026-06-10T12:29:19.299682+00:00'
+    size: 15946
+  tools/harnesses/capability_score_report.py:
+    hash: 355bca659e46d233
+    mtime: '2026-06-10T12:29:19.303682+00:00'
+    size: 14434
+  tools/harnesses/caution_gate.py:
+    hash: 6c7c3acdbdc96c1b
+    mtime: '2026-06-10T12:29:19.303682+00:00'
+    size: 9383
+  tools/harnesses/caution_graduation.py:
+    hash: 2f6f7488d05007d0
+    mtime: '2026-06-10T12:29:19.303682+00:00'
+    size: 4369
+  tools/harnesses/caution_policy.py:
+    hash: 425aed43a179432c
+    mtime: '2026-06-10T12:29:19.303682+00:00'
+    size: 17157
+  tools/harnesses/change_manifest.py:
+    hash: b43d694e9cce78ee
+    mtime: '2026-06-10T12:29:19.303682+00:00'
+    size: 6958
+  tools/harnesses/check_activate_protocol.py:
+    hash: 91c42eae9e54f6b8
+    mtime: '2026-06-10T12:29:19.303682+00:00'
+    size: 4799
+  tools/harnesses/check_auto_close_executor.py:
+    hash: a0f44388a7ea8df8
+    mtime: '2026-06-10T12:29:19.303682+00:00'
+    size: 6203
+  tools/harnesses/check_build14_planning_freeze.py:
+    hash: f63ddef9b29ffe2a
+    mtime: '2026-06-10T12:29:19.303682+00:00'
+    size: 11421
+  tools/harnesses/check_build16_closure.py:
+    hash: 877db346d2d18183
+    mtime: '2026-06-10T12:29:19.303682+00:00'
+    size: 8922
+  tools/harnesses/check_build1_closure.py:
+    hash: ac60829207335a24
+    mtime: '2026-06-10T12:29:19.303682+00:00'
+    size: 14213
+  tools/harnesses/check_build2_closure.py:
+    hash: 5361eaabc57ba680
+    mtime: '2026-06-10T12:29:19.307682+00:00'
+    size: 16991
+  tools/harnesses/check_build2_e2e_rc1.py:
+    hash: 92c7ec4b2bd0c869
+    mtime: '2026-06-10T12:29:19.307682+00:00'
+    size: 8147
+  tools/harnesses/check_build2_planning_freeze.py:
+    hash: bd9ecc69b2babf4c
+    mtime: '2026-06-10T12:29:19.307682+00:00'
+    size: 11337
+  tools/harnesses/check_build3_planning_freeze.py:
+    hash: c09058e67257e16d
+    mtime: '2026-06-10T12:29:19.307682+00:00'
+    size: 13433
+  tools/harnesses/check_build3_rc2_closure.py:
+    hash: 0503c96729f5d9c7
+    mtime: '2026-06-10T12:29:19.307682+00:00'
+    size: 11815
+  tools/harnesses/check_build3_use_friction_e2e.py:
+    hash: b2a1198a7ce0d92b
+    mtime: '2026-06-10T12:29:19.307682+00:00'
+    size: 11381
+  tools/harnesses/check_build4_closure.py:
+    hash: 5263aa16c292c866
+    mtime: '2026-06-10T12:29:19.307682+00:00'
+    size: 10099
+  tools/harnesses/check_build4_final_readiness.py:
+    hash: dcbdffbb9f3133ef
+    mtime: '2026-06-10T12:29:19.307682+00:00'
+    size: 11165
+  tools/harnesses/check_build4_graduation_e2e_rc.py:
+    hash: 0a4cf3f2ef0eae7e
+    mtime: '2026-06-10T12:29:19.307682+00:00'
+    size: 9480
+  tools/harnesses/check_build4_planning_freeze.py:
+    hash: 34abeb5b43a1748e
+    mtime: '2026-06-10T12:29:19.307682+00:00'
+    size: 14727
+  tools/harnesses/check_build5_closure.py:
+    hash: 5c07ba3b24a614ff
+    mtime: '2026-06-10T12:29:19.311682+00:00'
+    size: 12972
+  tools/harnesses/check_build5_opencode_visible_role_freeze.py:
+    hash: 8569187fb5d841d0
+    mtime: '2026-06-10T12:29:19.311682+00:00'
+    size: 8400
+  tools/harnesses/check_build6_planning_freeze.py:
+    hash: 28ce6993a88284da
+    mtime: '2026-06-10T12:29:19.311682+00:00'
+    size: 14537
+  tools/harnesses/check_build7_closure.py:
+    hash: e23eb456058c2166
+    mtime: '2026-06-10T12:29:19.311682+00:00'
+    size: 2375
+  tools/harnesses/check_build7_planning_freeze.py:
+    hash: 13cfc73c63c58135
+    mtime: '2026-06-10T12:29:19.311682+00:00'
+    size: 16002
+  tools/harnesses/check_caution_policy_gates.py:
+    hash: b6fc2af849d8213b
+    mtime: '2026-06-10T12:29:19.311682+00:00'
+    size: 20658
+  tools/harnesses/check_context_budget_task_router.py:
+    hash: fa13dc18be7c3648
+    mtime: '2026-06-10T12:29:19.311682+00:00'
+    size: 7581
+  tools/harnesses/check_context_compaction_runtime.py:
+    hash: aaa447cb9aa87775
+    mtime: '2026-06-10T12:29:19.311682+00:00'
+    size: 7138
+  tools/harnesses/check_context_default_harness_index.py:
+    hash: df518c96388aac4d
+    mtime: '2026-06-10T12:29:19.311682+00:00'
+    size: 9321
+  tools/harnesses/check_deactivate_protocol.py:
+    hash: 76729098438eeb28
+    mtime: '2026-06-10T12:29:19.311682+00:00'
+    size: 3978
+  tools/harnesses/check_delegation_runtime.py:
+    hash: 0f08f7251c6502b8
+    mtime: '2026-06-10T12:29:19.311682+00:00'
+    size: 10051
+  tools/harnesses/check_dual_profile_readiness.py:
+    hash: ca1477c4c9c4b753
+    mtime: '2026-06-10T12:29:19.311682+00:00'
+    size: 21245
+  tools/harnesses/check_eidren_e2e.py:
+    hash: 61af5286502c7748
+    mtime: '2026-06-10T12:29:19.311682+00:00'
+    size: 6795
+  tools/harnesses/check_eidren_practical_workflow.py:
+    hash: fd6083066e09f5ed
+    mtime: '2026-06-10T12:29:19.315681+00:00'
+    size: 16506
+  tools/harnesses/check_evidence_stability.py:
+    hash: 5f6c9b802689797b
+    mtime: '2026-06-10T12:29:19.315681+00:00'
+    size: 14052
+  tools/harnesses/check_fix_audit.py:
+    hash: 9f47183e5b4ec485
+    mtime: '2026-06-10T12:29:19.315681+00:00'
+    size: 2274
+  tools/harnesses/check_git_change_manifest.py:
+    hash: f7bb64cb00ebaa5e
+    mtime: '2026-06-10T12:29:19.315681+00:00'
+    size: 4954
+  tools/harnesses/check_git_stage_intelligence.py:
+    hash: b0b08767930d6b2e
+    mtime: '2026-06-10T12:29:19.315681+00:00'
+    size: 4655
+  tools/harnesses/check_global_control_bridge_m1.py:
+    hash: b0f66795a7dc6d3c
+    mtime: '2026-06-10T12:29:19.315681+00:00'
+    size: 5138
+  tools/harnesses/check_global_projection_bridge_m2.py:
+    hash: 8cc4a742dc6362bb
+    mtime: '2026-06-10T12:29:19.315681+00:00'
+    size: 1813
+  tools/harnesses/check_graduation_gate_runtime.py:
+    hash: 5e28557229fde758
+    mtime: '2026-06-10T12:29:19.315681+00:00'
+    size: 13851
+  tools/harnesses/check_handoff_runtime_ux.py:
+    hash: 722c9c116534a913
+    mtime: '2026-06-10T12:29:19.315681+00:00'
+    size: 8706
+  tools/harnesses/check_harness_intelligence_router.py:
+    hash: 8ff54fa786179171
+    mtime: '2026-06-10T12:29:19.315681+00:00'
+    size: 5800
+  tools/harnesses/check_harness_reuse_audit.py:
+    hash: 4d48686966ea04ad
+    mtime: '2026-06-10T12:29:19.315681+00:00'
+    size: 27756
+  tools/harnesses/check_human_response_contract.py:
+    hash: 3d89e2c1e25ed1eb
+    mtime: '2026-06-10T12:29:19.315681+00:00'
+    size: 1822
+  tools/harnesses/check_install_governor.py:
+    hash: c251dc126d72977b
+    mtime: '2026-06-10T12:29:19.315681+00:00'
+    size: 17408
+  tools/harnesses/check_install_governor_sandbox.py:
+    hash: bdbc07f1d72fa2f1
+    mtime: '2026-06-10T12:29:19.315681+00:00'
+    size: 6394
+  tools/harnesses/check_install_sandbox_usability.py:
+    hash: deff221c20466ab2
+    mtime: '2026-06-10T12:29:19.319681+00:00'
+    size: 12027
+  tools/harnesses/check_install_source_local_apply_policy.py:
+    hash: ff1bc476c866d4d2
+    mtime: '2026-06-10T12:29:19.319681+00:00'
+    size: 12253
+  tools/harnesses/check_install_source_local_apply_sandbox.py:
+    hash: b0c98d74386184f0
+    mtime: '2026-06-10T12:29:19.319681+00:00'
+    size: 13483
+  tools/harnesses/check_memory_firewall.py:
+    hash: 748e6d40709f2636
+    mtime: '2026-06-10T12:29:19.319681+00:00'
+    size: 6108
+  tools/harnesses/check_memory_gateway.py:
+    hash: 427e7659c4b80b4d
+    mtime: '2026-06-10T12:29:19.319681+00:00'
+    size: 8970
+  tools/harnesses/check_memory_gateway_proof.py:
+    hash: 7a992750c2c3710a
+    mtime: '2026-06-10T12:29:19.319681+00:00'
+    size: 6052
+  tools/harnesses/check_memory_pipeline_consolidation.py:
+    hash: 35b13ac31ae64a14
+    mtime: '2026-06-10T12:29:19.319681+00:00'
+    size: 9259
+  tools/harnesses/check_memory_read_probe_policy.py:
+    hash: ab1fa9108145d0a8
+    mtime: '2026-06-10T12:29:19.319681+00:00'
+    size: 9666
+  tools/harnesses/check_memory_read_probe_sandbox.py:
+    hash: 9b77ae9de4bd0757
+    mtime: '2026-06-10T12:29:19.319681+00:00'
+    size: 9560
+  tools/harnesses/check_memory_recall_ux.py:
+    hash: 19a559731ccb6a22
+    mtime: '2026-06-10T12:29:19.319681+00:00'
+    size: 10135
+  tools/harnesses/check_opencode_adapter.py:
+    hash: 93d2d5033bac11d1
+    mtime: '2026-06-10T12:29:19.319681+00:00'
+    size: 15169
+  tools/harnesses/check_opencode_command_surface.py:
+    hash: 2994fac7eda34b4e
+    mtime: '2026-06-10T12:29:19.319681+00:00'
+    size: 6412
+  tools/harnesses/check_opencode_pack_simulation.py:
+    hash: a264aa29b54f9952
+    mtime: '2026-06-10T12:29:19.319681+00:00'
+    size: 6806
+  tools/harnesses/check_opencode_prompt_budget.py:
+    hash: 77db34d42f95bf21
+    mtime: '2026-06-10T12:29:19.319681+00:00'
+    size: 1065
+  tools/harnesses/check_opencode_repo_local_contract.py:
+    hash: 9802fd7b56587f79
+    mtime: '2026-06-10T12:29:19.323681+00:00'
+    size: 13288
+  tools/harnesses/check_opencode_repo_local_e2e_rc1.py:
+    hash: ac7fec1dce61d106
+    mtime: '2026-06-10T12:29:19.323681+00:00'
+    size: 7998
+  tools/harnesses/check_opencode_repo_local_pack.py:
+    hash: b080103ae2ec2c26
+    mtime: '2026-06-10T12:29:19.323681+00:00'
+    size: 9973
+  tools/harnesses/check_opencode_repo_local_smoke.py:
+    hash: f55c9235ffdbacf6
+    mtime: '2026-06-10T12:29:19.323681+00:00'
+    size: 9926
+  tools/harnesses/check_opencode_session_routing.py:
+    hash: 1fc8a518575d3b12
+    mtime: '2026-06-10T12:29:19.323681+00:00'
+    size: 454
+  tools/harnesses/check_opencode_source_local_usability.py:
+    hash: 331764b8d9958835
+    mtime: '2026-06-10T12:29:19.323681+00:00'
+    size: 21096
+  tools/harnesses/check_opencode_surface_freshness.py:
+    hash: f4928d7e1a84d9b5
+    mtime: '2026-06-10T12:29:19.323681+00:00'
+    size: 6850
+  tools/harnesses/check_opencode_usability_e2e.py:
+    hash: 9b4fbfeb5da4eb2a
+    mtime: '2026-06-10T12:29:19.323681+00:00'
+    size: 8875
+  tools/harnesses/check_ovav_law_compliance.py:
+    hash: d85cd8f1b9e2eb84
+    mtime: '2026-06-10T12:29:19.323681+00:00'
+    size: 12819
+  tools/harnesses/check_phase_artifacts.py:
+    hash: 966dcc574250d62f
+    mtime: '2026-06-10T12:29:19.323681+00:00'
+    size: 5508
+  tools/harnesses/check_platform_engineering_session_rc.py:
+    hash: 6995751e2daf61f7
+    mtime: '2026-06-10T12:29:19.323681+00:00'
+    size: 5732
+  tools/harnesses/check_poison_guard_hardening.py:
+    hash: c8618be15f837d8b
+    mtime: '2026-06-10T12:29:19.323681+00:00'
+    size: 6252
+  tools/harnesses/check_pre_closure_review.py:
+    hash: 39ff74225b5edc17
+    mtime: '2026-06-10T12:29:19.323681+00:00'
+    size: 2497
+  tools/harnesses/check_privacy_redaction_hardening.py:
+    hash: efa924fdd66d7a16
+    mtime: '2026-06-10T12:29:19.323681+00:00'
+    size: 9016
+  tools/harnesses/check_profile_session_contracts.py:
+    hash: 2017ef578c27558d
+    mtime: '2026-06-10T12:29:19.323681+00:00'
+    size: 14479
+  tools/harnesses/check_profile_task_execution_dry_run.py:
+    hash: 3c57e5a7662559d4
+    mtime: '2026-06-10T12:29:19.327681+00:00'
+    size: 15051
+  tools/harnesses/check_profile_workflow_hardening.py:
+    hash: c0c33fdf318c7112
+    mtime: '2026-06-10T12:29:19.327681+00:00'
+    size: 20879
+  tools/harnesses/check_protocol_access_gate.py:
+    hash: b65ed3a83e154a75
+    mtime: '2026-06-10T12:29:19.327681+00:00'
+    size: 4068
+  tools/harnesses/check_protocol_audit_log.py:
+    hash: d56cc6334008988c
+    mtime: '2026-06-10T12:29:19.327681+00:00'
+    size: 3283
+  tools/harnesses/check_protocol_circuit_breaker.py:
+    hash: ba62f03cea08dff5
+    mtime: '2026-06-10T12:29:19.327681+00:00'
+    size: 3391
+  tools/harnesses/check_repo_local_work_loop.py:
+    hash: e9dd4983c7482de5
+    mtime: '2026-06-10T12:29:19.327681+00:00'
+    size: 15112
+  tools/harnesses/check_research_context_optimizer.py:
+    hash: 980b8393728aa082
+    mtime: '2026-06-10T12:29:19.327681+00:00'
+    size: 4162
+  tools/harnesses/check_research_intelligence_session_rc.py:
+    hash: 34cb407f7094ecef
+    mtime: '2026-06-10T12:29:19.327681+00:00'
+    size: 7549
+  tools/harnesses/check_research_pipeline.py:
+    hash: 3d36602a1ffb6ac9
+    mtime: '2026-06-10T12:29:19.327681+00:00'
+    size: 13055
+  tools/harnesses/check_research_sandbox_gate.py:
+    hash: e01f92b8e38be481
+    mtime: '2026-06-10T12:29:19.327681+00:00'
+    size: 2969
+  tools/harnesses/check_result_eval_runtime.py:
+    hash: 9c5db78d4e15b55e
+    mtime: '2026-06-10T12:29:19.327681+00:00'
+    size: 10864
+  tools/harnesses/check_rollback_protocol.py:
+    hash: 7cc9b25417da0800
+    mtime: '2026-06-10T12:29:19.327681+00:00'
+    size: 3417
+  tools/harnesses/check_runtime_automation.py:
+    hash: 14bf67755803f0b7
+    mtime: '2026-06-10T12:29:19.327681+00:00'
+    size: 3933
+  tools/harnesses/check_runtime_close_assistant.py:
+    hash: b84a1a332f11f52b
+    mtime: '2026-06-10T12:29:19.327681+00:00'
+    size: 16123
+  tools/harnesses/check_runtime_next_work.py:
+    hash: 661462525f212501
+    mtime: '2026-06-10T12:29:19.327681+00:00'
+    size: 7893
+  tools/harnesses/check_runtime_orchestrator_cli.py:
+    hash: 98dde823fe5eeb09
+    mtime: '2026-06-10T12:29:19.327681+00:00'
+    size: 21163
+  tools/harnesses/check_runtime_ux_hardening.py:
+    hash: f1f42176d0ae1c95
+    mtime: '2026-06-10T12:29:19.331681+00:00'
+    size: 9392
+  tools/harnesses/check_s143_shell_hardening.py:
+    hash: f8e151b16605fe63
+    mtime: '2026-06-10T12:29:19.331681+00:00'
+    size: 4273
+  tools/harnesses/check_s144_model_task_router.py:
+    hash: 2feaf435cf6a28b0
+    mtime: '2026-06-10T12:29:19.331681+00:00'
+    size: 7131
+  tools/harnesses/check_s146_security_hardening.py:
+    hash: 2e0155d1aa9743cf
+    mtime: '2026-06-10T12:29:19.331681+00:00'
+    size: 7379
+  tools/harnesses/check_s147_error_handling.py:
+    hash: 09c1cee3277ccecc
+    mtime: '2026-06-10T12:29:19.331681+00:00'
+    size: 5856
+  tools/harnesses/check_s148_edge_cases.py:
+    hash: 77a5200ff51f60bb
+    mtime: '2026-06-10T12:29:19.331681+00:00'
+    size: 6037
+  tools/harnesses/check_s149_runtime_resilience.py:
+    hash: 971666971b485ef4
+    mtime: '2026-06-10T12:29:19.331681+00:00'
+    size: 4748
+  tools/harnesses/check_s86_install_pipeline_consolidation.py:
+    hash: 241511c2f5e4b988
+    mtime: '2026-06-10T12:29:19.331681+00:00'
+    size: 5269
+  tools/harnesses/check_s87_source_local_apply_gateway.py:
+    hash: d864014d978f594a
+    mtime: '2026-06-10T12:29:19.331681+00:00'
+    size: 4635
+  tools/harnesses/check_s88_deploy_config_governance.py:
+    hash: 976b8b42a2675087
+    mtime: '2026-06-10T12:29:19.331681+00:00'
+    size: 3592
+  tools/harnesses/check_s89_backup_rollback_hardening.py:
+    hash: c206046fcd7dbc80
+    mtime: '2026-06-10T12:29:19.331681+00:00'
+    size: 7012
+  tools/harnesses/check_s90_install_gate_adversarial.py:
+    hash: a3dadbf92dd0968e
+    mtime: '2026-06-10T12:29:19.331681+00:00'
+    size: 7077
+  tools/harnesses/check_s92_build8_closure.py:
+    hash: fee07a55f3f6e601
+    mtime: '2026-06-10T12:29:19.331681+00:00'
+    size: 6260
+  tools/harnesses/check_scenario_generator.py:
+    hash: ebf6b3afe12e1dd6
+    mtime: '2026-06-10T12:29:19.331681+00:00'
+    size: 2412
+  tools/harnesses/check_sdd_init.py:
+    hash: f85f1ae88e067890
+    mtime: '2026-06-10T12:29:19.335681+00:00'
+    size: 3801
+  tools/harnesses/check_seed_skill_trust.py:
+    hash: 385a1eca0ce083ac
+    mtime: '2026-06-10T12:29:19.335681+00:00'
+    size: 25283
+  tools/harnesses/check_session_continuity.py:
+    hash: 87de323b125af5a9
+    mtime: '2026-06-10T12:29:19.335681+00:00'
+    size: 4909
+  tools/harnesses/check_session_greeting_truth.py:
+    hash: 78c530aa85c30a01
+    mtime: '2026-06-10T12:29:19.335681+00:00'
+    size: 1904
+  tools/harnesses/check_signals_activation_sandbox.py:
+    hash: e94ed61775369904
+    mtime: '2026-06-10T12:29:19.335681+00:00'
+    size: 5425
+  tools/harnesses/check_signals_live_readiness.py:
+    hash: adba252acd544323
+    mtime: '2026-06-10T12:29:19.335681+00:00'
+    size: 6036
+  tools/harnesses/check_skill_eval_adversarial.py:
+    hash: 7b16bc36aecb88c2
+    mtime: '2026-06-10T12:29:19.335681+00:00'
+    size: 17721
+  tools/harnesses/check_skill_manager.py:
+    hash: d4ec1b1ef472c8c3
+    mtime: '2026-06-10T12:29:19.335681+00:00'
+    size: 8239
+  tools/harnesses/check_skill_resource_index.py:
+    hash: 4279a704c3037ca4
+    mtime: '2026-06-10T12:29:19.335681+00:00'
+    size: 5326
+  tools/harnesses/check_snapshot_memory_policy.py:
+    hash: ad56659985721411
+    mtime: '2026-06-10T12:29:19.335681+00:00'
+    size: 7792
+  tools/harnesses/check_source_global_plan.py:
+    hash: 2faac88d52d7d08d
+    mtime: '2026-06-10T12:29:19.335681+00:00'
+    size: 6737
+  tools/harnesses/check_thavren_e2e.py:
+    hash: a808f3941ff51eca
+    mtime: '2026-06-10T12:29:19.335681+00:00'
+    size: 19465
+  tools/harnesses/check_thavren_practical_workflow.py:
+    hash: 699f0cb42c39b1fe
+    mtime: '2026-06-10T12:29:19.335681+00:00'
+    size: 15878
+  tools/harnesses/check_todo_progress_runtime.py:
+    hash: d1a701f817b97643
+    mtime: '2026-06-10T12:29:19.335681+00:00'
+    size: 15947
+  tools/harnesses/check_visible_surface_cleanup.py:
+    hash: ebd0ab1756e434f8
+    mtime: '2026-06-10T12:29:19.335681+00:00'
+    size: 3554
+  tools/harnesses/check_work_ledger_git_gates.py:
+    hash: a67a9485735f6e8a
+    mtime: '2026-06-10T12:29:19.335681+00:00'
+    size: 13939
+  tools/harnesses/check_work_session_closure.py:
+    hash: 3251f5314f5110f2
+    mtime: '2026-06-10T12:29:19.335681+00:00'
+    size: 6444
+  tools/harnesses/check_zero_trust_context.py:
+    hash: db6bac3d6ec417a6
+    mtime: '2026-06-10T12:29:19.339681+00:00'
+    size: 3033
+  tools/harnesses/close_manifest_builder.py:
+    hash: c6f712c20a65121d
+    mtime: '2026-06-10T12:29:19.339681+00:00'
+    size: 23846
+  tools/harnesses/close_workflow_assistant.py:
+    hash: a14ebdd75ac51547
+    mtime: '2026-06-10T12:29:19.339681+00:00'
+    size: 13026
+  tools/harnesses/context_budget.py:
+    hash: 57421ff7dee26334
+    mtime: '2026-06-10T12:29:19.339681+00:00'
+    size: 3572
+  tools/harnesses/context_compaction.py:
+    hash: e449b90bafdf8f30
+    mtime: '2026-06-10T12:29:19.339681+00:00'
+    size: 14999
+  tools/harnesses/context_default_entrypoint.py:
+    hash: 7a2e47cd16ce00d8
+    mtime: '2026-06-10T12:29:19.339681+00:00'
+    size: 12959
+  tools/harnesses/context_default_report.py:
+    hash: a67f7bf9b7cbc2cf
+    mtime: '2026-06-10T12:29:19.339681+00:00'
+    size: 4376
+  tools/harnesses/context_pack_report.py:
+    hash: 57dafe93c9e60e87
+    mtime: '2026-06-10T12:29:19.339681+00:00'
+    size: 5917
+  tools/harnesses/cross_validate.py:
+    hash: 83e48c1e54261364
+    mtime: '2026-06-10T12:29:19.339681+00:00'
+    size: 16610
+  tools/harnesses/decision_packet_validator.py:
+    hash: b70795449031ff5b
+    mtime: '2026-06-10T12:29:19.339681+00:00'
+    size: 31164
+  tools/harnesses/delegation_planner.py:
+    hash: 81a0681656de8d52
+    mtime: '2026-06-10T12:29:19.339681+00:00'
+    size: 11443
+  tools/harnesses/delegation_policy.py:
+    hash: da7307ffd6b3a5cf
+    mtime: '2026-06-10T12:29:19.339681+00:00'
+    size: 16274
+  tools/harnesses/delegation_runtime.py:
+    hash: 328610600623f8c2
+    mtime: '2026-06-10T12:29:19.343681+00:00'
+    size: 4221
+  tools/harnesses/deployment_claim_audit.py:
+    hash: cfb930eacddd6584
+    mtime: '2026-06-10T12:29:19.343681+00:00'
+    size: 7915
+  tools/harnesses/doc_alignment_trigger.py:
+    hash: 197e248d117efefa
+    mtime: '2026-06-10T12:29:19.343681+00:00'
+    size: 28436
+  tools/harnesses/dual_profile_readiness.py:
+    hash: 67b78daa7a617ac1
+    mtime: '2026-06-10T12:29:19.343681+00:00'
+    size: 14662
+  tools/harnesses/eidren_e2e_runtime.py:
+    hash: 66028925dbfa264c
+    mtime: '2026-06-10T12:29:19.343681+00:00'
+    size: 18785
+  tools/harnesses/eidren_task_router.py:
+    hash: 938f6976a126aceb
+    mtime: '2026-06-10T12:29:19.343681+00:00'
+    size: 7377
+  tools/harnesses/eidren_workflow.py:
+    hash: c462b5f568976406
+    mtime: '2026-06-10T12:29:19.343681+00:00'
+    size: 17569
+  tools/harnesses/eidren_workflow_report.py:
+    hash: b13e559186710cc1
+    mtime: '2026-06-10T12:29:19.343681+00:00'
+    size: 7114
+  tools/harnesses/eval_runtime.py:
+    hash: f0b7366d06753c33
+    mtime: '2026-06-10T12:29:19.343681+00:00'
+    size: 9309
+  tools/harnesses/evaluation_pipeline_runner.py:
+    hash: 81f0198cffe0e1fd
+    mtime: '2026-06-10T12:29:19.343681+00:00'
+    size: 7206
+  tools/harnesses/evidence_ledger_index.py:
+    hash: 0ec154329e142540
+    mtime: '2026-06-10T12:29:19.347681+00:00'
+    size: 11508
+  tools/harnesses/evidence_mode.py:
+    hash: 38cdaa70811e150f
+    mtime: '2026-06-10T12:29:19.347681+00:00'
+    size: 2499
+  tools/harnesses/evidence_stability.py:
+    hash: ea50b848d8b1d6f7
+    mtime: '2026-06-10T12:29:19.347681+00:00'
+    size: 4189
+  tools/harnesses/evidence_verifier.py:
+    hash: 5a3017a19f928c0a
+    mtime: '2026-06-10T12:29:19.347681+00:00'
+    size: 7523
+  tools/harnesses/expand_canonical_base.py:
+    hash: 328c788598c6a656
+    mtime: '2026-06-10T12:29:19.347681+00:00'
+    size: 6565
+  tools/harnesses/final_evaluation_object.py:
+    hash: 25c5a63e33774f2f
+    mtime: '2026-06-10T12:29:19.347681+00:00'
+    size: 17717
+  tools/harnesses/fix_audit.py:
+    hash: 854f074e3d34a344
+    mtime: '2026-06-10T12:29:19.347681+00:00'
+    size: 10226
+  tools/harnesses/git_safety_gate.py:
+    hash: 2663f65dca660c9c
+    mtime: '2026-06-10T12:29:19.347681+00:00'
+    size: 4468
+  tools/harnesses/global_control_bridge_m1.py:
+    hash: c9bc10aa23b57c1a
+    mtime: '2026-06-10T12:29:19.347681+00:00'
+    size: 7602
+  tools/harnesses/global_projection_bridge_m2.py:
+    hash: 1a9a908565817ebd
+    mtime: '2026-06-10T12:29:19.347681+00:00'
+    size: 4331
+  tools/harnesses/graduation_decision_report.py:
+    hash: 640791ca0f4b8f78
+    mtime: '2026-06-10T12:29:19.347681+00:00'
+    size: 8123
+  tools/harnesses/graduation_gate_runtime.py:
+    hash: 1a19373efb2e77fa
+    mtime: '2026-06-10T12:29:19.347681+00:00'
+    size: 9113
+  tools/harnesses/h_activate_protocol.py:
+    hash: 3226650ef704e95a
+    mtime: '2026-06-10T12:29:19.347681+00:00'
+    size: 4939
+  tools/harnesses/h_deactivate_protocol.py:
+    hash: 670e3f0ab35e0dac
+    mtime: '2026-06-10T12:29:19.351681+00:00'
+    size: 2837
+  tools/harnesses/h_gc_branches.py:
+    hash: 0855166041d50f81
+    mtime: '2026-06-10T12:29:19.351681+00:00'
+    size: 10213
+  tools/harnesses/h_git_auto_correct.py:
+    hash: 349e8fbd02c97546
+    mtime: '2026-06-10T12:29:19.351681+00:00'
+    size: 18666
+  tools/harnesses/h_git_branch_workflow.py:
+    hash: c8985219b9e88bd2
+    mtime: '2026-06-10T12:29:19.355681+00:00'
+    size: 54172
+  tools/harnesses/h_git_change_manifest.py:
+    hash: acf7d2f086b2bb6a
+    mtime: '2026-06-10T12:29:19.355681+00:00'
+    size: 15066
+  tools/harnesses/h_git_pr_structure.py:
+    hash: 989bfea57a8de2c4
+    mtime: '2026-06-10T12:29:19.355681+00:00'
+    size: 9974
+  tools/harnesses/h_git_stage_intelligence.py:
+    hash: c44f0829b32abe2e
+    mtime: '2026-06-10T12:29:19.355681+00:00'
+    size: 15334
+  tools/harnesses/h_protocol_access_gate.py:
+    hash: 6aaf16b721ee2792
+    mtime: '2026-06-10T12:29:19.355681+00:00'
+    size: 4408
+  tools/harnesses/h_protocol_audit_log.py:
+    hash: 2e64535e1ab713f7
+    mtime: '2026-06-10T12:29:19.355681+00:00'
+    size: 3090
+  tools/harnesses/h_protocol_circuit_breaker.py:
+    hash: 84c61d04182ea2e4
+    mtime: '2026-06-10T12:29:19.355681+00:00'
+    size: 3209
+  tools/harnesses/h_rollback_protocol.py:
+    hash: c85a9d0d406197a0
+    mtime: '2026-06-10T12:29:19.355681+00:00'
+    size: 2702
+  tools/harnesses/h_segment_completion_detector.py:
+    hash: de86be3359c3d0ae
+    mtime: '2026-06-10T12:29:19.355681+00:00'
+    size: 7463
+  tools/harnesses/h_session_close_label.py:
+    hash: 87bcef3027f42055
+    mtime: '2026-06-10T12:29:19.355681+00:00'
+    size: 5009
+  tools/harnesses/h_verify_evidence.py:
+    hash: 9b8188869f68652a
+    mtime: '2026-06-10T12:29:19.359681+00:00'
+    size: 11084
+  tools/harnesses/handoff_compaction.py:
+    hash: 0426c7d4db791f90
+    mtime: '2026-06-10T12:29:19.359681+00:00'
+    size: 7961
+  tools/harnesses/harness_index.py:
+    hash: 8fecd34c6aaa875a
+    mtime: '2026-06-10T12:29:19.359681+00:00'
+    size: 57128
+  tools/harnesses/harness_intelligence_router.py:
+    hash: 07c51ccf9c6c7b36
+    mtime: '2026-06-10T12:29:19.359681+00:00'
+    size: 20213
+  tools/harnesses/harness_reuse_audit.py:
+    hash: eef00ccec9100376
+    mtime: '2026-06-10T12:29:19.359681+00:00'
+    size: 7562
+  tools/harnesses/harness_task_router.py:
+    hash: d97e5d37ca508e2b
+    mtime: '2026-06-10T12:29:19.359681+00:00'
+    size: 9551
+  tools/harnesses/human_delivery_translator.py:
+    hash: 6292a17be97a8ad9
+    mtime: '2026-06-10T12:29:19.359681+00:00'
+    size: 4467
+  tools/harnesses/install_apply_boundaries.py:
+    hash: 7764b4c0572d6198
+    mtime: '2026-06-10T12:29:19.359681+00:00'
+    size: 6372
+  tools/harnesses/install_apply_rollback_sandbox.py:
+    hash: 64db3015cdca306f
+    mtime: '2026-06-10T12:29:19.359681+00:00'
+    size: 7141
+  tools/harnesses/install_apply_sandbox_manifest.py:
+    hash: c45c9238529ad623
+    mtime: '2026-06-10T12:29:19.359681+00:00'
+    size: 8730
+  tools/harnesses/install_apply_sandbox_report.py:
+    hash: 25e4d2e9fc18f6e8
+    mtime: '2026-06-10T12:29:19.359681+00:00'
+    size: 10771
+  tools/harnesses/install_backup_plan.py:
+    hash: 0cbf12ebfc32f059
+    mtime: '2026-06-10T12:29:19.359681+00:00'
+    size: 2716
+  tools/harnesses/install_backup_rollback_gate.py:
+    hash: 678f7f2e3d78aa67
+    mtime: '2026-06-10T12:29:19.359681+00:00'
+    size: 6573
+  tools/harnesses/install_gateway_bridge.py:
+    hash: 1fae8420ed80972e
+    mtime: '2026-06-10T12:29:19.359681+00:00'
+    size: 6334
+  tools/harnesses/install_git_hooks.py:
+    hash: 400b7093cd822244
+    mtime: '2026-06-10T12:29:19.363681+00:00'
+    size: 8156
+  tools/harnesses/install_manifest.py:
+    hash: 299e24345cc636c9
+    mtime: '2026-06-10T12:29:19.363681+00:00'
+    size: 5048
+  tools/harnesses/install_plan.py:
+    hash: 2bd2db981425b4ae
+    mtime: '2026-06-10T12:29:19.363681+00:00'
+    size: 8149
+  tools/harnesses/install_preview_router.py:
+    hash: 606920613e032e4f
+    mtime: '2026-06-10T12:29:19.363681+00:00'
+    size: 6085
+  tools/harnesses/install_risk_rollback_guide.py:
+    hash: d6d7d20f24b794c0
+    mtime: '2026-06-10T12:29:19.363681+00:00'
+    size: 3550
+  tools/harnesses/install_rollback_simulator.py:
+    hash: 714fe3ef94159779
+    mtime: '2026-06-10T12:29:19.363681+00:00'
+    size: 2785
+  tools/harnesses/install_safety_gate.py:
+    hash: f17c2764efda8cf1
+    mtime: '2026-06-10T12:29:19.363681+00:00'
+    size: 5724
+  tools/harnesses/install_sandbox.py:
+    hash: 2355f196ec071e02
+    mtime: '2026-06-10T12:29:19.363681+00:00'
+    size: 6145
+  tools/harnesses/install_sandbox_report.py:
+    hash: 44e0f0b68164d0f1
+    mtime: '2026-06-10T12:29:19.363681+00:00'
+    size: 4783
+  tools/harnesses/install_sandbox_ux.py:
+    hash: 4f8a86484574c84d
+    mtime: '2026-06-10T12:29:19.363681+00:00'
+    size: 12554
+  tools/harnesses/install_sandbox_ux_report.py:
+    hash: 6ae9823ef9a3f192
+    mtime: '2026-06-10T12:29:19.363681+00:00'
+    size: 5723
+  tools/harnesses/install_source_local_apply_policy.py:
+    hash: fa6fbe8d7e7bc60b
+    mtime: '2026-06-10T12:29:19.363681+00:00'
+    size: 6253
+  tools/harnesses/install_source_local_apply_policy_report.py:
+    hash: 868e97b1b867510d
+    mtime: '2026-06-10T12:29:19.363681+00:00'
+    size: 8538
+  tools/harnesses/install_source_local_apply_sandbox.py:
+    hash: 461d37231078e857
+    mtime: '2026-06-10T12:29:19.363681+00:00'
+    size: 7010
+  tools/harnesses/intent_to_evidence_chain.py:
+    hash: 7a063ea8b3a2b2a0
+    mtime: '2026-06-10T12:29:19.363681+00:00'
+    size: 5396
+  tools/harnesses/memory_gateway_report.py:
+    hash: d725956479fff0af
+    mtime: '2026-06-10T12:29:19.363681+00:00'
+    size: 3760
+  tools/harnesses/memory_read_probe_policy_report.py:
+    hash: bc0f4cffa655206f
+    mtime: '2026-06-10T12:29:19.367681+00:00'
+    size: 8735
+  tools/harnesses/memory_read_probe_sandbox_report.py:
+    hash: 80804bc3ed98ba70
+    mtime: '2026-06-10T12:29:19.367681+00:00'
+    size: 8500
+  tools/harnesses/memory_recall_report.py:
+    hash: cb69b4799a19b2be
+    mtime: '2026-06-10T12:29:19.367681+00:00'
+    size: 5339
+  tools/harnesses/model_task_router.py:
+    hash: 4a51179ff441b678
+    mtime: '2026-06-10T12:29:19.367681+00:00'
+    size: 17842
+  tools/harnesses/opencode_adapter_hardening.py:
+    hash: e276466d1ac97a51
+    mtime: '2026-06-10T12:29:19.367681+00:00'
+    size: 7126
+  tools/harnesses/opencode_agent_surface.py:
+    hash: 22137356a8f5f2c6
+    mtime: '2026-06-10T12:29:19.367681+00:00'
+    size: 5151
+  tools/harnesses/opencode_command_surface.py:
+    hash: 5ff91e0335afa3f9
+    mtime: '2026-06-10T12:29:19.367681+00:00'
+    size: 6056
+  tools/harnesses/opencode_command_surface_report.py:
+    hash: 7af4df0aa39dc411
+    mtime: '2026-06-10T12:29:19.367681+00:00'
+    size: 8289
+  tools/harnesses/opencode_context_pack.py:
+    hash: d101abf63d68815b
+    mtime: '2026-06-10T12:29:19.367681+00:00'
+    size: 17531
+  tools/harnesses/opencode_handoff_guide.py:
+    hash: e540c45d592e3a54
+    mtime: '2026-06-10T12:29:19.367681+00:00'
+    size: 9337
+  tools/harnesses/opencode_identity_guard.py:
+    hash: 1312caae5ab7b4d0
+    mtime: '2026-06-10T12:29:19.367681+00:00'
+    size: 5530
+  tools/harnesses/opencode_identity_guard_policy.py:
+    hash: 07aec397e6842249
+    mtime: '2026-06-10T12:29:19.367681+00:00'
+    size: 5150
+  tools/harnesses/opencode_pack_preview.py:
+    hash: 6004fa2238f75166
+    mtime: '2026-06-10T12:29:19.367681+00:00'
+    size: 8474
+  tools/harnesses/opencode_pack_report.py:
+    hash: 1759cf66dadb04e9
+    mtime: '2026-06-10T12:29:19.367681+00:00'
+    size: 5221
+  tools/harnesses/opencode_pack_simulation.py:
+    hash: f0a8cd99330c3caf
+    mtime: '2026-06-10T12:29:19.371681+00:00'
+    size: 9992
+  tools/harnesses/opencode_pack_validator.py:
+    hash: ae95334c61db65e7
+    mtime: '2026-06-10T12:29:19.371681+00:00'
+    size: 6202
+  tools/harnesses/opencode_repo_local_boundaries.py:
+    hash: 20c6a0a283da401a
+    mtime: '2026-06-10T12:29:19.371681+00:00'
+    size: 10010
+  tools/harnesses/opencode_repo_local_contract.py:
+    hash: 1a01295ff7a32bc1
+    mtime: '2026-06-10T12:29:19.371681+00:00'
+    size: 18432
+  tools/harnesses/opencode_repo_local_contract_report.py:
+    hash: 7d96bf730010a18c
+    mtime: '2026-06-10T12:29:19.371681+00:00'
+    size: 8491
+  tools/harnesses/opencode_repo_local_e2e.py:
+    hash: 1aba11550ed06cab
+    mtime: '2026-06-10T12:29:19.371681+00:00'
+    size: 13431
+  tools/harnesses/opencode_repo_local_e2e_readiness.py:
+    hash: 81c445c6770a8f0a
+    mtime: '2026-06-10T12:29:19.371681+00:00'
+    size: 3268
+  tools/harnesses/opencode_repo_local_e2e_report.py:
+    hash: 7fb77a17f00c86e7
+    mtime: '2026-06-10T12:29:19.371681+00:00'
+    size: 7466
+  tools/harnesses/opencode_repo_local_pack.py:
+    hash: ca1d1b9ef582cc52
+    mtime: '2026-06-10T12:29:19.371681+00:00'
+    size: 13757
+  tools/harnesses/opencode_repo_local_pack_report.py:
+    hash: 6a34e9692b17271a
+    mtime: '2026-06-10T12:29:19.371681+00:00'
+    size: 6287
+  tools/harnesses/opencode_repo_local_pack_validator.py:
+    hash: efe53ae097b8a8d6
+    mtime: '2026-06-10T12:29:19.371681+00:00'
+    size: 6151
+  tools/harnesses/opencode_repo_local_pack_writer.py:
+    hash: e1fb0c8a42c7e7a7
+    mtime: '2026-06-10T12:29:19.371681+00:00'
+    size: 16926
+  tools/harnesses/opencode_repo_local_smoke.py:
+    hash: b4968e6d942f37ff
+    mtime: '2026-06-10T12:29:19.371681+00:00'
+    size: 10018
+  tools/harnesses/opencode_repo_local_smoke_report.py:
+    hash: a33cae06378a6ee6
+    mtime: '2026-06-10T12:29:19.371681+00:00'
+    size: 4537
+  tools/harnesses/opencode_response_contract.py:
+    hash: 7a8a392ed291c327
+    mtime: '2026-06-10T12:29:19.375681+00:00'
+    size: 7407
+  tools/harnesses/opencode_safety_policy.py:
+    hash: 229d98292c546c63
+    mtime: '2026-06-10T12:29:19.375681+00:00'
+    size: 3577
+  tools/harnesses/opencode_session_guidance.py:
+    hash: fc260f1350d52c18
+    mtime: '2026-06-10T12:29:19.375681+00:00'
+    size: 5861
+  tools/harnesses/opencode_session_manifest.py:
+    hash: 789944b0da45ca2a
+    mtime: '2026-06-10T12:29:19.375681+00:00'
+    size: 7066
+  tools/harnesses/opencode_skill_surface.py:
+    hash: b81effd3a882f934
+    mtime: '2026-06-10T12:29:19.375681+00:00'
+    size: 3974
+  tools/harnesses/opencode_source_local_ux.py:
+    hash: a2d6ff45ac10c3cd
+    mtime: '2026-06-10T12:29:19.375681+00:00'
+    size: 10004
+  tools/harnesses/opencode_surface_freshness.py:
+    hash: 08d01d9fdc698d6f
+    mtime: '2026-06-10T12:29:19.375681+00:00'
+    size: 16683
+  tools/harnesses/opencode_task_bridge.py:
+    hash: 3bb877e0704426df
+    mtime: '2026-06-10T12:29:19.375681+00:00'
+    size: 8578
+  tools/harnesses/opencode_task_package.py:
+    hash: 111136bef7f1b554
+    mtime: '2026-06-10T12:29:19.375681+00:00'
+    size: 6966
+  tools/harnesses/opencode_usability_e2e.py:
+    hash: 4df89f047df0974e
+    mtime: '2026-06-10T12:29:19.375681+00:00'
+    size: 26920
+  tools/harnesses/opencode_visible_role_policy.py:
+    hash: 4b14a989c5ab2906
+    mtime: '2026-06-10T12:29:19.379681+00:00'
+    size: 4360
+  tools/harnesses/p0_governance_report.py:
+    hash: 07229574226c4b07
+    mtime: '2026-06-10T12:29:19.379681+00:00'
+    size: 8558
+  tools/harnesses/p0_readiness_matrix.py:
+    hash: 2eae54c68f5691f3
+    mtime: '2026-06-10T12:29:19.379681+00:00'
+    size: 13817
+  tools/harnesses/phase_dag.py:
+    hash: e881ecd8f2168f3c
+    mtime: '2026-06-10T12:29:19.379681+00:00'
+    size: 10649
+  tools/harnesses/platform_engineering_session_rc.py:
+    hash: eae05ddb0df975ed
+    mtime: '2026-06-10T12:29:19.379681+00:00'
+    size: 16428
+  tools/harnesses/pre_closure_review.py:
+    hash: 665b0a980ac30b0c
+    mtime: '2026-06-10T12:29:19.379681+00:00'
+    size: 11581
+  tools/harnesses/preview_surface_graduation_policy.py:
+    hash: ba7e00ede135f763
+    mtime: '2026-06-10T12:29:19.379681+00:00'
+    size: 5484
+  tools/harnesses/preview_surface_state.py:
+    hash: 1d2cc42d93b3d995
+    mtime: '2026-06-10T12:29:19.379681+00:00'
+    size: 6917
+  tools/harnesses/profile_session_context.py:
+    hash: 5d3e24356710c9c6
+    mtime: '2026-06-10T12:29:19.379681+00:00'
+    size: 9765
+  tools/harnesses/profile_session_contract_report.py:
+    hash: 1686ccbf1469d97f
+    mtime: '2026-06-10T12:29:19.379681+00:00'
+    size: 6516
+  tools/harnesses/profile_session_contracts.py:
+    hash: ed8b497b1082aae3
+    mtime: '2026-06-10T12:29:19.379681+00:00'
+    size: 16018
+  tools/harnesses/profile_session_policy.py:
+    hash: d69f7694fcabbeec
+    mtime: '2026-06-10T12:29:19.379681+00:00'
+    size: 8575
+  tools/harnesses/profile_task_dry_run.py:
+    hash: e2e9920c52c97d28
+    mtime: '2026-06-10T12:29:19.379681+00:00'
+    size: 8954
+  tools/harnesses/profile_task_dry_run_report.py:
+    hash: eb2da708cf39db0d
+    mtime: '2026-06-10T12:29:19.379681+00:00'
+    size: 7007
+  tools/harnesses/profile_task_execution_plan.py:
+    hash: 533d25b0828b7c0d
+    mtime: '2026-06-10T12:29:19.379681+00:00'
+    size: 35138
+  tools/harnesses/profile_task_matrix.py:
+    hash: afa5dba8c9ae460d
+    mtime: '2026-06-10T12:29:19.379681+00:00'
+    size: 8095
+  tools/harnesses/profile_task_safety_router.py:
+    hash: 5e89883837208b31
+    mtime: '2026-06-10T12:29:19.379681+00:00'
+    size: 6252
+  tools/harnesses/profile_workflow_hardening.py:
+    hash: e5f962426d67dacd
+    mtime: '2026-06-10T12:29:19.383681+00:00'
+    size: 15275
+  tools/harnesses/profile_workflow_report.py:
+    hash: f8145a2e164d2cca
+    mtime: '2026-06-10T12:29:19.383681+00:00'
+    size: 10370
+  tools/harnesses/progress_state_report.py:
+    hash: 1f85f98c3d34bcaa
+    mtime: '2026-06-10T12:29:19.383681+00:00'
+    size: 5849
+  tools/harnesses/project_discovery.py:
+    hash: afaf5707418a3fd2
+    mtime: '2026-06-10T12:29:19.383681+00:00'
+    size: 11733
+  tools/harnesses/readiness_evaluator.py:
+    hash: 55f674f8bf66d9dd
+    mtime: '2026-06-10T12:29:19.383681+00:00'
+    size: 9015
+  tools/harnesses/red_team_lens_evaluator.py:
+    hash: 8809bd83c8237de7
+    mtime: '2026-06-10T12:29:19.383681+00:00'
+    size: 18105
+  tools/harnesses/repo_local_work_loop.py:
+    hash: a5268a9a7fdd0f9b
+    mtime: '2026-06-10T12:29:19.383681+00:00'
+    size: 16232
+  tools/harnesses/research_context_optimizer.py:
+    hash: 80e8c950fe26326f
+    mtime: '2026-06-10T12:29:19.383681+00:00'
+    size: 7009
+  tools/harnesses/research_intelligence_session_rc.py:
+    hash: 7074df51a261555f
+    mtime: '2026-06-10T12:29:19.383681+00:00'
+    size: 20954
+  tools/harnesses/research_pipeline_runner.py:
+    hash: b617c34439a8910b
+    mtime: '2026-06-10T12:29:19.383681+00:00'
+    size: 9984
+  tools/harnesses/research_sandbox_gate.py:
+    hash: 0cb8706ff13d3feb
+    mtime: '2026-06-10T12:29:19.383681+00:00'
+    size: 5247
+  tools/harnesses/result_contract_runtime.py:
+    hash: 76392995d9d71e81
+    mtime: '2026-06-10T12:29:19.383681+00:00'
+    size: 9349
+  tools/harnesses/rollback_plan.py:
+    hash: b88b387acf847b89
+    mtime: '2026-06-10T12:29:19.387681+00:00'
+    size: 5027
+  tools/harnesses/route_recovery.py:
+    hash: ca99de463e922fc2
+    mtime: '2026-06-10T12:29:19.387681+00:00'
+    size: 4151
+  tools/harnesses/runtime_command_router.py:
+    hash: a3f9f7a406b2a2ff
+    mtime: '2026-06-10T12:29:19.387681+00:00'
+    size: 24957
+  tools/harnesses/runtime_daily_source.py:
+    hash: 75ea067c22d28df5
+    mtime: '2026-06-10T12:29:19.387681+00:00'
+    size: 6177
+  tools/harnesses/runtime_next_report.py:
+    hash: 2517952fc1e5b49b
+    mtime: '2026-06-10T12:29:19.387681+00:00'
+    size: 5226
+  tools/harnesses/runtime_next_work.py:
+    hash: d71d0d06627feb0f
+    mtime: '2026-06-10T12:29:19.387681+00:00'
+    size: 77023
+  tools/harnesses/runtime_orchestrator.py:
+    hash: 031973aa623ec34d
+    mtime: '2026-06-10T12:29:19.391681+00:00'
+    size: 94421
+  tools/harnesses/runtime_status_report.py:
+    hash: ff2e0c10316af399
+    mtime: '2026-06-10T12:29:19.391681+00:00'
+    size: 9008
+  tools/harnesses/runtime_usability_report.py:
+    hash: 9149033262d0235e
+    mtime: '2026-06-10T12:29:19.391681+00:00'
+    size: 6533
+  tools/harnesses/runtime_ux_report.py:
+    hash: ff9fbbaad4eec185
+    mtime: '2026-06-10T12:29:19.391681+00:00'
+    size: 4326
+  tools/harnesses/runtime_workflow_hardening.py:
+    hash: fb6ba1fa91235426
+    mtime: '2026-06-10T12:29:19.391681+00:00'
+    size: 4661
+  tools/harnesses/s102_gate_verification.py:
+    hash: 7821cf5029ba323d
+    mtime: '2026-06-10T12:29:19.391681+00:00'
+    size: 7401
+  tools/harnesses/s105_harness_audit.py:
+    hash: 79a44d60737416e2
+    mtime: '2026-06-10T12:29:19.395681+00:00'
+    size: 6190
+  tools/harnesses/safety_preflight.py:
+    hash: 5ae5968318bb621d
+    mtime: '2026-06-10T12:29:19.395681+00:00'
+    size: 9008
+  tools/harnesses/scenario_generator.py:
+    hash: 4d8cb5c400f17f53
+    mtime: '2026-06-10T12:29:19.395681+00:00'
+    size: 12013
+  tools/harnesses/sdd_init.py:
+    hash: d4f1c3876a87e553
+    mtime: '2026-06-10T12:29:19.395681+00:00'
+    size: 2146
+  tools/harnesses/seed_skill_trust.py:
+    hash: 47a32ceb9e671ef9
+    mtime: '2026-06-10T12:29:19.395681+00:00'
+    size: 14963
+  tools/harnesses/self_audit.py:
+    hash: 71fa8d346e2ef23f
+    mtime: '2026-06-10T12:29:19.395681+00:00'
+    size: 36049
+  tools/harnesses/semantic_drift_detector.py:
+    hash: a19a1d96428fa377
+    mtime: '2026-06-10T12:29:19.395681+00:00'
+    size: 12965
+  tools/harnesses/session_checkpoint.py:
+    hash: 261d959d9f07a3ef
+    mtime: '2026-06-10T12:29:19.395681+00:00'
+    size: 8921
+  tools/harnesses/session_report_generator.py:
+    hash: 4c9529b367d3cd96
+    mtime: '2026-06-10T12:29:19.395681+00:00'
+    size: 13424
+  tools/harnesses/signals_live_probe.py:
+    hash: 0c306233cf30871f
+    mtime: '2026-06-10T12:29:19.395681+00:00'
+    size: 144
+  tools/harnesses/signals_probe_report.py:
+    hash: 9ad06631a63d4420
+    mtime: '2026-06-10T12:29:19.395681+00:00'
+    size: 148
+  tools/harnesses/signals_readiness_policy.py:
+    hash: 7ddf575541fc339f
+    mtime: '2026-06-10T12:29:19.395681+00:00'
+    size: 156
+  tools/harnesses/skill_context_loader.py:
+    hash: fe6c32868e3dcf6a
+    mtime: '2026-06-10T12:29:19.395681+00:00'
+    size: 7594
+  tools/harnesses/skill_eval_report.py:
+    hash: e6ff6b0b95d89aa4
+    mtime: '2026-06-10T12:29:19.395681+00:00'
+    size: 11871
+  tools/harnesses/skill_eval_suite.py:
+    hash: 7499664fafadf5a2
+    mtime: '2026-06-10T12:29:19.395681+00:00'
+    size: 16437
+  tools/harnesses/skill_graduation_policy.py:
+    hash: 19db098babcb8848
+    mtime: '2026-06-10T12:29:19.395681+00:00'
+    size: 11625
+  tools/harnesses/skill_manager.py:
+    hash: 55350bf828f90884
+    mtime: '2026-06-10T12:29:19.399681+00:00'
+    size: 12650
+  tools/harnesses/skill_resource_index.py:
+    hash: e59d89b48883fb9f
+    mtime: '2026-06-10T12:29:19.399681+00:00'
+    size: 3983
+  tools/harnesses/skill_scoring.py:
+    hash: 54fd68c67451ed13
+    mtime: '2026-06-10T12:29:19.399681+00:00'
+    size: 7780
+  tools/harnesses/skill_trust_report.py:
+    hash: 149efac2a4d003e4
+    mtime: '2026-06-10T12:29:19.399681+00:00'
+    size: 8754
+  tools/harnesses/source_global_approval_gate.py:
+    hash: 626c3c694ea1e2c6
+    mtime: '2026-06-10T12:29:19.399681+00:00'
+    size: 2678
+  tools/harnesses/source_global_plan.py:
+    hash: ab78a5c2ba37c150
+    mtime: '2026-06-10T12:29:19.399681+00:00'
+    size: 4807
+  tools/harnesses/source_global_plan_report.py:
+    hash: 8d8ad6220314e232
+    mtime: '2026-06-10T12:29:19.399681+00:00'
+    size: 4876
+  tools/harnesses/source_global_risk.py:
+    hash: 99bda8b2538bce8e
+    mtime: '2026-06-10T12:29:19.399681+00:00'
+    size: 2534
+  tools/harnesses/source_local_acceptance.py:
+    hash: 7653151ab3dc2f09
+    mtime: '2026-06-10T12:29:19.399681+00:00'
+    size: 5367
+  tools/harnesses/stable_validation_runner.py:
+    hash: 866bd029e77bec96
+    mtime: '2026-06-10T12:29:19.403681+00:00'
+    size: 10931
+  tools/harnesses/standardize_governor_cli.py:
+    hash: 519004070ad5dd93
+    mtime: '2026-06-10T12:29:19.403681+00:00'
+    size: 3216
+  tools/harnesses/thavren_e2e_report.py:
+    hash: db4e8d6b7c453026
+    mtime: '2026-06-10T12:29:19.403681+00:00'
+    size: 8562
+  tools/harnesses/thavren_e2e_runtime.py:
+    hash: dcaaaac67cbbf50c
+    mtime: '2026-06-10T12:29:19.403681+00:00'
+    size: 19324
+  tools/harnesses/thavren_task_router.py:
+    hash: 475f485401496c3f
+    mtime: '2026-06-10T12:29:19.403681+00:00'
+    size: 7381
+  tools/harnesses/thavren_workflow.py:
+    hash: bbf7d9e6062a7cf9
+    mtime: '2026-06-10T12:29:19.403681+00:00'
+    size: 19010
+  tools/harnesses/thavren_workflow_report.py:
+    hash: 729fc2620ae51534
+    mtime: '2026-06-10T12:29:19.403681+00:00'
+    size: 7044
+  tools/harnesses/todo_action_router.py:
+    hash: 010fcddc555cdbc3
+    mtime: '2026-06-10T12:29:19.403681+00:00'
+    size: 8254
+  tools/harnesses/todo_progress_runtime.py:
+    hash: eec505acb876e218
+    mtime: '2026-06-10T12:29:19.407681+00:00'
+    size: 16845
+  tools/harnesses/triple_reality_stress_gate.py:
+    hash: fbd657033bc96aad
+    mtime: '2026-06-10T12:29:19.407681+00:00'
+    size: 20876
+  tools/harnesses/unified_checker.py:
+    hash: 6e312dca7e579ff1
+    mtime: '2026-06-10T12:29:19.407681+00:00'
+    size: 18819
+  tools/harnesses/verify_output.py:
+    hash: f85673a51e6ab036
+    mtime: '2026-06-10T12:29:19.407681+00:00'
+    size: 7499
+  tools/harnesses/visible_surface_cleanup.py:
+    hash: 88b4e4604f000cc6
+    mtime: '2026-06-10T12:29:19.407681+00:00'
+    size: 4889
+  tools/harnesses/work_ledger_runtime.py:
+    hash: fbd19e9d544b3f7e
+    mtime: '2026-06-10T12:29:19.411681+00:00'
+    size: 11484
+  tools/harnesses/workspace_safety_gate.py:
+    hash: 88d94f6a8647a23d
+    mtime: '2026-06-10T12:29:19.411681+00:00'
+    size: 10116
+  tools/model_integrity/claim_parser.py:
+    hash: b683a3d14d3d5b56
+    mtime: '2026-06-10T12:29:19.451680+00:00'
+    size: 11081
+  tools/model_integrity/experiment_e0.py:
+    hash: 74ff83a79360828e
+    mtime: '2026-06-10T12:29:19.451680+00:00'
+    size: 14360
+  tools/model_integrity/model_integrity_layer.py:
+    hash: 26fc7de788bc2ef3
+    mtime: '2026-06-10T12:29:19.451680+00:00'
+    size: 13037
+  tools/model_integrity/ovav_gateway.py:
+    hash: 23131927daee7d11
+    mtime: '2026-06-10T12:29:19.451680+00:00'
+    size: 15433
+  tools/model_integrity/rails/output_rails.py:
+    hash: 64905ec5982bee85
+    mtime: '2026-06-10T12:29:19.455680+00:00'
+    size: 20932
+  tools/model_integrity/verification_engine.py:
+    hash: 47f9effdb9e8d747
+    mtime: '2026-06-10T12:29:19.455680+00:00'
+    size: 16379
+  tools/permissions/bash_commands.py:
+    hash: 81582136f6d8b48f
+    mtime: '2026-06-10T12:29:19.459680+00:00'
+    size: 13083
+  tools/permissions/claims_governance.py:
+    hash: f1ce23024f3ba705
+    mtime: '2026-06-10T12:29:19.459680+00:00'
+    size: 9745
+  tools/permissions/config_governance.py:
+    hash: 82b197fd6f977623
+    mtime: '2026-06-10T12:29:19.459680+00:00'
+    size: 11044
+  tools/permissions/gate_liberation.py:
+    hash: 7fcd97e49613a9cc
+    mtime: '2026-06-10T12:29:19.459680+00:00'
+    size: 14355
+  tools/permissions/live_behavior.py:
+    hash: 8fff052dc2f40b80
+    mtime: '2026-06-10T12:29:19.459680+00:00'
+    size: 8449
+  tools/permissions/materialize.py:
+    hash: 1de18d6473d9c2cc
+    mtime: '2026-06-10T12:29:19.459680+00:00'
+    size: 1827
+  tools/permissions/new_states.py:
+    hash: 9120eafdd2e8a716
+    mtime: '2026-06-10T12:29:19.459680+00:00'
+    size: 15681
+  tools/permissions/ovav_permission_authority.py:
+    hash: 67baf1d3b28c6a36
+    mtime: '2026-06-10T12:29:19.459680+00:00'
+    size: 17127
+  tools/permissions/plugin_governance.py:
+    hash: e420cb7ca32f84c7
+    mtime: '2026-06-10T12:29:19.459680+00:00'
+    size: 6353
+  tools/permissions/rego_engine.py:
+    hash: 9a05c956b7c943ff
+    mtime: '2026-06-10T12:29:19.463680+00:00'
+    size: 20112
+  tools/permissions/research_profile.py:
+    hash: e93563238ad4e450
+    mtime: '2026-06-10T12:29:19.463680+00:00'
+    size: 10060
+  tools/permissions/sandbox_governance.py:
+    hash: 014b2b44c5406be1
+    mtime: '2026-06-10T12:29:19.463680+00:00'
+    size: 9390
+  tools/permissions/simulate.py:
+    hash: 9d408165097942ac
+    mtime: '2026-06-10T12:29:19.463680+00:00'
+    size: 7946
+  tools/permissions/system_paths.py:
+    hash: 1d3e595ea0daeb7b
+    mtime: '2026-06-10T12:29:19.463680+00:00'
+    size: 8834
+  tools/permissions/temporal_scoped.py:
+    hash: 0dc9ba1d029236e4
+    mtime: '2026-06-10T12:29:19.463680+00:00'
+    size: 15576
+  tools/permissions/unsafe_selectors.py:
+    hash: 199a727cb0fcd92a
+    mtime: '2026-06-10T12:29:19.463680+00:00'
+    size: 13826
+  tools/permissions/verify.py:
+    hash: f34c0706e1fe9c88
+    mtime: '2026-06-10T12:29:19.463680+00:00'
+    size: 9525
+  tools/research/benchmark_engine.py:
+    hash: fe55b9562af4b9fd
+    mtime: '2026-06-10T12:29:19.471680+00:00'
+    size: 13676
+  tools/research/decision_brief_builder.py:
+    hash: 9520321b1cda248a
+    mtime: '2026-06-10T12:29:19.471680+00:00'
+    size: 17526
+  tools/research/evidence_scorer.py:
+    hash: 1ef76116557b0f27
+    mtime: '2026-06-10T12:29:19.471680+00:00'
+    size: 13486
+  tools/research/research_artifact_writer.py:
+    hash: 58224a9d16f07097
+    mtime: '2026-06-10T12:29:19.471680+00:00'
+    size: 12034
+  tools/research/source_verifier.py:
+    hash: 75980cb4f60480cd
+    mtime: '2026-06-10T12:29:19.471680+00:00'
+    size: 21652
+  tools/security/bootstrap_verifier.py:
+    hash: cd355fe75da487a9
+    mtime: '2026-06-10T12:29:19.471680+00:00'
+    size: 7694
+  tools/security/branch_type_mapper.py:
+    hash: b458a88eb1f77cd9
+    mtime: '2026-06-10T12:29:19.471680+00:00'
+    size: 16507
+  tools/security/branch_types.py:
+    hash: e2940d4a36a86ae7
+    mtime: '2026-06-10T12:29:19.471680+00:00'
+    size: 13429
+  tools/security/canonical_source_resolver.py:
+    hash: edd4ec4752559c55
+    mtime: '2026-06-10T12:29:19.471680+00:00'
+    size: 19382
+  tools/security/credential_governor.py:
+    hash: 79697febce2d782a
+    mtime: '2026-06-10T12:29:19.475680+00:00'
+    size: 29051
+  tools/security/credential_health.py:
+    hash: da73a6b2859a1685
+    mtime: '2026-06-10T12:29:19.475680+00:00'
+    size: 13160
+  tools/security/credential_vault.py:
+    hash: 89b9c8e7da160de8
+    mtime: '2026-06-10T12:29:19.475680+00:00'
+    size: 18210
+  tools/security/defense_cortex.py:
+    hash: a3ffdcd404b0c160
+    mtime: '2026-06-10T12:29:19.475680+00:00'
+    size: 21894
+  tools/security/exfil_detector.py:
+    hash: d5ba13c5198ee3b9
+    mtime: '2026-06-10T12:29:19.475680+00:00'
+    size: 14733
+  tools/security/gate_self_protection.py:
+    hash: b1b76bcdd45afc51
+    mtime: '2026-06-10T12:29:19.475680+00:00'
+    size: 10054
+  tools/security/head_integrity_verifier.py:
+    hash: ac0654ee3b56da6d
+    mtime: '2026-06-10T12:29:19.479680+00:00'
+    size: 8961
+  tools/security/host_defense_logger.py:
+    hash: 594eda4d291c7014
+    mtime: '2026-06-10T12:29:19.479680+00:00'
+    size: 6645
+  tools/security/host_defense_responder.py:
+    hash: fff6412c9cae24b2
+    mtime: '2026-06-10T12:29:19.479680+00:00'
+    size: 9544
+  tools/security/implementation_guard.py:
+    hash: 50218253a2993eea
+    mtime: '2026-06-10T12:29:19.479680+00:00'
+    size: 65154
+  tools/security/integrity_monitor.py:
+    hash: 723517459f96a9c6
+    mtime: '2026-06-10T12:29:19.479680+00:00'
+    size: 12968
+  tools/security/integrity_repair.py:
+    hash: 7296b3e5321bbfd6
+    mtime: '2026-06-10T12:29:19.479680+00:00'
+    size: 26899
+  tools/security/intelligent_authorizer.py:
+    hash: 56578b684843baec
+    mtime: '2026-06-10T12:29:19.479680+00:00'
+    size: 17685
+  tools/security/living_integrity.py:
+    hash: 2309c6b324ac3d35
+    mtime: '2026-06-10T12:29:19.479680+00:00'
+    size: 39084
+  tools/security/lockdown_authority.py:
+    hash: 4a65da42c5a6c7db
+    mtime: '2026-06-10T12:29:19.483680+00:00'
+    size: 15421
+  tools/security/memory_zero.py:
+    hash: f4c53b5fa6ddc8f5
+    mtime: '2026-06-10T12:29:19.483680+00:00'
+    size: 3542
+  tools/security/network_guard.py:
+    hash: 471c04cd5cdcfd70
+    mtime: '2026-06-10T12:29:19.483680+00:00'
+    size: 9790
+  tools/security/provenance_checker.py:
+    hash: 69bb74d546a64dc3
+    mtime: '2026-06-10T12:29:19.483680+00:00'
+    size: 14366
+  tools/security/quarantine.py:
+    hash: 69edfea8fc70fb40
+    mtime: '2026-06-10T12:29:19.483680+00:00'
+    size: 15969
+  tools/security/risk_scorer.py:
+    hash: caa11d4e551aaca8
+    mtime: '2026-06-10T12:29:19.483680+00:00'
+    size: 16022
+  tools/security/root_immune_list.py:
+    hash: 7f1cc3095321f853
+    mtime: '2026-06-10T12:29:19.483680+00:00'
+    size: 10451
+  tools/security/sbom.py:
+    hash: 433c2e25d8b9a4f4
+    mtime: '2026-06-10T12:29:19.483680+00:00'
+    size: 13794
+  tools/security/secrets_vault.py:
+    hash: cdc45a1e945a4441
+    mtime: '2026-06-10T12:29:19.483680+00:00'
+    size: 12051
+  tools/security/session_context_guard.py:
+    hash: 914c3b6bf3a7f87a
+    mtime: '2026-06-10T12:29:19.483680+00:00'
+    size: 11625
+  tools/security/system_health_scheduler.py:
+    hash: 59f16b79fdaa6226
+    mtime: '2026-06-10T12:29:19.483680+00:00'
+    size: 22253
+  tools/security/validators.py:
+    hash: 474bcb50c08cb64d
+    mtime: '2026-06-10T12:29:19.483680+00:00'
+    size: 6141
+  tools/validators/branch_shield.py:
+    hash: ff7e4e93a4aabfda
+    mtime: '2026-06-10T12:29:19.491680+00:00'
+    size: 22938
+  tools/validators/check_L6_security_zero_trust.py:
+    hash: 15b73b40f0214f0f
+    mtime: '2026-06-10T12:29:19.495680+00:00'
+    size: 7820
+  tools/validators/check_L7_feedback_loop.py:
+    hash: dafc2ab5b202ca01
+    mtime: '2026-06-10T12:29:19.495680+00:00'
+    size: 6952
+  tools/validators/check_agent_permission_invariants.py:
+    hash: 431eadd61e75106b
+    mtime: '2026-06-10T12:29:19.495680+00:00'
+    size: 4965
+  tools/validators/check_agent_runtime_enforcement.py:
+    hash: d6a48098ba993685
+    mtime: '2026-06-10T12:29:19.495680+00:00'
+    size: 5762
+  tools/validators/check_agent_runtime_service_area_router.py:
+    hash: 9ef811a451d05202
+    mtime: '2026-06-10T12:29:19.495680+00:00'
+    size: 2768
+  tools/validators/check_agent_surface_hierarchy.py:
+    hash: a39d81929a4d3e2d
+    mtime: '2026-06-10T12:29:19.495680+00:00'
+    size: 9729
+  tools/validators/check_agent_ux_visual_delivery.py:
+    hash: 9ba61e0253fc13ed
+    mtime: '2026-06-10T12:29:19.495680+00:00'
+    size: 4247
+  tools/validators/check_architecture_guardian.py:
+    hash: c2e8c2983c861006
+    mtime: '2026-06-10T12:29:19.495680+00:00'
+    size: 10620
+  tools/validators/check_behavioral_directives.py:
+    hash: 506cac92cae14a77
+    mtime: '2026-06-10T12:29:19.495680+00:00'
+    size: 2966
+  tools/validators/check_bootstrap_chain.py:
+    hash: 5b8a5aa3361b22ff
+    mtime: '2026-06-10T12:29:19.495680+00:00'
+    size: 1200
+  tools/validators/check_build17_canonical_review.py:
+    hash: 6cbed90735e5e2af
+    mtime: '2026-06-10T12:29:19.495680+00:00'
+    size: 2486
+  tools/validators/check_build18_launch_pack.py:
+    hash: 1d62f63c4888746a
+    mtime: '2026-06-10T12:29:19.495680+00:00'
+    size: 1861
+  tools/validators/check_canonical_integrity.py:
+    hash: 312fbee2d35ac5e1
+    mtime: '2026-06-10T12:29:19.499680+00:00'
+    size: 11700
+  tools/validators/check_config_syntax.py:
+    hash: 5f05c028c9fe74b0
+    mtime: '2026-06-10T12:29:19.499680+00:00'
+    size: 5058
+  tools/validators/check_context_economy_and_active_connections.py:
+    hash: b72be706783a659c
+    mtime: '2026-06-10T12:29:19.499680+00:00'
+    size: 5233
+  tools/validators/check_context_firewall_v2.py:
+    hash: 501e3e935badc695
+    mtime: '2026-06-10T12:29:19.499680+00:00'
+    size: 5910
+  tools/validators/check_contract_freshness.py:
+    hash: bf51dd6dd41875ba
+    mtime: '2026-06-10T12:29:19.499680+00:00'
+    size: 5563
+  tools/validators/check_cross_target_consistency.py:
+    hash: c98098f0c9a94af1
+    mtime: '2026-06-10T12:29:19.499680+00:00'
+    size: 3538
+  tools/validators/check_exfil_patterns.py:
+    hash: 3f56eba09cc25871
+    mtime: '2026-06-10T12:29:19.499680+00:00'
+    size: 1520
+  tools/validators/check_f1_architecture.py:
+    hash: 5a5ab4b11e04dedb
+    mtime: '2026-06-10T12:29:19.499680+00:00'
+    size: 2801
+  tools/validators/check_f2_infrastructure.py:
+    hash: c7bb415874dc628b
+    mtime: '2026-06-10T12:29:19.499680+00:00'
+    size: 3956
+  tools/validators/check_f3_roles.py:
+    hash: 8cc00b42f6b32310
+    mtime: '2026-06-10T12:29:19.499680+00:00'
+    size: 3963
+  tools/validators/check_f4_security_hardening.py:
+    hash: 013fe4b455194d81
+    mtime: '2026-06-10T12:29:19.499680+00:00'
+    size: 11257
+  tools/validators/check_f5_advanced_hardening.py:
+    hash: c4ef1f537eda7d7b
+    mtime: '2026-06-10T12:29:19.499680+00:00'
+    size: 5773
+  tools/validators/check_final_launch_current_authority.py:
+    hash: 4e8458361e07de3b
+    mtime: '2026-06-10T12:29:19.499680+00:00'
+    size: 3360
+  tools/validators/check_final_launch_runtime_authority.py:
+    hash: b85a8d0548be8ba3
+    mtime: '2026-06-10T12:29:19.499680+00:00'
+    size: 3464
+  tools/validators/check_formal_verification.py:
+    hash: 118a31fc5bacc740
+    mtime: '2026-06-10T12:29:19.499680+00:00'
+    size: 1256
+  tools/validators/check_git_push_gate.py:
+    hash: 010e0f1b8b651029
+    mtime: '2026-06-10T12:29:19.499680+00:00'
+    size: 2178
+  tools/validators/check_handoff_sync.py:
+    hash: 02f42a03541244e8
+    mtime: '2026-06-10T12:29:19.499680+00:00'
+    size: 2669
+  tools/validators/check_harness_contract_alignment.py:
+    hash: d115e4235bae02e6
+    mtime: '2026-06-10T12:29:19.499680+00:00'
+    size: 3733
+  tools/validators/check_host_config_drift.py:
+    hash: 1f99f53232c0130c
+    mtime: '2026-06-10T12:29:19.503680+00:00'
+    size: 48128
+  tools/validators/check_invalid_fixtures.py:
+    hash: 5bd450f502665e49
+    mtime: '2026-06-10T12:29:19.503680+00:00'
+    size: 5130
+  tools/validators/check_lead_scope.py:
+    hash: 8aaa2e099f2a5a92
+    mtime: '2026-06-10T12:29:19.503680+00:00'
+    size: 17400
+  tools/validators/check_ledger_write_path.py:
+    hash: 3d823ac2a0b90c26
+    mtime: '2026-06-10T12:29:19.503680+00:00'
+    size: 8408
+  tools/validators/check_living_integrity.py:
+    hash: d8b763d4c06dd5c1
+    mtime: '2026-06-10T12:29:19.503680+00:00'
+    size: 9699
+  tools/validators/check_network_hardening.py:
+    hash: c71fa2b5f6efcf28
+    mtime: '2026-06-10T12:29:19.503680+00:00'
+    size: 1580
+  tools/validators/check_opencode_plugins.py:
+    hash: 6b0c9ea3d881c0ff
+    mtime: '2026-06-10T12:29:19.503680+00:00'
+    size: 8048
+  tools/validators/check_opencode_runtime_wiring.py:
+    hash: 5e62d82a2355002f
+    mtime: '2026-06-10T12:29:19.503680+00:00'
+    size: 5601
+  tools/validators/check_ovav_ssh_profile.py:
+    hash: 25fea44986d6f718
+    mtime: '2026-06-10T12:29:19.503680+00:00'
+    size: 9567
+  tools/validators/check_ovav_wezterm_workspace_isolation.py:
+    hash: a3e9bd26cc43f95f
+    mtime: '2026-06-10T12:29:19.503680+00:00'
+    size: 14032
+  tools/validators/check_permission_policy_drift.py:
+    hash: e081190c60130482
+    mtime: '2026-06-10T12:29:19.503680+00:00'
+    size: 1592
+  tools/validators/check_protected_branch.py:
+    hash: 4e89dc5a802f4dfb
+    mtime: '2026-06-10T12:29:19.503680+00:00'
+    size: 18579
+  tools/validators/check_registry_drift.py:
+    hash: a18f4f87aeebc382
+    mtime: '2026-06-10T12:29:19.507680+00:00'
+    size: 13929
+  tools/validators/check_rego_policies.py:
+    hash: dc4f5c8e73230441
+    mtime: '2026-06-10T12:29:19.507680+00:00'
+    size: 1533
+  tools/validators/check_release_gate.py:
+    hash: 82ecc3dfb66e2adc
+    mtime: '2026-06-10T12:29:19.507680+00:00'
+    size: 6436
+  tools/validators/check_runtime_integrity.py:
+    hash: db857e1b1b66dd4d
+    mtime: '2026-06-10T12:29:19.507680+00:00'
+    size: 1116
+  tools/validators/check_secrets_hygiene.py:
+    hash: 8f04bb3ee7f25216
+    mtime: '2026-06-10T12:29:19.507680+00:00'
+    size: 3621
+  tools/validators/check_service_area_governance.py:
+    hash: 8bb468943e3670e3
+    mtime: '2026-06-10T12:29:19.507680+00:00'
+    size: 2419
+  tools/validators/check_single_authority_source.py:
+    hash: 8e8b37e0b93e96ce
+    mtime: '2026-06-10T12:29:19.507680+00:00'
+    size: 9043
+  tools/validators/check_squad_normalization.py:
+    hash: c18c92a35dac7a1e
+    mtime: '2026-06-10T12:29:19.507680+00:00'
+    size: 3802
+  tools/validators/check_stale_artifact_references.py:
+    hash: 83a41cc1db03f644
+    mtime: '2026-06-10T12:29:19.507680+00:00'
+    size: 5635
+  tools/validators/check_supply_chain.py:
+    hash: db92688f1aa25826
+    mtime: '2026-06-10T12:29:19.507680+00:00'
+    size: 2113
+  tools/validators/check_surface_drift.py:
+    hash: 1d05b6d9afbd78bd
+    mtime: '2026-06-10T12:29:19.507680+00:00'
+    size: 4266
+  tools/validators/check_todo_debt.py:
+    hash: 6d5489922cde04f8
+    mtime: '2026-06-10T12:29:19.507680+00:00'
+    size: 5304
+  tools/validators/check_tool_config_profiles.py:
+    hash: a70527c47bedb74f
+    mtime: '2026-06-10T12:29:19.507680+00:00'
+    size: 4939
+  tools/validators/check_tool_readiness_matrix.py:
+    hash: 66e5fe11b0e100b5
+    mtime: '2026-06-10T12:29:19.507680+00:00'
+    size: 14200
+  tools/validators/check_validator_coverage.py:
+    hash: cc654f63ca5b8f3a
+    mtime: '2026-06-10T12:29:19.507680+00:00'
+    size: 9468
+  tools/validators/check_wezterm_path_integrity.py:
+    hash: 55ae8a9fd0a87c38
+    mtime: '2026-06-10T12:29:19.511680+00:00'
+    size: 16202
+  tools/validators/check_workspace_safety_gate.py:
+    hash: 362a4583f7d77717
+    mtime: '2026-06-10T12:29:19.511680+00:00'
+    size: 3364
+  tools/validators/common.py:
+    hash: 6b0b6b9722910f41
+    mtime: '2026-06-10T12:29:19.511680+00:00'
+    size: 1358
+  tools/validators/merge_readiness.py:
+    hash: 02750f5db85d1377
+    mtime: '2026-06-10T12:29:19.511680+00:00'
+    size: 13142
+  tools/validators/merge_readiness_suite.py:
+    hash: a706ef37452f233d
+    mtime: '2026-06-10T12:29:19.511680+00:00'
+    size: 10109
+  tools/validators/pre_push_intelligence.py:
+    hash: 62fa6e5e185b1486
+    mtime: '2026-06-10T12:29:19.511680+00:00'
+    size: 13576
+  tools/validators/thought_firewall.py:
+    hash: 4e536011cc93a3f0
+    mtime: '2026-06-10T12:29:19.511680+00:00'
+    size: 4635
+  tools/validators/validate_all.py:
+    hash: 172f6e34b1580d99
+    mtime: '2026-06-10T12:29:19.511680+00:00'
+    size: 8209
+  tools/validators/validate_harnesses.py:
+    hash: e1f1281e54fe2097
+    mtime: '2026-06-10T12:29:19.515680+00:00'
+    size: 53925
+  tools/validators/validate_memory_policy.py:
+    hash: cc54175fb7f8cca6
+    mtime: '2026-06-10T12:29:19.515680+00:00'
+    size: 2373
+  tools/validators/validate_model_policy.py:
+    hash: 93244f3718eacfc4
+    mtime: '2026-06-10T12:29:19.515680+00:00'
+    size: 7749
+  tools/validators/validate_phase_dag.py:
+    hash: def36615887eb46c
+    mtime: '2026-06-10T12:29:19.515680+00:00'
+    size: 2216
+  tools/validators/validate_registries.py:
+    hash: e175e1d8723fb2fc
+    mtime: '2026-06-10T12:29:19.515680+00:00'
+    size: 707
+  tools/validators/validate_result_contracts.py:
+    hash: 7dda3309cacfa81c
+    mtime: '2026-06-10T12:29:19.515680+00:00'
+    size: 1803
+  tools/validators/validate_service_profiles.py:
+    hash: e80422e9df5de9a6
+    mtime: '2026-06-10T12:29:19.515680+00:00'
+    size: 4562
+  tools/validators/validate_skills.py:
+    hash: 54ebb8eb40ae5633
+    mtime: '2026-06-10T12:29:19.515680+00:00'
+    size: 3229
+toolset_hash: 3eb4429bdfd7ad4a
+version: 2

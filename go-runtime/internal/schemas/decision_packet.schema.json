@@ -1,0 +1,292 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ovav.dev/schemas/decision_packet.schema.json",
+  "title": "OVAV Decision Packet Schema",
+  "description": "Pre-implementation decision packet required for all medium+ changes. Validated against the 21 OVAV Laws before any implementation begins.",
+  "type": "object",
+  "required": [
+    "packet_id",
+    "proposal",
+    "service_area",
+    "lead",
+    "task_size",
+    "risk_level",
+    "touched_surfaces",
+    "expected_files",
+    "user_visible_change",
+    "rollback_needed",
+    "law_activation_map"
+  ],
+  "properties": {
+    "packet_id": {
+      "type": "string",
+      "description": "Unique identifier for this decision packet (e.g., DP-2026-05-29-001)"
+    },
+    "proposal": {
+      "type": "string",
+      "description": "Human-readable description of the proposed change"
+    },
+    "rationale": {
+      "type": "string",
+      "description": "Why this change is needed and what problem it solves"
+    },
+    "service_area": {
+      "type": "string",
+      "enum": ["platform_engineering", "research_intelligence"],
+      "description": "OVAV service area responsible for this change"
+    },
+    "lead": {
+      "type": "string",
+      "description": "Lead operator (e.g., thavren, eidren)"
+    },
+    "task_size": {
+      "type": "string",
+      "enum": ["micro", "simple", "medium", "complex", "critical"],
+      "description": "Size classification of the proposed change"
+    },
+    "risk_level": {
+      "type": "string",
+      "enum": ["low", "medium", "high", "critical"],
+      "description": "Risk classification of the proposed change"
+    },
+    "touched_surfaces": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      },
+      "description": "Directories, files or surface categories that will be modified"
+    },
+    "expected_files": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["path", "action"],
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Repo-relative path to the file"
+          },
+          "action": {
+            "type": "string",
+            "enum": ["create", "modify", "delete"],
+            "description": "What will be done to this file"
+          },
+          "reason": {
+            "type": "string",
+            "description": "Why this file is needed"
+          }
+        }
+      },
+      "description": "Files that will be created, modified or deleted"
+    },
+    "context_needed": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["source_id"],
+        "properties": {
+          "source_id": {
+            "type": "string",
+            "description": "Identifier of the context source"
+          },
+          "tier": {
+            "type": "string",
+            "enum": ["T0_none", "T1_tiny", "T2_compact", "T3_focused", "T4_full_scoped", "T5_closure_grade"],
+            "description": "Context tier required"
+          },
+          "reason": {
+            "type": "string",
+            "description": "Why this context is needed"
+          }
+        }
+      },
+      "description": "Context sources that will be loaded"
+    },
+    "tools_needed": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["tool_class"],
+        "properties": {
+          "tool_class": {
+            "type": "string",
+            "description": "Class of tool needed (e.g., bash, file_write, git)"
+          },
+          "risk": {
+            "type": "string",
+            "enum": ["low", "medium", "high"],
+            "description": "Risk level of this tool"
+          }
+        }
+      },
+      "description": "Tools that will be used during implementation"
+    },
+    "permissions_needed": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["permission_class"],
+        "properties": {
+          "permission_class": {
+            "type": "string",
+            "description": "Permission class required"
+          },
+          "grant_source": {
+            "type": "string",
+            "description": "Where this permission is granted (e.g., standing grant, explicit approval)"
+          }
+        }
+      },
+      "description": "Permissions that must be active"
+    },
+    "harnesses_expected": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["harness_name"],
+        "properties": {
+          "harness_name": {
+            "type": "string",
+            "description": "Name of the harness/validator that should run"
+          },
+          "trigger": {
+            "type": "string",
+            "description": "What triggers this harness (e.g., file path, surface)"
+          }
+        }
+      },
+      "description": "Harnesses and validators expected to run"
+    },
+    "user_visible_change": {
+      "type": "boolean",
+      "description": "Whether this change affects the user-visible surface"
+    },
+    "rollback_needed": {
+      "type": "boolean",
+      "description": "Whether a rollback plan is required"
+    },
+    "rollback_plan": {
+      "type": "string",
+      "description": "How to undo this change if it fails"
+    },
+    "evidence_required": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Evidence artifacts that must be produced"
+    },
+    "law_activation_map": {
+      "type": "object",
+      "description": "Pre-computed activation map: which laws apply to this packet based on task_size, touched_surfaces and user_visible_change",
+      "required": [
+        "product_laws",
+        "authority_laws",
+        "identity_laws",
+        "context_tool_laws",
+        "execution_laws",
+        "security_evolution_laws"
+      ],
+      "properties": {
+        "product_laws": {
+          "type": "object",
+          "required": ["LAW-01", "LAW-02", "LAW-03", "LAW-04"],
+          "properties": {
+            "LAW-01": { "$ref": "#/$defs/law_activation" },
+            "LAW-02": { "$ref": "#/$defs/law_activation" },
+            "LAW-03": { "$ref": "#/$defs/law_activation" },
+            "LAW-04": { "$ref": "#/$defs/law_activation" }
+          }
+        },
+        "authority_laws": {
+          "type": "object",
+          "required": ["LAW-05", "LAW-06", "LAW-07"],
+          "properties": {
+            "LAW-05": { "$ref": "#/$defs/law_activation" },
+            "LAW-06": { "$ref": "#/$defs/law_activation" },
+            "LAW-07": { "$ref": "#/$defs/law_activation" }
+          }
+        },
+        "identity_laws": {
+          "type": "object",
+          "required": ["LAW-08", "LAW-09", "LAW-10"],
+          "properties": {
+            "LAW-08": { "$ref": "#/$defs/law_activation" },
+            "LAW-09": { "$ref": "#/$defs/law_activation" },
+            "LAW-10": { "$ref": "#/$defs/law_activation" }
+          }
+        },
+        "context_tool_laws": {
+          "type": "object",
+          "required": ["LAW-11", "LAW-12", "LAW-13", "LAW-14"],
+          "properties": {
+            "LAW-11": { "$ref": "#/$defs/law_activation" },
+            "LAW-12": { "$ref": "#/$defs/law_activation" },
+            "LAW-13": { "$ref": "#/$defs/law_activation" },
+            "LAW-14": { "$ref": "#/$defs/law_activation" }
+          }
+        },
+        "execution_laws": {
+          "type": "object",
+          "required": ["LAW-15", "LAW-16", "LAW-17"],
+          "properties": {
+            "LAW-15": { "$ref": "#/$defs/law_activation" },
+            "LAW-16": { "$ref": "#/$defs/law_activation" },
+            "LAW-17": { "$ref": "#/$defs/law_activation" }
+          }
+        },
+        "security_evolution_laws": {
+          "type": "object",
+          "required": ["LAW-18", "LAW-19", "LAW-20", "LAW-21"],
+          "properties": {
+            "LAW-18": { "$ref": "#/$defs/law_activation" },
+            "LAW-19": { "$ref": "#/$defs/law_activation" },
+            "LAW-20": { "$ref": "#/$defs/law_activation" },
+            "LAW-21": { "$ref": "#/$defs/law_activation" }
+          }
+        }
+      }
+    },
+    "decision": {
+      "type": "string",
+      "enum": ["PASS", "PASS_WITH_CHANGES", "FAIL", "BLOCKED"],
+      "description": "Final decision after all laws are evaluated"
+    },
+    "decision_rationale": {
+      "type": "string",
+      "description": "Human-readable explanation of the decision"
+    },
+    "required_changes": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Changes required before this packet can pass"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when this packet was generated"
+    },
+    "evaluated_by": {
+      "type": "string",
+      "description": "Operator or system that evaluated this packet"
+    }
+  },
+  "$defs": {
+    "law_activation": {
+      "type": "object",
+      "required": ["active", "reason"],
+      "properties": {
+        "active": {
+          "type": "boolean",
+          "description": "Whether this law is activated for this packet"
+        },
+        "reason": {
+          "type": "string",
+          "description": "Why this law is activated or skipped (cite activation rule from ovav_laws.yaml)"
+        }
+      }
+    }
+  }
+}

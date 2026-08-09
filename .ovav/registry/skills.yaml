@@ -1,0 +1,706 @@
+skills:
+  runtime_governance_seed:
+    display_name: Runtime Governance Seed
+    owner_profile: ovav_systems_architect
+    owner_operator: thavren
+    owner_lane: runtime_governance
+    provenance: registry_seed
+    status: experimental
+    eval_status: pending
+    risk_level: low
+    permission_level: project_read
+    score: 70
+    rule_pack_ref: runtime_governance_seed
+    memory_write: scoped
+    memory_write_scope: runtime_governance_only
+    required: true
+    harness_refs:
+    - h_skill_registry_refresh
+    - h_skill_score_gate
+    - h_skill_context_loader
+    - h_skill_rule_pack_validator
+    - h_skill_permission_gate
+    - h_result_contract
+    - h_verify_evidence
+    - h_work_report_builder
+    - h_human_response_translator
+    eval_refs:
+    - eval_profile_resolution
+    - eval_lane_classification
+    - eval_skill_without_owner_blocked
+    - eval_skill_without_eval_experimental
+    - eval_result_contract_requires_evidence
+    - eval_readiness_preserves_experimental
+    last_validated_at: null
+  research_verification_seed:
+    display_name: Research Verification Seed
+    owner_profile: ovav_research_analyst
+    owner_operator: eidren
+    owner_lane: source_verification
+    provenance: registry_seed
+    status: experimental
+    eval_status: pending
+    risk_level: low
+    permission_level: project_read
+    score: 70
+    rule_pack_ref: research_verification_seed
+    memory_write: scoped
+    memory_write_scope: source_verification_only
+    required: true
+    harness_refs:
+    - h_skill_registry_refresh
+    - h_skill_score_gate
+    - h_skill_context_loader
+    - h_skill_rule_pack_validator
+    - h_skill_permission_gate
+    - h_result_contract
+    - h_verify_evidence
+    - h_work_report_builder
+    - h_human_response_translator
+    eval_refs:
+    - eval_profile_resolution
+    - eval_lane_classification
+    - eval_skill_without_owner_blocked
+    - eval_skill_without_eval_experimental
+    - eval_evidence_report_parseable
+    - eval_readiness_preserves_experimental
+    last_validated_at: null
+
+  ovav-context-pack:
+    name: ovav-context-pack
+    description: Use when OVAV needs a compact context pack for role routing, current
+      layer, artifacts, gates, blocked surfaces and next action.
+    owner_profile: ovav_systems_architect
+    status: safe
+    score: 5
+    max_score: 5
+    source: .ovav/source/skills/ovav-context-pack/SKILL.md
+    checks:
+      owner:
+        passed: true
+        detail: 'owner_profile_inferred: ovav_systems_architect'
+        mandatory: true
+      description:
+        passed: true
+        detail: description_present
+        mandatory: true
+      memory:
+        passed: true
+        detail: no_memory_concern
+        mandatory: true
+      permission:
+        passed: true
+        detail: no_permission_concern
+        mandatory: false
+      provenance:
+        passed: true
+        detail: opencode_source
+        mandatory: false
+    last_scored: 20260523T042814Z
+    owner_lane: runtime_governance
+    provenance: opencode
+    risk_level: low
+    permission_level: source_local
+    rule_pack_ref: ovav-context-pack
+    eval_status: passed
+  ovav-identity-guard:
+    name: ovav-identity-guard
+    description: Use when editing OVAV OpenCode agents, commands or skills to preserve
+      visible professional service roles and protected internal lead metadata.
+    owner_profile: ovav_systems_architect
+    status: experimental
+    score: 4
+    max_score: 5
+    source: .ovav/source/skills/ovav-identity-guard/SKILL.md
+    checks:
+      owner:
+        passed: true
+        detail: 'owner_profile_inferred: ovav_systems_architect'
+        mandatory: true
+      description:
+        passed: true
+        detail: description_present
+        mandatory: true
+      memory:
+        passed: true
+        detail: memory_mentioned_but_no_write_requested
+        mandatory: true
+      permission:
+        passed: false
+        detail: permission_mentioned_without_declaration
+        mandatory: false
+      provenance:
+        passed: true
+        detail: opencode_source
+        mandatory: false
+    last_scored: 20260523T042814Z
+    owner_lane: runtime_governance
+    provenance: opencode
+    risk_level: medium
+    permission_level: governed
+    rule_pack_ref: ovav-identity-guard
+    eval_status: pending
+  ovav-platform-session:
+    name: ovav-platform-session
+    description: Use when Platform Engineering session behavior, Spanish user-facing
+      replies, Thavren expert voice, lane routing or S63 usable session RC rules are
+      needed.
+    owner_profile: ovav_systems_architect
+    status: experimental
+    score: 4
+    max_score: 5
+    source: .ovav/source/skills/ovav-platform-session/SKILL.md
+    checks:
+      owner:
+        passed: true
+        detail: 'owner_profile_inferred: ovav_systems_architect'
+        mandatory: true
+      description:
+        passed: true
+        detail: description_present
+        mandatory: true
+      memory:
+        passed: true
+        detail: memory_mentioned_but_no_write_requested
+        mandatory: true
+      permission:
+        passed: false
+        detail: permission_mentioned_without_declaration
+        mandatory: false
+      provenance:
+        passed: true
+        detail: opencode_source
+        mandatory: false
+    last_scored: 20260523T042814Z
+    owner_lane: runtime_governance
+    provenance: opencode
+    risk_level: medium
+    permission_level: governed
+    rule_pack_ref: ovav-platform-session
+    eval_status: pending
+  ovav-repo-local-work-loop:
+    name: ovav-repo-local-work-loop
+    description: Use when OVAV repo-local work loop behavior, context→work→validate→close
+      routing, progressive loading, Harness Intelligence Router integration or S65
+      practical work loop rules are needed.
+    owner_profile: ovav_systems_architect
+    status: safe
+    score: 5
+    max_score: 5
+    source: .ovav/source/skills/ovav-repo-local-work-loop/SKILL.md
+    checks:
+      owner:
+        passed: true
+        detail: 'owner_profile_inferred: ovav_systems_architect'
+        mandatory: true
+      description:
+        passed: true
+        detail: description_present
+        mandatory: true
+      memory:
+        passed: true
+        detail: memory_mentioned_but_no_write_requested
+        mandatory: true
+      permission:
+        passed: true
+        detail: no_permission_concern
+        mandatory: false
+      provenance:
+        passed: true
+        detail: opencode_source
+        mandatory: false
+    last_scored: 20260523T042814Z
+    owner_lane: runtime_governance
+    provenance: opencode
+    risk_level: low
+    permission_level: source_local
+    rule_pack_ref: ovav-repo-local-work-loop
+    eval_status: passed
+
+  ovav-research-session:
+    name: ovav-research-session
+    description: Use when OVAV Research Intelligence session behavior, Spanish user-facing
+      replies, Eidren expert voice, evidence-first routing or S64 usable session RC
+      rules are needed.
+    owner_profile: ovav_research_analyst
+    status: safe
+    score: 5
+    max_score: 5
+    source: .ovav/source/skills/ovav-research-session/SKILL.md
+    checks:
+      owner:
+        passed: true
+        detail: 'owner_profile_declared: ovav_research_analyst'
+        mandatory: true
+      description:
+        passed: true
+        detail: description_present
+        mandatory: true
+      memory:
+        passed: true
+        detail: memory_mentioned_but_no_write_requested
+        mandatory: true
+      permission:
+        passed: true
+        detail: permission_declared
+        mandatory: false
+      provenance:
+        passed: true
+        detail: opencode_source
+        mandatory: false
+    last_scored: 20260523T042814Z
+    owner_lane: deep_research
+    provenance: opencode
+    risk_level: low
+    permission_level: source_local
+    rule_pack_ref: ovav-research-session
+    eval_status: passed
+  ovav-response-contract:
+    name: ovav-response-contract
+    description: Use when OVAV output must follow the human, compact, visual, didactic
+      response contract without hidden reasoning or robotic structure.
+    owner_profile: ovav_systems_architect
+    status: safe
+    score: 5
+    max_score: 5
+    source: .ovav/source/skills/ovav-response-contract/SKILL.md
+    checks:
+      owner:
+        passed: true
+        detail: 'owner_profile_inferred: ovav_systems_architect'
+        mandatory: true
+      description:
+        passed: true
+        detail: description_present
+        mandatory: true
+      memory:
+        passed: true
+        detail: no_memory_concern
+        mandatory: true
+      permission:
+        passed: true
+        detail: no_permission_concern
+        mandatory: false
+      provenance:
+        passed: true
+        detail: opencode_source
+        mandatory: false
+    last_scored: 20260523T042814Z
+    owner_lane: runtime_governance
+    provenance: opencode
+    risk_level: low
+    permission_level: source_local
+    rule_pack_ref: ovav-response-contract
+    eval_status: passed
+  ovav-runtime-gates:
+    name: ovav-runtime-gates
+    description: Use when OVAV work needs source-local runtime gates, validation,
+      next-work resolution, close-layer dry-runs or blocked-surface checks.
+    owner_profile: ovav_systems_architect
+    status: safe
+    score: 5
+    max_score: 5
+    source: .ovav/source/skills/ovav-runtime-gates/SKILL.md
+    checks:
+      owner:
+        passed: true
+        detail: 'owner_profile_inferred: ovav_systems_architect'
+        mandatory: true
+      description:
+        passed: true
+        detail: description_present
+        mandatory: true
+      memory:
+        passed: true
+        detail: memory_mentioned_but_no_write_requested
+        mandatory: true
+      permission:
+        passed: true
+        detail: no_permission_concern
+        mandatory: false
+      provenance:
+        passed: true
+        detail: opencode_source
+        mandatory: false
+    last_scored: 20260523T042814Z
+    owner_lane: runtime_governance
+    provenance: opencode
+    risk_level: low
+    permission_level: source_local
+    rule_pack_ref: ovav-runtime-gates
+    eval_status: passed
+
+  ovav-artifact-flow:
+    name: ovav-artifact-flow
+    description: Enforces artifact-first SDD flow. Blocks apply if required upstream
+      artifacts are missing. Use for artifact dependency validation and phase DAG
+      enforcement.
+    owner_profile: ovav_systems_architect
+    owner_lane: runtime_governance
+    provenance: opencode
+    risk_level: medium
+    permission_level: governed
+    rule_pack_ref: ovav-artifact-flow
+    eval_status: pending
+    status: experimental
+    score: 4
+    max_score: 5
+    source: .ovav/source/skills/ovav-artifact-flow/SKILL.md
+    checks:
+      owner:
+        passed: true
+        detail: 'owner_profile_declared: ovav_systems_architect'
+        mandatory: true
+      description:
+        passed: true
+        detail: description_present
+        mandatory: true
+      memory:
+        passed: true
+        detail: memory_mentioned_but_no_write_requested
+        mandatory: true
+      permission:
+        passed: false
+        detail: permission_mentioned_without_declaration
+        mandatory: false
+      provenance:
+        passed: true
+        detail: opencode_source
+        mandatory: false
+    last_scored: 20260523T042814Z
+  ovav-research-evidence:
+    name: ovav-research-evidence
+    description: Guides research, benchmark and source-verification tasks for Eidren
+      through OVAV Research Intelligence. Use for source quality validation, evidence
+      scoring, comparative benchmarking, and decision brief generation.
+    owner_profile: ovav_research_analyst
+    owner_lane: source_verification
+    provenance: opencode
+    risk_level: low
+    permission_level: source_local
+    rule_pack_ref: ovav-research-evidence
+    eval_status: passed
+    status: safe
+    score: 5
+    max_score: 5
+    source: .ovav/source/skills/ovav-research-evidence/SKILL.md
+    checks:
+      owner:
+        passed: true
+        detail: 'owner_profile_declared: ovav_research_analyst'
+        mandatory: true
+      description:
+        passed: true
+        detail: description_present
+        mandatory: true
+      memory:
+        passed: true
+        detail: memory_mentioned_but_no_write_requested
+        mandatory: true
+      permission:
+        passed: true
+        detail: permission_declared
+        mandatory: false
+      provenance:
+        passed: true
+        detail: opencode_source
+        mandatory: false
+    last_scored: 20260523T042814Z
+  ovav-sdd-init:
+    name: ovav-sdd-init
+    description: Triggers automatic project discovery (h_sdd_init) when a project
+      is unknown or stale. Use for stack detection, artifact map generation, and project
+      initialization.
+    owner_profile: ovav_systems_architect
+    owner_lane: runtime_governance
+    provenance: opencode
+    risk_level: medium
+    permission_level: governed
+    rule_pack_ref: ovav-sdd-init
+    eval_status: pending
+    status: experimental
+    score: 4
+    max_score: 5
+    source: .ovav/source/skills/ovav-sdd-init/SKILL.md
+    checks:
+      owner:
+        passed: true
+        detail: 'owner_profile_declared: ovav_systems_architect'
+        mandatory: true
+      description:
+        passed: true
+        detail: description_present
+        mandatory: true
+      memory:
+        passed: true
+        detail: memory_mentioned_but_no_write_requested
+        mandatory: true
+      permission:
+        passed: false
+        detail: permission_mentioned_without_declaration
+        mandatory: false
+      provenance:
+        passed: true
+        detail: opencode_source
+        mandatory: false
+    last_scored: 20260523T042814Z
+  ovav-agent-router:
+    name: ovav-agent-router
+    description: Use when OVAV needs to detect the domain of a request and route to the correct lead/agent, or when delegating work to a specific OVAV service area.
+    owner_profile: ovav_systems_architect
+    owner_lane: runtime_governance
+    provenance: opencode
+    risk_level: low
+    permission_level: source_local
+    rule_pack_ref: ovav-agent-router
+    eval_status: pending
+    status: experimental
+    score: 4
+    max_score: 5
+    source: .ovav/source/skills/ovav-agent-router/SKILL.md
+    checks:
+      owner:
+        passed: true
+        detail: 'owner_profile_declared: ovav_systems_architect'
+        mandatory: true
+      description:
+        passed: true
+        detail: description_present
+        mandatory: true
+      memory:
+        passed: true
+        detail: memory_mentioned_but_no_write_requested
+        mandatory: true
+      permission:
+        passed: true
+        detail: permission_declared
+        mandatory: false
+      provenance:
+        passed: true
+        detail: opencode_source
+        mandatory: false
+    last_scored: 20260717T23:45:00Z
+  ovav-session-continuity:
+    name: ovav-session-continuity
+    description: Use when OVAV session behavior, continuity, handoff, or cross-session context preservation is needed.
+    owner_profile: ovav_systems_architect
+    owner_lane: runtime_governance
+    provenance: opencode
+    risk_level: low
+    permission_level: source_local
+    rule_pack_ref: ovav-session-continuity
+    eval_status: pending
+    status: experimental
+    score: 4
+    max_score: 5
+    source: .ovav/source/skills/ovav-session-continuity/SKILL.md
+    checks:
+      owner:
+        passed: true
+        detail: 'owner_profile_declared: ovav_systems_architect'
+        mandatory: true
+      description:
+        passed: true
+        detail: description_present
+        mandatory: true
+      memory:
+        passed: true
+        detail: memory_mentioned_but_no_write_requested
+        mandatory: true
+      permission:
+        passed: true
+        detail: permission_declared
+        mandatory: false
+      provenance:
+        passed: true
+        detail: opencode_source
+        mandatory: false
+    last_scored: 20260717T23:45:00Z
+  ovav-security-gates:
+    name: ovav-security-gates
+    description: Use when OVAV security enforcement, command blocking, actor audit, or session validation is needed.
+    owner_profile: ovav_systems_architect
+    owner_lane: runtime_governance
+    provenance: opencode
+    risk_level: medium
+    permission_level: governed
+    rule_pack_ref: ovav-security-gates
+    eval_status: pending
+    status: experimental
+    score: 4
+    max_score: 5
+    source: .ovav/source/skills/ovav-security-gates/SKILL.md
+    checks:
+      owner:
+        passed: true
+        detail: 'owner_profile_declared: ovav_systems_architect'
+        mandatory: true
+      description:
+        passed: true
+        detail: description_present
+        mandatory: true
+      memory:
+        passed: true
+        detail: memory_mentioned_but_no_write_requested
+        mandatory: true
+      permission:
+        passed: true
+        detail: permission_declared
+        mandatory: false
+      provenance:
+        passed: true
+        detail: opencode_source
+        mandatory: false
+    last_scored: 20260717T23:45:00Z
+  ovav-health-session:
+    name: ovav-health-session
+    description: Use when Health and Performance session behavior, Renata lead ownership, sports nutrition, exercise physiology, clinical research, meal planning, supplementation, sleep/recovery or mental performance is needed.
+    owner_profile: ovav_health_specialist
+    owner_lane: health_performance
+    provenance: opencode
+    risk_level: low
+    permission_level: source_local
+    rule_pack_ref: ovav-health-session
+    eval_status: pending
+    status: experimental
+    score: 4
+    max_score: 5
+    source: .ovav/source/skills/ovav-health-session/SKILL.md
+    checks:
+      owner:
+        passed: true
+        detail: 'owner_profile_declared: ovav_health_specialist'
+        mandatory: true
+      description:
+        passed: true
+        detail: description_present
+        mandatory: true
+      memory:
+        passed: true
+        detail: memory_mentioned_but_no_write_requested
+        mandatory: true
+      permission:
+        passed: true
+        detail: permission_declared
+        mandatory: false
+      provenance:
+        passed: true
+        detail: opencode_source
+        mandatory: false
+    last_scored: 20260717T23:45:00Z
+  ovav-education-session:
+    name: ovav-education-session
+    description: Use when Education and Career session behavior, Valeria lead ownership, personalized learning, adaptive curricula, professional training, career development, tutoring or assessment is needed.
+    owner_profile: ovav_education_specialist
+    owner_lane: education_career
+    provenance: opencode
+    risk_level: low
+    permission_level: source_local
+    rule_pack_ref: ovav-education-session
+    eval_status: pending
+    status: experimental
+    score: 3
+    max_score: 5
+    source: .ovav/source/skills/ovav-education-session/SKILL.md
+    checks:
+      owner:
+        passed: true
+        detail: 'owner_profile_declared: ovav_education_specialist'
+        mandatory: true
+      description:
+        passed: true
+        detail: description_present
+        mandatory: true
+      memory:
+        passed: true
+        detail: memory_mentioned_but_no_write_requested
+        mandatory: true
+      permission:
+        passed: true
+        detail: permission_declared
+        mandatory: false
+      provenance:
+        passed: true
+        detail: opencode_source
+        mandatory: false
+    last_scored: 20260717T23:45:00Z
+  ovav-ux-session:
+    name: ovav-ux-session
+    description: Use when UI/UX Design session behavior, Elena lead ownership, design system, UX research, accessibility WCAG 2.1 AA, prototyping or design review is needed.
+    owner_profile: ovav_ux_specialist
+    owner_lane: ux_design
+    provenance: opencode
+    risk_level: low
+    permission_level: source_local
+    rule_pack_ref: ovav-ux-session
+    eval_status: pending
+    status: experimental
+    score: 3
+    max_score: 5
+    source: .ovav/source/skills/ovav-ux-session/SKILL.md
+    checks:
+      owner:
+        passed: true
+        detail: 'owner_profile_declared: ovav_ux_specialist'
+        mandatory: true
+      description:
+        passed: true
+        detail: description_present
+        mandatory: true
+      memory:
+        passed: true
+        detail: memory_mentioned_but_no_write_requested
+        mandatory: true
+      permission:
+        passed: true
+        detail: permission_declared
+        mandatory: false
+      provenance:
+        passed: true
+        detail: opencode_source
+        mandatory: false
+    last_scored: 20260717T23:45:00Z
+  ovav-business-session:
+    name: ovav-business-session
+    description: Use when Commercial and Growth session behavior, Sofia lead ownership, business strategy, monetization, market intelligence, growth or financial architecture is needed.
+    owner_profile: ovav_business_specialist
+    owner_lane: commercial_growth
+    provenance: opencode
+    risk_level: low
+    permission_level: source_local
+    rule_pack_ref: ovav-business-session
+    eval_status: pending
+    status: experimental
+    score: 3
+    max_score: 5
+    source: .ovav/source/skills/ovav-business-session/SKILL.md
+    checks:
+      owner:
+        passed: true
+        detail: 'owner_profile_declared: ovav_business_specialist'
+        mandatory: true
+      description:
+        passed: true
+        detail: description_present
+        mandatory: true
+      memory:
+        passed: true
+        detail: memory_mentioned_but_no_write_requested
+        mandatory: true
+      permission:
+        passed: true
+        detail: permission_declared
+        mandatory: false
+      provenance:
+        passed: true
+        detail: opencode_source
+        mandatory: false
+    last_scored: 20260717T23:45:00Z
+metadata:
+  last_refresh: 20260717T23:45:00Z
+  total_skills: 19
+  safe: 6
+  experimental: 13
+  blocked: 0
+  rule_pack_version: s104_v1
+  source: "cleanup 2026-07-17: removed 3 phantom entries (space-named), added 7 missing skills"

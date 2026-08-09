@@ -1,0 +1,22 @@
+# Squad: Implementer Spark
+# Lead contract internal team member — invisible to user
+
+squad:
+  id: squad_implementer_spark
+  display_name: Lucas
+  area: platform_engineering
+  lead: thavren
+  role: "Small deterministic patches, fixtures and bounded edits"
+  role_id: bounded_patch_implementer
+
+activation:
+  modes: [focused_squad, full_squad]
+  never_default: true
+  router: Delegation Router
+
+model_body:
+  primary: "openai/gpt-4o"
+  secondary: "opencode/deepseek-v4-flash-free"
+
+lanes:
+  - repo_local_implementation

@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ovav.dev/schemas/red_team_lens.schema.json",
+  "title": "OVAV Red Team Lens Evaluation Schema",
+  "description": "Schema for evaluating proposals through 5 adversarial perspectives: builder, reviewer, attacker, maintainer, user. Activated for complex+ task sizes.",
+  "type": "object",
+  "required": [
+    "evaluation_id",
+    "packet_id",
+    "evaluated_at",
+    "lenses",
+    "final_decision"
+  ],
+  "properties": {
+    "evaluation_id": {
+      "type": "string",
+      "description": "Unique identifier for this red team evaluation"
+    },
+    "packet_id": {
+      "type": "string",
+      "description": "Reference to the decision packet being evaluated"
+    },
+    "evaluated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "evaluator": {
+      "type": "string",
+      "default": "red_team_lens_evaluator.py / OVAV Platform Engineering"
+    },
+    "lenses": {
+      "type": "object",
+      "required": ["builder", "reviewer", "attacker", "maintainer", "user"],
+      "properties": {
+        "builder": { "$ref": "#/$defs/lens_result" },
+        "reviewer": { "$ref": "#/$defs/lens_result" },
+        "attacker": { "$ref": "#/$defs/lens_result" },
+        "maintainer": { "$ref": "#/$defs/lens_result" },
+        "user": { "$ref": "#/$defs/lens_result" }
+      }
+    },
+    "final_decision": {
+      "type": "string",
+      "enum": ["PASS", "PASS_WITH_CHANGES", "FAIL", "BLOCKED"],
+      "description": "Aggregate decision. Gate: if attacker or maintainer score < 0.5, cannot pass directly."
+    },
+    "summary": {
+      "type": "object",
+      "properties": {
+        "lenses_evaluated": {"type": "integer"},
+        "lenses_passed": {"type": "integer"},
+        "lenses_failed": {"type": "integer"},
+        "lenses_changes": {"type": "integer"},
+        "gate_blocking_failures": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Lenses that triggered the gate (attacker, maintainer)"
+        },
+        "average_score": {"type": "number", "minimum": 0, "maximum": 1.0}
+      }
+    },
+    "required_changes": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "rationale": {
+      "type": "string"
+    }
+  },
+  "$defs": {
+    "lens_result": {
+      "type": "object",
+      "required": ["lens", "question", "result", "score", "evidence"],
+      "properties": {
+        "lens": {
+          "type": "string",
+          "enum": ["builder", "reviewer", "attacker", "maintainer", "user"]
+        },
+        "question": {
+          "type": "string",
+          "description": "The question this lens asks"
+        },
+        "result": {
+          "type": "string",
+          "enum": ["PASS", "FAIL", "CHANGES_REQUIRED"],
+          "description": "Result for this lens"
+        },
+        "score": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Confidence score for this lens evaluation (0-1)"
+        },
+        "evidence": {
+          "type": "string",
+          "description": "Evidence supporting the lens evaluation"
+        },
+        "concerns": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Specific concerns raised by this lens"
+        }
+      }
+    }
+  }
+}

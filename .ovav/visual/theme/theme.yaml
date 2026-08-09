@@ -1,0 +1,162 @@
+# OVAV Visual Theme — Canonical Source
+# =============================================================================
+# Este archivo es la fuente ÚNICA de identidad visual OVAV.
+# No depende de ningún cliente (OpenCode, terminal, web).
+# Los clientes se generan desde aquí vía adaptadores de proyección.
+#
+# Schema: ovav.visual.theme.v1
+# Location: .ovav/visual/theme/theme.yaml
+# =============================================================================
+
+schema: ovav.visual.theme.v1
+name: "OVAV Default"
+version: "2.0.0"
+description: "Tema visual canónico del sistema gobernador OVAV — modo oscuro eye-friendly, bajo contraste, largas sesiones"
+
+# ══════════════════════════════════════════════════════════════════════════════
+# PALETA DE MARCA — Colores de identidad OVAV (suavizados)
+# ══════════════════════════════════════════════════════════════════════════════
+brand:
+  # Lead operators
+  thavren: "#6d9b8e"       # Teal suave — Platform Engineering Lead
+  eidren: "#9aaa4a"        # Verde oliva suave — Research Intelligence Lead
+
+  # Service areas
+  platform_engineering: "#6d9b8e"   # Hereda de Thavren
+  research_intelligence: "#9aaa4a"  # Hereda de Eidren
+
+  # System
+  ovav_core: "#5a7d8a"     # Azul grisáceo apagado — núcleo del sistema
+  ovav_accent: "#c47d8a"   # Rosa apagado — acentos y highlights
+
+# ══════════════════════════════════════════════════════════════════════════════
+# PALETA SEMÁNTICA — Significado funcional (suavizado)
+# ══════════════════════════════════════════════════════════════════════════════
+semantic:
+  success:  "#7eb77f"      # Verde apagado — validación pasada
+  error:    "#d4756b"      # Rojo suave — fallo, bloqueo
+  warning:  "#d4a85c"      # Ámbar apagado — advertencia
+  info:     "#6d9bc3"      # Azul polvo — información, estado neutral
+  highlight: "#c4a65a"     # Dorado apagado — dato importante
+
+# ══════════════════════════════════════════════════════════════════════════════
+# PALETA DE SUPERFICIE — Fondos y bordes (modo oscuro suave)
+# ══════════════════════════════════════════════════════════════════════════════
+surfaces:
+  dark:
+    bg_root:          "#242424"   # Fondo principal — gris oscuro cálido
+    bg_panel:         "#2d2d2d"   # Paneles — gris medio
+    bg_element:       "#383838"   # Elementos interactivos
+    bg_hover:         "#454545"   # Hover/activo
+    bg_selected:      "#505050"   # Seleccionado
+    border:           "#383838"   # Bordes estándar
+    border_active:    "#6d9b8e"   # Borde activo — color Thavren
+    border_focus:     "#9aaa4a"   # Borde foco — color Eidren
+    text_primary:     "#d4d4d4"   # Texto principal — gris claro
+    text_secondary:   "#a0a0a0"   # Texto secundario — gris medio
+    text_muted:       "#707070"   # Texto atenuado
+    text_inverse:     "#242424"   # Texto sobre fondo claro
+
+  light:
+    bg_root:          "#f5f0e8"   # Fondo principal — crema papel
+    bg_panel:         "#ede4d6"   # Paneles
+    bg_element:       "#e5dac8"   # Elementos
+    bg_hover:         "#d9ccb6"   # Hover
+    bg_selected:      "#cbbfa6"   # Seleccionado
+    border:           "#d9ccb6"   # Bordes
+    border_active:    "#5a7d8a"   # Borde activo
+    border_focus:     "#9aaa4a"   # Borde foco
+    text_primary:     "#3a3a3a"   # Texto principal
+    text_secondary:   "#5c5c5c"   # Texto secundario
+    text_muted:       "#808080"   # Texto atenuado
+    text_inverse:     "#f5f0e8"   # Texto sobre fondo oscuro
+
+# ══════════════════════════════════════════════════════════════════════════════
+# SINTAXIS — Colores para código y diff (suavizado)
+# ══════════════════════════════════════════════════════════════════════════════
+syntax:
+  keyword:    "#c47d8a"   # Rosa apagado — palabras clave
+  string:     "#9aaa4a"   # Verde Eidren — strings
+  number:     "#c47d8a"   # Rosa apagado — números
+  comment:    "#707070"   # Gris — comentarios
+  function:   "#6d9b8e"   # Teal Thavren — funciones
+  type:       "#d4a85c"   # Ámbar — tipos
+  variable:   "#d4d4d4"   # Gris claro — variables
+  constant:   "#d4756b"   # Rojo suave — constantes
+  operator:   "#7eb77f"   # Verde apagado — operadores
+
+diff:
+  added:           "#7eb77f"   # Verde — líneas añadidas
+  removed:         "#d4756b"   # Rojo — líneas eliminadas
+  context:         "#707070"   # Gris — contexto
+  hunk_header:     "#5a7d8a"   # Azul OVAV — cabecera de hunk
+  highlight_added: "#7eb77f"   # Highlight añadido
+  highlight_removed: "#d4756b" # Highlight eliminado
+
+# ══════════════════════════════════════════════════════════════════════════════
+# AGENTES — Colores de identidad por agente (suavizado)
+# ══════════════════════════════════════════════════════════════════════════════
+agents:
+  # Leads
+  thavren:
+    color: "#6d9b8e"
+    icon: "✦"
+    label: "Thavren"
+  eidren:
+    color: "#9aaa4a"
+    icon: "✦"
+    label: "Eidren"
+
+  # Squad — Heavy
+  aric:   { color: "#c47d8a", icon: "◆", label: "Aric" }
+  doran:  { color: "#a87d8a", icon: "◆", label: "Doran" }
+  nara:   { color: "#7eb77f", icon: "◆", label: "Nara" }
+  soren:  { color: "#6d9b8e", icon: "◆", label: "Soren" }
+  vella:  { color: "#d4a85c", icon: "◆", label: "Vella" }
+  virek:  { color: "#c4a65a", icon: "◆", label: "Virek" }
+  zara:   { color: "#d4756b", icon: "◆", label: "Zara" }
+
+  # Squad — Light
+  kael:   { color: "#b0b0b0", icon: "◇", label: "Kael" }
+  lyra:   { color: "#a0a0a0", icon: "◇", label: "Lyra" }
+  orin:   { color: "#909090", icon: "◇", label: "Orin" }
+  ryn:    { color: "#c0c0c0", icon: "◇", label: "Ryn" }
+
+# ══════════════════════════════════════════════════════════════════════════════
+# ESTADOS — Colores de estado del sistema (suavizado)
+# ══════════════════════════════════════════════════════════════════════════════
+status:
+  pass:        "#7eb77f"   # Verde — PASS
+  fail:        "#d4756b"   # Rojo — FAIL
+  warn:        "#d4a85c"   # Ámbar — WARN
+  info:        "#6d9bc3"   # Azul — INFO
+  blocked:     "#d4756b"   # Rojo — BLOCKED
+  active:      "#6d9b8e"   # Teal Thavren — ACTIVO
+  inactive:    "#707070"   # Gris — INACTIVO
+  pending:     "#c4a65a"   # Dorado — PENDIENTE
+  complete:    "#7eb77f"   # Verde — COMPLETO
+
+# ══════════════════════════════════════════════════════════════════════════════
+# PRESUPUESTO — Thresholds para indicadores de consumo
+# ══════════════════════════════════════════════════════════════════════════════
+budget:
+  thresholds:
+    safe:     { max: 50, color: "#7eb77f", icon: "🟢" }
+    moderate: { max: 75, color: "#c4a65a", icon: "🟡" }
+    warning:  { max: 90, color: "#d4a85c", icon: "🟠" }
+    critical: { max: 100, color: "#d4756b", icon: "🔴" }
+
+# ══════════════════════════════════════════════════════════════════════════════
+# TIPOGRAFÍA — Tokens de estilo (referencia, no píxeles exactos)
+# ══════════════════════════════════════════════════════════════════════════════
+typography:
+  family: "monospace"
+  weights:
+    regular: "normal"
+    bold: "bold"
+  sizes:
+    xs: "compact"
+    sm: "small"
+    md: "normal"
+    lg: "large"
+    xl: "heading"

@@ -1,0 +1,156 @@
+harnesses:
+  h_service_profile_resolver:
+    tier: 10
+    trigger: on_user_message
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  h_lane_classifier:
+    tier: 10
+    trigger: on_user_message
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  h_lead_or_delegate_decider:
+    tier: 10
+    trigger: on_user_message
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  h_squad_assignment:
+    tier: 9
+    trigger: on_user_message
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  h_context_budget_guard:
+    tier: 9
+    trigger: on_user_message
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  h_permission_gate:
+    tier: 10
+    trigger: before_apply
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  h_skill_permission_gate:
+    tier: 9
+    trigger: before_apply
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  h_sdd_init:
+    tier: 10
+    trigger: project_unknown_or_stale
+    side_effects: project_local_artifacts_only
+    owner_profile: ovav_systems_architect
+  h_phase_dag:
+    tier: 10
+    trigger: before_phase_transition
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  h_artifact_dependency:
+    tier: 10
+    trigger: before_apply_or_verify
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  h_sdd_artifact_grammar:
+    tier: 9
+    trigger: artifact_created_or_modified
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  h_result_contract:
+    tier: 9
+    trigger: before_response_close
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  h_apply_progress:
+    tier: 9
+    trigger: after_apply_step
+    side_effects: project_local_artifacts_only
+    owner_profile: ovav_systems_architect
+  h_verify_evidence:
+    tier: 10
+    trigger: before_close
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  h_skill_registry_refresh:
+    tier: 9
+    trigger: skill_registry_missing_or_stale
+    side_effects: registry_refresh_only
+    owner_profile: ovav_systems_architect
+  h_skill_score_gate:
+    tier: 9
+    trigger: skill_selected
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  h_engram_healthcheck:
+    tier: 9
+    trigger: memory_required
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  h_memory_privacy_classifier:
+    tier: 10
+    trigger: memory_candidate_detected
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  h_memory_redactor:
+    tier: 10
+    trigger: sensitive_memory_detected
+    side_effects: redaction_only
+    owner_profile: ovav_systems_architect
+  h_memory_poison_guard:
+    tier: 10
+    trigger: memory_candidate_evaluated
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  h_memory_write_gateway:
+    tier: 10
+    trigger: memory_write_requested
+    side_effects: gated_write_only
+    owner_profile: ovav_systems_architect
+  h_memory_recall_filter:
+    tier: 9
+    trigger: memory_recall_requested
+    side_effects: filtered_read_only
+    owner_profile: ovav_systems_architect
+  h_delegation_trigger:
+    tier: 9
+    trigger: delegation_threshold_reached
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  h_do_not_delegate_guard:
+    tier: 10
+    trigger: small_task_or_direct_question
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  h_subagent_context_pack:
+    tier: 9
+    trigger: delegation_started
+    side_effects: context_pack_only
+    owner_profile: ovav_systems_architect
+  h_subagent_result_absorber:
+    tier: 9
+    trigger: subagent_returned
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  h_git_stage_review:
+    tier: 10
+    trigger: after_git_stage
+    side_effects: review_only
+    owner_profile: ovav_systems_architect
+  h_git_commit_review:
+    tier: 10
+    trigger: after_git_commit
+    side_effects: review_only
+    owner_profile: ovav_systems_architect
+  h_git_push_review:
+    tier: 10
+    trigger: after_git_push
+    side_effects: review_only
+    owner_profile: ovav_systems_architect
+  h_work_report_builder:
+    tier: 8
+    trigger: before_close
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  h_human_response_translator:
+    tier: 8
+    trigger: before_response_close
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect

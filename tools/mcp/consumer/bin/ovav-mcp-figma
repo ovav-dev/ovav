@@ -1,0 +1,114 @@
+#!/bin/bash
+# OVAV Figma MCP Server Wrapper
+# Wraps figma-mcp for OVAV usage
+
+set -e
+
+# Check for FIGMA_TOKEN
+if [ -z "$FIGMA_TOKEN" ]; then
+  echo "Error: FIGMA_TOKEN environment variable not set" >&2
+  echo "Set it with: export FIGMA_TOKEN=your_token_here" >&2
+  exit 1
+fi
+
+# Get the directory of this script
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PACKAGE_DIR="$(dirname "$SCRIPT_DIR")"
+
+# Run the figma MCP server
+exec node -e "
+import { Server } from '@modelcontextprotocol/sdk/server/index.js';
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+
+const FIGMA_TOKEN = process.env.FIGMA_TOKEN;
+
+const server = new Server(
+  { name: 'ovav-figma', version: '1.0.0' },
+  { capabilities: { tools: {} } }
+);
+
+// List tools
+server.setRequestHandler('tools/list', async () => ({
+  tools: [
+    {
+      name: 'figma_get_file',
+      description: 'Get Figma file information',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          fileKey: { type: 'string', description: 'Figma file key' }
+        },
+        required: ['fileKey']
+      }
+    },
+    {
+      name: 'figma_get_node',
+      description: 'Get specific node from Figma file',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          fileKey: { type: 'string', description: 'Figma file key' },
+          nodeId: { type: 'string', description: 'Node ID (format: 1:234)' }
+        },
+        required: ['fileKey', 'nodeId']
+      }
+    },
+    {
+      name: 'figma_get_styles',
+      description: 'Extract design tokens (colors, typography, spacing)',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          fileKey: { type: 'string', description: 'Figma file key' }
+        },
+        required: ['fileKey']
+      }
+    }
+  ]
+}));
+
+// Handle tool calls
+server.setRequestHandler('tools/call', async (request) => {
+  const { name, arguments: args } = request.params;
+  
+  try {
+    let result;
+    
+    switch (name) {
+      case 'figma_get_file':
+        const fileResponse = await fetch(
+          \`https://api.figma.com/v1/files/\${args.fileKey}\`,
+          { headers: { 'X-Figma-Token': FIGMA_TOKEN } }
+        );
+        result = await fileResponse.json();
+        break;
+      
+      case 'figma_get_node':
+        const nodeResponse = await fetch(
+          \`https://api.figma.com/v1/files/\${args.fileKey}/nodes?ids=\${args.nodeId}\`,
+          { headers: { 'X-Figma-Token': FIGMA_TOKEN } }
+        );
+        result = await nodeResponse.json();
+        break;
+      
+      case 'figma_get_styles':
+        const stylesResponse = await fetch(
+          \`https://api.figma.com/v1/files/\${args.fileKey}/styles\`,
+          { headers: { 'X-Figma-Token': FIGMA_TOKEN } }
+        );
+        result = await stylesResponse.json();
+        break;
+      
+      default:
+        throw new Error(\`Unknown tool: \${name}\`);
+    }
+    
+    return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+  } catch (error) {
+    return { content: [{ type: 'text', text: \`Error: \${error.message}\` }], isError: true };
+  }
+});
+
+const transport = new StdioServerTransport();
+await server.connect(transport);
+"

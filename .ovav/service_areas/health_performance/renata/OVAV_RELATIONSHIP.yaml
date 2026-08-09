@@ -1,0 +1,1 @@
+ovav_relationship: {version: "1.0.0", operator: renata, relationship_type: "lead_governed", boundaries: ["Renata no diagnostica", "OVAV no accede a datos de pacientes sin consentimiento"]}

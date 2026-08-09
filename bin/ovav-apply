@@ -1,0 +1,188 @@
+#!/usr/bin/env bash
+#============================================================
+# ovav-apply — OVAV SYSTEMS Total Freedom Apply Script
+#============================================================
+# Instala todas las configs de OVAV SYSTEMS:
+#   - MiMoCode wrapper config (mimocode.jsonc)
+#   - opencode.json wrapper config
+#   - MIMOCODE_DANGEROUSLY_SKIP_PERMISSIONS=1
+#   - WezTerm config
+#   - Git config
+#   - Shell (fish) config
+#
+# Uso: bash bin/ovav-apply [--dry-run]
+#============================================================
+
+set -e
+
+DRY_RUN=false
+if [[ "${1:-}" == "--dry-run" ]]; then
+  DRY_RUN=true
+  echo "[DRY RUN] No se aplicará ningún cambio"
+fi
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+OVAV_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+CONFIG_DIR="$OVAV_ROOT/config"
+HOME_DIR="${HOME:-/home/$USER}"
+
+echo "=============================================="
+echo " OVAV SYSTEMS — Applying Total Freedom Config"
+echo "=============================================="
+echo " OVAV root: $OVAV_ROOT"
+echo " Home: $HOME_DIR"
+echo ""
+
+#----------------------------------------------------------
+# 1. MiMoCode global config
+#----------------------------------------------------------
+echo "[1/6] MiMoCode wrapper config..."
+MIMOCODE_CONFIG_DIR="$HOME_DIR/.config/mimocode"
+if [[ ! -d "$MIMOCODE_CONFIG_DIR" ]]; then
+  if $DRY_RUN; then
+    echo "  [DRY] mkdir -p $MIMOCODE_CONFIG_DIR"
+    echo "  [DRY] cp $CONFIG_DIR/mimocode/mimocode.jsonc $MIMOCODE_CONFIG_DIR/mimocode.jsonc"
+  else
+    mkdir -p "$MIMOCODE_CONFIG_DIR"
+    cp "$CONFIG_DIR/mimocode/mimocode.jsonc" "$MIMOCODE_CONFIG_DIR/mimocode.jsonc"
+    echo "  ✓ mimocode.jsonc instalado"
+  fi
+else
+  if $DRY_RUN; then
+    echo "  [DRY] cp $CONFIG_DIR/mimocode/mimocode.jsonc $MIMOCODE_CONFIG_DIR/mimocode.jsonc (sobreescribe)"
+  else
+    cp "$CONFIG_DIR/mimocode/mimocode.jsonc" "$MIMOCODE_CONFIG_DIR/mimocode.jsonc"
+    echo "  ✓ mimocode.jsonc actualizado"
+  fi
+fi
+
+#----------------------------------------------------------
+# 2. opencode.json — ya está en el repo, solo copiar si existe
+#----------------------------------------------------------
+echo "[2/6] opencode.json..."
+if [[ -f "$OVAV_ROOT/opencode.json" ]]; then
+  if $DRY_RUN; then
+    echo "  [DRY] cp $OVAV_ROOT/opencode.json $MIMOCODE_CONFIG_DIR/../opencode/opencode.json"
+  else
+    mkdir -p "$HOME_DIR/.config/opencode"
+    cp "$OVAV_ROOT/opencode.json" "$HOME_DIR/.config/opencode/opencode.json"
+    echo "  ✓ opencode.json instalado"
+  fi
+else
+  echo "  ⚠ opencode.json no encontrado en $OVAV_ROOT — omitido"
+fi
+
+#----------------------------------------------------------
+# 3. MIMOCODE_DANGEROUSLY_SKIP_PERMISSIONS=1 en shell profile
+#----------------------------------------------------------
+echo "[3/6] MIMOCODE_DANGEROUSLY_SKIP_PERMISSIONS env var..."
+
+SKIP_MARKER="# OVAV SYSTEMS — MIMOCODE TOTAL FREEDOM"
+SKIP_LINE="export MIMOCODE_DANGEROUSLY_SKIP_PERMISSIONS=1"
+
+# Bash
+BASHRC="$HOME_DIR/.bashrc"
+if $DRY_RUN; then
+  echo "  [DRY] Agregar MIMOCODE_DANGEROUSLY_SKIP_PERMISSIONS=1 a $BASHRC"
+else
+  if grep -q "MIMOCODE_DANGEROUSLY_SKIP_PERMISSIONS" "$BASHRC" 2>/dev/null; then
+    echo "  ✓ Ya configurado en .bashrc"
+  else
+    echo -e "\n$SKIP_MARKER\n$SKIP_LINE" >> "$BASHRC"
+    echo "  ✓ MIMOCODE_DANGEROUSLY_SKIP_PERMISSIONS=1 agregado a .bashrc"
+  fi
+fi
+
+# Fish
+FISH_CONFIG="$HOME_DIR/.config/fish/config.fish"
+if [[ -f "$FISH_CONFIG" ]] || ! $DRY_RUN; then
+  if $DRY_RUN; then
+    echo "  [DRY] Agregar MIMOCODE_DANGEROUSLY_SKIP_PERMISSIONS=1 a $FISH_CONFIG"
+  else
+    mkdir -p "$(dirname "$FISH_CONFIG")"
+    if grep -q "MIMOCODE_DANGEROUSLY_SKIP_PERMISSIONS" "$FISH_CONFIG" 2>/dev/null; then
+      echo "  ✓ Ya configurado en config.fish"
+    else
+      echo -e "\n$SKIP_MARKER\n$SKIP_LINE" >> "$FISH_CONFIG"
+      echo "  ✓ MIMOCODE_DANGEROUSLY_SKIP_PERMISSIONS=1 agregado a config.fish"
+    fi
+  fi
+fi
+
+#----------------------------------------------------------
+# 4. WezTerm config
+#----------------------------------------------------------
+echo "[4/6] WezTerm config..."
+WEZTERM_SOURCE="$CONFIG_DIR/wezterm/wezterm.lua"
+WEZTERM_TARGET="$HOME_DIR/.wezterm.lua"
+if [[ -f "$WEZTERM_SOURCE" ]]; then
+  if $DRY_RUN; then
+    echo "  [DRY] ln -sf $WEZTERM_SOURCE $WEZTERM_TARGET"
+  else
+    if [[ -L "$WEZTERM_TARGET" ]]; then
+      rm "$WEZTERM_TARGET"
+    fi
+    ln -sf "$WEZTERM_SOURCE" "$WEZTERM_TARGET"
+    echo "  ✓ wezterm.lua linkeado"
+  fi
+else
+  echo "  ⚠ wezterm.lua no encontrado — omitido"
+fi
+
+#----------------------------------------------------------
+# 5. Git config (global)
+#----------------------------------------------------------
+echo "[5/6] Git config..."
+if $DRY_RUN; then
+  echo "  [DRY] git config --global include.path $CONFIG_DIR/git/gitconfig"
+else
+  if [[ -f "$CONFIG_DIR/git/gitconfig" ]]; then
+    git config --global include.path "$CONFIG_DIR/git/gitconfig"
+    echo "  ✓ git config incluido"
+  else
+    echo "  ⚠ git/gitconfig no encontrado"
+  fi
+fi
+
+#----------------------------------------------------------
+# 6. OVAV SYSTEMS bootstrap — crear dirs necesarios
+#----------------------------------------------------------
+echo "[6/6] OVAV SYSTEMS dirs..."
+if $DRY_RUN; then
+  echo "  [DRY] mkdir -p $HOME_DIR/.local/state/ovav-opencode"
+  echo "  [DRY] mkdir -p $HOME_DIR/.config/ovav"
+else
+  mkdir -p "$HOME_DIR/.local/state/ovav-opencode"
+  mkdir -p "$HOME_DIR/.config/ovav"
+  echo "  ✓ Dirs de estado creados"
+fi
+
+echo ""
+echo "=============================================="
+echo " ✓ OVAV SYSTEMS — Total Freedom Applied"
+echo "=============================================="
+echo ""
+echo " IMPORTANTE: Para activar MIMOCODE_DANGEROUSLY_SKIP_PERMISSIONS,"
+echo " reinicia la sesión de shell o ejecuta:"
+echo "   source ~/.bashrc"
+echo "   # o para fish:"
+echo "   source ~/.config/fish/config.fish"
+echo ""
+echo " Para aplicar cambios de MiMoCode sin reiniciar:"
+echo "   /skip-permissions   (en TUI)"
+echo "   MIMOCODE_DANGEROUSLY_SKIP_PERMISSIONS=1 mimo run ..."
+echo ""
+
+#----------------------------------------------------------
+# NOTE sobre MIMOCODE_DANGEROUSLY_SKIP_PERMISSIONS
+#----------------------------------------------------------
+# El env var MIMOCODE_DANGEROUSLY_SKIP_PERMISSIONS=1 debe estar
+# disponible en el proceso padre de bash (no en bashrc).
+#
+# Para shells interactivos: está en .bashrc (ANTES del guard [[ $- != *i* ]] && return)
+# Para bash -c (no interactivo): debe pasar en el comando directamente:
+#   MIMOCODE_DANGEROUSLY_SKIP_PERMISSIONS=1 bash -c 'rm /tmp/file'
+#
+# Alternativa en TUI MiMoCode: usar /skip-permissions
+# Alternativa persistente: agregar el env var al launcher del sistema
+#   (systemd, init, /etc/environment, etc.)

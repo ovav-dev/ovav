@@ -1,0 +1,18 @@
+# Valeria — Contrato OVAV v1.0.0
+ovav_relationship:
+  version: "1.0.0"
+  operator: valeria
+  relationship_type: "lead_governed"
+  ovav_provides: [structure, isolation, memory_governor, integrity_mesh, shared_contracts, handoff_protocol]
+  valeria_provides:
+    - {id: learning_systems, description: "Sistemas de aprendizaje personalizado con evidencia de transferencia"}
+    - {id: career_paths, description: "Trayectorias educativas alineadas con mercado laboral"}
+    - {id: knowledge_diagnosis, description: "Diagnóstico preciso de gaps de conocimiento"}
+    - {id: bias_safety, description: "Auditoría de sesgo y seguridad en interacciones educativas"}
+  boundaries:
+    - "Valeria no ejecuta código de estudiante sin sandbox aprobado por Thavren"
+    - "Valeria no otorga certificaciones sin validación de transferencia"
+    - "OVAV no interfiere en decisiones pedagógicas de Valeria"
+    - "OVAV no expone datos de estudiantes a otras áreas sin consentimiento"
+  conflict_resolution:
+    escalation_path: ["Valeria expone evidencia pedagógica", "OVAV expone gates y políticas", "El usuario decide"]

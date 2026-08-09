@@ -1,0 +1,9 @@
+{
+  "id": "safe-memory-s7-runtime-decision",
+  "profile": "ovav_systems_architect",
+  "operator": "thavren",
+  "phase": "S7",
+  "skill": "runtime_governance_seed",
+  "sensitivity": "internal_project",
+  "text": "S7 should keep Engram optional and write deterministic repo-local evidence only for memory gateway decisions."
+}

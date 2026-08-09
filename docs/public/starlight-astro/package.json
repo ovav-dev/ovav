@@ -1,0 +1,20 @@
+{
+  "name": "ovav-docs",
+  "version": "2.0.0",
+  "private": true,
+  "description": "OVAV Documentation Site — Starlight on Cloudflare Pages",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "deploy": "wrangler pages deploy dist/"
+  },
+  "dependencies": {
+    "@astrojs/starlight": "^0.34.0",
+    "astro": "^5.7.0"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}

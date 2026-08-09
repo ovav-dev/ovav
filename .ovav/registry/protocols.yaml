@@ -1,0 +1,173 @@
+protocols:
+  a2a:
+    activation: gated_by_f0_validators
+    activation_rationale: A2A gateway infrastructure delivered (BUILD 12). Activation
+      requires gate_liberation.py ovav_mesh gate (all 6 F0 validators green).
+      Mesh runtime files (agent_mesh.py, mesh_topology.py, protocol_handshake.py)
+      referenced in inactive_creations.yaml do not exist on disk — implementation
+      deferred to Sprint 4 (Migration).
+    agents:
+    - allowed_communication:
+      - task_dispatch
+      - result_absorption
+      blocked_surfaces_coverage:
+      - no_raw_memory_exchange
+      - context_pack_only
+      conditions:
+      - context_pack_only
+      - lead_initiated_only
+      - no_raw_memory_exchange
+      - audit_logged
+      description: Eidren delegates research tasks to benchmark-analyst squad agent.
+      display_name: OVAV Research Intelligence → Squad Agents
+      id: ovav_research_intelligence
+      risk_level: medium
+      scope_limit:
+        max_context_tokens: 16000
+        max_result_tokens: 8000
+      status: active
+      type: a2a
+    - allowed_communication:
+      - task_dispatch
+      - structured_result
+      blocked_surfaces_coverage:
+      - lead_initiated_only
+      - context_scoped
+      - no_autonomous_agent_chaining
+      conditions:
+      - lead_initiated_only
+      - context_scoped
+      - audit_logged
+      description: Inter-squad communication for complex multi-agent tasks.
+      display_name: Squad Agent Communication (General)
+      id: squad_agents_general
+      risk_level: medium
+      scope_limit:
+        max_context_tokens: 24000
+        max_result_tokens: 12000
+      status: active
+      type: a2a
+    status: gated_infrastructure_ready
+  mcp:
+    activation: requires_build13_planning_freeze
+    activation_rationale: BUILD 12 delivers gateway infrastructure. BUILD 13 planning
+      freeze will determine activation order, risk profile, and rollout gates for
+      each MCP server.
+    servers:
+    - blocked_surfaces_coverage:
+      - no_home_access
+      - no_global_config_write
+      - source_local_only
+      circuit_breaker:
+        cooldown_seconds: 60
+        failure_threshold: 5
+      description: Source-local filesystem operations governed by OVAV gateway.
+      display_name: MCP Filesystem Server
+      id: mcp_filesystem
+      rate_limit:
+        max_per_minute: 30
+        max_per_session: 500
+      risk_level: medium
+      status: active
+      tools:
+      - allowed_operations:
+        - read
+        conditions:
+        - source_local_only
+        - explicit_user_approval
+        - audit_logged
+        name: read_file
+      - allowed_operations:
+        - write
+        conditions:
+        - source_local_only
+        - backup_before_write
+        - explicit_user_approval
+        - audit_logged
+        name: write_file
+      - allowed_operations:
+        - list
+        conditions:
+        - source_local_only
+        - audit_logged
+        name: list_directory
+      type: mcp
+    - blocked_surfaces_coverage:
+      - whitelist_urls_only
+      - no_auth_endpoints
+      - read_only
+      circuit_breaker:
+        cooldown_seconds: 120
+        failure_threshold: 3
+      description: Controlled web fetch operations with URL whitelist. No auth endpoints.
+      display_name: MCP Web Fetch
+      id: mcp_web_fetch
+      rate_limit:
+        max_per_minute: 10
+        max_per_session: 50
+      risk_level: high
+      status: active
+      tools:
+      - allowed_operations:
+        - fetch
+        conditions:
+        - whitelist_urls_only
+        - no_auth_endpoints
+        - read_only
+        - explicit_user_approval
+        - audit_logged
+        name: fetch_url
+      type: mcp
+      url_whitelist_rules:
+        notes: URL whitelist is authoritative. Any URL not matching these patterns
+          is denied at the whitelist layer.
+        patterns:
+        - https://docs.python.org/*
+        - https://pypi.org/pypi/*/json
+        - https://github.com/*/releases
+        - https://raw.githubusercontent.com/*
+    - blocked_surfaces_coverage:
+      - no_destructive_ops
+      - no_force_push
+      - no_force_delete
+      - source_local_only
+      circuit_breaker:
+        cooldown_seconds: 60
+        failure_threshold: 5
+      description: Read-only git operations governed by OVAV git safety gates.
+      display_name: MCP Git Operations
+      id: mcp_git
+      rate_limit:
+        max_per_minute: 20
+        max_per_session: 200
+      risk_level: low
+      status: active
+      tools:
+      - allowed_operations:
+        - read
+        conditions:
+        - source_local_only
+        - no_destructive_ops
+        - audit_logged
+        name: git_status
+      - allowed_operations:
+        - read
+        conditions:
+        - source_local_only
+        - no_secret_leakage
+        - audit_logged
+        name: git_diff
+      - allowed_operations:
+        - read
+        conditions:
+        - source_local_only
+        - audit_logged
+        name: git_log
+      - allowed_operations:
+        - list
+        conditions:
+        - source_local_only
+        - audit_logged
+        name: git_branch_list
+      type: mcp
+    status: gated_infrastructure_ready

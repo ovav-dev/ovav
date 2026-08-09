@@ -1,0 +1,90 @@
+# OVAV Public CLI Manifest — qué se exporta al producto público
+# Usado por ovav_public_export_gate.py y release_pipeline.py
+# Solo lo listado aquí llega a usuarios. TODO lo demás es interno.
+
+schema: ovav.cli.public_manifest.v1
+version: "1.0.0"
+updated: "2026-06-10"
+
+# ── Comandos públicos (los que ve el usuario) ────────────────────────────────
+public_commands:
+  - name: status
+    description: Estado del sistema OVAV
+    handler: tools/cli/ovav_execution_gateway.py
+    aliases: [st, info]
+
+  - name: update
+    description: Actualizar OVAV a la última versión
+    handler: tools/cli/ovav_official_update.py
+    aliases: [up, upgrade]
+
+  - name: verify
+    description: Verificar instalación de OVAV
+    handler: tools/cli/ovav_fresh_clone_smoke.py
+    aliases: [check, test]
+
+  - name: version
+    description: Mostrar versión de OVAV
+    handler: tools/cli/ovav_execution_gateway.py
+    aliases: [v, -v, --version]
+
+  - name: help
+    description: Ayuda de comandos OVAV
+    handler: builtin
+    aliases: [-h, --help]
+
+# ── Archivos públicos (los que se incluyen en la release) ────────────────────
+public_files:
+  directories:
+    - bin/
+    - tools/cli/ovav_execution_gateway.py
+    - tools/cli/ovav_official_update.py
+    - tools/cli/ovav_fresh_clone_smoke.py
+    - tools/cli/ovav_public_cli.py
+    - tools/visual/theme_engine.py
+    - .opencode/themes/ovav.json
+    - .opencode/plugins/ovav-monitor.js
+    - .opencode/plugins/ovav-status.js
+    - .ovav/visual/
+    - .ovav/economy/provider_prices.yaml
+    - .ovav/schemas/
+    - requirements.txt
+
+  exclude_patterns:
+    - "**/__pycache__/**"
+    - "**/*.pyc"
+    - "**/.env*"
+    - "**/credentials*"
+    - "**/secrets*"
+    - "**/vault/**"
+    - ".ovav/lockdown/**"
+    - ".ovav/security/credential_vault.py"
+    - "tools/security/credential_vault.py"
+    - "tools/validators/check_host_config_drift.py"
+    - "tools/harnesses/**"
+    - ".ovav/runtime/**"
+    - ".ovav/artifacts/**"
+
+# ── Lo que NUNCA se exporta ──────────────────────────────────────────────────
+internal_only:
+  - tools/harnesses/         # 386 harnesses de desarrollo
+  - tools/validators/        # 73 validadores internos
+  - tools/security/          # Stack de defensa completo
+  - tools/governor/          # Gobernador interno
+  - tools/memory/            # Memory governor (interno)
+  - tools/install_gateway/   # Instalador gobernado (CEO)
+  - tools/agent_runtime/     # Runtime de agentes (interno)
+  - .ovav/lab/               # Lab de ideas
+  - .ovav/lockdown/          # Estado de lockdown
+  - .ovav/registry/          # Registries internos
+  - .ovav/memory/            # Memoria OVAV
+  - .ovav/snv/               # SNV state
+  - .ovav/context/           # Contexto de desarrollo
+  - .ovav/docs/              # Documentación interna
+  - .ovav/forge/             # Forge
+  - .ovav/connector_bus/     # ConnectorBus
+  - .ovav/dante/             # Área de Dante
+  - .ovav/eidren/            # Área de Eidren
+  - .ovav/renata/            # Área de Renata
+  - .ovav/sofia/             # Área de Sofía
+  - .ovav/valeria/           # Área de Valeria

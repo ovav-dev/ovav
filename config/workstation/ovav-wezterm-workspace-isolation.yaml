@@ -1,0 +1,47 @@
+# OVAV WezTerm Workspace Isolation — Policy
+# Auto-generated stub. Real config requires user workstation setup.
+# Source template reference for validators.
+
+profile_id: ovav-wezterm-workspace-isolation
+workspace_scope: repo_branch_root_hash
+workspace_name_shape: ovav-{repo_slug}-{branch_slug}-{root_hash}
+source_template: .ovav/source/configs/wezterm/ovav-workspace-isolation.wezterm.lua.example
+governed_payload: config/wezterm/wezterm.lua
+windows_loader: .ovav/source/configs/wezterm/ovav-windows-loader.wezterm.lua
+wezterm_version_min: "20240101-nightly"
+launches_real_wezterm_now: false
+writes_user_home_now: false
+ovav_installs_wezterm: false
+apply_mode: source_local
+rollback_enabled: true
+backup_required: true
+dry_run_default: true
+session_isolation: independent_window
+tab_layout: horizontal
+tab_labels: preset
+verify_governed_config: true
+validate_workspace_names: true
+# ── v3 CANONICAL PATH ARCHITECTURE ──
+canonical_wsl_path: /home/braka/.config/wezterm/wezterm.lua
+windows_entry_point: "%USERPROFILE%\\.wezterm.lua"
+windows_fallback_path: "%USERPROFILE%\\.wezterm-fallback.lua"
+windows_blocked_path: "%APPDATA%\\wezterm\\.wezterm.lua"
+proxy_marker: OVAV_WZPROXY_v3
+fallback_marker: OVAV_WZFALLBACK_v1
+path_integrity_validator: tools/validators/check_wezterm_path_integrity.py
+# blocked_path_note: APPDATA path must NOT exist as full config; only USERPROFILE proxy is authorized
+
+# helper_tool: tools/workstation/ovav_wezterm_workspace.py
+# tool_config_registry: .ovav/registry/tool_configs.yaml
+# ovav_tailor_surface: ovav tools wezterm plan
+# current_pane_check: env_must_match_computed_workspace_branch_and_repo_root
+# OVAV_WEZTERM_WORKSPACE: computed_workspace_name
+# blocked_until_explicit_install_approval:
+# write_wezterm_global_config
+# color_profile: ovav_pi_eye_comfort
+# inactive_pane_dimming: disabled_brightness_1_0
+# governed_windows_session_scope: fixed_four_operator_sessions
+# first_tab_policy: static_session_indicator
+# chrome_like_scrollbar: same_background_trackless_subtle_thumb
+# sketchbook_canvas: one_background_for_header_tabs_scroll_and_terminal
+# tab_label_width: long_smart_abbreviation

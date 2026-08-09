@@ -1,0 +1,7 @@
+squad:
+  id: squad_cloud
+  name: "Cloud Squad"
+  area: devops_infrastructure
+  lead: uriel
+  scope: "Cloud infrastructure, networking, cost optimization, Vercel/Railway/Neon/Cloudflare"
+  status: active

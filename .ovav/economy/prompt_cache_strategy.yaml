@@ -1,0 +1,75 @@
+# OVAV Prompt Caching Strategy (I-015)
+# Define cuándo y cómo usar caché de prompts para reducir costos.
+# Integrado con provider_prices.yaml que ya registra cache_discount por proveedor.
+
+schema: ovav.prompt_cache.v1
+version: "1.0.0"
+updated: "2026-06-10"
+
+# ── Estrategia de caching ───────────────────────────────────────────────────
+strategy:
+  # Mismo trabajo + mismo archivo = alto cache hit
+  same_file_same_task:
+    cache_ttl_minutes: 30
+    prefetch: true
+    expected_savings_pct: 30
+
+  # Misma tarea, diferente archivo = cache medio
+  same_task_different_file:
+    cache_ttl_minutes: 15
+    prefetch: false
+    expected_savings_pct: 15
+
+  # Cambio de rama = invalidar caché
+  branch_switch:
+    action: invalidate_all
+    reason: "Different codebase context"
+
+  # Cambio de objetivo/tarea = invalidar caché
+  task_switch:
+    action: invalidate_all
+    reason: "Different task requirements"
+
+# ── Proveedores y su soporte de caché ────────────────────────────────────────
+providers:
+  deepseek:
+    cache_supported: true
+    cache_type: "automatic"       # DeepSeek cachea automáticamente en el backend
+    discount_input: 0.50          # 50% descuento en input tokens cacheados
+    max_cache_duration_hours: 1   # DeepSeek mantiene caché ~1 hora
+
+  anthropic:
+    cache_supported: true
+    cache_type: "explicit"        # Requiere cache_control header explícito
+    discount_input: 0.90          # 90% descuento con cache_control
+    max_cache_duration_minutes: 5 # TTL corto — requiere re-validation frecuente
+
+  openai:
+    cache_supported: true
+    cache_type: "automatic"
+    discount_input: 0.50
+    max_cache_duration_hours: 1
+
+  qwen:
+    cache_supported: false
+    discount_input: 0.0
+
+# ── Sistema de archivos — qué se cachea ──────────────────────────────────────
+cacheable:
+  system_instructions:
+    - AGENTS.md           # Siempre cacheado — cambia raramente
+    - docs/26_RUNTIME_CONTEXT_BUDGET.md
+    - .opencode/agents/lead-thavren.md
+  skill_files:
+    - .opencode/skills/*/SKILL.md
+  registry_files:
+    - .ovav/registry/auto_triggers.yaml
+  static_configs:
+    - .ovav/policy/permission_authority.json
+    - provider_prices.yaml
+
+never_cache:
+  - .ovav/lockdown/state.json      # Cambia frecuentemente
+  - .ovav/runtime/*                 # Runtime state
+  - .ovav/memory/store/*            # Memoria viva
+  - cost_ledger.jsonl               # Tracking continuo

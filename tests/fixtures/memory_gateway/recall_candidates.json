@@ -1,0 +1,49 @@
+{
+  "memories": [
+    {
+      "id": "recall-safe-s7-gateway",
+      "profile": "ovav_systems_architect",
+      "operator": "thavren",
+      "phase": "S7",
+      "skill": "runtime_governance_seed",
+      "sensitivity": "internal_project",
+      "text": "Memory gateway phase requires classifier, redactor, write gateway and recall filter evidence before S8."
+    },
+    {
+      "id": "recall-safe-s7-policy",
+      "profile": "ovav_systems_architect",
+      "operator": "thavren",
+      "phase": "S7",
+      "skill": "runtime_governance_seed",
+      "sensitivity": "public_project",
+      "text": "Engram is optional in S7; unavailable or degraded healthcheck status must not fail the memory gateway gate."
+    },
+    {
+      "id": "recall-other-profile",
+      "profile": "ovav_research_analyst",
+      "operator": "eidren",
+      "phase": "S7",
+      "skill": "research_verification_seed",
+      "sensitivity": "internal_project",
+      "text": "Research memory belongs to Eidren and should not appear in Thavren recall packs."
+    },
+    {
+      "id": "recall-secret-denied",
+      "profile": "ovav_systems_architect",
+      "operator": "thavren",
+      "phase": "S7",
+      "skill": "runtime_governance_seed",
+      "sensitivity": "secret",
+      "text": "token=FAKEKEY must never be recalled."
+    },
+    {
+      "id": "recall-path-review-denied",
+      "profile": "ovav_systems_architect",
+      "operator": "thavren",
+      "phase": "S7",
+      "skill": "runtime_governance_seed",
+      "sensitivity": "sensitive_local",
+      "text": "Local config path /home/example/.local/share/ovav should be review-gated and excluded from compact recall."
+    }
+  ]
+}

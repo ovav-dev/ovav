@@ -1,0 +1,38 @@
+{
+  "name": "ovav-mcp-consumer",
+  "version": "1.0.0",
+  "description": "OVAV MCP Consumer Package - One-click MCP server setup",
+  "main": "index.js",
+  "scripts": {
+    "install:servers": "pnpm install",
+    "setup": "bash install.sh",
+    "test": "echo \"Tests coming soon\""
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "ai",
+    "figma",
+    "database",
+    "api-gateway"
+  ],
+  "author": "OVAV Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/server-postgres": "^1.0.0",
+    "@modelcontextprotocol/server-sqlite": "^1.0.0",
+    "@modelcontextprotocol/server-memory": "^1.0.0",
+    "@modelcontextprotocol/server-git": "^1.0.0",
+    "@modelcontextprotocol/server-fetch": "^1.0.0"
+  },
+  "optionalDependencies": {
+    "ovav-mcp-figma": "^1.0.0",
+    "ovav-mcp-design-system": "^1.0.0",
+    "ovav-mcp-api-gateway": "^1.0.0",
+    "ovav-mcp-ux-linter": "^1.0.0"
+  }
+}

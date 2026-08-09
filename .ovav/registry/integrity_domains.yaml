@@ -1,0 +1,220 @@
+# OVAV Living Integrity Model — Domain Classification
+# ============================================================================
+# Schema: ovav.integrity_domains.v1
+#
+# L0 — Classifier: cada archivo pertenece a un dominio de integridad.
+# La clasificación determina el comportamiento del sistema ante drifts:
+#   - Qué respuesta dispara (critical / warning / info / silent)
+#   - Si puede hacer auto-heal de la baseline
+#   - Si requiere entrada en el ledger de cambios autorizados
+#   - Si se trackea en el SBOM estático
+#
+# Principio: "No todas las mutaciones son ataques. No todos los archivos
+#             son iguales. El sistema debe distinguir para defender."
+# ============================================================================
+
+schema: ovav.integrity_domains.v1
+generated_at: "2026-05-30T09:30:00Z"
+classifier_algorithm: glob_first_match
+classifier_note: >
+  Patterns se evalúan en orden de prioridad (1 = más alto). Primera coincidencia gana.
+  Si un archivo no coincide con ningún patrón, se clasifica como unclassified
+  y recibe tratamiento CRITICAL por defecto (fail-secure).
+
+domains:
+
+  # ── immutable_source ──────────────────────────────────────────────────────
+  # Archivos que definen el comportamiento CORE de OVAV.
+  # Cualquier modificación sin entrada en el ledger de autorizaciones es
+  # una brecha crítica. NUNCA auto-heal. Siempre requiere verificación humana.
+  # --------------------------------------------------------------------------
+  immutable_source:
+    priority: 1
+    description: >
+      Código fuente, definiciones de agentes, skills, y documentos que
+      establecen comportamiento ejecutable de OVAV. Estos archivos SON
+      el sistema. Modificarlos sin trazabilidad es un ataque directo.
+    patterns:
+      # ── Agentes y Skills ──
+      - "AGENTS.md"                        # Sello de integridad principal
+      - "clients/opencode/agents/*.md"            # Definiciones de agentes
+      - ".ovav/source/skills/**/SKILL.md"     # Definiciones de skills
+      - ".ovav/source/skills/**/*.md"         # Recursos de skills
+
+      # ── Código fuente ──
+      - "tools/**/*.py"                    # Todo el código Python
+      - "tools/**/*.sh"                    # Scripts shell
+
+      # ── Documentos de implementación ──
+      - "IMPLEMENTATION_PLAN.md"           # ELIMINADO 2026-06-15. Autoridad canónica: .ovav/plan/caps.yaml
+      - "docs/implementation/*.md"         # Documentos de implementación
+
+    response: critical
+    auto_heal: false
+    ledger_required: true
+    sbom_track: true
+    score_threshold: 85              # Score ≥ 85 → blockade
+    action_on_drift: >
+      BLOCKADE inmediato. Verificar ledger de autorizaciones.
+      Si el cambio está autorizado → actualizar baseline manualmente.
+      Si no está autorizado → restaurar desde git HEAD y auditar.
+
+  # ── governed_config ───────────────────────────────────────────────────────
+  # Configuración que gobierna el comportamiento de OVAV: políticas,
+  # permisos, contratos de servicio, registros.
+  # Cambios aquí son posibles durante desarrollo pero siempre deben ser
+  # trazables. Auto-heal condicional: si el ledger autoriza → regenera.
+  # --------------------------------------------------------------------------
+  governed_config:
+    priority: 2
+    description: >
+      Políticas, permisos, contratos de servicio y registros que definen
+      cómo OVAV gobierna su propio comportamiento. Cambios son esperados
+      durante evolución del sistema pero requieren trazabilidad.
+    patterns:
+      # ── Políticas y permisos ──
+      - ".ovav/policy/*.json"              # Autoridad de permisos
+      - ".ovav/policy/*.yaml"              # Políticas YAML
+      - ".ovav/policy/*.yml"
+
+      # ── Contratos de servicio ──
+      - ".ovav/service_areas/**/*.yaml"    # Contratos de service areas
+      - ".ovav/service_areas/**/*.yml"
+      - ".ovav/service_areas/**/*.json"
+
+      # ── Configuración OpenCode repo-local ──
+      - ".opencode/*.json"                 # Config JSON
+      - ".opencode/*.jsonc"                # Config JSONC
+      - ".opencode/*.yaml"                 # Config YAML
+      - ".opencode/*.yml"
+
+      # ── Registros ──
+      - ".ovav/registry/harnesses.yaml"
+      - ".ovav/registry/artifacts.yaml"
+      - ".ovav/registry/evals.yaml"
+      - ".ovav/registry/contract_manifest.yaml"
+      - ".ovav/registry/delegation_rules.yaml"
+      - ".ovav/registry/operators.yaml"
+      - ".ovav/registry/permissions.yaml"
+      - ".ovav/registry/phase_dag.yaml"
+      - ".ovav/registry/install_packs.yaml"
+      - ".ovav/registry/memory_policy.yaml"
+      - ".ovav/registry/network_allowlist.yaml"
+      - ".ovav/registry/absorption_backlog.yaml"
+      - ".ovav/registry/auto_triggers.yaml"
+      - ".ovav/registry/capability_registry.yaml"
+      - ".ovav/registry/capability_scores.yaml"
+
+      # ── Baselines de integridad (se regeneran, pero son gobernados) ──
+      - ".ovav/registry/core_hashes.yaml"
+      - ".ovav/registry/sbom.yaml"
+      - ".ovav/registry/integrity_domains.yaml"
+
+      # ── Documentos de referencia y autoridad ──
+      - "docs/reference/*.md"
+      - "docs/26_RUNTIME_CONTEXT_BUDGET.md"
+
+    response: warning
+    auto_heal: conditional
+    ledger_required: true
+    sbom_track: true
+    score_threshold: 50              # Score ≥ 50 → warning
+    action_on_drift: >
+      WARNING. Verificar ledger. Si el cambio está autorizado en el ledger →
+      auto-regenerar baseline. Si no está autorizado → alertar sin bloquear,
+      requerir verificación del operador.
+
+  # ── mutable_runtime ───────────────────────────────────────────────────────
+  # Archivos que cambian naturalmente como parte de la operación de OVAV:
+  # sesiones, handoffs, logs, rastreadores, evidencia en vuelo.
+  # Auto-heal siempre. No requieren ledger. Fuera del SBOM estático.
+  # --------------------------------------------------------------------------
+  mutable_runtime:
+    priority: 3
+    description: >
+      Estado de ejecución que muta naturalmente durante la operación:
+      sesiones, handoffs, logs, evidencia de runtime, rastreadores.
+      Estos cambios NO son ataques. El sistema los acepta y actualiza
+      su propia comprensión del baseline automáticamente.
+    patterns:
+      # ── Runtime sessions y estado ──
+      - ".ovav/runtime/**"                # Sesiones, markers, intrusion_retries, logs
+
+      # ── Salud del sistema (mutable — generado por health scheduler) ──
+      - ".ovav/health/**"                 # Baselines y reportes de salud
+
+      # ── Hash de confianza (auto-actualizado cada sesión) ──
+      - ".ovav/trusted_head_hash"         # HEAD verificado por sesión
+
+      # ── Contexto activo ──
+      - ".ovav/context/*.md"              # Handoffs de sesión
+      - ".ovav/registry/authorized_changes_ledger.yaml"
+      - ".ovav/registry/work_ledger.yaml"       # Ledger de trabajo (mutable)
+      # active_context_ledger.yaml blocked — must not exist
+
+      # ── Evaluación runtime ──
+      - ".ovav/evaluation/*.yaml"         # Approval risk router, boring path, etc.
+      - ".ovav/evaluation/*.json"
+
+      # ── Artefactos de evidencia (runtime, no archivados) ──
+      - ".ovav/artifacts/**/evidence/*.json"
+
+      # ── Auto-generados ──
+      - "requirements.hash"
+
+      # ── S13 ARC runtime — Autonomous Repair Cortex state ──
+      - ".ovav/integrity/**"
+
+      # ── Alertas ──
+      - ".ovav/alerts/**"
+
+    response: info
+    auto_heal: true
+    ledger_required: false
+    sbom_track: false
+    score_threshold: 5               # Score ≥ 5 → info (siempre se supera, es informativo)
+    action_on_drift: >
+      INFO. Cambio esperado en dominio mutable. Auto-regenerar baseline
+      para este archivo sin intervención. No requiere ledger. No dispara alerta.
+
+  # ── evidence_artifact ─────────────────────────────────────────────────────
+  # Evidencia ya verificada y archivada. Tratamiento SILENT.
+  # Estos archivos se escriben una vez, se verifican, y no se vuelven a tocar.
+  # --------------------------------------------------------------------------
+  evidence_artifact:
+    priority: 4
+    description: >
+      Evidencia histórica ya verificada y cerrada. Una vez escrita y
+      validada, estos archivos no deberían cambiar. Si cambian, es
+      corrupción de archivo, no ataque — pero tampoco es operación normal.
+    patterns:
+      - ".ovav/artifacts/**/FINAL_*.json"
+      - ".ovav/artifacts/**/CLOSURE*.json"
+      - ".ovav/artifacts/**/*_REPORT.json"
+
+    response: silent
+    auto_heal: false
+    ledger_required: false
+    sbom_track: true
+    score_threshold: 20              # Score ≥ 20 → silent log (casi nunca se dispara)
+    action_on_drift: >
+      SILENT. Registrar en log de integridad sin alertar. Estos archivos
+      no deberían cambiar tras cierre, pero si cambian es probablemente
+      corrupción de disco o manipulación de evidencia histórica.
+      No requiere acción inmediata, pero queda registrado para auditoría.
+
+# ── Fallback: cualquier archivo no clasificado ───────────────────────────────
+fallback:
+  domain: unclassified
+  description: >
+    Archivo no cubierto por ningún patrón de dominio. Tratamiento
+    fail-secure: se asume CRITICAL hasta que se clasifique explícitamente.
+  response: critical
+  auto_heal: false
+  ledger_required: true
+  sbom_track: true
+  score_threshold: 90
+  action_on_drift: >
+    CRITICAL (unclassified). Archivo fuera de los dominios conocidos.
+    Tratar como immutable_source. Clasificar explícitamente para
+    evitar falsas alarmas futuras.

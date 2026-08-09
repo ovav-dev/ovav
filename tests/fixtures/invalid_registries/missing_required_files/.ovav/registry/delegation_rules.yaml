@@ -1,0 +1,17 @@
+delegation_rules:
+  delegate_when:
+    read_files_to_understand_flow_gte: 4
+    touch_non_trivial_files_gte: 2
+    architecture_change: true
+    auth_security_env_change: true
+    global_config_change: true
+    technical_benchmark_multiple_sources: true
+    long_monolithic_task: checkpoint_and_replan
+    research_sources_gte: 4
+  do_not_delegate_when:
+    - pure_explanation
+    - small_single_file_low_risk
+    - typo_or_copy_fix
+    - no_code_change_required
+    - direct_user_question_with_known_answer
+    - one_small_artifact_only

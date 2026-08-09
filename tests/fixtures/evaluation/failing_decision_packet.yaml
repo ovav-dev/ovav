@@ -1,0 +1,13 @@
+# Intentionally minimal/invalid packet to test rejection
+packet_id: DP-FAIL-001
+proposal: "Hack rápido sin plan"
+service_area: platform_engineering
+lead: thavren
+task_size: complex
+risk_level: high
+touched_surfaces:
+  - tools/
+expected_files: []
+user_visible_change: true
+rollback_needed: true
+# Missing: context_needed, tools_needed, harnesses_expected, evidence_required

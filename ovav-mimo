@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+# ── OVAV Mimocode Wrapper ──────────────────────────────────────────────────
+# Launch mimocode with optimal OVAV configuration.
+#
+# Usage:  ./ovav-mimo [extra mimo flags...]
+#         ./ovav-mimo serve           (headless server)
+#         ./ovav-mimo run "mensaje"   (non-interactive)
+#
+# Features leveraged from mimocode v0.1.3:
+#   --trust        Skip workspace trust prompt
+#   --agent        Pre-select OVAV agent
+#   --model        Use XIOAMI free model
+#   --never-ask    Auto-decide without asking (use /never-ask to toggle)
+#
+# Canonical home: OVAV worktree root
+# ───────────────────────────────────────────────────────────────────────────
+
+set -euo pipefail
+
+MIMO_BIN="${MIMO_BIN:-/home/braka/.mimocode/bin/mimo}"
+OVAV_ROOT="$(cd "$(dirname "$0")" && pwd)"
+DEFAULT_AGENT="${OVAV_AGENT:-Platform Engineering}"
+DEFAULT_MODEL="${OVAV_MODEL:-mimo/mimo-auto}"
+
+cd "$OVAV_ROOT"
+
+# Determine if this is a serve/run command or TUI mode
+FIRST_ARG="${1:-}"
+case "$FIRST_ARG" in
+    serve)
+        shift
+        exec "$MIMO_BIN" serve \
+            --trust \
+            --model "$DEFAULT_MODEL" \
+            --agent "$DEFAULT_AGENT" \
+            "$@"
+        ;;
+    run)
+        shift
+        exec "$MIMO_BIN" run \
+            --trust \
+            --model "$DEFAULT_MODEL" \
+            --agent "$DEFAULT_AGENT" \
+            "$@"
+        ;;
+    *)
+        # TUI mode — interactive
+        exec "$MIMO_BIN" \
+            --trust \
+            --model "$DEFAULT_MODEL" \
+            --agent "$DEFAULT_AGENT" \
+            "$@"
+        ;;
+esac

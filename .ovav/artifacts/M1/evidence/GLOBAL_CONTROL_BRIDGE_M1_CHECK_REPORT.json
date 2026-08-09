@@ -1,0 +1,20 @@
+{
+  "blocked_surfaces_touched": [],
+  "bridge_id": "global_control_bridge_m1",
+  "checks": {
+    "aggregate_evidence_written": true,
+    "blocked_surfaces_resist_consent": true,
+    "install_apply_blocked": true,
+    "install_plan_only": true,
+    "plugin_installation_blocked": true,
+    "py_compile": true,
+    "registry_entries_present": true,
+    "source_local_artifact_allowed": true
+  },
+  "global_writes_performed": false,
+  "home_writes_performed": false,
+  "issues": [],
+  "milestone": "M1",
+  "next_action": "Keep M1 as source-local global-intent triage until a future install/global segment explicitly opens apply gates.",
+  "status": "pass"
+}

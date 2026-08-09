@@ -1,0 +1,13 @@
+self_model:
+  version: "1.0.0"
+  operator: camila
+  service_area: legal_compliance
+  core_competencies:
+    contracts: [{name: "Contract drafting and review", proficiency: 0.90}, {name: "License compliance analysis", proficiency: 0.85}, {name: "Service agreement negotiation", proficiency: 0.80}]
+    compliance: [{name: "GDPR/CCPA/LGPD analysis", proficiency: 0.85}, {name: "Privacy impact assessment", proficiency: 0.80}, {name: "Data retention policy design", proficiency: 0.75}]
+    ip: [{name: "Open source license compatibility", proficiency: 0.85}, {name: "Copyright and trademark analysis", proficiency: 0.80}, {name: "Patent landscape review", proficiency: 0.60}]
+  collaboration:
+    - {partner: "Thavren", type: "cross_area", protocol: "handoff_sanitizado", description: "Security compliance and data protection review"}
+    - {partner: "Sofía", type: "cross_area", protocol: "handoff_sanitizado", description: "Commercial contract and terms review"}
+  knowledge_domains: ["Contract law", "Data privacy regulation", "Intellectual property", "Open source licensing", "Technology law"]
+  model_preferences: {primary: "opencode-go/deepseek-v4-pro", secondary: "minimax-coding-plan/MiniMax-M3"}

@@ -1,0 +1,30 @@
+# OVAV Governance — Research Profile
+# =============================================================================
+# Governs external research, evidence gathering, and source verification
+# Updated: 2026-08-07
+# =============================================================================
+
+research_profile:
+  version: "1.0"
+  authority: "Eidren — Research Intelligence Lead"
+  
+  evidence_standards:
+    - require_citation: true
+    - min_evidence_quality: "verified"
+    - cross_reference_required: true
+    
+  source_types:
+    - code_references
+    - documentation
+    - benchmarks
+    - security_advisories
+    
+  verification:
+    - verify_url_alive: true
+    - check_source_integrity: true
+    - validate_timestamps: true
+    
+  forbidden:
+    - unverified_claims
+    - single_source_only
+    - rumor_based_decisions

@@ -1,0 +1,63 @@
+# Sample Decision Packet — Phase 1.2 Decision Packet Validator (meta-packet)
+# This packet validates the creation of the decision_packet_validator.py itself
+packet_id: DP-2026-05-29-001
+proposal: >
+  Crear el Decision Packet schema y validator para que toda implementación
+  medium+ requiera un packet evaluado contra las 21 Leyes OVAV. Esto incluye
+  decision_packet.schema.json y tools/harnesses/decision_packet_validator.py.
+rationale: >
+  La OVAV Living Intelligence Evaluation Layer (Sección 5 del .md canónico)
+  requiere que ningún cambio medium+ comience sin un decision packet válido.
+  Esto materializa el Gate de la Sección 5 en código ejecutable.
+service_area: platform_engineering
+lead: thavren
+task_size: medium
+risk_level: medium
+touched_surfaces:
+  - schemas/
+  - tools/harnesses/
+  - tests/fixtures/evaluation/
+  - registry/
+expected_files:
+  - path: schemas/decision_packet.schema.json
+    action: create
+    reason: Schema JSON para validar estructura de decision packets
+  - path: tools/harnesses/decision_packet_validator.py
+    action: create
+    reason: Validador ejecutable que evalúa packets contra las 21 leyes
+  - path: tests/fixtures/evaluation/sample_decision_packet.yaml
+    action: create
+    reason: Fixture de prueba para el validator
+context_needed:
+  - source_id: .ovav/laws/ovav_laws.yaml
+    tier: T3_focused
+    reason: Definición canónica de las 21 leyes y sus reglas de activación
+  - source_id: OVAV_LIVING_INTELLIGENCE_EVALUATION_LAYER_THAVREN.md
+    tier: T3_focused
+    reason: Sección 5 (Decision Packet) y Sección 17 (Final Evaluation Object)
+  - source_id: tools/harnesses/check_ovav_law_compliance.py
+    tier: T2_compact
+    reason: Patrón de checker existente para consistencia de código
+tools_needed:
+  - tool_class: file_write
+    risk: medium
+  - tool_class: bash
+    risk: medium
+permissions_needed:
+  - permission_class: repo_local_write
+    grant_source: standing_grant_platform_engineering
+  - permission_class: harness_execution
+    grant_source: standing_grant_platform_engineering
+harnesses_expected:
+  - harness_name: decision_packet_validator
+    trigger: tools/harnesses/decision_packet_validator.py
+  - harness_name: check_ovav_law_compliance
+    trigger: .ovav/laws/ovav_laws.yaml
+user_visible_change: false
+rollback_needed: false
+evidence_required:
+  - json_report
+  - trace
+  - markdown_log
+generated_at: "2026-05-29T20:00:00Z"
+evaluated_by: thavren

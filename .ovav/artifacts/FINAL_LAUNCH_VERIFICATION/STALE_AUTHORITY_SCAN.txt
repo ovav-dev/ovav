@@ -1,0 +1,118 @@
+.ovav/source/skills/ovav-runtime-gates/SKILL.md:3:description: Use when OVAV work needs source-local runtime gates, validation, next-work resolution, close-layer dry-runs or blocked-surface checks.
+.ovav/source/skills/ovav-runtime-gates/SKILL.md:15:- Close dry-run: `python3 tools/ovav_runtime.py close-layer --latest --dry-run`
+.ovav/source/skills/ovav-runtime-gates/SKILL.md:16:- Controlled preview-surface graduation RC baseline check: `python3 tools/ovav_runtime.py build4-closure --dry-run`
+.ovav/service_areas/shared/context_economy_contract.yaml:56:        - close-layer dry-run
+.ovav/source/skills/ovav-repo-local-work-loop/references/context-work-validate-close.md:30:- Dry-run close-layer. No remote/origin workflow.
+.ovav/registry/artifacts.yaml:522:  s45_build4_recommendations:
+.ovav/registry/artifacts.yaml:525:  s46_build4_planning_freeze_summary:
+.ovav/registry/artifacts.yaml:528:  s46_build4_segment_map:
+.ovav/registry/artifacts.yaml:531:  s46_build4_scope_boundaries:
+.ovav/registry/artifacts.yaml:537:  s46_build4_activation_order:
+.ovav/registry/artifacts.yaml:540:  s46_build4_blocked_surfaces:
+.ovav/registry/artifacts.yaml:543:  build4_current_handoff:
+.ovav/registry/artifacts.yaml:705:  s58_build4_graduation_e2e_rc_summary:
+.ovav/registry/artifacts.yaml:708:  s58_build4_graduation_e2e_report:
+.ovav/registry/artifacts.yaml:711:  s58_build4_graduation_readiness_report:
+.ovav/registry/artifacts.yaml:714:  s58_build4_graduation_e2e_human_report:
+.ovav/registry/artifacts.yaml:717:  s59_build4_final_readiness_summary:
+.ovav/registry/artifacts.yaml:720:  s59_build4_final_readiness_report:
+.ovav/registry/artifacts.yaml:723:  s59_build4_surface_readiness_matrix:
+.ovav/registry/artifacts.yaml:726:  s59_build4_blocked_surface_audit:
+.ovav/registry/artifacts.yaml:729:  s59_build4_final_readiness_human_report:
+.ovav/registry/artifacts.yaml:732:  s60_build4_closure_summary:
+.ovav/registry/artifacts.yaml:735:  s60_build4_closure_report:
+.ovav/registry/artifacts.yaml:738:  s60_build4_final_baseline_report:
+.ovav/registry/artifacts.yaml:741:  s60_build4_human_closure_report:
+.ovav/registry/artifacts.yaml:747:  build4_final_handoff:
+.ovav/service_areas/shared/current_authority_contract.yaml:26:    - BUILD 4
+.ovav/service_areas/shared/current_authority_contract.yaml:27:    - Build4
+.ovav/service_areas/shared/current_authority_contract.yaml:28:    - build4
+.ovav/service_areas/shared/current_authority_contract.yaml:29:    - S76
+.ovav/service_areas/shared/current_authority_contract.yaml:30:    - deployment claim audit
+.ovav/service_areas/shared/current_authority_contract.yaml:31:    - build4-closure
+.ovav/service_areas/shared/current_authority_contract.yaml:32:    - close-layer
+.ovav/service_areas/shared/current_authority_contract.yaml:33:    - ready_with_caution
+.ovav/service_areas/shared/current_authority_contract.yaml:34:    - controlled preview
+.ovav/service_areas/shared/current_authority_contract.yaml:35:    - preview RC
+.ovav/source/skills/ovav-repo-local-work-loop/references/visible-surface-cleanup.md:32:| "BUILD 4 baseline" | "controlled_preview_surface_graduation_rc baseline" |
+.ovav/registry/work_ledger.yaml:430:    segment: S76
+.ovav/registry/evals.yaml:65:  eval_build1_closure_ready_with_caution:
+.ovav/registry/evals.yaml:116:  eval_build2_closure_ready_with_caution:
+.ovav/registry/evals.yaml:245:  eval_build3_rc2_closure_ready_with_caution:
+.ovav/registry/evals.yaml:292:  eval_build4_activation_order_repo_local_first:
+.ovav/registry/evals.yaml:299:    - h_build4_activation_order
+.ovav/registry/evals.yaml:300:    - h_check_build4_planning_freeze
+.ovav/registry/evals.yaml:301:  eval_build4_blocked_surfaces_preserved:
+.ovav/registry/evals.yaml:309:    - h_build4_scope_boundaries
+.ovav/registry/evals.yaml:310:    - h_check_build4_planning_freeze
+.ovav/registry/evals.yaml:311:  eval_build4_blocks_forbidden_surfaces:
+.ovav/registry/evals.yaml:318:    - h_build4_scope_boundaries
+.ovav/registry/evals.yaml:319:    - h_check_build4_planning_freeze
+.ovav/registry/evals.yaml:320:  eval_build4_graduation_policy:
+.ovav/registry/evals.yaml:328:    - h_check_build4_planning_freeze
+.ovav/registry/evals.yaml:329:  eval_build4_planning_freeze:
+.ovav/registry/evals.yaml:337:    - h_build4_segment_map
+.ovav/registry/evals.yaml:338:    - h_build4_scope_boundaries
+.ovav/registry/evals.yaml:339:    - h_check_build4_planning_freeze
+.ovav/registry/evals.yaml:340:  eval_build4_segment_order_opencode_first:
+.ovav/registry/evals.yaml:347:    - h_build4_segment_map
+.ovav/registry/evals.yaml:348:    - h_check_build4_planning_freeze
+.ovav/registry/evals.yaml:1747:    - h_build4_graduation_e2e
+.ovav/registry/evals.yaml:1748:    - h_check_build4_graduation_e2e_rc
+.ovav/registry/evals.yaml:1749:  eval_s58_build4_graduation_e2e_chain:
+.ovav/registry/evals.yaml:1756:    - h_build4_graduation_e2e
+.ovav/registry/evals.yaml:1757:    - h_check_build4_graduation_e2e_rc
+.ovav/registry/evals.yaml:1765:    - h_check_build4_graduation_e2e_rc
+.ovav/registry/evals.yaml:1773:    - h_build4_graduation_readiness
+.ovav/registry/evals.yaml:1774:    - h_check_build4_graduation_e2e_rc
+.ovav/registry/evals.yaml:1782:    - h_build4_blocked_surface_audit
+.ovav/registry/evals.yaml:1783:  eval_s59_build4_final_readiness:
+.ovav/registry/evals.yaml:1790:    - h_build4_final_readiness
+.ovav/registry/evals.yaml:1791:    - h_check_build4_final_readiness
+.ovav/registry/evals.yaml:1799:    - h_build4_surface_readiness_matrix
+.ovav/registry/evals.yaml:1800:  eval_s60_build4_closure:
+.ovav/registry/evals.yaml:1807:    - h_build4_closure
+.ovav/registry/evals.yaml:1808:    - h_check_build4_closure
+.ovav/registry/evals.yaml:1809:  eval_s60_build4_closure_human_report:
+.ovav/registry/evals.yaml:1816:    - h_build4_closure_report
+.ovav/registry/evals.yaml:1817:  eval_s60_build4_final_baseline:
+.ovav/registry/evals.yaml:1824:    - h_build4_final_baseline
+.ovav/registry/evals.yaml:1832:    - h_build4_closure_report
+.ovav/registry/evals.yaml:2472:- eval_build1_closure_ready_with_caution
+.ovav/registry/evals.yaml:2535:- eval_build2_closure_ready_with_caution
+.ovav/registry/evals.yaml:2596:- eval_build3_rc2_closure_ready_with_caution
+.ovav/registry/evals.yaml:2601:- eval_build4_planning_freeze
+.ovav/registry/evals.yaml:2602:- eval_build4_segment_order_opencode_first
+.ovav/registry/evals.yaml:2603:- eval_build4_blocks_forbidden_surfaces
+.ovav/registry/evals.yaml:2604:- eval_build4_graduation_policy
+.ovav/registry/evals.yaml:2605:- eval_build4_activation_order_repo_local_first
+.ovav/registry/evals.yaml:2606:- eval_build4_blocked_surfaces_preserved
+.ovav/registry/evals.yaml:2648:- eval_s58_build4_graduation_e2e_chain
+.ovav/registry/evals.yaml:2653:- eval_s59_build4_final_readiness
+.ovav/registry/evals.yaml:2656:- eval_s60_build4_closure
+.ovav/registry/evals.yaml:2657:- eval_s60_build4_final_baseline
+.ovav/registry/evals.yaml:2658:- eval_s60_build4_closure_human_report
+.ovav/source/skills/ovav-platform-session/references/harness-governance.md:13:- source-local close-layer dry-runs
+.ovav/registry/skills.yaml:366:      next-work resolution, close-layer dry-runs or blocked-surface checks.
+.ovav/registry/harnesses.yaml:234:    trigger: on_ready_with_caution_classification
+.ovav/registry/harnesses.yaml:767:  build4_segment_map:
+.ovav/registry/harnesses.yaml:769:    trigger: before_build4_planning_freeze
+.ovav/registry/harnesses.yaml:772:  build4_scope_boundaries:
+.ovav/registry/harnesses.yaml:774:    trigger: before_build4_planning_freeze
+.ovav/registry/harnesses.yaml:779:    trigger: before_build4_planning_freeze
+.ovav/registry/harnesses.yaml:782:  build4_activation_order:
+.ovav/registry/harnesses.yaml:784:    trigger: before_build4_planning_freeze
+.ovav/registry/harnesses.yaml:787:  check_build4_planning_freeze:
+.ovav/registry/harnesses.yaml:1027:  build4_graduation_e2e:
+.ovav/registry/harnesses.yaml:1032:  build4_graduation_readiness:
+.ovav/registry/harnesses.yaml:1037:  build4_graduation_e2e_report:
+.ovav/registry/harnesses.yaml:1042:  check_build4_graduation_e2e_rc:
+.ovav/registry/harnesses.yaml:1047:  build4_final_readiness:
+.ovav/registry/harnesses.yaml:1052:  build4_surface_readiness_matrix:
+.ovav/registry/harnesses.yaml:1057:  build4_blocked_surface_audit:
+.ovav/registry/harnesses.yaml:1062:  build4_final_readiness_report:
+.ovav/registry/harnesses.yaml:1067:  check_build4_final_readiness:
+.ovav/registry/harnesses.yaml:1072:  build4_closure:
+.ovav/registry/harnesses.yaml:1077:  build4_final_baseline:
+.ovav/registry/harnesses.yaml:1082:  build4_closure_report:
+.ovav/registry/harnesses.yaml:1087:  check_build4_closure:

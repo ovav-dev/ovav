@@ -1,0 +1,17 @@
+
+╔══════════════════════════════════════════════════════════╗
+║       OVAV cPanel v5.1 — Enterprise Control Panel        ║
+╠══════════════════════════════════════════════════════════╣
+║  URL:      http://localhost:5858                         ║
+║  API:      http://localhost:5858 /api/v1/status          ║
+║  Bind:     127.0.0.1                                     ║
+╠══════════════════════════════════════════════════════════╣
+║  Runtime:  Go (stdlib-only, zero dependencies)           ║
+║  Repo:     /home/braka/Systems/OVAV/go-runtime           ║
+║  Version:  2.1.0                                         ║
+║  Quit:     Ctrl+C                                       ║
+╚══════════════════════════════════════════════════════════╝
+  Listening on http://127.0.0.1:5858
+
+  cPanel shutting down...
+  cPanel stopped.

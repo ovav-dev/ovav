@@ -1,0 +1,862 @@
+artifacts:
+  project_discovery:
+    path: .ovav/artifacts/init/PROJECT_DISCOVERY.json
+    companion_path: .ovav/artifacts/init/PROJECT_DISCOVERY.md
+    phase: init
+  artifact_map:
+    path: .ovav/artifacts/init/ARTIFACT_MAP.md
+    phase: init
+  exploration_notes:
+    path: .ovav/artifacts/explore/EXPLORE.md
+    phase: explore
+  flow_map:
+    path: .ovav/artifacts/explore/FLOW_MAP.md
+    phase: explore
+  proposal:
+    path: .ovav/artifacts/proposal/PROPOSAL.md
+    phase: proposal
+  spec:
+    path: .ovav/artifacts/spec/SPEC.md
+    phase: spec
+  design:
+    path: .ovav/artifacts/design/DESIGN.md
+    phase: design
+  tasks:
+    path: .ovav/artifacts/tasks/TASKS.md
+    phase: tasks
+  apply_log:
+    path: .ovav/artifacts/apply/APPLY_LOG.md
+    phase: apply
+  verify_report:
+    path: .ovav/artifacts/verify/VERIFY.md
+    phase: verify
+  handoff_summary:
+    path: .ovav/artifacts/archive/HANDOFF.md
+    phase: archive
+  result_contract_runtime_report:
+    path: .ovav/artifacts/S8/evidence/RESULT_CONTRACT_RUNTIME_REPORT.json
+    phase: verify
+  eval_runtime_report:
+    path: .ovav/artifacts/S8/evidence/EVAL_RUNTIME_REPORT.json
+    phase: verify
+  evidence_verification_report:
+    path: .ovav/artifacts/S8/evidence/EVIDENCE_VERIFICATION_REPORT.json
+    phase: verify
+  readiness_evaluation_report:
+    path: .ovav/artifacts/S8/evidence/READINESS_EVALUATION_REPORT.json
+    phase: verify
+  s8_result_eval_summary:
+    path: .ovav/artifacts/S8/S8_RESULT_EVAL_RUNTIME.md
+    phase: archive
+  s10_work_ledger_summary:
+    path: .ovav/artifacts/S10/S10_WORK_LEDGER_GIT_GATES.md
+    phase: archive
+  s10_work_ledger_report:
+    path: .ovav/artifacts/S10/evidence/WORK_LEDGER_REPORT.json
+    phase: verify
+  s10_change_manifest_report:
+    path: .ovav/artifacts/S10/evidence/CHANGE_MANIFEST_REPORT.json
+    phase: verify
+  s10_git_safety_gate_report:
+    path: .ovav/artifacts/S10/evidence/GIT_SAFETY_GATE_REPORT.json
+    phase: verify
+  s10_human_delivery_report:
+    path: .ovav/artifacts/S10/evidence/HUMAN_DELIVERY_REPORT.md
+    phase: archive
+  s11_install_governor_summary:
+    path: .ovav/artifacts/S11/S11_INSTALL_GOVERNOR.md
+    phase: archive
+  s11_install_plan_report:
+    path: .ovav/artifacts/S11/evidence/INSTALL_PLAN_REPORT.json
+    phase: verify
+  s11_install_manifest_report:
+    path: .ovav/artifacts/S11/evidence/INSTALL_MANIFEST_REPORT.json
+    phase: verify
+  s11_install_safety_gate_report:
+    path: .ovav/artifacts/S11/evidence/INSTALL_SAFETY_GATE_REPORT.json
+    phase: verify
+  s11_rollback_plan_report:
+    path: .ovav/artifacts/S11/evidence/ROLLBACK_PLAN_REPORT.json
+    phase: verify
+  s12_thavren_e2e_summary:
+    path: .ovav/artifacts/S12/S12_THAVREN_E2E.md
+    phase: archive
+  thavren_e2e_package:
+    path: .ovav/artifacts/S12/THAVREN_E2E_PACKAGE.json
+    phase: verify
+  thavren_e2e_report:
+    path: .ovav/artifacts/S12/evidence/THAVREN_E2E_REPORT.json
+    phase: verify
+  thavren_e2e_human_report:
+    path: .ovav/artifacts/S12/evidence/THAVREN_E2E_HUMAN_REPORT.md
+    phase: archive
+  s13_eidren_e2e_summary:
+    path: .ovav/artifacts/S13/S13_EIDREN_E2E.md
+    phase: archive
+  eidren_e2e_package:
+    path: .ovav/artifacts/S13/EIDREN_E2E_PACKAGE.json
+    phase: verify
+  eidren_e2e_report:
+    path: .ovav/artifacts/S13/evidence/EIDREN_E2E_REPORT.json
+    phase: verify
+  eidren_e2e_human_report:
+    path: .ovav/artifacts/S13/evidence/EIDREN_E2E_HUMAN_REPORT.md
+    phase: archive
+  s14_dual_profile_readiness_summary:
+    path: .ovav/artifacts/S14/S14_DUAL_PROFILE_READINESS.md
+    phase: archive
+  s14_p0_readiness_matrix:
+    path: .ovav/artifacts/S14/P0_READINESS_MATRIX.json
+    phase: verify
+  s14_p0_governance_human_report:
+    path: .ovav/artifacts/S14/evidence/P0_GOVERNANCE_HUMAN_REPORT.md
+    phase: archive
+  s14_p0_readiness_report:
+    path: .ovav/artifacts/S14/evidence/P0_READINESS_REPORT.json
+    phase: verify
+  s15_evidence_stability_summary:
+    path: .ovav/artifacts/S15/S15_EVIDENCE_STABILITY.md
+    phase: archive
+  s15_evidence_mode_report:
+    path: .ovav/artifacts/S15/evidence/EVIDENCE_MODE_REPORT.json
+    phase: verify
+  s15_evidence_stability_report:
+    path: .ovav/artifacts/S15/evidence/EVIDENCE_STABILITY_REPORT.json
+    phase: verify
+  s15_stable_validation_report:
+    path: .ovav/artifacts/S15/evidence/STABLE_VALIDATION_REPORT.json
+    phase: verify
+  s16_build1_closure_summary:
+    path: .ovav/artifacts/S16/S16_BUILD1_CLOSURE.md
+    phase: archive
+  s16_build1_readiness_matrix:
+    path: .ovav/artifacts/S16/BUILD1_READINESS_MATRIX.json
+    phase: verify
+  s16_build1_closure_report:
+    path: .ovav/artifacts/S16/evidence/BUILD1_CLOSURE_REPORT.json
+    phase: verify
+  s16_source_local_acceptance_report:
+    path: .ovav/artifacts/S16/evidence/SOURCE_LOCAL_ACCEPTANCE_REPORT.json
+    phase: verify
+  s16_build1_human_closure_report:
+    path: .ovav/artifacts/S16/evidence/BUILD1_HUMAN_CLOSURE_REPORT.md
+    phase: archive
+  s17_build2_planning_freeze_summary:
+    path: .ovav/artifacts/S17/S17_BUILD2_PLANNING_FREEZE.md
+    phase: archive
+  s17_build2_segment_map:
+    path: .ovav/artifacts/S17/evidence/BUILD2_SEGMENT_MAP.json
+    phase: verify
+  s17_build2_scope_boundaries:
+    path: .ovav/artifacts/S17/evidence/BUILD2_SCOPE_BOUNDARIES.json
+    phase: verify
+  s17_build2_routing_matrix:
+    path: .ovav/artifacts/S17/evidence/BUILD2_ROUTING_MATRIX.json
+    phase: verify
+  s18_caution_policy_gates_summary:
+    path: .ovav/artifacts/S18/S18_CAUTION_POLICY_GATES.md
+    phase: archive
+  s18_caution_policy_report:
+    path: .ovav/artifacts/S18/evidence/CAUTION_POLICY_REPORT.json
+    phase: verify
+  s18_caution_gate_report:
+    path: .ovav/artifacts/S18/evidence/CAUTION_GATE_REPORT.json
+    phase: verify
+  s18_caution_graduation_report:
+    path: .ovav/artifacts/S18/evidence/CAUTION_GRADUATION_REPORT.json
+    phase: verify
+  s19_seed_skill_trust_summary:
+    path: .ovav/artifacts/S19/S19_SEED_SKILL_TRUST.md
+    phase: archive
+  s19_seed_skill_trust_report:
+    path: .ovav/artifacts/S19/evidence/SEED_SKILL_TRUST_REPORT.json
+    phase: verify
+  s19_skill_graduation_policy_report:
+    path: .ovav/artifacts/S19/evidence/SKILL_GRADUATION_POLICY_REPORT.json
+    phase: verify
+  s19_skill_trust_human_report:
+    path: .ovav/artifacts/S19/evidence/SKILL_TRUST_HUMAN_REPORT.md
+    phase: archive
+  s20_skill_eval_adversarial_summary:
+    path: .ovav/artifacts/S20/S20_SKILL_EVAL_ADVERSARIAL.md
+    phase: archive
+  s20_skill_eval_suite_report:
+    path: .ovav/artifacts/S20/evidence/SKILL_EVAL_SUITE_REPORT.json
+    phase: verify
+  s20_adversarial_skill_cases_report:
+    path: .ovav/artifacts/S20/evidence/ADVERSARIAL_SKILL_CASES_REPORT.json
+    phase: verify
+  s20_skill_eval_human_report:
+    path: .ovav/artifacts/S20/evidence/SKILL_EVAL_HUMAN_REPORT.md
+    phase: archive
+  s21_runtime_orchestrator_cli_summary:
+    path: .ovav/artifacts/S21/S21_RUNTIME_ORCHESTRATOR_CLI.md
+    phase: archive
+  s21_runtime_orchestrator_report:
+    path: .ovav/artifacts/S21/evidence/RUNTIME_ORCHESTRATOR_REPORT.json
+    phase: verify
+  s21_runtime_status_report:
+    path: .ovav/artifacts/S21/evidence/RUNTIME_STATUS_REPORT.json
+    phase: verify
+  s21_runtime_cli_human_report:
+    path: .ovav/artifacts/S21/evidence/RUNTIME_CLI_HUMAN_REPORT.md
+    phase: archive
+  s22_context_compaction_summary:
+    path: .ovav/artifacts/S22/S22_CONTEXT_COMPACTION_RUNTIME.md
+    phase: archive
+  s22_context_compaction_report:
+    path: .ovav/artifacts/S22/evidence/CONTEXT_COMPACTION_REPORT.json
+    phase: verify
+  s22_context_budget_report:
+    path: .ovav/artifacts/S22/evidence/CONTEXT_BUDGET_REPORT.json
+    phase: verify
+  s22_snapshot_continuity_report:
+    path: .ovav/artifacts/S22/evidence/SNAPSHOT_CONTINUITY_REPORT.json
+    phase: verify
+  s22_context_pack_human_report:
+    path: .ovav/artifacts/S22/evidence/CONTEXT_PACK_HUMAN_REPORT.md
+    phase: archive
+  s24_opencode_pack_simulation_summary:
+    path: .ovav/artifacts/S24/S24_OPENCODE_PACK_SIMULATION.md
+    phase: archive
+  s24_opencode_pack_simulation_report:
+    path: .ovav/artifacts/S24/evidence/OPENCODE_PACK_SIMULATION_REPORT.json
+    phase: verify
+  s24_opencode_pack_validation_report:
+    path: .ovav/artifacts/S24/evidence/OPENCODE_PACK_VALIDATION_REPORT.json
+    phase: verify
+  s24_opencode_pack_human_report:
+    path: .ovav/artifacts/S24/evidence/OPENCODE_PACK_HUMAN_REPORT.md
+    phase: archive
+  s24_simulated_pack_tree:
+    path: .ovav/artifacts/S24/evidence/simulated_pack/pack.json
+    phase: verify
+  s25_legacy_readiness_summary:
+    path: .ovav/artifacts/S25/S25_ENGRAM_LIVE_READINESS.md
+    phase: archive
+    note: "Historical artifact — system removed v52.0."
+  s25_legacy_probe_report:
+    path: .ovav/artifacts/S25/evidence/ENGRAM_LIVE_PROBE_REPORT.json
+    phase: verify
+    note: "Historical artifact."
+  s25_legacy_readiness_policy_report:
+    path: .ovav/artifacts/S25/evidence/ENGRAM_READINESS_POLICY_REPORT.json
+    phase: verify
+    note: "Historical artifact."
+  s25_legacy_probe_human_report:
+    path: .ovav/artifacts/S25/evidence/ENGRAM_PROBE_HUMAN_REPORT.md
+    phase: archive
+    note: "Historical artifact."
+  s26_legacy_memory_gateway_summary:
+    path: .ovav/artifacts/S26/S26_MEMORY_GATEWAY_PROOF.md
+    phase: archive
+    note: "Historical artifact — system removed v52.0."
+  s26_legacy_memory_gateway_report:
+    path: .ovav/artifacts/S26/evidence/MEMORY_GATEWAY_PROOF_REPORT.json
+    phase: verify
+    note: "Historical artifact."
+  s26_legacy_memory_cases_report:
+    path: .ovav/artifacts/S26/evidence/MEMORY_CANDIDATE_CASES_REPORT.json
+    phase: verify
+    note: "Historical artifact."
+  s26_legacy_memory_human_report:
+    path: .ovav/artifacts/S26/evidence/MEMORY_GATEWAY_HUMAN_REPORT.md
+    phase: archive
+    note: "Historical artifact."
+  s27_install_governor_sandbox_summary:
+    path: .ovav/artifacts/S27/S27_INSTALL_GOVERNOR_SANDBOX.md
+    phase: archive
+  s27_install_sandbox_report:
+    path: .ovav/artifacts/S27/evidence/INSTALL_SANDBOX_REPORT.json
+    phase: verify
+  s27_install_backup_plan_report:
+    path: .ovav/artifacts/S27/evidence/INSTALL_BACKUP_PLAN_REPORT.json
+    phase: verify
+  s27_install_rollback_simulation_report:
+    path: .ovav/artifacts/S27/evidence/INSTALL_ROLLBACK_SIMULATION_REPORT.json
+    phase: verify
+  s27_install_sandbox_human_report:
+    path: .ovav/artifacts/S27/evidence/INSTALL_SANDBOX_HUMAN_REPORT.md
+    phase: archive
+  s27_install_sandbox_tree:
+    path: .ovav/artifacts/S27/evidence/sandbox/manifest/sandbox_manifest.json
+    phase: verify
+  s28_source_global_plan_summary:
+    path: .ovav/artifacts/S28/S28_SOURCE_GLOBAL_PLAN.md
+    phase: archive
+  s28_source_global_plan_report:
+    path: .ovav/artifacts/S28/evidence/SOURCE_GLOBAL_PLAN_REPORT.json
+    phase: verify
+  s28_source_global_risk_report:
+    path: .ovav/artifacts/S28/evidence/SOURCE_GLOBAL_RISK_REPORT.json
+    phase: verify
+  s28_source_global_approval_gate_report:
+    path: .ovav/artifacts/S28/evidence/SOURCE_GLOBAL_APPROVAL_GATE_REPORT.json
+    phase: verify
+  s28_source_global_human_report:
+    path: .ovav/artifacts/S28/evidence/SOURCE_GLOBAL_HUMAN_REPORT.md
+    phase: archive
+  s29_build2_e2e_rc1_summary:
+    path: .ovav/artifacts/S29/S29_BUILD2_E2E_RC1.md
+    phase: archive
+  s29_build2_e2e_rc1_report:
+    path: .ovav/artifacts/S29/evidence/BUILD2_E2E_RC1_REPORT.json
+    phase: verify
+  s29_build2_rc1_readiness_report:
+    path: .ovav/artifacts/S29/evidence/BUILD2_RC1_READINESS_REPORT.json
+    phase: verify
+  s29_build2_e2e_human_report:
+    path: .ovav/artifacts/S29/evidence/BUILD2_E2E_HUMAN_REPORT.md
+    phase: archive
+  s30_build2_closure_summary:
+    path: .ovav/artifacts/S30/S30_BUILD2_CLOSURE.md
+    phase: archive
+  s30_build2_final_readiness_matrix:
+    path: .ovav/artifacts/S30/BUILD2_FINAL_READINESS_MATRIX.json
+    phase: verify
+  s30_build2_closure_report:
+    path: .ovav/artifacts/S30/evidence/BUILD2_CLOSURE_REPORT.json
+    phase: verify
+  s30_build2_final_readiness_report:
+    path: .ovav/artifacts/S30/evidence/BUILD2_FINAL_READINESS_REPORT.json
+    phase: verify
+  s30_build2_human_closure_report:
+    path: .ovav/artifacts/S30/evidence/BUILD2_HUMAN_CLOSURE_REPORT.md
+    phase: archive
+  s30_build3_recommendations:
+    path: .ovav/artifacts/S30/evidence/BUILD3_RECOMMENDATIONS.md
+    phase: archive
+  build2_final_handoff:
+    path: .ovav/context/BUILD2_FINAL_HANDOFF.md
+    phase: archive
+  s31_build3_planning_freeze_summary:
+    path: .ovav/artifacts/S31/S31_BUILD3_PLANNING_FREEZE.md
+    phase: archive
+  s31_build3_segment_map:
+    path: .ovav/artifacts/S31/evidence/BUILD3_SEGMENT_MAP.json
+    phase: verify
+  s31_build3_scope_boundaries:
+    path: .ovav/artifacts/S31/evidence/BUILD3_SCOPE_BOUNDARIES.json
+    phase: verify
+  s31_build3_runtime_ux_requirements:
+    path: .ovav/artifacts/S31/evidence/BUILD3_RUNTIME_UX_REQUIREMENTS.json
+    phase: verify
+  s31_build3_auto_trigger_matrix:
+    path: .ovav/artifacts/S31/evidence/BUILD3_AUTO_TRIGGER_MATRIX.json
+    phase: verify
+  build3_current_handoff:
+    path: .ovav/context/BUILD3_CURRENT_HANDOFF.md
+    phase: archive
+  s32_runtime_next_work_summary:
+    path: .ovav/artifacts/S32/S32_RUNTIME_NEXT_WORK.md
+    phase: archive
+  s32_runtime_next_work_report:
+    path: .ovav/artifacts/S32/evidence/RUNTIME_NEXT_WORK_REPORT.json
+    phase: verify
+  s32_runtime_next_human_report:
+    path: .ovav/artifacts/S32/evidence/RUNTIME_NEXT_HUMAN_REPORT.md
+    phase: archive
+  s33_context_default_harness_index_summary:
+    path: .ovav/artifacts/S33/S33_CONTEXT_DEFAULT_HARNESS_INDEX.md
+    phase: archive
+  s33_harness_index_report:
+    path: .ovav/artifacts/S33/evidence/HARNESS_INDEX_REPORT.json
+    phase: verify
+  s33_context_default_entrypoint_report:
+    path: .ovav/artifacts/S33/evidence/CONTEXT_DEFAULT_ENTRYPOINT_REPORT.json
+    phase: verify
+  s33_context_default_human_report:
+    path: .ovav/artifacts/S33/evidence/CONTEXT_DEFAULT_HUMAN_REPORT.md
+    phase: archive
+  s34_handoff_runtime_ux_summary:
+    path: .ovav/artifacts/S34/S34_HANDOFF_RUNTIME_UX.md
+    phase: archive
+  s34_handoff_compaction_report:
+    path: .ovav/artifacts/S34/evidence/HANDOFF_COMPACTION_REPORT.json
+    phase: verify
+  s34_runtime_daily_source_report:
+    path: .ovav/artifacts/S34/evidence/RUNTIME_DAILY_SOURCE_REPORT.json
+    phase: verify
+  s34_runtime_ux_human_report:
+    path: .ovav/artifacts/S34/evidence/RUNTIME_UX_HUMAN_REPORT.md
+    phase: archive
+  s35_runtime_ux_hardening_summary:
+    path: .ovav/artifacts/S35/S35_RUNTIME_UX_HARDENING.md
+    phase: archive
+  s35_evidence_ledger_index_report:
+    path: .ovav/artifacts/S35/evidence/EVIDENCE_LEDGER_INDEX_REPORT.json
+    phase: verify
+  s35_runtime_workflow_hardening_report:
+    path: .ovav/artifacts/S35/evidence/RUNTIME_WORKFLOW_HARDENING_REPORT.json
+    phase: verify
+  s35_runtime_usability_human_report:
+    path: .ovav/artifacts/S35/evidence/RUNTIME_USABILITY_HUMAN_REPORT.md
+    phase: archive
+  s36_runtime_close_assistant_summary:
+    path: .ovav/artifacts/S36/S36_RUNTIME_CLOSE_ASSISTANT.md
+    phase: archive
+  s36_close_workflow_assistant_report:
+    path: .ovav/artifacts/S36/evidence/CLOSE_WORKFLOW_ASSISTANT_REPORT.json
+    phase: verify
+  s36_close_manifest_report:
+    path: .ovav/artifacts/S36/evidence/CLOSE_MANIFEST_REPORT.json
+    phase: verify
+  s36_close_snapshot_plan_report:
+    path: .ovav/artifacts/S36/evidence/CLOSE_SNAPSHOT_PLAN_REPORT.json
+    phase: verify
+  s36_runtime_close_human_report:
+    path: .ovav/artifacts/S36/evidence/RUNTIME_CLOSE_HUMAN_REPORT.md
+    phase: archive
+  s37_thavren_practical_workflow_summary:
+    path: .ovav/artifacts/S37/S37_THAVREN_PRACTICAL_WORKFLOW.md
+    phase: archive
+  s37_thavren_workflow_report:
+    path: .ovav/artifacts/S37/evidence/THAVREN_WORKFLOW_REPORT.json
+    phase: verify
+  s37_thavren_task_router_report:
+    path: .ovav/artifacts/S37/evidence/THAVREN_TASK_ROUTER_REPORT.json
+    phase: verify
+  s37_thavren_workflow_human_report:
+    path: .ovav/artifacts/S37/evidence/THAVREN_WORKFLOW_HUMAN_REPORT.md
+    phase: archive
+  s38_eidren_practical_workflow_summary:
+    path: .ovav/artifacts/S38/S38_EIDREN_PRACTICAL_WORKFLOW.md
+    phase: archive
+  s38_eidren_workflow_report:
+    path: .ovav/artifacts/S38/evidence/EIDREN_WORKFLOW_REPORT.json
+    phase: verify
+  s38_eidren_task_router_report:
+    path: .ovav/artifacts/S38/evidence/EIDREN_TASK_ROUTER_REPORT.json
+    phase: verify
+  s38_eidren_workflow_human_report:
+    path: .ovav/artifacts/S38/evidence/EIDREN_WORKFLOW_HUMAN_REPORT.md
+    phase: archive
+  s39_profile_workflow_hardening_summary:
+    path: .ovav/artifacts/S39/S39_PROFILE_WORKFLOW_HARDENING.md
+    phase: archive
+  s39_profile_workflow_hardening_report:
+    path: .ovav/artifacts/S39/evidence/PROFILE_WORKFLOW_HARDENING_REPORT.json
+    phase: verify
+  s39_profile_task_matrix_report:
+    path: .ovav/artifacts/S39/evidence/PROFILE_TASK_MATRIX_REPORT.json
+    phase: verify
+  s39_profile_workflow_human_report:
+    path: .ovav/artifacts/S39/evidence/PROFILE_WORKFLOW_HUMAN_REPORT.md
+    phase: archive
+  s40_opencode_source_local_usability_summary:
+    path: .ovav/artifacts/S40/S40_OPENCODE_SOURCE_LOCAL_USABILITY.md
+    phase: archive
+  s40_opencode_source_local_ux_report:
+    path: .ovav/artifacts/S40/evidence/OPENCODE_SOURCE_LOCAL_UX_REPORT.json
+    phase: verify
+  s40_opencode_pack_preview_report:
+    path: .ovav/artifacts/S40/evidence/OPENCODE_PACK_PREVIEW_REPORT.json
+    phase: verify
+  s40_opencode_handoff_guide_report:
+    path: .ovav/artifacts/S40/evidence/OPENCODE_HANDOFF_GUIDE_REPORT.json
+    phase: verify
+  s40_opencode_source_local_human_report:
+    path: .ovav/artifacts/S40/evidence/OPENCODE_SOURCE_LOCAL_HUMAN_REPORT.md
+    phase: archive
+  s41_todo_progress_runtime_summary:
+    path: .ovav/artifacts/S41/S41_TODO_PROGRESS_RUNTIME.md
+    phase: archive
+  s41_todo_progress_runtime_report:
+    path: .ovav/artifacts/S41/evidence/TODO_PROGRESS_RUNTIME_REPORT.json
+    phase: verify
+  s41_progress_state_report:
+    path: .ovav/artifacts/S41/evidence/PROGRESS_STATE_REPORT.json
+    phase: verify
+  s41_todo_action_router_report:
+    path: .ovav/artifacts/S41/evidence/TODO_ACTION_ROUTER_REPORT.json
+    phase: verify
+  s41_todo_progress_human_report:
+    path: .ovav/artifacts/S41/evidence/TODO_PROGRESS_HUMAN_REPORT.md
+    phase: archive
+  s42_memory_recall_ux_summary:
+    path: .ovav/artifacts/S42/S42_MEMORY_RECALL_UX.md
+    phase: archive
+  s42_memory_recall_ux_report:
+    path: .ovav/artifacts/S42/evidence/MEMORY_RECALL_UX_REPORT.json
+    phase: verify
+  s42_memory_candidate_preview_report:
+    path: .ovav/artifacts/S42/evidence/MEMORY_CANDIDATE_PREVIEW_REPORT.json
+    phase: verify
+  s42_memory_recall_human_report:
+    path: .ovav/artifacts/S42/evidence/MEMORY_RECALL_HUMAN_REPORT.md
+    phase: archive
+  s43_install_sandbox_usability_summary:
+    path: .ovav/artifacts/S43/S43_INSTALL_SANDBOX_USABILITY.md
+    phase: archive
+  s43_install_sandbox_ux_report:
+    path: .ovav/artifacts/S43/evidence/INSTALL_SANDBOX_UX_REPORT.json
+    phase: verify
+  s43_install_preview_router_report:
+    path: .ovav/artifacts/S43/evidence/INSTALL_PREVIEW_ROUTER_REPORT.json
+    phase: verify
+  s43_install_risk_rollback_guide_report:
+    path: .ovav/artifacts/S43/evidence/INSTALL_RISK_ROLLBACK_GUIDE_REPORT.json
+    phase: verify
+  s43_install_sandbox_ux_human_report:
+    path: .ovav/artifacts/S43/evidence/INSTALL_SANDBOX_UX_HUMAN_REPORT.md
+    phase: archive
+  s44_build3_use_friction_e2e_summary:
+    path: .ovav/artifacts/S44/S44_BUILD3_USE_FRICTION_E2E.md
+    phase: archive
+  s44_build3_use_friction_e2e_report:
+    path: .ovav/artifacts/S44/evidence/BUILD3_USE_FRICTION_E2E_REPORT.json
+    phase: verify
+  s44_build3_friction_score_report:
+    path: .ovav/artifacts/S44/evidence/BUILD3_FRICTION_SCORE_REPORT.json
+    phase: verify
+  s44_build3_use_friction_human_report:
+    path: .ovav/artifacts/S44/evidence/BUILD3_USE_FRICTION_HUMAN_REPORT.md
+    phase: archive
+  s45_build3_rc2_closure_summary:
+    path: .ovav/artifacts/S45/S45_BUILD3_RC2_CLOSURE.md
+    phase: archive
+  s45_build3_final_readiness_matrix:
+    path: .ovav/artifacts/S45/BUILD3_FINAL_READINESS_MATRIX.json
+    phase: verify
+  s45_build3_rc2_closure_report:
+    path: .ovav/artifacts/S45/evidence/BUILD3_RC2_CLOSURE_REPORT.json
+    phase: verify
+  s45_build3_final_readiness_report:
+    path: .ovav/artifacts/S45/evidence/BUILD3_FINAL_READINESS_REPORT.json
+    phase: verify
+  s45_build3_human_closure_report:
+    path: .ovav/artifacts/S45/evidence/BUILD3_HUMAN_CLOSURE_REPORT.md
+    phase: archive
+  s45_build4_recommendations:
+    path: .ovav/artifacts/S45/evidence/BUILD4_RECOMMENDATIONS.md
+    phase: archive
+  s46_build4_planning_freeze_summary:
+    path: .ovav/artifacts/S46/S46_BUILD4_PLANNING_FREEZE.md
+    phase: archive
+  s46_build4_segment_map:
+    path: .ovav/artifacts/S46/evidence/BUILD4_SEGMENT_MAP.json
+    phase: verify
+  s46_build4_scope_boundaries:
+    path: .ovav/artifacts/S46/evidence/BUILD4_SCOPE_BOUNDARIES.json
+    phase: verify
+  s46_preview_surface_graduation_policy:
+    path: .ovav/artifacts/S46/evidence/PREVIEW_SURFACE_GRADUATION_POLICY.json
+    phase: verify
+  s46_build4_activation_order:
+    path: .ovav/artifacts/S46/evidence/BUILD4_ACTIVATION_ORDER.json
+    phase: verify
+  s46_build4_blocked_surfaces:
+    path: .ovav/artifacts/S46/evidence/BUILD4_BLOCKED_SURFACES.json
+    phase: verify
+  build4_current_handoff:
+    path: .ovav/context/BUILD4_CURRENT_HANDOFF.md
+    phase: archive
+  s47_graduation_gate_runtime_summary:
+    path: .ovav/artifacts/S47/S47_GRADUATION_GATE_RUNTIME.md
+    phase: archive
+  s47_graduation_gate_runtime_report:
+    path: .ovav/artifacts/S47/evidence/GRADUATION_GATE_RUNTIME_REPORT.json
+    phase: verify
+  s47_preview_surface_state_report:
+    path: .ovav/artifacts/S47/evidence/PREVIEW_SURFACE_STATE_REPORT.json
+    phase: verify
+  s47_graduation_decision_human_report:
+    path: .ovav/artifacts/S47/evidence/GRADUATION_DECISION_HUMAN_REPORT.md
+    phase: archive
+  s48_opencode_repo_local_contract_summary:
+    path: .ovav/artifacts/S48/S48_OPENCODE_REPO_LOCAL_CONTRACT.md
+    phase: archive
+  s48_opencode_repo_local_contract_report:
+    path: .ovav/artifacts/S48/evidence/OPENCODE_REPO_LOCAL_CONTRACT_REPORT.json
+    phase: verify
+  s48_opencode_repo_local_boundaries_report:
+    path: .ovav/artifacts/S48/evidence/OPENCODE_REPO_LOCAL_BOUNDARIES_REPORT.json
+    phase: verify
+  s48_opencode_repo_local_contract_human_report:
+    path: .ovav/artifacts/S48/evidence/OPENCODE_REPO_LOCAL_CONTRACT_HUMAN_REPORT.md
+    phase: archive
+  s49_opencode_repo_local_pack_summary:
+    path: .ovav/artifacts/S49/S49_OPENCODE_REPO_LOCAL_PACK.md
+    phase: archive
+  s49_opencode_repo_local_pack_report:
+    path: .ovav/artifacts/S49/evidence/OPENCODE_REPO_LOCAL_PACK_REPORT.json
+    phase: verify
+  s49_opencode_repo_local_pack_writer_report:
+    path: .ovav/artifacts/S49/evidence/OPENCODE_REPO_LOCAL_PACK_WRITER_REPORT.json
+    phase: verify
+  s49_opencode_repo_local_pack_validation_report:
+    path: .ovav/artifacts/S49/evidence/OPENCODE_REPO_LOCAL_PACK_VALIDATION_REPORT.json
+    phase: verify
+  s49_opencode_repo_local_pack_human_report:
+    path: .ovav/artifacts/S49/evidence/OPENCODE_REPO_LOCAL_PACK_HUMAN_REPORT.md
+    phase: archive
+  s49_opencode_repo_local_pack_files:
+    path: .opencode/
+    phase: apply
+  s50_opencode_repo_local_smoke_summary:
+    path: .ovav/artifacts/S50/S50_OPENCODE_REPO_LOCAL_SMOKE.md
+    phase: archive
+  s50_opencode_repo_local_smoke_report:
+    path: .ovav/artifacts/S50/evidence/OPENCODE_REPO_LOCAL_SMOKE_REPORT.json
+    phase: verify
+  s50_opencode_session_manifest_report:
+    path: .ovav/artifacts/S50/evidence/OPENCODE_SESSION_MANIFEST_REPORT.json
+    phase: verify
+  s50_opencode_session_guidance_report:
+    path: .ovav/artifacts/S50/evidence/OPENCODE_SESSION_GUIDANCE_REPORT.json
+    phase: verify
+  s50_opencode_repo_local_smoke_human_report:
+    path: .ovav/artifacts/S50/evidence/OPENCODE_REPO_LOCAL_SMOKE_HUMAN_REPORT.md
+    phase: archive
+  s51_profile_session_contracts_summary:
+    path: .ovav/artifacts/S51/S51_PROFILE_SESSION_CONTRACTS.md
+    phase: archive
+  s51_profile_session_contracts_report:
+    path: .ovav/artifacts/S51/evidence/PROFILE_SESSION_CONTRACTS_REPORT.json
+    phase: verify
+  s51_profile_session_context_report:
+    path: .ovav/artifacts/S51/evidence/PROFILE_SESSION_CONTEXT_REPORT.json
+    phase: verify
+  s51_profile_session_policy_report:
+    path: .ovav/artifacts/S51/evidence/PROFILE_SESSION_POLICY_REPORT.json
+    phase: verify
+  s51_profile_session_contract_human_report:
+    path: .ovav/artifacts/S51/evidence/PROFILE_SESSION_CONTRACT_HUMAN_REPORT.md
+    phase: archive
+  s53_opencode_repo_local_e2e_summary:
+    path: .ovav/artifacts/S53/S53_OPENCODE_REPO_LOCAL_E2E_RC1.md
+    phase: archive
+  s53_opencode_repo_local_e2e_report:
+    path: .ovav/artifacts/S53/evidence/OPENCODE_REPO_LOCAL_E2E_REPORT.json
+    phase: verify
+  s53_opencode_repo_local_e2e_readiness_report:
+    path: .ovav/artifacts/S53/evidence/OPENCODE_REPO_LOCAL_E2E_READINESS_REPORT.json
+    phase: verify
+  s53_opencode_repo_local_e2e_human_report:
+    path: .ovav/artifacts/S53/evidence/OPENCODE_REPO_LOCAL_E2E_HUMAN_REPORT.md
+    phase: archive
+  s54_memory_read_probe_policy_summary:
+    path: .ovav/artifacts/S54/S54_MEMORY_READ_PROBE_POLICY.md
+    phase: archive
+  s54_memory_read_probe_policy_report:
+    path: .ovav/artifacts/S54/evidence/MEMORY_READ_PROBE_POLICY_REPORT.json
+    phase: verify
+  s54_memory_probe_boundaries_report:
+    path: .ovav/artifacts/S54/evidence/MEMORY_PROBE_BOUNDARIES_REPORT.json
+    phase: verify
+  s54_memory_probe_redaction_policy_report:
+    path: .ovav/artifacts/S54/evidence/MEMORY_PROBE_REDACTION_POLICY_REPORT.json
+    phase: verify
+  s54_memory_read_probe_policy_human_report:
+    path: .ovav/artifacts/S54/evidence/MEMORY_READ_PROBE_POLICY_HUMAN_REPORT.md
+    phase: archive
+  s55_memory_read_probe_sandbox_summary:
+    path: .ovav/artifacts/S55/S55_MEMORY_READ_PROBE_SANDBOX.md
+    phase: archive
+  s55_memory_read_probe_sandbox_report:
+    path: .ovav/artifacts/S55/evidence/MEMORY_READ_PROBE_SANDBOX_REPORT.json
+    phase: verify
+  s55_memory_probe_signal_simulator_report:
+    path: .ovav/artifacts/S55/evidence/MEMORY_PROBE_SIGNAL_SIMULATOR_REPORT.json
+    phase: verify
+  s55_memory_probe_candidate_filter_report:
+    path: .ovav/artifacts/S55/evidence/MEMORY_PROBE_CANDIDATE_FILTER_REPORT.json
+    phase: verify
+  s55_memory_read_probe_sandbox_human_report:
+    path: .ovav/artifacts/S55/evidence/MEMORY_READ_PROBE_SANDBOX_HUMAN_REPORT.md
+    phase: archive
+  s56_install_source_local_apply_policy_summary:
+    path: .ovav/artifacts/S56/S56_INSTALL_SOURCE_LOCAL_APPLY_POLICY.md
+    phase: archive
+  s56_install_source_local_apply_policy_report:
+    path: .ovav/artifacts/S56/evidence/INSTALL_SOURCE_LOCAL_APPLY_POLICY_REPORT.json
+    phase: verify
+  s56_install_apply_boundaries_report:
+    path: .ovav/artifacts/S56/evidence/INSTALL_APPLY_BOUNDARIES_REPORT.json
+    phase: verify
+  s56_install_backup_rollback_gate_report:
+    path: .ovav/artifacts/S56/evidence/INSTALL_BACKUP_ROLLBACK_GATE_REPORT.json
+    phase: verify
+  s56_install_source_local_apply_policy_human_report:
+    path: .ovav/artifacts/S56/evidence/INSTALL_SOURCE_LOCAL_APPLY_POLICY_HUMAN_REPORT.md
+    phase: archive
+  s57_install_source_local_apply_sandbox_summary:
+    path: .ovav/artifacts/S57/S57_INSTALL_SOURCE_LOCAL_APPLY_SANDBOX_RC.md
+    phase: archive
+  s57_install_source_local_apply_sandbox_report:
+    path: .ovav/artifacts/S57/evidence/INSTALL_SOURCE_LOCAL_APPLY_SANDBOX_REPORT.json
+    phase: verify
+  s57_install_apply_sandbox_manifest_report:
+    path: .ovav/artifacts/S57/evidence/INSTALL_APPLY_SANDBOX_MANIFEST_REPORT.json
+    phase: verify
+  s57_install_apply_rollback_sandbox_report:
+    path: .ovav/artifacts/S57/evidence/INSTALL_APPLY_ROLLBACK_SANDBOX_REPORT.json
+    phase: verify
+  s57_install_source_local_apply_sandbox_human_report:
+    path: .ovav/artifacts/S57/evidence/INSTALL_SOURCE_LOCAL_APPLY_SANDBOX_HUMAN_REPORT.md
+    phase: archive
+  s57_install_apply_sandbox_manifest:
+    path: .ovav/artifacts/S57/evidence/sandbox/simulated_apply_manifest.json
+    phase: verify
+  s57_install_apply_sandbox_backup_plan:
+    path: .ovav/artifacts/S57/evidence/sandbox/simulated_backup_plan.json
+    phase: verify
+  s57_install_apply_sandbox_rollback_plan:
+    path: .ovav/artifacts/S57/evidence/sandbox/simulated_rollback_plan.json
+    phase: verify
+  s57_install_apply_sandbox_affected_files:
+    path: .ovav/artifacts/S57/evidence/sandbox/simulated_affected_files.json
+    phase: verify
+  s57_install_apply_sandbox_safety_check:
+    path: .ovav/artifacts/S57/evidence/sandbox/simulated_safety_check.json
+    phase: verify
+  s58_build4_graduation_e2e_rc_summary:
+    path: .ovav/artifacts/S58/S58_BUILD4_GRADUATION_E2E_RC.md
+    phase: archive
+  s58_build4_graduation_e2e_report:
+    path: .ovav/artifacts/S58/evidence/BUILD4_GRADUATION_E2E_REPORT.json
+    phase: verify
+  s58_build4_graduation_readiness_report:
+    path: .ovav/artifacts/S58/evidence/BUILD4_GRADUATION_READINESS_REPORT.json
+    phase: verify
+  s58_build4_graduation_e2e_human_report:
+    path: .ovav/artifacts/S58/evidence/BUILD4_GRADUATION_E2E_HUMAN_REPORT.md
+    phase: archive
+  s59_build4_final_readiness_summary:
+    path: .ovav/artifacts/S59/S59_BUILD4_FINAL_READINESS.md
+    phase: archive
+  s59_build4_final_readiness_report:
+    path: .ovav/artifacts/S59/evidence/BUILD4_FINAL_READINESS_REPORT.json
+    phase: verify
+  s59_build4_surface_readiness_matrix:
+    path: .ovav/artifacts/S59/evidence/BUILD4_SURFACE_READINESS_MATRIX.json
+    phase: verify
+  s59_build4_blocked_surface_audit:
+    path: .ovav/artifacts/S59/evidence/BUILD4_BLOCKED_SURFACE_AUDIT.json
+    phase: verify
+  s59_build4_final_readiness_human_report:
+    path: .ovav/artifacts/S59/evidence/BUILD4_FINAL_READINESS_HUMAN_REPORT.md
+    phase: archive
+  s60_build4_closure_summary:
+    path: .ovav/artifacts/S60/S60_BUILD4_CLOSURE.md
+    phase: archive
+  s60_build4_closure_report:
+    path: .ovav/artifacts/S60/evidence/BUILD4_CLOSURE_REPORT.json
+    phase: verify
+  s60_build4_final_baseline_report:
+    path: .ovav/artifacts/S60/evidence/BUILD4_FINAL_BASELINE_REPORT.json
+    phase: verify
+  s60_build4_human_closure_report:
+    path: .ovav/artifacts/S60/evidence/BUILD4_HUMAN_CLOSURE_REPORT.md
+    phase: archive
+  s60_build5_recommendations:
+    path: .ovav/artifacts/S60/evidence/BUILD5_RECOMMENDATIONS.md
+    phase: archive
+  build4_final_handoff:
+    path: .ovav/context/BUILD4_FINAL_HANDOFF.md
+    phase: archive
+  s61_opencode_visible_role_freeze_summary:
+    path: .ovav/artifacts/S61/S61_OPENCODE_VISIBLE_ROLE_IDENTITY_FREEZE.md
+    phase: archive
+  s61_build5_opencode_ux_scope:
+    path: .ovav/artifacts/S61/evidence/BUILD5_OPENCODE_UX_SCOPE.json
+    phase: verify
+  s61_opencode_visible_role_policy:
+    path: .ovav/artifacts/S61/evidence/OPENCODE_VISIBLE_ROLE_POLICY.json
+    phase: verify
+  s61_opencode_identity_guard_policy:
+    path: .ovav/artifacts/S61/evidence/OPENCODE_IDENTITY_GUARD_POLICY.json
+    phase: verify
+  s61_build5_opencode_ux_human_report:
+    path: .ovav/artifacts/S61/evidence/BUILD5_OPENCODE_UX_HUMAN_REPORT.md
+    phase: archive
+  build5_current_handoff:
+    path: .ovav/context/BUILD5_CURRENT_HANDOFF.md
+    phase: archive
+  build5_doc_29:
+    path: docs/29_BUILD5_OPENCODE_USABILITY_ACTIVATION.md
+    phase: archive
+  s62_opencode_command_surface_summary:
+    path: .ovav/artifacts/S62/S62_OPENCODE_COMMAND_SURFACE.md
+    phase: archive
+  s62_opencode_command_surface_report:
+    path: .ovav/artifacts/S62/evidence/OPENCODE_COMMAND_SURFACE_REPORT.json
+    phase: verify
+  s62_opencode_agent_surface_report:
+    path: .ovav/artifacts/S62/evidence/OPENCODE_AGENT_SURFACE_REPORT.json
+    phase: verify
+  s62_opencode_skill_surface_report:
+    path: .ovav/artifacts/S62/evidence/OPENCODE_SKILL_SURFACE_REPORT.json
+    phase: verify
+  s62_opencode_identity_guard_report:
+    path: .ovav/artifacts/S62/evidence/OPENCODE_IDENTITY_GUARD_REPORT.json
+    phase: verify
+  s62_opencode_command_surface_human_report:
+    path: .ovav/artifacts/S62/evidence/OPENCODE_COMMAND_SURFACE_HUMAN_REPORT.md
+    phase: archive
+  s63_platform_engineering_session_rc_summary:
+    path: .ovav/artifacts/S63/S63_PLATFORM_ENGINEERING_SESSION_RC.md
+    phase: archive
+  s63_platform_engineering_session_rc_report:
+    path: .ovav/artifacts/S63/evidence/PLATFORM_ENGINEERING_SESSION_RC_REPORT.json
+    phase: verify
+  s63_platform_engineering_session_rc_human_report:
+    path: .ovav/artifacts/S63/evidence/PLATFORM_ENGINEERING_SESSION_RC_HUMAN_REPORT.md
+    phase: archive
+  s64_research_intelligence_session_rc_summary:
+    path: .ovav/artifacts/S64/S64_RESEARCH_INTELLIGENCE_SESSION_RC.md
+    phase: archive
+  s64_research_intelligence_session_rc_report:
+    path: .ovav/artifacts/S64/evidence/RESEARCH_INTELLIGENCE_SESSION_RC_REPORT.json
+    phase: verify
+  s64_research_intelligence_session_rc_human_report:
+    path: .ovav/artifacts/S64/evidence/RESEARCH_INTELLIGENCE_SESSION_RC_HUMAN_REPORT.md
+    phase: archive
+  s64_harness_intelligence_router_coverage:
+    path: .ovav/artifacts/S64/evidence/HARNESS_INTELLIGENCE_ROUTER_COVERAGE.json
+    phase: verify
+  s65_repo_local_work_loop_summary:
+    path: .ovav/artifacts/S65/S65_REPO_LOCAL_WORK_LOOP.md
+    phase: archive
+  s65_repo_local_work_loop_report:
+    path: .ovav/artifacts/S65/evidence/REPO_LOCAL_WORK_LOOP_REPORT.json
+    phase: verify
+  s65_repo_local_work_loop_human_report:
+    path: .ovav/artifacts/S65/evidence/REPO_LOCAL_WORK_LOOP_HUMAN_REPORT.md
+    phase: archive
+  s66_usability_e2e_summary:
+    path: .ovav/artifacts/S66/S66_OPENCODE_USABILITY_E2E.md
+    phase: archive
+  s66_usability_e2e_report:
+    path: .ovav/artifacts/S66/evidence/OPENCODE_USABILITY_E2E_REPORT.json
+    phase: verify
+  s66_usability_e2e_human_report:
+    path: .ovav/artifacts/S66/evidence/OPENCODE_USABILITY_E2E_HUMAN_REPORT.md
+    phase: archive
+  s66_surface_freshness_report:
+    path: .ovav/artifacts/S66/evidence/OPENCODE_SURFACE_FRESHNESS_REPORT.json
+    phase: verify
+  s67_build5_closure_summary:
+    path: .ovav/artifacts/S67/S67_BUILD5_CLOSURE.md
+    phase: archive
+  s67_build5_closure_report:
+    path: .ovav/artifacts/S67/evidence/BUILD5_CLOSURE_REPORT.json
+    phase: verify
+  s67_build5_final_baseline:
+    path: .ovav/artifacts/S67/evidence/BUILD5_FINAL_BASELINE_REPORT.json
+    phase: verify
+  s67_build5_closure_human_report:
+    path: .ovav/artifacts/S67/evidence/BUILD5_CLOSURE_HUMAN_REPORT.md
+    phase: archive
+  s67_build6_recommendations:
+    path: .ovav/artifacts/S67/evidence/BUILD6_RECOMMENDATIONS.md
+    phase: archive
+  m1_global_control_bridge_summary:
+    path: .ovav/artifacts/M1/GLOBAL_CONTROL_BRIDGE_M1.md
+    phase: archive
+  m1_global_control_bridge_report:
+    path: .ovav/artifacts/M1/evidence/GLOBAL_CONTROL_BRIDGE_M1_REPORT.json
+    phase: verify
+  m1_global_control_bridge_check_report:
+    path: .ovav/artifacts/M1/evidence/GLOBAL_CONTROL_BRIDGE_M1_CHECK_REPORT.json
+    phase: verify

@@ -1,0 +1,144 @@
+# Platform Engineering — Service Lanes
+# Each lane is a discrete work stream within the area.
+# Source: .ovav/service_areas/areas/platform_engineering.yaml
+
+area: platform_engineering
+lead: thavren
+version: "1.0.0"
+
+lanes:
+  architecture_contracts:
+    id: architecture_contracts
+    description: Contratos de arquitectura, integridad DAG, dependencias y diseño de cambios estructurales mínimos
+    squad: squad_sys_architect
+    artifacts:
+      - area_boundaries.yaml
+      - capabilities.yaml
+      - lanes.yaml
+    gates:
+      - check_f1_architecture.py
+      - check_harness_contract_alignment.py
+
+  repo_local_implementation:
+    id: repo_local_implementation
+    description: Implementación source-local, refactors, tests, parches de runtime y CLI
+    squad: squad_implementer_codex
+    backup_squad: squad_implementer_spark
+    artifacts:
+      - source files
+      - test files
+    gates:
+      - workspace_safety_gate.py
+      - check_protected_branch.py
+
+  opencode_experience:
+    id: opencode_experience
+    description: "Superficies de OpenCode: agentes, skills, comandos, permisos, configuración y DX"
+    squad: squad_sys_architect
+    artifacts:
+      - opencode.json
+      - clients/opencode/agents/
+      - .ovav/source/skills/
+      - .opencode/commands/
+    gates:
+      - check_opencode_runtime_wiring.py
+      - check_permission_policy_drift.py
+
+  runtime_governance:
+    id: runtime_governance
+    description: "Gobernanza de runtime: routers, gateways, sessions, context budget"
+    artifacts:
+      - tools/ovav_runtime.py
+      - tools/agent_runtime/
+      - .ovav/service_areas/shared/
+    gates:
+      - check_agent_runtime_enforcement.py
+      - check_context_firewall_v2.py
+
+  harness_validation:
+    id: harness_validation
+    description: Validadores, harnesses source-local, evidence checks y closure proof
+    squad: squad_code_reviewer
+    artifacts:
+      - tools/validators/
+      - tools/harnesses/
+    gates:
+      - check_harness_contract_alignment.py
+      - OVAV_EVIDENCE_MODE=strict validate
+
+  workstation_configuration:
+    id: workstation_configuration
+    description: "Configuración de workstation: WSL2, terminal, shell, paths, editor"
+    artifacts:
+      - ~/.config/wezterm/
+      - ~/.config/ovav/
+    gates:
+      - check_ovav_wezterm_workspace_isolation.py
+
+  install_backup_recovery:
+    id: install_backup_recovery
+    description: Instalación gobernada, backup/rollback y recovery
+    squad: squad_install_engineer
+    artifacts:
+      - tools/install/
+      - tools/install_gateway/
+    gates:
+      - check_install_governor.py
+      - check_install_source_local_apply_sandbox.py
+
+  adapters_protocols:
+    id: adapters_protocols
+    description: Adaptadores y protocolos de integración externa
+    artifacts:
+      - tools/adapters/
+      - tools/protocols/
+    gates:
+      - check_protocol_access_gate.py
+
+  memory_snapshot_continuity:
+    id: memory_snapshot_continuity
+    description: Continuidad de memoria, snapshots y state persistence
+    artifacts:
+      # tools/memory/ + .ovav/memory/ removed v52.0 (2026-06-11)
+      # Canonical state: git HEAD + caps.yaml
+    gates:
+      - check_memory_gateway.py  # DEPRECATED: imports stubbed
+      - check_snapshot_memory_policy.py
+
+  release_closure:
+    id: release_closure
+    description: Disciplina de release/cierre, handoff continuity, trace/evidence readiness
+    squad: squad_code_reviewer
+    artifacts:
+      - .ovav/artifacts/
+      - registry/
+    gates:
+      - check_final_launch_current_authority.py
+      - check_evidence_stability.py
+
+  launch_readiness:
+    id: launch_readiness
+    description: "Readiness de launch: smoke testing, verificación final, tag"
+    artifacts:
+      - .ovav/evaluation/
+    gates:
+      - check_final_launch_runtime_authority.py
+      - check_build18_launch_pack.py
+
+  security_scope:
+    id: security_scope
+    description: Superficies bloqueadas, boundaries de permisos, secretos, auth y scope risk
+    squad: squad_security_auditor
+    artifacts:
+      - .ovav/policy/permission_authority.json
+      - .ovav/security/
+    gates:
+      - check_L6_security_zero_trust.py
+      - check_secrets_hygiene.py
+
+# ── Lane Activation Rules ─────────────────────────────────────────────────
+activation_rules:
+  lead_resolves_first: true
+  delegation_by_size_risk: true
+  squads_never_default: true
+  user_never_sees_team: true

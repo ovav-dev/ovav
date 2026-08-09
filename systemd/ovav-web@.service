@@ -1,0 +1,26 @@
+[Unit]
+Description=OVAV Web Development Stack
+After=network.target
+
+[Service]
+Type=simple
+User=%u
+WorkingDirectory=/home/braka/Systems/OVAV
+ExecStart=/home/braka/Systems/OVAV/bin/ovav-watchdog.sh start
+ExecStop=/home/braka/Systems/OVAV/bin/ovav-watchdog.sh stop
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=on-failure
+RestartSec=5
+StandardOutput=append:/tmp/ovav-web-stdout.log
+StandardError=append:/tmp/ovav-web-stderr.log
+
+# Environment
+Environment=HOME=/home/braka
+Environment=USER=%u
+
+# Keep alive
+TimeoutStopSec=10
+KillMode=mixed
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,93 @@
+safe_stop_contract:
+  version: 1
+  purpose: >-
+    Define the required user-facing report when the host execution environment
+    interrupts work because of step, tool, timeout or action limits.
+
+  runtime_distinction:
+    host_runtime:
+      label: Host Runtime
+      meaning: OpenCode or the agent execution environment that can limit steps, tools, time or actions.
+      examples:
+        - tool-call limit
+        - step budget exhausted
+        - timeout
+        - host approval boundary
+    ovav_runtime:
+      label: OVAV Runtime
+      meaning: >-
+        OVAV governance system — routers, gateways, capsules, handoffs, validators, policies and evidence.
+      examples:
+        - Service Area Router
+        - Context Gateway
+        - Tool Gateway
+        - Session Capsule
+        - Handoff Protocol
+        - validators and harnesses
+
+  trigger:
+    - Host Runtime step/tool/action limit reached.
+    - Work cannot continue safely inside the current host execution budget.
+    - Validation or commit readiness is incomplete because the host stopped execution.
+
+  required_report:
+    title: Safe Stop Report
+    fields:
+      - State: PARTIAL / SAFE STOP / READY FOR COMMIT
+      - Stop reason
+      - Completed work
+      - Pending work
+      - Files changed
+      - Validators passed
+      - Validators not run
+      - Risk level
+      - Exact next action
+      - Commit allowed: yes/no
+
+  state_rules:
+    PARTIAL: Some work is complete, but required edits or validation remain unfinished.
+    SAFE_STOP: Work paused safely because the Host Runtime limit was reached; no vague completion claim is allowed.
+    READY_FOR_COMMIT: All scoped work and required validation are complete, with exact files reviewed and staged only if approved.
+
+  output_rules:
+    - Do not answer vaguely after a host limit.
+    - Do not claim completion when validation or review is missing.
+    - Distinguish Host Runtime limits from OVAV Runtime governance decisions.
+    - Include the exact next action a human or next session should run.
+
+  open_code_1_17_recovery:
+    description: >-
+      OpenCode 1.17+ provides one automatic context-overflow recovery attempt
+      before the session is killed. This recovery may compact context, preserve
+      recent tokens, and retry the interrupted turn.
+    important: >-
+      This is a HOST RUNTIME BEHAVIOR, not a configurable key in opencode.json.
+      The 2026-06-11 post-mortem confirmed that "recovery" is NOT a valid
+      opencode.json schema key. Do not attempt to add it to opencode.json.
+    behavior:
+      - One automatic retry is attempted when context overflow is detected.
+      - If the retry succeeds, the session continues without a safe stop.
+      - If the retry fails, the session is terminated and a safe stop report is required.
+    version_applies: ">=1.17.0"
+
+  host_runtime_limits:
+    context_overflow:
+      note: >-
+        OpenCode >=1.17.0 includes built-in context-overflow retry.
+        The safe stop report should distinguish between:
+        (a) overflow that was recovered by the host retry, and
+        (b) overflow that exhausted the retry and still failed.
+      retry_available: true
+      min_version: "1.17.0"
+
+  safe_stop_report_additions:
+    for_opencode_ge_1_17:
+      - field: context_overflow_retry_attempted
+        type: boolean
+        description: "Whether the host retry was attempted before this stop"
+      - >-
+        If retry was attempted and succeeded, the session should NOT produce a
+        safe stop report — work continues normally.
+      - >-
+        If retry was attempted and failed, mark State as SAFE_STOP and note
+        "Retry exhausted, context overflow fatal".

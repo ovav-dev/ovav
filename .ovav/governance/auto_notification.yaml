@@ -1,0 +1,32 @@
+schema: ovav.autonomous.notification.v1
+created: '2026-06-10T06:12:01.479024+00:00'
+channels:
+  chat:
+    enabled: true
+    method: session_context_alert
+  dashboard:
+    enabled: true
+    method: ovav-monitor.js
+  log:
+    enabled: true
+    path: .ovav/runtime/logs/autonomous_events.jsonl
+triggers:
+  pain_scorer_threshold:
+    level: critical
+    action: notify_ceo
+  lockdown_activated:
+    action: notify_ceo + log
+  budget_exhausted_95:
+    action: alert_visual
+  validator_failure:
+    action: log + self_heal
+  security_breach:
+    action: notify_ceo + lockdown
+ceo_notification:
+  method: session_message
+  format: compact
+  include:
+  - trigger
+  - severity
+  - recommended_action
+  - affected_systems

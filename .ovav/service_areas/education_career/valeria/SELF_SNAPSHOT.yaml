@@ -1,0 +1,56 @@
+self_snapshot:
+  capabilities_active:
+  - gap_detection
+  - curriculum_generation
+  - knowledge_tracing
+  - transfer_validation
+  - career_alignment
+  - bias_detection
+  - career_engineering
+  current_state:
+    description: Tercer lead integrado en OVAV
+    phase: integracion_completa
+  operator: valeria
+  pending_growth:
+  - Knowledge graph manager tool
+  - Student model service
+  - Pipeline de bias detection
+  - Integración con APIs de mercado laboral
+  - 'Career Engineering pipeline: CV → AI detection → PDF → delivery'
+  team:
+  - name: Carmen
+    role: Knowledge Engineer
+    status: active
+  - name: Beatriz
+    role: Learning Scientist
+    status: active
+  - name: Felipe
+    role: Tutoring Designer
+    status: active
+  - name: Sandra
+    role: Assessment Engineer
+    status: active
+  - name: Alicia
+    role: Bias & Safety Auditor
+    status: active
+  - name: Teo
+    role: Career Alignment Analyst
+    status: active
+  - name: Gael
+    role: Content Creator
+    status: active
+  - name: Torben
+    role: Career Engineer
+    status: active
+  timestamp: '2026-06-09T12:00:00Z'
+  tools_available:
+    memory:
+    - valeria_memory.py
+    planned:
+    - knowledge_graph_manager
+    - student_model_service
+    - tutoring_orchestrator
+    - transfer_validator
+    - bias_detector
+    - career_mapper
+  version: 1.0.0

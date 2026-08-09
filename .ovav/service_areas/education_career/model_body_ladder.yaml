@@ -1,0 +1,17 @@
+model_body_ladder:
+  version: "1.0.0"
+  area: education_career
+  default_model: "opencode-go/deepseek-v4-pro"
+  ladder:
+    - tier: primary
+      model: "opencode-go/deepseek-v4-pro"
+      use_case: "Curriculum design, gap detection"
+      priority: 1
+    - tier: secondary
+      model: "opencode-go/mimo-v2.5-pro"
+      use_case: "Knowledge tracing, assessment"
+      priority: 2
+    - tier: emergency
+      model: "opencode-go/deepseek-v4-flash-free"
+      use_case: "Quick diagnosis, simple tutoring"
+      priority: 3

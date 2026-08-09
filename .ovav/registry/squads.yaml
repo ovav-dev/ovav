@@ -1,0 +1,231 @@
+squads:
+  systems_architecture_squad:
+    owner_profile: ovav_systems_architect
+    owning_service_area: platform_engineering
+    lead: thavren
+    visible_by_default: false
+    default_activation: none
+    allowed_delegation_modes:
+    - focused_squad
+    - full_squad
+    - critical_squad
+    roles:
+    - Systems Architect
+    - Runtime & Routing Engineer
+    - Developer Experience Engineer
+    - Harness & Validation Engineer
+    - Automation Engineer
+    - Install & Recovery Engineer
+    - Security & Scope Auditor
+    - Release & Continuity Steward
+    activation_conditions:
+    - Service Area Router resolves platform_engineering.
+    - Lead resolves first and keeps lead_only or skill_only for micro/simple work.
+    - Delegation Router selects focused_squad, full_squad or critical_squad by size/risk.
+    - Context Gateway approves only task-scoped repo-local context.
+    - Tool Gateway approves source-local tools and blocks global/install/live surfaces
+      without grant.
+    required_gateways:
+    - Service Area Router
+    - Delegation Router
+    - Context Gateway
+    - Tool Gateway
+    - Delivery Contract
+    - Observability Trace for non-trivial work
+    validation_requirements:
+    - check_agent_runtime_enforcement.py
+    - check_opencode_runtime_wiring.py
+    - check_squad_normalization.py
+    historical_agents:
+      architecture_cartographer:
+        normalized_role: Systems Architect
+        responsibilities:
+        - map_system
+        - contracts
+        - dependencies
+      harness_engineer:
+        normalized_role: Harness & Validation Engineer
+        responsibilities:
+        - harnesses
+        - gates
+        - validators
+      opencode_integrator:
+        normalized_role: Developer Experience Engineer
+        responsibilities:
+        - agents
+        - skills
+        - commands
+        - adapters
+      security_auditor:
+        normalized_role: Security & Scope Auditor
+        responsibilities:
+        - permissions
+        - secrets
+        - risk
+      install_engineer:
+        normalized_role: Install & Recovery Engineer
+        responsibilities:
+        - backup
+        - rollback
+        - install
+      release_operator:
+        normalized_role: Release & Continuity Steward
+        responsibilities:
+        - git
+        - tags
+        - release_notes
+  research_analyst_squad:
+    owner_profile: ovav_research_analyst
+    owning_service_area: research_intelligence
+    lead: eidren
+    visible_by_default: false
+    default_activation: none
+    normalization_status: merge
+    merged_into: research_intelligence_squad
+    compatibility_boundary: retained as legacy registry alias; do not activate directly
+    allowed_delegation_modes:
+    - focused_squad
+    - full_squad
+    - critical_squad
+    roles:
+    - Research Strategist
+    - Source Verification Analyst
+    - Benchmark Analyst
+    - Evidence Scoring Analyst
+    - Technical Comparator
+    - Risk & Assumption Analyst
+    - Decision Synthesizer
+    - Research Delivery Editor
+    activation_conditions:
+    - Service Area Router resolves research_intelligence.
+    - Lead resolves first and keeps lead_only or skill_only for micro/simple work.
+    - Delegation Router selects focused_squad, full_squad or critical_squad by evidence/risk
+      needs.
+    - Context Gateway denies repo-root/internal context by default unless scoped permission
+      or sanitized handoff exists.
+    - Tool Gateway denies repo edits, git writes, install/apply and global config
+      by default.
+    required_gateways:
+    - Service Area Router
+    - Delegation Router
+    - Context Gateway
+    - Tool Gateway
+    - Delivery Contract
+    - Observability Trace for non-trivial work
+    validation_requirements:
+    - check_agent_runtime_enforcement.py
+    - check_opencode_runtime_wiring.py
+    - check_squad_normalization.py
+    historical_agents:
+      source_hunter:
+        normalized_role: Source Verification Analyst
+        responsibilities:
+        - find_sources
+        - source_map
+      evidence_critic:
+        normalized_role: Evidence Scoring Analyst
+        responsibilities:
+        - bias
+        - contradictions
+        - confidence
+      technical_benchmarker:
+        normalized_role: Benchmark Analyst
+        responsibilities:
+        - compare_systems
+        - score_features
+      data_synthesizer:
+        normalized_role: Decision Synthesizer
+        responsibilities:
+        - tables
+        - patterns
+        - scoring
+      narrative_editor:
+        normalized_role: Research Delivery Editor
+        responsibilities:
+        - human_report
+        - publication
+      decision_mapper:
+        normalized_role: Risk & Assumption Analyst
+        responsibilities:
+        - adopt_adapt_reject_monitor
+  research_intelligence_squad:
+    owner_profile: ovav_research_analyst
+    owning_service_area: research_intelligence
+    lead: eidren
+    visible_by_default: false
+    default_activation: none
+    allowed_delegation_modes:
+    - focused_squad
+    - full_squad
+    - critical_squad
+    roles:
+    - Research Strategist
+    - Source Verification Analyst
+    - Benchmark Analyst
+    - Evidence Scoring Analyst
+    - Technical Comparator
+    - Risk & Assumption Analyst
+    - Decision Synthesizer
+    - Research Delivery Editor
+    activation_conditions:
+    - Service Area Router resolves research_intelligence.
+    - Lead resolves first and keeps lead_only or skill_only for micro/simple work.
+    - Delegation Router selects focused_squad, full_squad or critical_squad by evidence/risk
+      needs.
+    - Context Gateway denies repo-root/internal context by default unless scoped permission
+      or sanitized handoff exists.
+    - Tool Gateway denies repo edits, git writes, install/apply and global config
+      by default.
+    required_gateways:
+    - Service Area Router
+    - Delegation Router
+    - Context Gateway
+    - Tool Gateway
+    - Delivery Contract
+    - Observability Trace for non-trivial work
+    validation_requirements:
+    - check_agent_runtime_enforcement.py
+    - check_opencode_runtime_wiring.py
+    - check_squad_normalization.py
+    historical_agents:
+      source_hunter:
+        normalized_role: Source Verification Analyst
+        responsibilities:
+        - find_sources
+        - source_map
+      evidence_critic:
+        normalized_role: Evidence Scoring Analyst
+        responsibilities:
+        - bias
+        - contradictions
+        - confidence
+      technical_benchmarker:
+        normalized_role: Benchmark Analyst
+        responsibilities:
+        - compare_systems
+        - score_features
+      data_synthesizer:
+        normalized_role: Decision Synthesizer
+        responsibilities:
+        - tables
+        - patterns
+        - scoring
+      narrative_editor:
+        normalized_role: Research Delivery Editor
+        responsibilities:
+        - human_report
+        - publication
+      decision_mapper:
+        normalized_role: Risk & Assumption Analyst
+        responsibilities:
+        - adopt_adapt_reject_monitor
+  health_performance_squad:
+    service_area: health_performance
+    lead: renata
+    profiles:
+    - ovav_health_performance
+    members:
+    - name: Renata
+      role: Lead — Health & Performance Science
+    owner_profile: ovav_health_performance
+    owning_service_area: health_performance

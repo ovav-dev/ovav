@@ -1,0 +1,29 @@
+{
+  "bridge_id": "global_projection_bridge_m2",
+  "files": [
+    {
+      "path": "opencode.jsonc",
+      "sha256": "8336a03cf34a195f949ab3e00cb623c93c1167f3607fe928d608b3cad49b23a6"
+    },
+    {
+      "path": "AGENTS.md",
+      "sha256": "1e3cc165f8eabfa05e3a2e035aeea69ab48165580528cb40ba3f9b49cad02cb6"
+    },
+    {
+      "path": "agents/ovav-platform-engineering.md",
+      "sha256": "4dcdd63a16222331fe0dc47e171d35e51fc37406b2a3a78c5996665a354415b6"
+    },
+    {
+      "path": "agents/ovav-research-intelligence.md",
+      "sha256": "668f33bbac57a5b4b675ab1dd4798958cbfb1833bf4f1d32e3773a6b333dc649"
+    }
+  ],
+  "global_writes_performed": false,
+  "home_writes_performed": false,
+  "intended_global_target": "~/.config/opencode",
+  "milestone": "M2",
+  "next_action": "Apply payload only in an explicitly authorized global segment/runtime that allows HOME writes.",
+  "payload_root": "/home/braka/Systems/OVAV/.ovav/artifacts/M2/global_projection_payload",
+  "plugin_installs_performed": false,
+  "status": "prepared_source_local_payload"
+}

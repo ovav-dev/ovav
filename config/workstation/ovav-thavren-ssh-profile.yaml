@@ -1,0 +1,59 @@
+profile_id: ovav-thavren-ssh-profile
+status: source_local_plan
+owner_scope: ovav_bab_private
+visible_service: OVAV Platform Engineering
+
+purpose:
+  - dedicated_github_remote_access_for_ovav_thavren
+  - reduce_repeated_passphrase_prompts_without_storing_secrets
+  - keep_user_global_identity_separate_from_ovav_identity
+
+recommended_mode:
+  transport: ssh
+  key_type: ed25519
+  key_scope: dedicated_to_ovav_thavren
+  passphrase_required: true
+  agent: ssh-agent
+  agent_lifetime_policy: daily_24h_or_until_session_closed
+  host_alias: github-ovav-thavren
+  remote_url_shape: git@github-ovav-thavren:ORG/REPO.git
+  shell_profile_template: config/fish/ovav-thavren-ssh-agent.fish.example
+  unlock_command: ovav_ssh_unlock
+  status_command: ovav_ssh_status
+  expected_prompt_behavior: ask_passphrase_once_per_24h_when_key_is_missing_or_expired
+
+upgrade_path:
+  fido2_security_key:
+    key_type: ed25519-sk
+    use_when: maximum_security_or_user_prefers_hardware_touch
+    tradeoff: requires_hardware_presence_and_possible_touch_prompts
+  password_manager_agent:
+    example: 1Password SSH Agent
+    use_when: user_already_trusts_password_manager_for_ssh_keys
+    tradeoff: external_dependency_outside_source_local_ovav
+
+must_not_store:
+  - private_keys
+  - passphrases
+  - github_tokens
+  - known_hosts_contents
+  - user_home_snapshots
+
+must_validate:
+  - ssh_template_exists
+  - fish_agent_template_exists
+  - ssh_template_has_dedicated_host_alias
+  - ssh_template_uses_identities_only
+  - fish_template_uses_limited_agent_lifetime
+  - fish_template_does_not_auto_unlock_on_startup
+  - ssh_template_does_not_contain_private_key_material
+  - recommended_remote_is_not_https
+  - ovav_does_not_require_secret_visibility
+
+blocked_until_explicit_install_approval:
+  - write_user_home_ssh_config
+  - generate_real_keypair
+  - change_git_remote
+  - start_or_modify_global_agent
+  - write_windows_user_config
+  - write_wezterm_global_config

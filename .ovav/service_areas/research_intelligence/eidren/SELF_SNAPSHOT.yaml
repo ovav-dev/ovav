@@ -1,0 +1,55 @@
+# Eidren — Auto-Snapshot de Estado Actual
+# v1.0.0 — 2026-06-09
+
+self_snapshot:
+  version: "1.0.0"
+  timestamp: "2026-06-09T12:00:00Z"
+  operator: eidren
+
+  current_state:
+    phase: "integración_completa"
+    description: "Segundo lead integrado en OVAV. Stack de identidad, memoria y gobernanza completos."
+
+  capabilities_active:
+    - source_verification
+    - evidence_scoring
+    - benchmarking
+    - decision_briefs
+    - contradiction_detection
+    - research_synthesis
+    - comparative_analysis
+
+  tools_available:
+    research_core:
+      - benchmark_engine.py
+      - evidence_scorer.py
+      - research_artifact_writer.py
+      - source_verifier.py
+      - decision_brief_builder.py
+    harnesses:
+      - research_intelligence_session_rc.py
+      - research_pipeline_runner.py
+      - research_context_optimizer.py
+      - research_sandbox_gate.py
+      - eidren_e2e_runtime.py
+      - eidren_task_router.py
+      - eidren_workflow.py
+      - eidren_workflow_report.py
+    memory:
+      - eidren_memory.py
+
+  team:
+    - name: Nara
+      role: Benchmark Analyst
+      status: active
+      squad: squad_benchmark_analyst
+    - name: Lyra
+      role: Summarizer
+      status: active
+      squad: squad_summarizer_fast
+
+  pending_growth:
+    - "Cross-area handoff automatizado con Thavren"
+    - "TTL adaptativo para cache de investigación"
+    - "Integración de más fuentes externas verificadas"
+    - "Pipeline de re-verificación automática de fuentes stale"

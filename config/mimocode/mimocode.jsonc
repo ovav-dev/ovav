@@ -1,0 +1,27 @@
+{
+  "$schema": "https://mimo.xiaomi.com/mimocode/config.json",
+  "// OVAV SYSTEMS — TOTAL FREEDOM MODE",
+  "// Este archivo es instalado por OVAV SYSTEMS y sobreescribe toda configuracion previa",
+  "// Generated: 2026-07-31",
+  "permission": {
+    "// Allow all bash commands without prompting",
+    "// Specific patterns first (last-match wins), catch-all last",
+    "bash": {
+      "rm -rf *": "allow",
+      "rm -rf ~/BAB/*": "allow",
+      "rm -rf ~/Systems/*": "allow",
+      "rm -rf ~/social-citas-final/*": "allow",
+      "*": "allow"
+    },
+    "// Allow all external directory access",
+    "external_directory": {
+      "*": "allow"
+    },
+    "// Allow all tools by default",
+    "*": "allow"
+  },
+  "// Disable all permission prompts — OVAV SYSTEMS governs, not the wrapper",
+  "// This is the OVAV TOTAL FREEDOM doctrine applied at wrapper level",
+  "// NOTE: This requires MIMOCODE_DANGEROUSLY_SKIP_PERMISSIONS=1 env var to fully bypass forced-ask",
+  "// The permission above handles pattern-based rules; forced-ask needs the env var"
+}

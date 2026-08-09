@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+
+# Source
+src/
+# Keep compiled JS in src/
+!src/**/*.js
+!src/**/*.d.ts
+!src/**/*.d.ts.map
+!src/**/*.js.map
+
+# Development
+*.test.ts
+tests/
+*.spec.ts
+
+# Config
+tsconfig.json
+.DS_Store
+*.log
+
+# Git
+.git
+.gitignore
+
+# CI
+.github/
+.gitlab-ci.yml
+.releaserc

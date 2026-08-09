@@ -1,0 +1,78 @@
+{
+  "name": "@ovav/pi-memory",
+  "version": "3.1.0",
+  "description": "OVAV MEMORY v3 — Proactive memory injection, LiveProfiler signal detection, F0-F5 governance validators, and permission gates for pi coding agent",
+  "type": "module",
+  "main": "./src/ovav-memory.js",
+  "types": "./src/ovav-memory.d.ts",
+  "exports": {
+    ".": {
+      "import": "./src/ovav-memory.js",
+      "types": "./src/ovav-memory.d.ts"
+    },
+    "./memory": {
+      "import": "./src/ovav-memory.js",
+      "types": "./src/ovav-memory.d.ts"
+    },
+    "./governance": {
+      "import": "./src/ovav-governance/registry.js",
+      "types": "./src/ovav-governance/registry.d.ts"
+    },
+    "./permissions": {
+      "import": "./src/ovav-permissions/gate.js",
+      "types": "./src/ovav-permissions/gate.d.ts"
+    },
+    "./audit": {
+      "import": "./src/ovav-audit/logger.js",
+      "types": "./src/ovav-audit/logger.d.ts"
+    }
+  },
+  "files": [
+    "src/"
+  ],
+  "scripts": {
+    "build": "tsc --project tsconfig.json",
+    "test": "node --test tests/*.test.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "ovav",
+    "pi",
+    "pi-extension",
+    "pi-package",
+    "memory",
+    "governance",
+    "agent",
+    "cell-store",
+    "live-profiler",
+    "permission-gate"
+  ],
+  "pi": {
+    "extensions": [
+      "./src/extensions/ovav-memory.ts"
+    ],
+    "skills": [
+      "./src/skills/ovav-governance"
+    ]
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "author": "OVAV Systems <systems@ovav.io>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ovav-systems/ovav"
+  },
+  "bugs": {
+    "url": "https://github.com/ovav-systems/ovav/issues"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.4.0"
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": ">=0.84.0"
+  }
+}

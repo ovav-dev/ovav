@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ovav.dev/schemas/semantic_drift.schema.json",
+  "title": "OVAV Semantic Drift Schema",
+  "description": "Detects authority conflicts across docs, registry, OpenCode config, service areas, permissions, runtime, and work ledger.",
+  "type": "object",
+  "required": ["drift_id", "evaluated_at", "sources_compared", "drift_cases", "final_severity"],
+  "properties": {
+    "drift_id": {"type": "string"},
+    "evaluated_at": {"type": "string", "format": "date-time"},
+    "sources_compared": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Sources compared in this drift scan"
+    },
+    "drift_cases": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/drift_case"}
+    },
+    "final_severity": {
+      "type": "string",
+      "enum": ["none", "low", "medium", "high", "critical"],
+      "description": "Highest severity found. High → blocks implementation. Medium → resolve before close."
+    },
+    "summary": {
+      "type": "object",
+      "properties": {
+        "total_checks": {"type": "integer"},
+        "conflicts_found": {"type": "integer"},
+        "high_severity": {"type": "integer"},
+        "medium_severity": {"type": "integer"},
+        "low_severity": {"type": "integer"}
+      }
+    }
+  },
+  "$defs": {
+    "drift_case": {
+      "type": "object",
+      "required": ["case_type", "source_a", "source_b", "severity", "detected"],
+      "properties": {
+        "case_type": {
+          "type": "string",
+          "enum": ["path_conflict", "branch_conflict", "permission_conflict", "identity_conflict", "capability_conflict", "validator_conflict", "blocked_surface_conflict", "model_identity_conflict"]
+        },
+        "source_a": {"type": "string"},
+        "source_b": {"type": "string"},
+        "description": {"type": "string"},
+        "severity": {"type": "string", "enum": ["low", "medium", "high", "critical"]},
+        "detected": {"type": "boolean"},
+        "evidence": {"type": "string"},
+        "resolution": {"type": "string"}
+      }
+    }
+  }
+}

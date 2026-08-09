@@ -1,0 +1,47 @@
+{
+  "schema_version": "ovav.final_launch_smoke_evidence.v1",
+  "generated_at": "2026-05-27T07:10:30Z",
+  "updated_at": "2026-05-27T07:45:00Z",
+  "issue": "#5 Final launch verification smoke evidence",
+  "branch": "task/rc8.3-experience-engine-foundation",
+  "base": "origin/develop@6ca89ce",
+  "final_commit": "85a23d8 (fix validate on develop) merged via PR #7 → develop@1d59fec",
+  "final_tag": "v1.0.0-rc8",
+  "status": "smoke_passed_final_launch_verification_closed",
+  "authority": {
+    "phase": "Final Launch Verification",
+    "baseline": "B23 Tool Readiness Matrix + Advanced Capability Boundary",
+    "blocked_claims": [
+      "production_ready",
+      "global_ready"
+    ]
+  },
+  "checks": [
+    {"command": "OVAV_EVIDENCE_MODE=strict python3 tools/ovav_runtime.py validate", "status": "pass"},
+    {"command": "python3 tools/validators/check_opencode_runtime_wiring.py", "status": "pass"},
+    {"command": "python3 tools/validators/check_permission_policy_drift.py", "status": "pass"},
+    {"command": "python3 tools/validators/check_agent_runtime_enforcement.py", "status": "pass"},
+    {"command": "python3 tools/validators/check_final_launch_current_authority.py", "status": "pass"},
+    {"command": "python3 tools/validators/check_final_launch_runtime_authority.py", "status": "pass"},
+    {"command": "python3 tools/validators/validate_all.py", "status": "pass"},
+    {"command": "python3 -B bin/ovav publish-check --json", "status": "pass"},
+    {"command": "python3 -B bin/ovav repo-check --json", "status": "pass"},
+    {"command": "python3 -B bin/ovav smoke --json", "status": "pass", "passed": 21, "failed": 0},
+    {"command": "python3 -B bin/ovav fresh-smoke --json", "status": "pass", "passed": 15, "failed": 0},
+    {"command": "python3 tools/cli/ovav_clean_install_smoke.py --json", "status": "pass"},
+    {"command": "python3 tools/ovav_runtime.py close-layer --latest --dry-run", "status": "dry_run_complete", "close_target_status": "not_closed"}
+  ],
+  "runtime_reports": [
+    ".ovav/runtime/reports/practical-smoke-report.json",
+    ".ovav/runtime/reports/fresh-clone-smoke-report.json"
+  ],
+  "implementation_fixes": [
+    "Aligned practical/fresh smoke with RC8.3 no-argument cockpit token `OVAV Launch`.",
+    "Made fresh-smoke and installer local source payloads include current working tree files instead of stale HEAD archives.",
+    "Made public export gate scan git-visible files and ignore ignored local payloads.",
+    "Allowed permission drift validation to run read-only in source archives without .git.",
+    "Split secret-marker fixture strings so public export scanning no longer flags validator fixtures as real secrets.",
+    "Fixed check_permission_policy_drift.py to run read-only on protected branches (develop/main). Uses evaluate_workspace_safety(mode=read) to detect protected branches, passes write=False to reconcile_all. Fixes validate crash on develop. Merged via PR #7."
+  ],
+  "remaining_blockers": []
+}

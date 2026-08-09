@@ -1,0 +1,109 @@
+# Platform Engineering — Area Boundaries
+# Canonical source: .ovav/service_areas/areas/platform_engineering.yaml
+# This file is a runtime projection derived from the area contract.
+
+area: platform_engineering
+canonical_area_name: "AI-Native Platform Engineering & Developer Experience"
+lead: thavren
+
+# ── What Platform Engineering COVERS ──────────────────────────────────────
+covers:
+  - windows_wsl2_workstation:
+      description: Windows, WSL2 y sistemas de workstation
+      examples: [WSL2 config, terminal setup, shell environment, editor integration]
+  - terminal_shell_editor_paths:
+      description: Terminal, shell, editor y paths del sistema
+      examples: [WezTerm, bash, zsh, PATH management, editor config]
+  - git_ssh_repo_structure:
+      description: Git, SSH y estructura de repositorios
+      examples: [Git config, SSH keys, repo layout, branching strategy]
+  - cli_internal_tooling:
+      description: CLI y tooling interno de OVAV
+      examples: [OVAV runtime, validators, harnesses, gates]
+  - opencode_surfaces:
+      description: Superficies de configuración y DX de OpenCode
+      examples: [opencode.json, agents, skills, commands, permissions]
+  - developer_experience:
+      description: Experiencia de desarrollo end-to-end
+      examples: [workflow, context economy, session routing, delegation]
+  - automation_ci_cd:
+      description: Automatización y CI/CD
+      examples: [scripts, validators, pre-commit hooks, GitHub Actions]
+  - runtime_governance:
+      description: Gobernanza de runtime OVAV
+      examples: [Service Area Router, Context Gateway, Tool Gateway, Delegation Router]
+  - context_tool_boundaries:
+      description: Boundaries de contexto y herramientas
+      examples: [Context Budget, Tool Gateway, Session Capsule]
+  - harnesses_validators:
+      description: Harnesses y validadores source-local
+      examples: [Workspace Safety Gate, Git Push Gate, Permission Drift, Host Drift]
+  - install_backup_rollback:
+      description: Instalación, backup y rollback gobernados
+      examples: [Install Governor, Backup Plan, Rollback Protocol]
+  - release_continuity:
+      description: Continuidad de release y cierre
+      examples: [Artifact flow, evidence chains, closure reports]
+  - technical_security:
+      description: Seguridad técnica y boundaries
+      examples: [Permission Authority, Blocked Surfaces, Secret Hygiene]
+  - observability_reliability:
+      description: Observabilidad y confiabilidad
+      examples: [Trace events, health checks, model watchdog]
+  - ai_native_platform_governance:
+      description: Gobernanza de plataforma AI-native
+      examples: [OVAV Law Compliance, Living Integrity, Lockdown Authority]
+
+# ── What Platform Engineering DOES NOT COVER ─────────────────────────────
+does_not_cover:
+  - visual_web_design:
+      description: Diseño web visual o landing pages como producto
+      route_to: "Web & Product Engineering (pendiente)"
+  - nutrition_fitness_health:
+      description: Nutrición, fitness o planificación de salud
+      route_to: "Human Performance (pendiente)"
+  - deep_research_reports:
+      description: Reportes de investigación profundos como servicio
+      route_to: "Eidren — Research Intelligence"
+  - brand_strategy:
+      description: Estrategia de marca
+      route_to: "Fuera de scope OVAV"
+  - medical_diagnosis:
+      description: Diagnóstico médico
+      route_to: "Fuera de scope OVAV"
+  - legal_diagnosis:
+      description: Diagnóstico legal
+      route_to: "Fuera de scope OVAV"
+  - web_product_build:
+      description: Construcción de producto web
+      route_to: "Web & Product Engineering (pendiente)"
+  - ai_agent_assistant_design:
+      description: Diseño de AI agents/assistants como producto
+      route_to: "AI Systems (pendiente)"
+
+# ── Internal Research (allowed within area scope) ────────────────────────
+internal_research_allowed:
+  - platform_tool_evaluation:
+      description: Evaluación y benchmarking de herramientas de plataforma
+  - terminal_editor_cli_comparison:
+      description: Comparación de terminal/editor/CLI para optimización de workstation
+  - ci_cd_tool_selection:
+      description: Selección de herramientas CI/CD para gobernanza de plataforma
+  - security_tool_evaluation:
+      description: Evaluación de herramientas de seguridad para hardening
+  - opencode_capability_research:
+      description: Investigación de capacidades de OpenCode para mejora de DX
+
+# ── Cross-Area Routing ───────────────────────────────────────────────────
+cross_area_routing:
+  research_questions:
+    route_to: "Eidren — Research Intelligence"
+    method: "handoff sanitizado con purpose, allowed_context, denied_context, scope, trace_id"
+  web_product_build:
+    route_to: "Web & Product Engineering Lead (pendiente)"
+  ai_system_design:
+    route_to: "AI Systems Lead (pendiente)"
+  health_nutrition:
+    route_to: "Human Performance Lead (pendiente)"
+  learning_skill:
+    route_to: "Learning Engineering Lead (pendiente)"

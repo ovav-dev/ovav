@@ -1,0 +1,60 @@
+# OVAV cPanel Backend — Fly.io Configuration (Tunnel Edition)
+# =============================================================================
+# App: ovav-systems (d678beea.ovav.dev — canonical non-indexable admin URL)
+# Architecture: cloudflared tunnel → Fly.io (no public IP, no open ports)
+# Public access ONLY through Cloudflare Edge → Tunnel → localhost:5858
+# cpanel.ovav.dev [DEPRECATED] → use d678beea.ovav.dev
+# Deploy: flyctl deploy --config fly.toml
+# =============================================================================
+
+app = "ovav-systems"
+primary_region = "dfw"
+
+[build]
+  dockerfile = "Dockerfile.cpanel"
+
+[build.args]
+  VERSION = "2.3.2"
+  GIT_BRANCH = "main"
+  GIT_SHA = "5479a280"
+
+[env]
+  PORT = "5858"
+  OVAV_ROOT = "/app"
+  OVAV_LISTEN_ADDR = "0.0.0.0"
+  # TUNNEL_TOKEN — Set via: flyctl secrets set TUNNEL_TOKEN=<token>
+
+# Service configuration — internal + minimal public for health keeping.
+# Primary access: cloudflared tunnel → d678beea.ovav.dev
+# Public port 5858 is rate-limited by Fly.io + app OAuth.
+[[services]]
+  internal_port = 5858
+  protocol = "tcp"
+  processes = ["app"]
+
+  [[services.ports]]
+    port = 80
+    handlers = ["http"]
+    force_https = true
+
+  [[services.ports]]
+    port = 443
+    handlers = ["tls", "http"]
+
+  [services.concurrency]
+    type = "connections"
+    hard_limit = 25
+    soft_limit = 20
+
+[[services.http_checks]]
+  interval = "15s"
+  timeout = "5s"
+  grace_period = "15s"
+  method = "get"
+  path = "/health"
+  protocol = "http"
+
+# Keep machines alive (tunnel needs running backend)
+[experimental]
+  auto_start_machines = true
+  auto_stop_machines = false

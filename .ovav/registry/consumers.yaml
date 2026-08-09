@@ -1,0 +1,48 @@
+# OVAV Consumer Registry — v2.0.0
+# Authority: INCIDENT-2026-07-16-bitel-agent + OWS-HARDENING-v0.1.0
+# Last updated: 2026-07-17
+
+schema: ovav.consumer_registry.v1
+
+consumers:
+  - id: bitel-agent
+    aliases: [bt-sys-react]
+    name: Bitel Agent (Call Center)
+    display_name: bitel-agent
+    root_path: /home/braka/Work/web/products/bt-sys-react
+    contact: Alexander Salvador
+    state: registered
+    waiver_path: .ovav/security/consumer_waivers/bt-sys-react.yaml
+    registered_at: "2026-07-16T21:52:19Z"
+    bootstrap_version: "2.0.0"
+    audit_destination: .ovav/runtime/logs/consumer_audit.jsonl
+
+    # v2.0.0: all 11 OWS commands granted (was: empty)
+    granted_subsystems:
+      - id: ows
+        commands: [owc, owd, owl, owv, ows, owclean, owm, owx, owa, owr, owlk]
+        flags:
+          owc: [--carry, --profile]
+          owd: [--resume, --compliance]
+          owl: [--zombie-only, --json, --history]
+          owv: [--verbose]
+          ows: [--rebase, --full]
+          owsuggest: [--explain]
+        boundaries:
+          git_operations: consumer_root_only
+          audit_required: true
+          self_recovery: own_worktrees_only
+
+    # External endpoints (CEO verified)
+    external_endpoints:
+      - url: https://api-bitel-agent.fly.dev
+        purpose: Bitel Agent API endpoint
+        verified_by: CEO
+        verified_at: "2026-07-16"
+
+    governor: Thavren - Lead, Platform Engineering
+    initialized_at: "2026-07-16T21:52:19Z"
+    last_updated: "2026-07-17T13:30:00Z"
+    purpose: >
+      Bitel-agent call center project. Registered via INCIDENT-2026-07-16.
+      Full OWS access with audit trail. Consumer bridge v2.0.0.

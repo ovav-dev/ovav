@@ -1,0 +1,9 @@
+capabilities:
+  version: "2.0.0"
+  area: ux_design
+  registered:
+    - {id: design_system, name: "Design System", status: active}
+    - {id: ux_research, name: "UX Research", status: active}
+    - {id: accessibility, name: "Accessibility (WCAG)", status: active}
+    - {id: prototyping, name: "Prototyping", status: active}
+    - {id: design_review, name: "Design Review", status: active}

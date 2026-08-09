@@ -1,0 +1,66 @@
+tool_policy:
+  authority:
+    canonical_source: .ovav/policy/permission_authority.json
+    host_configs_are: projections
+    drift_response: log_and_restore_ovav_policy
+  platform_engineering:
+    read_repo_files:
+      decision: allow_by_task
+    edit_repo_files:
+      decision: allow_by_task
+    run_validators:
+      decision: allow
+    git_status:
+      decision: allow
+    git_commit:
+      decision: allow_when_user_requested_and_workspace_safety_gate_passes
+    git_push:
+      decision: deny_raw_use_ovav_git_push_gate_with_user_confirmation
+    github_work_items:
+      decision: allow_gated_active_repo_only
+      allowed_operations:
+        - gh_auth_status
+        - gh_repo_view
+        - gh_issue_list
+        - gh_issue_view
+        - gh_issue_create_or_update_via_ovav_gh_issue_gate
+      denied_operations:
+        - token_printing
+        - auth_reconfiguration
+        - broad_gh_api
+        - releases_or_package_publishing
+        - non_active_repo_external_service_actions
+    install_apply:
+      decision: requires_capability_grant_backup_verify_rollback
+    global_config_write:
+      decision: requires_capability_grant_backup_verify_rollback
+    destructive_delete:
+      decision: requires_explicit_approval_and_backup
+
+  research_intelligence:
+    public_source_research:
+      decision: allow
+    benchmark_matrix:
+      decision: allow
+    evidence_scoring:
+      decision: allow
+    read_shared_governance:
+      decision: allow
+    read_repo_files:
+      decision: deny_by_default
+      exception: scoped_internal_review_or_sanitized_handoff
+    edit_repo_files:
+      decision: deny
+    git_write:
+      decision: deny
+    install_apply:
+      decision: deny
+    global_config_write:
+      decision: deny
+    read_raw_snapshots:
+      decision: deny
+
+fail_closed: true
+unknown_tool_decision: deny_or_requires_permission
+
+# LAW-001 governance: .ovav/laws/area_boundary_enforcement.yaml (Non-Invasion Area Boundary Law)

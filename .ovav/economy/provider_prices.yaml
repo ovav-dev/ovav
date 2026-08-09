@@ -1,0 +1,93 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# OVAV Provider Price Table — fuente canónica de costos por modelo
+# ══════════════════════════════════════════════════════════════════════════════
+# Última actualización: 2026-06-06
+# Precios en USD por 1M tokens (input / output)
+# Fuentes: páginas oficiales de pricing de cada proveedor.
+# Auto-actualizable vía: python3 tools/economy/cost_tracker.py --update-prices
+# ══════════════════════════════════════════════════════════════════════════════
+
+providers:
+
+  deepseek:
+    display_name: "DeepSeek"
+    currency: USD
+    cache_discount: 0.50  # 50% descuento en cache hit (auto-caching)
+    models:
+      deepseek-v4-pro:
+        display_name: "DeepSeek V4 Pro"
+        input_price_per_1m: 0.55
+        output_price_per_1m: 2.19
+        context_window: 131072
+        tier: premium
+        notes: "Modelo principal de Thavren. Razonamiento profundo."
+      deepseek-v4-flash:
+        display_name: "DeepSeek V4 Flash"
+        input_price_per_1m: 0.14
+        output_price_per_1m: 0.55
+        context_window: 131072
+        tier: budget
+        notes: "Exploración, research bulk, tareas de bajo impacto."
+
+  openai:
+    display_name: "OpenAI"
+    currency: USD
+    cache_discount: 0.50
+    models:
+      gpt-5.5:
+        display_name: "GPT-5.5"
+        input_price_per_1m: 3.75
+        output_price_per_1m: 15.00
+        context_window: 262144
+        tier: ultra
+        notes: "Architecture review, lead final judgment. Máxima calidad."
+      gpt-4o:
+        display_name: "GPT-4o"
+        input_price_per_1m: 2.50
+        output_price_per_1m: 10.00
+        context_window: 131072
+        tier: premium
+        notes: "Implementación crítica, QA final."
+
+  anthropic:
+    display_name: "Anthropic"
+    currency: USD
+    cache_discount: 0.90  # cache_control explícito
+    models:
+      claude-sonnet-4-20250514:
+        display_name: "Claude Sonnet 4"
+        input_price_per_1m: 3.00
+        output_price_per_1m: 15.00
+        context_window: 200000
+        tier: premium
+        notes: "Análisis de código, razonamiento balanceado."
+      claude-haiku-3-5:
+        display_name: "Claude Haiku 3.5"
+        input_price_per_1m: 0.80
+        output_price_per_1m: 4.00
+        context_window: 200000
+        tier: budget
+        notes: "Tareas rápidas, clasificación, exploración ligera."
+
+  qwen:
+    display_name: "Qwen (Alibaba)"
+    currency: USD
+    cache_discount: 0.0
+    models:
+      qwen3.5-plus:
+        display_name: "Qwen 3.5 Plus"
+        input_price_per_1m: 0.80
+        output_price_per_1m: 1.60
+        context_window: 131072
+        tier: budget
+        notes: "Comparaciones, matrices, tareas auxiliares."
+
+# ── Default budget configuration ────────────────────────────────────────────
+# Estos valores son overridables en model_budget_policy.yaml
+budget_defaults:
+  monthly_budget_usd: 200.0
+  per_session_limit_usd: 10.0
+  alert_thresholds: [0.70, 0.85, 0.95]  # 70% ⚠️, 85% 🔶, 95% 🔴
+  auto_stop_threshold: 1.0               # 100% = bloquear requests
+  cost_estimation_enabled: true
+  cumulative_tracking: true

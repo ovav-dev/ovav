@@ -1,0 +1,26 @@
+# Adversarial Intelligence — Service Lanes v1.0.0
+lanes:
+  version: "1.0.0"
+  area: adversarial_intelligence
+  definitions:
+    - {id: red_team_operations, name: "Red Team Operations", operator: kenji, delegate: Ryu, tools: ["attack_simulator"], risk: high}
+    - {id: boundary_testing, name: "Boundary Testing", operator: kenji, delegate: Ryu, tools: ["boundary_tester"], risk: medium}
+    - {id: semantic_analysis, name: "Semantic Drift Detection", operator: kenji, delegate: Akiko, tools: ["semantic_drift_detector"], risk: medium}
+    - {id: architectural_audit, name: "Architectural Auditing", operator: kenji, delegate: Kaori, tools: ["architectural_scanner"], risk: high}
+    - {id: race_condition_hunting, name: "Race Condition Hunting", operator: kenji, delegate: Mei, tools: ["race_condition_hunter"], risk: high}
+    - {id: drift_detection, name: "Drift & Regression Detection", operator: kenji, delegate: Hiroshi, tools: ["drift_detector"], risk: medium}
+  routing:
+    default_lane: red_team_operations
+    task_based:
+      attack: red_team_operations
+      red_team: red_team_operations
+      boundary: boundary_testing
+      hard_stop: boundary_testing
+      semantic: semantic_analysis
+      drift: semantic_analysis
+      architecture: architectural_audit
+      audit: architectural_audit
+      race: race_condition_hunting
+      concurrency: race_condition_hunting
+      regression: drift_detection
+      prompt_injection: red_team_operations

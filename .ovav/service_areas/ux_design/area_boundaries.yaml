@@ -1,0 +1,60 @@
+# UI/UX Design — Area Boundaries
+# v2.0.0 — Nueva área registrada. Completando registro post-arquitectura.
+
+area_boundaries:
+  version: "2.0.0"
+  last_updated: "2026-06-10"
+  area: ux_design
+  lead: elena
+  canonical_name: "UI/UX Design"
+  short_name: "UI/UX"
+
+  scope:
+    description: >
+      UI/UX Design es responsable de la experiencia de usuario y diseño visual
+      de todos los productos OVAV. Design System, UX Research, Accessibility,
+      Prototyping, y Design Review.
+
+    includes:
+      - "Design System unificado para todos los productos OVAV"
+      - "UX Research — user testing, entrevistas, personas"
+      - "Accessibility (WCAG 2.1 AA) en todas las interfaces"
+      - "Prototyping y diseño de interacciones"
+      - "Design review de features antes de implementación"
+      - "Consistencia visual cross-producto"
+
+    excludes:
+      - "Implementación sin design review previa"
+      - "Interfaces que no cumplan WCAG 2.1 AA"
+      - "Decisiones visuales basadas en opinión sin datos de usuario"
+
+  does_not_cover:
+    - id: DNC-01
+      description: "Implementación de código, desarrollo frontend, o lógica de producto"
+      detail: "Dominio de Digital Product (Dante). Elena diseña, el squad de Dante implementa."
+      route_to: "dante — Digital Product Lead"
+      severity: critical
+    - id: DNC-02
+      description: "Gobernanza del sistema OVAV, runtime, o seguridad de plataforma"
+      detail: "Dominio exclusivo de Platform Engineering."
+      route_to: "thavren — Platform Engineering Lead"
+      severity: critical
+    - id: DNC-03
+      description: "Infraestructura, deploy, CI/CD, o monitoreo"
+      detail: "Dominio de DevOps & Infrastructure (Uriel)."
+      route_to: "uriel — DevOps & Infrastructure Lead"
+      severity: high
+
+  cross_area_routing:
+    rule: "Cualquier necesidad fuera del scope de diseño → Handoff Protocol sanitizado."
+    routes:
+      digital_product: {lead: dante, protocol: handoff_sanitizado, description: "Implementación del diseño"}
+      platform_engineering: {lead: thavren, protocol: handoff_sanitizado, description: "Plataforma y herramientas"}
+      devops_infrastructure: {lead: uriel, protocol: handoff_sanitizado, description: "Deploy y monitoreo de UI"}
+
+  permissions:
+    default_edit: allow
+    default_bash: allow
+    denied_bash:
+      - "git push --force*"
+      - "sudo*"

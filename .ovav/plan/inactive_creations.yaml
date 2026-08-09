@@ -1,0 +1,376 @@
+inventory_version: 1.0
+inventory_date: 2026-07-15 12:30 UTC-5
+total_inactive_entries: 38
+python_dead_code:
+  description: 'Archivos Python con bloque `if __name__ == ''__main__''` que ningún otro
+
+    archivo en tools/ importa. Son ejecutables independientes que nadie llama.
+
+    Pueden ser features completas nunca activadas o código abandonado.
+
+    '
+  total: 166
+  total_loc_estimate: ~35,000 LOC
+  by_category:
+    harnesses:
+      count: 0
+      priority: ✅ ELIMINADO Sprint 6 T5 (228 archivos -26.7K LOC)
+      files: []
+    agent_runtime:
+      count: 24
+      priority: ALTA — sistema nervioso operacional
+      files:
+      - tools/agent_runtime/agent_brain.py
+      - tools/agent_runtime/agent_heartbeat.py
+      - tools/agent_runtime/agent_identity.py
+      - tools/agent_runtime/agent_mesh.py
+      - tools/agent_runtime/agent_mesh_discovery.py
+      - tools/agent_runtime/agent_role_manifest.py
+      - tools/agent_runtime/agent_specialization.py
+      - tools/agent_runtime/capability_ledger.py
+      - tools/agent_runtime/context_bridge.py
+      - tools/agent_runtime/context_cut_protocol.py
+      - tools/agent_runtime/context_memory.py
+      - tools/agent_runtime/directive_compiler.py
+      - tools/agent_runtime/evaluation_ledger.py
+      - tools/agent_runtime/gate_checkpoint.py
+      - tools/agent_runtime/mesh_topology.py
+      - tools/agent_runtime/neural_signature.py
+      - tools/agent_runtime/prompt_compiler.py
+      - tools/agent_runtime/protocol_handshake.py
+      - tools/agent_runtime/recovery_ledger.py
+      - tools/agent_runtime/response_compiler.py
+      - tools/agent_runtime/session_ledger.py
+      - tools/agent_runtime/skill_routing.py
+      - tools/agent_runtime/specialization_router.py
+      - tools/agent_runtime/task_context_bridge.py
+    governor:
+      count: 19
+      priority: CRÍTICA — gobierno central del sistema
+      files:
+      - tools/governor/attribution_seal.py
+      - tools/governor/context_budget.py
+      - tools/governor/context_budget_task_router.py
+      - tools/governor/context_economy.py
+      - tools/governor/context_firewall.py
+      - tools/governor/dante_memory.py
+      - tools/governor/governor_alert.py
+      - tools/governor/governor_brain.py
+      - tools/governor/governor_cli.py
+      - tools/governor/handoff_evaluator.py
+      - tools/governor/milestone_recognition.py
+      - tools/governor/output_guard.py
+      - tools/governor/ovav_governor.py
+      - tools/governor/plugin_security_gate.py
+      - tools/governor/response_contract.py
+      - tools/governor/self_diagnosis.py
+      - tools/governor/session_budget.py
+      - tools/governor/thavren_memory.py
+      - tools/governor/unified_health.py
+    cli:
+      count: 19
+      priority: ALTA — interfaz de usuario operacional
+      files:
+      - tools/cli/ovav_backup_manager.py
+      - tools/cli/ovav_capa7_cli.py
+      - tools/cli/ovav_cpanel.py
+      - tools/cli/ovav_execution_gateway.py
+      - tools/cli/ovav_fresh_clone_smoke.py
+      - tools/cli/ovav_install_smoke.py
+      - tools/cli/ovav_official_update.py
+      - tools/cli/ovav_oneclick_installer.py
+      - tools/cli/ovav_plan_artifacts.py
+      - tools/cli/ovav_plan_dashboard.py
+      - tools/cli/ovav_practical_smoke.py
+      - tools/cli/ovav_profile.py
+      - tools/cli/ovav_public_cli.py
+      - tools/cli/ovav_public_export_gate.py
+      - tools/cli/ovav_release_package.py
+      - tools/cli/ovav_repo_presentation_gate.py
+      - tools/cli/ovav_surface_manager.py
+      - tools/cli/ovav_tool_configs.py
+      - tools/cli/ovav_tui.py
+    permissions:
+      count: 11
+      priority: ALTA — sistema de permisos
+      files:
+      - tools/permissions/bash_commands.py
+      - tools/permissions/claims_governance.py
+      - tools/permissions/config_governance.py
+      - tools/permissions/live_behavior.py
+      - tools/permissions/plugin_governance.py
+      - tools/permissions/research_profile.py
+      - tools/permissions/sandbox_governance.py
+      - tools/permissions/simulate.py
+      - tools/permissions/system_paths.py
+      - tools/permissions/temporal_scoped.py
+      - tools/permissions/unsafe_selectors.py
+    security:
+      count: 6
+      priority: CRÍTICA — defensa del sistema
+      files:
+      - tools/security/auto_credentials.py
+      - tools/security/defense_cortex.py
+      - tools/security/host_defense_responder.py
+      - tools/security/integrity_repair.py
+      - tools/security/intelligent_authorizer.py
+      - tools/security/system_health_scheduler.py
+    varios:
+      count: 35
+      priority: MEDIA-BAJA
+      files:
+      - tools/agents/project_opencode.py
+      - tools/build/package_ovav_product.py
+      - tools/dev/visual_sandbox.py
+      - tools/economy/dashboard.py
+      - tools/education/career_compiler.py
+      - tools/education/career_router.py
+      - tools/education/certificate_generator.py
+      - tools/education/curriculum_compiler.py
+      - tools/git/auto_correct.py
+      - tools/git/check_ledger_gates.py
+      - tools/github/ovav_gh_issue_gate.py
+      - tools/hooks/install_hooks.py
+      - tools/hooks/protection_perms.py
+      - tools/install/ovav_clean_uninstall.py
+      - tools/knowledge/seed_knowledge.py
+      - tools/maintenance/cleanup_ledger.py
+      - tools/mcp/ovav_mcp_server.py
+      - tools/memory/memory_orchestrator.py
+      - tools/migration/migrate_agents_to_yaml.py
+      - tools/model_integrity/experiment_e0.py
+      - tools/model_integrity/ovav_gateway.py
+      - tools/ovav_dashboard.py
+      - tools/platform/cross_platform_paths.py
+      - tools/prompt/prompt_architect.py
+      - tools/sandbox/sandbox_test.py
+      - tools/skills/refresh_registry.py
+      - tools/validators/validate_all.py
+      - tools/visual/project_opencode_visual.py
+      - tools/visual/release_pipeline.py
+      - tools/web/fetch_orchestrator.py
+      - tools/web/ovav_multimedia.py
+      - tools/web/research_cache.py
+      - tools/work_session/work_session_queue.py
+      - tools/workstation/ovav_wezterm_workspace.py
+      - tools/workstation/ovav_workstation_access.py
+python_living_but_deprecated:
+  description: 'Herramientas Python que SÍ son importadas por otros archivos
+
+    (están cableadas) pero pertenecen a sistemas deprecados
+
+    (sistemas deprecados). Migrar a Go o eliminar.
+
+    '
+  memory_system:
+    status: ✅ ELIMINADO — tools/memory/ completo borrado. Importadores actualizados.
+    migration_strategy: 'Sistema memory eliminado completamente. Archivos importadores actualizados
+
+      para usar git HEAD + caps.yaml como fuente canónica.
+
+      '
+go_validators_wired_untested:
+  description: 'Los 82 validadores Go están TODOS registrados en DefaultRegistry()
+
+    (validators.go). Son funcionales y se ejecutan en `ovav validate`.
+
+    PERO solo existe 1 archivo de test para 82 validadores.
+
+    Están "cableados" pero su corrección no está verificada.
+
+    '
+  total: 82
+  registered_in_default_registry: 82
+  test_files: 1
+  test_coverage: 73.0%
+  validation_layers:
+    L0_RUNTIME_SAFETY:
+      count: 9
+      validators:
+      - secrets_hygiene
+      - exfil_patterns
+      - supply_chain
+      - protected_branch
+      - workspace_safety
+      - git_push
+      - permission_drift
+      - runtime_integrity
+      - contract_freshness
+    L1_ARCHITECTURE:
+      count: 6
+      validators:
+      - architecture_compliance
+      - architecture_governance
+      - architecture_guardian
+      - contract_enforcement
+      - caps_single_next
+      - caps_schema
+      - caps_chronos_alignment
+    L2_SECURITY:
+      count: 11
+      validators:
+      - security_policy
+      - security_hardening
+      - advanced_hardening
+      - zero_trust
+      - credential_governance
+      - network_hardening
+      - plugin_security
+      - config_integrity
+      - install_verification
+      - red_team_audit
+      - gate_self_protection
+    L3_OPERATIONS:
+      count: 7
+      validators:
+      - merge_readiness
+      - release_gate
+      - head_integrity
+      - workspace_isolation
+      - host_config_drift
+      - runtime_wiring
+      - surface_drift
+    L4_QUALITY:
+      count: 9
+      validators:
+      - config_syntax
+      - single_authority
+      - registry_drift
+      - registry_validator
+      - handoff_sync
+      - canonical_integrity
+      - stale_artifact_references
+      - validator_coverage
+      - todo_debt
+    L5_AGENT_GOVERNANCE:
+      count: 18
+      validators:
+      - agent_governance
+      - agent_runtime_enforcement
+      - agent_surface_hierarchy
+      - agent_permission_invariants
+      - agent_ux_visual_delivery
+      - context_firewall
+      - context_firewall_v2
+      - context_economy
+      - thought_firewall
+      - session_context_guard
+      - behavioral_directives
+      - model_policy
+      - tool_readiness
+      - service_profiles
+      - service_area_router
+      - service_area_governance
+      - skills
+      - bootstrap_chain
+    L6_CROSS_CUTTING:
+      count: 14
+      validators:
+      - feedback_loop
+      - harness_integrity
+      - harness_contract_alignment
+      - f1_architecture
+      - f2_infrastructure
+      - f3_roles
+      - cross_target_consistency
+      - multi_platform
+      - squad_normalization
+      - tool_config_profiles
+      - phase_dag
+      - ledger_write_path
+      - memory_policy
+      - lead_scope
+      - rego_policies
+      - invalid_fixtures
+      - ssh_profile
+      - wezterm_path_integrity
+go_isolated_packages:
+  description: 'Paquetes Go que compilan y tienen tests pero ningún otro
+
+    paquete los importa. Están construidos pero no integrados
+
+    al flujo principal.
+
+    '
+  packages:
+  - package: license
+    imports_from_others: 0
+    status: Compila, tiene tests (69.9% coverage), pero NADIE lo usa
+    action: Integrar en ovav CLI o eliminar
+  - package: status
+    imports_from_others: 0
+    status: Compila, 0 tests, NADIE lo usa
+    action: Integrar en ovav status o eliminar
+  - package: project
+    imports_from_others: 0
+    status: Compila, 0 tests, NADIE lo usa
+    action: Integrar en owc o eliminar
+  - package: infra
+    imports_from_others: 1 (solo ovav CLI)
+    status: Nuevo, 0 tests, solo importado por cmd/ovav
+    action: 'Agregar tests (prioridad: coverage 0→70%)'
+  - package: chronos
+    imports_from_others: 1 (solo ovav CLI)
+    status: Usado solo por CLI, 67.6% coverage
+    action: OK — usage válido. Mejorar coverage 67.6→85%
+harnesses_not_in_cicd:
+  description: '0 de los 316 harnesses Python están cableados a GitHub Actions.
+
+    Ningún workflow de CI/CD referencia tools/harnesses/.
+
+    Los 64 check_* harnesses y 63 checks/ están completamente
+
+    fuera del pipeline de integración continua.
+
+    '
+  total_harnesses: 316
+  in_cicd: 0
+  fix: Crear workflow .github/workflows/harnesses.yml que ejecute los harnesses críticos
+fish_functions_gap:
+  caps_claimed: 13
+  repo_actual: 11
+  missing: 2
+  action: Identificar las 2 funciones faltantes y decidir si crear o actualizar caps
+migration_priority:
+  tier_1_immediate:
+    goal: Activar lo ya construido que es crítico
+    items:
+    - Instalar git hooks (tools/hooks/install_hooks.py → activar)
+    - Cablear harnesses a CI/CD (crear harnesses.yml workflow)
+    - Integrar paquete license en ovav CLI
+    - Integrar paquete status en ovav status command
+    - Activar tools/security/defense_cortex.py → migrar a Go
+    - Activar tools/governor/output_guard.py → migrar a Go
+    - Activar tools/governor/unified_health.py → migrar a Go
+  tier_2_short_term:
+    goal: Migrar herramientas Python completas a Go
+    items:
+    - tools/governor/ (19 archivos inactivos) → Go governor package
+    - tools/permissions/ (11 archivos inactivos) → Go permissions package
+    - tools/security/ (6 archivos inactivos) → integrar en Go security validators
+    - tools/agent_runtime/ (24 archivos inactivos) → evaluar cuáles migrar
+  tier_3_medium_term:
+    goal: Activar features completas no utilizadas
+    items:
+    - tools/cli/ (19 CLIs inactivos) → integrar en ovav CLI Go
+    - tools/web/ (3 herramientas web) → evaluar utilidad
+    - tools/visual/ (2 visualizadores) → integrar en cockpit TUI
+  tier_4_eliminate:
+    goal: Eliminar código deprecado sin valor
+    items:
+    - tools/memory/ COMPLETO (32 archivos, ~10K LOC) — ELIMINADO
+    - tools/validators/validate_all.py (reemplazado por Go)
+    - tools/migration/migrate_agents_to_yaml.py (migración completada)
+summary:
+  total_creations_built: ~900 (636 py + 178 go + 82 validators + 316 harnesses)
+  total_inactive: 38
+  breakdown:
+    python_dead_code: 0 entry points (TODOS eliminados Sprint 6)
+    go_validators_untested: 82 (todos cableados, 1 test file)
+    go_isolated_packages: 4 (license, status, project, infra)
+    harnesses_not_in_cicd: 316 (0 en GitHub Actions)
+    fish_functions_gap: 2
+  duplication_note: Algunos ítems se solapan (harnesses dead code ya contados en python_dead_code)
+  unique_inactive_creations: ~250 herramientas/validadores/sistemas construidos pero no usados
+  estimated_loc_inactive: ~50,000-60,000 LOC
+updated_by: thavren

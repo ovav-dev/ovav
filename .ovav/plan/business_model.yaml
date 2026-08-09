@@ -1,0 +1,610 @@
+# OVAV Business Model — Canonical
+# =============================================================================
+# Generated: 2026-06-15 20:40 UTC-5
+# Author: Sofía (Commercial & Growth Strategy Lead)
+# Squad: Gabriela (Market Intelligence, 🇬🇧) + Julián (Sales & Revenue, 🇪🇸)
+# Authority: CEO Alexander Salvador
+# Segment: SEG-6 / X6-COMMERCIAL
+#
+# Este documento define la estrategia comercial de OVAV:
+# propuesta de valor (reframed: capa de gobernanza profesional, 
+# tool-agnostic), pricing con justificación "Layer Above", 
+# mercado objetivo, diferenciación competitiva y estrategia go-to-market.
+# =============================================================================
+
+version: 2
+document_type: "business_model"
+canonical_parent: ".ovav/plan/caps.yaml"
+segment: "SEG-6"
+task_id: "X6-COMMERCIAL"
+status: "ceo_approved_reframe"
+created_at: "2026-06-15 20:40 UTC-5"
+updated_at: "2026-06-16 02:45 UTC-5"
+created_by: "sofia"
+squad: ["gabriela", "julian"]
+next_review: "2026-06-22 UTC-5"  # 1 semana — validar con CEO
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 1. PROPUESTA DE VALOR
+# ═══════════════════════════════════════════════════════════════════════════
+
+value_proposition:
+  one_liner: >
+    OVAV — Gobernanza profesional de desarrollo. Ocho perfiles expertos
+    orquestan tu ciclo completo de desarrollo con evidencia, estándares
+    y control total. La capa profesional por encima de tus herramientas.
+
+  elevator_pitch: >
+    Las herramientas que usás — editores, modelos de lenguaje, plataformas
+    de deploy — son instrumentos. OVAV es el director de orquesta. Ocho
+    perfiles profesionales trabajan en paralelo, con modelos múltiples,
+    generando evidencia auditable en cada paso. Funciona con tu editor,
+    tu terminal, tus plataformas. No reemplaza nada: lo gobierna todo.
+    Local-first, open-core, 15MB de runtime en Go. Porque la excelencia
+    profesional no se improvisa: se gobierna.
+
+  core_promise: "Professional governance. Evidence-backed. Tool-agnostic."
+
+  # ── Why OVAV doesn't compete with AI tools ───────────────────────────
+  
+  why_not_ai_competitor:
+    heading: "Why OVAV doesn't compete with AI coding tools"
+    core_insight: >
+      OVAV is a professional governance layer. AI tools are inputs — OVAV
+      is the system that governs them. We don't compete with Copilot, Cursor,
+      or any AI assistant. We're the layer above, the same way a project
+      management platform doesn't compete with the code editors its team uses.
+    
+    analogy: >
+      An orchestra doesn't compete with violins. The conductor doesn't compete
+      with the musicians. OVAV is the conductor of your development workflow —
+      AI tools are instruments in the orchestra. The best instruments alone
+      don't make a symphony. Professional governance does.
+    
+    positioning_points:
+      - "OVAV doesn't write code — it governs how every line gets written, reviewed, tested, and deployed"
+      - "Editor-agnostic: use VS Code, Neovim, terminal, or any editor. OVAV orchestrates across all of them"
+      - "AI-agnostic: use any model, any provider. OVAV provides the governance layer, not the suggestions"
+      - "SDLC-complete: plan → build → test → deploy. AI tools cover one phase; OVAV governs the entire cycle"
+      - "Evidence-first: every professional decision leaves a record. AI tools give you suggestions; OVAV gives you accountability"
+    
+    competitor_complement: >
+      OVAV makes every tool you already use more valuable. Copilot inside
+      OVAV is governed Copilot. Cursor inside OVAV is governed Cursor.
+      We're not asking developers to choose — we're asking them to govern.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 2. TIERS DE PRICING
+# ═══════════════════════════════════════════════════════════════════════════
+
+pricing:
+  currency: "USD"
+  billing_cycle: "mensual / anual (2 meses gratis en plan anual)"
+  updated: "2026-06-15"
+
+  free:
+    name: "OVAV Free"
+    price_monthly: 0
+    tagline: "Para developers individuales que quieren probar gobernanza con IA."
+    includes:
+      - "CLI completa (ovav plan, build, test, deploy)"
+      - "2 perfiles profesionales (Platform Engineering + uno a elección)"
+      - "Modelos comunitarios (via OpenCode — DeepSeek, Llama, etc.)"
+      - "Documentación pública (docs.ovav.dev)"
+      - "Soporte comunitario (GitHub Discussions)"
+      - "Vault encryption local (AES-256-GCM)"
+    limitations:
+      - "Máximo 2 perfiles activos simultáneos"
+      - "Sin SSO ni audit logs"
+      - "Sin soporte prioritario"
+      - "Sin custom models privados"
+      - "Sin despliegue gestionado en staging/producción"
+    conversion_triggers:
+      - "Desbloquear los 8 perfiles profesionales"
+      - "Acceder a benchmarks y evidencia de Eidren"
+      - "Integrar modelos privados (OpenAI, Anthropic, Azure)"
+
+  pro:
+    name: "OVAV Pro"
+    price_monthly: 19
+    price_annual: 190
+    tagline: "Para developers profesionales que exigen control total de su stack con IA."
+    includes:
+      - "Todo lo de Free"
+      - "8 perfiles profesionales completos (Platform, Product, Education, Health, Commercial, Evidence, Intelligence, Career)"
+      - "Modelos ilimitados: OpenAI, Anthropic, Google, Azure, Open-source — cambiás en caliente"
+      - "Evidence & Decision Intelligence (benchmarks, research briefs de Eidren)"
+      - "Tailor Composer: planes de desarrollo personalizados por perfil"
+      - "Soporte prioritario (email, tiempo de respuesta < 24h hábiles)"
+      - "Vault encryption con backup manual"
+      - "Acceso anticipado a features nuevas (beta channel)"
+    limitations:
+      - "Sin SSO/SAML"
+      - "Sin audit logs"
+      - "Sin SLA"
+      - "Sin self-hosting"
+      - "1 usuario por licencia"
+    target: "Developer profesional independiente, tech lead, founder técnico."
+    annual_discount_pct: 17  # 190 vs 228 (19*12)
+
+  enterprise:
+    name: "OVAV Enterprise"
+    price_monthly_per_user: 49
+    minimum_seats: 10
+    tagline: "Para equipos de ingeniería que necesitan gobernanza, compliance y escala."
+    includes:
+      - "Todo lo de Pro"
+      - "SSO (SAML/OIDC) — Google Workspace, GitHub, Azure AD"
+      - "Audit logs completos (quién hizo qué, cuándo, con qué modelo)"
+      - "Self-hosting disponible (Docker, Kubernetes, on-prem)"
+      - "Custom profiles (perfiles específicos de tu empresa)"
+      - "SLA: 99.5% uptime (cloud) o acuerdo personalizado (self-hosted)"
+      - "Soporte dedicado: Slack compartido + account manager"
+      - "Onboarding guiado (2 sesiones de 90 min con un Platform Engineer de OVAV)"
+      - "Vault encryption con backup automatizado a S3/GCS"
+      - "Custom model routing rules (ej. compliance models para datos sensibles)"
+    limitations:
+      - "Mínimo 10 seats (debajo de 10 → plan Pro individual por developer)"
+      - "Custom profiles requieren scoping call (incluida en onboarding)"
+    target: "Equipos de 10-500+ developers. Fintech, healthtech, empresas con compliance."
+    enterprise_plus:
+      note: "Para 500+ seats o requerimientos especiales → contacto directo con CEO."
+      contact: "enterprise@ovav.dev"
+
+  # ── Layer Above — Pricing justification ─────────────────────────────────
+  
+  layer_above_pricing:
+    heading: "Pricing in context — the professional governance layer"
+    insight: >
+      OVAV Pro at $19/mo sits in a deliberate pricing corridor: above
+      single-purpose tools but below enterprise platforms. It's priced as a
+      professional governance layer — the same way teams pay for project
+      management, deployment, and monitoring as separate line items.
+      
+      OVAV doesn't compete on AI tool pricing ($10-20/mo for code suggestions).
+      It competes on professional workflow value. When a developer pays $19/mo
+      for OVAV, they're not buying better autocomplete — they're buying
+      professional governance across their entire development workflow.
+    
+    comparables:
+      - tool: "Linear"
+        price: "$10–16/user/mo"
+        category: "Project management"
+        what_you_pay_for: "Professional workflow orchestration for engineering teams"
+      - tool: "Vercel"
+        price: "$20/user/mo"
+        category: "Deployment platform"
+        what_you_pay_for: "Professional infrastructure for shipping web applications"
+      - tool: "Sentry"
+        price: "$26/mo (Team)"
+        category: "Error monitoring"
+        what_you_pay_for: "Professional observability for production applications"
+      - tool: "GitLab Premium"
+        price: "$29/user/mo"
+        category: "DevOps platform"
+        what_you_pay_for: "Professional SDLC platform with CI/CD, security, and compliance"
+      - tool: "1Password"
+        price: "$7.99/user/mo"
+        category: "Credential security"
+        what_you_pay_for: "Professional secrets management for teams"
+      - tool: "Notion"
+        price: "$10–15/user/mo"
+        category: "Knowledge management"
+        what_you_pay_for: "Professional documentation and team collaboration"
+    
+    ovav_position: >
+      OVAV Pro ($19/mo) sits at the intersection of these professional tools.
+      It's more than a password manager ($7.99) and less than a full DevOps
+      platform ($29). This is intentional: OVAV is the governance layer that
+      orchestrates all the tools below it — not a replacement for any of them.
+    
+    enterprise_context: >
+      OVAV Enterprise ($49/user/mo) is priced below GitLab Ultimate ($99/user/mo)
+      and GitHub Enterprise ($39–49/user/mo) because OVAV doesn't replace those
+      platforms — it governs the professional workflow on top of them. It's the
+      premium for professional control, not the cost of yet another platform.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 3. MERCADO OBJETIVO
+# ═══════════════════════════════════════════════════════════════════════════
+
+market:
+  global_developer_population:
+    total: "28M (2024, Evans Data)"
+    growth_rate: "~5% anual"
+    source: "Evans Data Corporation, Global Developer Population Study 2024"
+
+  ai_tool_adoption:
+    using_any_ai_tool: "70% (Stack Overflow Developer Survey 2024)"
+    paying_for_ai_tool: "~25% del total (estimado)"
+    source: "Stack Overflow Developer Survey 2024"
+
+  tam_sam_som:
+    tam:
+      label: "TAM — Total Addressable Market"
+      description: "Todos los developers que usan herramientas de IA en su flujo de trabajo."
+      size: "~19.6M developers (70% de 28M)"
+      value_usd: "$4.2B (2024) → proyectado $27B (2032, ~25% CAGR)"
+      source: "Grand View Research, AI in Software Development Market 2024"
+
+    sam:
+      label: "SAM — Serviceable Addressable Market"
+      description: "Developers que necesitan gobernanza multi-modelo y prefieren local-first."
+      filters:
+        - "Usan 2+ modelos de IA y necesitan orquestación"
+        - "Valoran privacidad de código (no cloud-first)"
+        - "Trabajan en equipos con compliance o auditing requirements"
+        - "Stack técnico diverso (multi-lenguaje, multi-plataforma)"
+      size: "~4.9M developers (~25% de TAM)"
+      profile: "Tech leads, senior developers, platform engineers, CTOs de startups."
+
+    som:
+      label: "SOM — Serviceable Obtainable Market (Year 1-2)"
+      description: "Early adopters alcanzables con estrategia GTM inicial."
+      size: "~10K-50K developers (0.2-1% de SAM)"
+      channels: "Product Hunt, HN, Reddit, GitHub, developer conferences."
+
+  user_personas:
+    primary:
+      name: "Alex — Senior Developer / Tech Lead"
+      age_range: "28-40"
+      stack: "Multi-lenguaje (Go, TypeScript, Python)"
+      pain: >
+        "Uso Copilot en VS Code y Cursor para ciertas tareas, pero no tengo
+        control de qué modelo usa cada cosa. Mi equipo mezcla ChatGPT,
+        Copilot y Claude sin criterio. No hay audit trail de qué código
+        fue generado por IA. Necesito gobernanza sin sacrificar velocidad."
+      ovav_fit: "Pro ($19/mo). 8 perfiles, multi-modelo, evidencia auditable."
+      conversion_path: "Free → prueba 2 semanas → ve valor en perfiles extra → Pro."
+
+    secondary:
+      name: "Mariana — CTO de startup fintech (20 devs)"
+      age_range: "35-50"
+      pain: >
+        "Mis developers usan 4 herramientas de IA distintas. Compliance
+        nos exige saber qué código fue generado por IA y con qué modelo.
+        No puedo mandar datos financieros a Copilot. Necesito self-hosting
+        o al menos un audit log claro."
+      ovav_fit: "Enterprise ($49/user/mo). SSO, audit logs, self-hosting."
+      conversion_path: "Demo con CEO → PoC con 5 devs → rollout a 20."
+
+    tertiary:
+      name: "Carlos — Estudiante de Ingeniería de Software"
+      age_range: "20-25"
+      pain: >
+        "Uso ChatGPT gratis y Copilot student. Me sirven para código pero
+        no me enseñan por qué una solución es mejor que otra. No entiendo
+        arquitectura ni testing. Quiero aprender flujos profesionales."
+      ovav_fit: "Free (2 perfiles: Platform Eng + Education). Curriculum engine."
+      conversion_path: "Free → graduado → primer trabajo → Pro."
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 4. DIFERENCIADORES VS COMPETENCIA
+# ═══════════════════════════════════════════════════════════════════════════
+
+competitive_landscape:
+  benchmark_date: "2026-06-15"
+  analyst: "Eidren (Evidence & Decision Intelligence) → Sara + Paula"
+  note: >
+    Análisis actualizado con reframing estratégico (v2, 2026-06-16):
+    OVAV es capa de gobernanza profesional, no compite con herramientas AI.
+    Eidren publicará benchmark competitivo completo en docs/research/competitive_analysis_2026.md.
+
+  ovav_positioning: >
+    OVAV no compite en "calidad de sugerencias de código". No compite
+    con herramientas de AI en absoluto. Es la capa de gobernanza profesional
+    por encima de editores, modelos y plataformas. Mientras Cursor/Copilot
+    responden "¿qué código sugiero?", OVAV responde "¿cómo gobierna mi equipo
+    el ciclo completo de desarrollo con estándares profesionales?".
+
+  competitors:
+    github_copilot:
+      name: "GitHub Copilot"
+      company: "Microsoft / GitHub"
+      type: "Code completion + chat"
+      pricing: "$10/mo (individual), $19/user/mo (business), $39/user/mo (enterprise)"
+      strengths:
+        - "Mejor integración GitHub (issues, PRs, repos)"
+        - "Mayor training data (todo GitHub público)"
+        - "Instalación cero (ya está en VS Code/GitHub)"
+        - "Marca reconocida"
+      weaknesses:
+        - "100% cloud — tu código pasa por servidores Microsoft"
+        - "Modelo único (OpenAI Codex) — vendor lock-in total"
+        - "Sin gobernanza multi-perfil — solo autocompletado y chat"
+        - "Sin audit trail ni evidencia de decisiones"
+        - "Sin self-hosting real (solo GitHub Enterprise Cloud)"
+      ovav_wins:
+        - "Local-first — código nunca sale de tu máquina"
+        - "Multi-modelo — usá OpenAI hoy, Claude mañana, Llama el viernes"
+        - "8 perfiles profesionales — no solo 'completar código'"
+        - "Evidencia auditable — sabés qué modelo sugirió qué y por qué"
+        - "Runtime Go (~15MB binario) vs Electron/cloud overhead"
+
+    cursor:
+      name: "Cursor"
+      company: "Anysphere Inc."
+      type: "AI-first code editor (VS Code fork)"
+      pricing: "Free (hobby), $20/mo (Pro), $40/user/mo (Business)"
+      strengths:
+        - "Experiencia de edición superior — inline edits, tab, cmd+K"
+        - "Velocidad de iteración altísima (YC-backed, shipping rápido)"
+        - "Multi-modelo dentro del editor (sonnet, gpt-4o, etc.)"
+        - "Agente integrado (composer) que edita múltiples archivos"
+      weaknesses:
+        - "Es un editor — si tu equipo usa otros editores, estás fragmentado"
+        - "No cubre plan → deploy — solo la fase de código"
+        - "Sin perfiles profesionales por dominio"
+        - "Sin governance, audit logs, ni compliance"
+        - "Cloud-dependent para features premium"
+        - "Problemas de privacidad con código empresarial"
+      ovav_wins:
+        - "Editor-agnóstico — funciona con VS Code, Neovim, terminal, lo que uses"
+        - "Cubre SDLC completo (plan → build → test → deploy)"
+        - "Perfiles por dominio (no solo 'developer genérico')"
+        - "Self-hosting + audit logs (Enterprise)"
+        - "No es un fork de VS Code — es una capa de gobernanza independiente"
+
+    continue_dev:
+      name: "Continue.dev"
+      company: "Continue Dev, Inc."
+      type: "Open-source AI code assistant"
+      pricing: "Free (OSS), $20/user/mo (Teams, beta)"
+      strengths:
+        - "Open-source (Apache 2.0) — transparencia total"
+        - "Multi-modelo, multi-provider (cualquier LLM compatible)"
+        - "Editor-agnóstico (VS Code + JetBrains)"
+        - "Comunidad activa (30K+ GitHub stars)"
+        - "Extensible via slash commands y custom rules"
+      weaknesses:
+        - "Enfocado en el editor — no cubre plan/deploy/testing"
+        - "Sin governance multi-perfil"
+        - "Sin vault encryption ni audit logs"
+        - "Sin research evidence ni benchmarks integrados"
+        - "Equipo pequeño (~20 personas) — riesgo de sostenibilidad"
+        - "Modelo de negocio en fase temprana (Teams en beta)"
+      ovav_wins:
+        - "Cubre SDLC completo — no solo chat en editor"
+        - "8 perfiles profesionales con workflows específicos"
+        - "Evidence & benchmarks integrados (Eidren)"
+        - "Vault encryption + audit logs + self-hosting (Enterprise)"
+        - "Runtime Go nativo (no JavaScript/TypeScript overhead)"
+
+    tabnine:
+      name: "Tabnine"
+      company: "Tabnine Ltd."
+      type: "AI code completion (enterprise-focused)"
+      pricing: "Free (basic), $12/user/mo (Pro), $39/user/mo (Enterprise)"
+      strengths:
+        - "Self-hosting viable (on-prem, VPC)"
+        - "Modelos entrenados on-prem (IP protection)"
+        - "Soporte multi-IDE (15+ editores)"
+        - "Enterprise sales motion maduro"
+      weaknesses:
+        - "Solo code completion — no chat multi-turno, no SDLC"
+        - "Modelos propietarios (no multi-modelo abierto)"
+        - "Sin perfiles profesionales"
+        - "Sin evidence/benchmarks"
+      ovav_wins:
+        - "Multi-modelo abierto (no lock-in a un solo modelo propietario)"
+        - "SDLC completo con 8 perfiles"
+        - "Evidence & research integrados"
+
+  ovav_moat_summary:
+    - "Professional SDLC orchestration — plan to deploy, governed end-to-end, not just code suggestions"
+    - "Local-first professional workstation — your code, your machine, your standards"
+    - "Eight domain-specific professional profiles — deep expertise, not generic autocomplete"
+    - "Tool-agnostic architecture — bring your own models, editors, and platforms. No lock-in, ever"
+    - "Pure Go native runtime — 15MB binary, zero Electron overhead, zero cloud dependency"
+    - "Evidence-backed professional standards — benchmarks, research, auditable decision trails"
+    - "Open-core professional standard — auditable, contributable, vendor-independent. Built to last"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 5. ESTRATEGIA GO-TO-MARKET
+# ═══════════════════════════════════════════════════════════════════════════
+
+go_to_market:
+  strategy_name: "Governance-First Developer Adoption"
+  core_insight: >
+    Los developers ya usan herramientas — editores, modelos, plataformas.
+    No necesitamos venderles otra herramienta más. Necesitamos mostrarles
+    que sin gobernanza profesional, su stack de herramientas es una orquesta
+    sin director: instrumentos excelentes que no producen una sinfonía.
+    La entrada no es "mejor autocompletado" — es "goberná profesionalmente
+    las herramientas que ya usás".
+
+  phases:
+    phase_1:
+      name: "Seed — Primeros 100 usuarios"
+      timeline: "Mes 1-3 (Jul-Sep 2026)"
+      target: "100 usuarios activos (Free + Pro)"
+      channels:
+        product_hunt:
+          name: "Product Hunt Launch"
+          action: "Lanzar OVAV como 'Professional Development Governance' en Product Hunt"
+          target_metric: "Top 5 del día, 500+ upvotes, 200+ signups"
+          assets_needed: "Landing page (ovav.dev), demo video (2 min), screenshots del Cockpit TUI"
+
+        hackernews:
+          name: "Hacker News — Show HN"
+          action: "Show HN: OVAV — Open-source professional development governance (Go + TypeScript)"
+          target_metric: "Front page, 100+ comments, 50+ GitHub stars"
+          timing: "Martes 8am EST (máximo tráfico HN)"
+
+        reddit:
+          name: "Reddit — comunidades developer"
+          subreddits:
+            - "r/programming (5M+ miembros)"
+            - "r/selfhosted (350K+ — perfecto para local-first)"
+            - "r/golang (280K+ — runtime Go es diferenciador)"
+            - "r/typescript (150K+)"
+            - "r/MachineLearning (3M+ — para el ángulo de gobernanza profesional multi-modelo)"
+          action: "Post técnico: 'OVAV: Gobernanza profesional de desarrollo — cómo orquestar tu stack completo con evidencia'"
+          target_metric: "10K+ post views combinados, 200+ signups"
+
+        discord:
+          name: "Discord — comunidades de developers"
+          servers:
+            - "The Programmer's Hangout (100K+)"
+            - "DevCord (50K+)"
+            - "Go Discord (20K+)"
+          action: "Participación orgánica. No spam. Compartir cuando sea relevante."
+
+        github:
+          name: "GitHub — repo público + estrellas"
+          action: "README pulido, badges, demo GIF, quickstart de 5 minutos"
+          target_metric: "500+ stars en mes 1, trending en Go/TypeScript"
+
+      conversion_funnel:
+        awareness: "Product Hunt + HN + Reddit → 5000 visitas landing page"
+        signup: "15% conversión → 750 signups Free"
+        activation: "40% de signups instalan CLI → 300 usuarios activos"
+        retention_week1: "50% de activos siguen después de 1 semana → 150"
+        target_paying: "15% de retenidos → ~25 usuarios Pro (early adopters)"
+        enterprise_leads: "2-5 conversaciones iniciadas via inbound"
+
+    phase_2:
+      name: "Growth — 100 a 1,000 usuarios"
+      timeline: "Mes 4-6 (Oct-Dic 2026)"
+      target: "1,000 usuarios activos, 150+ Pro, 3-5 Enterprise"
+      channels:
+        content:
+          - "Blog técnico (ovav.dev/blog): 2 posts/semana — Go tips, multi-model workflows, benchmark comparisons"
+          - "YouTube: tutoriales de 10 min — 'Professional Development Governance: how OVAV orchestrates your workflow'"
+          - "Newsletter quincenal: 'The Governor's Brief' con benchmarks de Eidren"
+        conferences:
+          - "GopherCon (si timing coincide)"
+          - "React Summit / TSConf"
+          - "AI Engineer Summit"
+          - "Propuesta de charla: 'Professional Development Governance: orchestrating your entire SDLC with evidence and standards'"
+        partnerships:
+          - "Integración con OpenCode (ya existente) — co-marketing"
+          - "Partnership con Fly.io (ya deployamos ahí) — case study conjunto"
+          - "Explorar: Vercel, Railway, Render — para deploy targets adicionales"
+        oss_community:
+          - "Programa de contributors: 'Good First Issue' tags, guía de contribución"
+          - "Swag para contributors: stickers, camisetas (costo: $500)"
+          - "OVAV Ambassador program: 10 developers activos con early access + canal privado"
+
+    phase_3:
+      name: "Scale — 1,000 a 10,000 usuarios"
+      timeline: "Mes 7-12 (Ene-Jun 2027)"
+      target: "10,000 usuarios, 1,000+ Pro, 20+ Enterprise"
+      channels:
+        enterprise_sales:
+          - "Outbound: lista de 100 empresas target (fintech, healthtech, SaaS con compliance)"
+          - "Inbound: leads de Free/Pro que escalan a equipo"
+          - "Sales motion: demo con CEO → PoC 2 semanas → contrato anual"
+        education:
+          - "OVAV for Education: plan gratuito para universidades"
+          - "Partnership con bootcamps (Le Wagon, Ironhack, 4Geeks)"
+          - "Integración curricular: 'Professional Development Governance' como módulo en cursos de ingeniería"
+        referrals:
+          - "Programa de referidos: 1 mes gratis de Pro por cada referido que se quede 3 meses"
+          - "Team discount: 10% descuento en 5+ seats, 20% en 20+"
+
+  key_metrics:
+    north_star: "Weekly Active Developers gobernando su SDLC con OVAV"
+    funnel:
+      landing_visitors: "Meta: 10K/mes en phase 2"
+      signup_rate: "Meta: >15%"
+      activation_rate: "Meta: >40% (instalaron CLI + ejecutaron 'ovav plan')"
+      week1_retention: "Meta: >60%"
+      month1_retention: "Meta: >40%"
+      free_to_pro_conversion: "Meta: >10% en 6 meses"
+      pro_churn_monthly: "Meta: <5%"
+      enterprise_sales_cycle: "Meta: <45 días (PoC → contrato)"
+
+  budget_estimate:
+    phase_1_monthly: "$500 (Product Hunt launch, dominio, email, diseño landing)"
+    phase_2_monthly: "$2,000 (contenido, ads dirigidos a developers, conferencias, swag)"
+    phase_3_monthly: "$5,000 (enterprise sales tooling, ads escalados, education program)"
+    note: "No incluye salarios del equipo. Solo gastos operativos de GTM."
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 6. MODELO DE NEGOCIO — UNIT ECONOMICS
+# ═══════════════════════════════════════════════════════════════════════════
+
+unit_economics:
+  pro:
+    monthly_revenue_per_user: "$19 (mensual) / $15.83 (anual prorrateado)"
+    estimated_gross_margin: "~90% (costo principal: inference API si usan modelos cloud, sino ~$0)"
+    cac_estimate:
+      phase_1: "$10-15 (orgánico, boca a boca)"
+      phase_2: "$20-30 (contenido + ads)"
+      phase_3: "$30-50 (escala con paid channels)"
+    ltv_estimate:
+      average_months: 18 (asumiendo 5.5% churn mensual)
+      ltv: "$342 (18 × $19) — sin contar upgrades a Enterprise"
+
+  enterprise:
+    monthly_revenue_per_seat: "$49"
+    average_deal_size: "$24,500/año (50 seats × $49 × 10 meses efectivos con descuento por volumen)"
+    estimated_gross_margin: "~85% (soporte dedicado + onboarding reducen margen)"
+    cac_estimate: "$2,000-5,000 por deal (sales motion + demo + PoC support)"
+    ltv_estimate:
+      average_contract_years: 2.5
+      average_expansion: "1.5x (crecen de 50 a 75 seats en año 2)"
+      ltv: "$91,875 por cuenta enterprise promedio"
+
+  breakeven:
+    pro_only_path: "~200 usuarios Pro para cubrir costos operativos básicos (~$3,800/mes)"
+    hybrid_path: "50 usuarios Pro + 2 Enterprise deals = breakeven en mes 6-9"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 7. RIESGOS COMERCIALES
+# ═══════════════════════════════════════════════════════════════════════════
+
+risks:
+  R1:
+    risk: "Copilot/Cursor copian gobernanza multi-perfil"
+    probability: "MEDIUM"
+    impact: "HIGH"
+    mitigation: "Moat técnico: runtime Go nativo local-first es difícil de replicar para empresas cloud-first. Ventaja de 12-18 meses."
+  R2:
+    risk: "Adopción Free masiva sin conversión a Pro"
+    probability: "MEDIUM"
+    impact: "MEDIUM"
+    mitigation: "Free tiene límites claros (2 perfiles). Features premium (evidence, benchmarks, multi-model routing) son el gancho. Monitorear tasa de conversión mensualmente."
+  R3:
+    risk: "Enterprise sales cycle más largo de lo estimado"
+    probability: "HIGH"
+    impact: "LOW"
+    mitigation: "No depender de Enterprise para breakeven. Pro debe cubrir costos base. Enterprise es upside."
+  R4:
+    risk: "Competencia open-source alternativa (fork de Continue.dev con governance)"
+    probability: "LOW"
+    impact: "MEDIUM"
+    mitigation: "Comunidad OVAV activa. Velocidad de shipping. 8 perfiles profesionales son difícil de replicar sin el equipo multidisciplinario."
+  R5:
+    risk: "Dependencia de OpenCode como runtime base"
+    probability: "MEDIUM"
+    impact: "HIGH"
+    mitigation: "Arquitectura multi-provider desde día 1. Si OpenCode cambia términos, migrar a otro runtime (ya soportamos multi-modelo nativo)."
+  R6:
+    risk: "Ser percibidos como 'una herramienta de AI más' en lugar de una capa de gobernanza profesional"
+    probability: "HIGH"
+    impact: "HIGH"
+    mitigation: "Todo el copy, GTM, y posicionamiento debe distinguir claramente: OVAV no compite con herramientas de AI, es la capa profesional por encima de ellas. Si el mercado nos percibe como 'otro Copilot', perdemos la categoría. Monitorear percepción en HN, Reddit, y redes sociales post-lanzamiento. Ajustar copy inmediatamente si hay confusión."
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 8. PRÓXIMOS PASOS (SEG-6)
+# ═══════════════════════════════════════════════════════════════════════════
+
+next_steps:
+  immediate:
+    - "CEO review del reframing (Alexander Salvador) — validar posicionamiento 'Professional Governance Layer'"
+    - "Sofía: entregar landing_copy_brief.yaml a Dante para implementar en ovav.dev (CF Pages)"
+    - "Dante: implementar nuevo copy en landing page ovav.dev usando landing_copy_brief.yaml como source of truth"
+    - "Eidren publica competitive_analysis_2026.md con benchmarks medibles"
+
+  week_2:
+    - "Gabriela: validación de TAM/SAM/SOM con datos actualizados"
+    - "Julián: definir sales playbook para Enterprise (demo script, objeciones comunes, nuevo framing)"
+    - "CEO + Sofía: decidir fecha de Product Hunt launch con nuevo posicionamiento"
+
+  week_4:
+    - "Product Hunt launch ejecutado con copy 'Professional Development Governance'"
+    - "Primeras 100 signups → medir funnel real vs proyectado"
+    - "Monitorear percepción: ¿nos entienden como capa de gobernanza o como 'otra herramienta AI'?"
+    - "Iterar pricing si datos de conversión lo justifican"

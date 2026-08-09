@@ -1,0 +1,18 @@
+# OVAV Runtime Dependencies
+# Generated: 2026-06-02 — Thavren audit
+# Minimum versions from currently verified environment.
+#
+# Install:
+#   python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
+# Or system-wide (if PEP 668 allows):
+#   pip3 install --break-system-packages -r requirements.txt
+#
+# Note: regex is used by token_counter.py for sentence boundary detection.
+#       tiktoken is used by generate_vocab.py for OpenAI token counting.
+#       Both have graceful fallbacks if not installed.
+
+PyYAML>=6.0
+pytest>=9.0
+jsonschema>=4.10
+regex>=2024.0
+tiktoken>=0.7.0

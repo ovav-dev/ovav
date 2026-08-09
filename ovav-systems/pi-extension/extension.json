@@ -1,0 +1,23 @@
+/**
+ * OVAV MEMORY v3 — pi.dev extension manifest
+ */
+
+{
+  "name": "ovav-systems",
+  "version": "3.0.0",
+  "description": "OVAV MEMORY v3 — Cell-based live memory with F0-F5 governance",
+  "entry": "dist/ovav-memory.js",
+  "hooks": {
+    "before_agent_start": "onBeforeAgentStart",
+    "tool_call": "onToolCall",
+    "turn_end": "onTurnEnd",
+    "project_trust": "onProjectTrust"
+  },
+  "permissions": ["fs", "env"],
+  "scopes": ["pi", "opencode", "mimocode"],
+  "cellsDir": ".ovav/runtime/livemem/cells",
+  "governance": {
+    "f0Deprecated": true,
+    "validators": ["f1", "f2", "f3", "f4", "f5"]
+  }
+}

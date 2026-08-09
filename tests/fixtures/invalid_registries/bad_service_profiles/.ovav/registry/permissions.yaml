@@ -1,0 +1,17 @@
+permissions:
+  default: ask
+  deny:
+    - direct_memory_write
+    - direct_mcp_access
+    - policy_self_modification
+    - secret_storage
+    - blind_global_overwrite
+  ask:
+    - global_config_write
+    - package_install
+    - destructive_delete
+    - external_network
+  allow:
+    - project_read
+    - project_local_artifact_write
+    - safe_grep

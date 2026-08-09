@@ -1,0 +1,7 @@
+squad:
+  id: squad_infra_security
+  name: "Infrastructure Security Squad"
+  area: devops_infrastructure
+  lead: uriel
+  scope: "Infrastructure hardening, firewall rules, secret rotation, compliance scanning"
+  status: active

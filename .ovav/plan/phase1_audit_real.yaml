@@ -1,0 +1,758 @@
+# ═══════════════════════════════════════════════════════════
+# OVAV PHASE 1 AUDIT — Estado Real (Junio 19, 2026)
+# ═══════════════════════════════════════════════════════════
+# Auditor: thavren + squad Platform Engineering
+# Alcance: Sistema OVAV completo — migración Python→Go,
+#          deuda técnica, cobertura, herramientas duplicadas,
+#          sistemas deprecados, frentes de investigación pendientes.
+# ═══════════════════════════════════════════════════════════
+
+audit_version: 1.0
+audit_date: 2026-06-19 05:00 UTC-5
+audit_git_head: 6f5f4f65
+audit_branch: feature/ceo-avances2
+audit_status: COMPLETO — 12 dimensiones evaluadas
+
+# ═══════════════════════════════════════════════════════════
+# 1. RESUMEN EJECUTIVO
+# ═══════════════════════════════════════════════════════════
+executive_summary:
+  phase1_official_status: "COMPLETED (según caps.yaml v42.0)"
+  phase1_real_status: "~45% completitud real"
+  critical_gap: |
+    caps.yaml declara "Python workflow eliminado (2092 LOC)" pero esto
+    solo cubre 3 archivos específicos (branch_workflow.py + 2 shims + .pyc).
+    Quedan 149,631 LOC de Python operacional en 636 archivos.
+    Solo ~73 archivos Python (~11%) tienen algún equivalente Go parcial.
+
+  key_numbers:
+    python_files_total: 636
+    python_loc_total: 149631
+    python_loc_sin_harnesses: 98291
+    python_harnesses_loc: 51340
+    go_source_files: 178
+    go_loc_total: 55342
+    go_loc_internal: 42987
+    go_loc_cmd: 12355
+    migration_percent_real: "15-20% (superficie operacional)"
+    product_surface_percent: "95% (user-facing Go binaries)"
+    governance_surface_percent: "25% (operational tooling)"
+
+  conclusion: |
+    Phase 1 NO está lista para cerrarse. El producto user-facing (cPanel,
+    cockpit, ovav CLI, tailor) funciona en Go. Pero la gobernanza operacional
+    (636 archivos Python en tools/, 316 harnesses, 128 archivos con referencias
+    a sistemas deprecados) sigue siendo 85% Python.
+    Phase 2 no debería arrancar hasta ≥85% completitud real en Phase 1.
+
+# ═══════════════════════════════════════════════════════════
+# 2. MIGRACIÓN PYTHON→GO — ANÁLISIS DETALLADO
+# ═══════════════════════════════════════════════════════════
+migration_analysis:
+
+  # --- Producto user-facing (MIGRADO) ---
+  product_surface:
+    status: ✅ 95% COMPLETO
+    binaries:
+      - ovav: CLI principal (status, profile, infra)
+      - cpanel: Backend panel de control (Fly.io)
+      - cockpit: TUI interactiva (bubbletea)
+      - tailor: Configuración de entorno
+      - convert_agents: Conversión de agentes
+    loc: 12355
+    cross_platform: "✅ linux/amd64, darwin/amd64, windows/amd64"
+    remaining:
+      - cockpit coverage 62.8% → necesita mejora
+      - F6 Cockpit features visuales (plan Phase 2)
+
+  # --- Gobernanza operacional (PARCIAL) ---
+  governance_surface:
+    status: 🟡 ~25% MIGRADO
+    go_packages_with_equivalents:
+      - package: gitflow
+        python_equivalent: tools/git/ (24 py files)
+        go_files: 4
+        coverage: 79.3%
+        gap: "Solo cubre workflow.go + pre_push.go. Faltan 22+ herramientas git."
+      - package: validators
+        python_equivalent: tools/validators/ (validate_all.py)
+        go_files: 82 source + 1 test
+        coverage: 73.0%
+        gap: "82 validadores Go con SOLO 1 archivo de test. Imposible verificar corrección."
+      - package: install
+        python_equivalent: tools/install/ (2 py files)
+        go_files: 12
+        coverage: 93.6%
+        gap: "INSTALL.md aún referencia python3 tools/ovav_runtime.py validate"
+      - package: vault
+        python_equivalent: tools/security/credential_vault.py + secrets_vault.py
+        go_files: 2
+        coverage: 73.0%
+        gap: "Vault Go funcional pero tokens/ directorio vacío en este worktree"
+      - package: economy
+        python_equivalent: tools/economy/ (9 py files)
+        go_files: 1
+        coverage: 75.7%
+        gap: "9 herramientas Python de economía sin migrar (dashboard, alerts, etc.)"
+      - package: profile
+        python_equivalent: tools/profile/ + tools/cli/ovav_profile.py (12+ py files)
+        go_files: 1
+        coverage: 83.0%
+        gap: "Múltiples herramientas de perfil Python aún activas"
+      - package: doctor
+        python_equivalent: tools/health/ + governor/unified_health.py (6+ py files)
+        go_files: 1
+        coverage: 74.8%
+        gap: "Sistema de diagnóstico fragmentado entre Python y Go"
+
+    python_directories_sin_go:
+      - dir: harnesses/
+        files: 316
+        loc: 51340
+        criticality: CRÍTICO
+        notes: "64 check_* harnesses, 63 checks/, 15 impl/, 12 tests/. Motor de validación operacional."
+      - dir: agent_runtime/
+        files: 62
+        loc: ~8000
+        criticality: CRÍTICO
+        notes: "Session greeting, chronos gate, auto-triggers, self-diagnosis runtime."
+      - dir: security/
+        files: 30
+        loc: ~6000
+        criticality: CRÍTICO
+        notes: "Defense gate, exfil detection, credential vault, audit log, canary tokens."
+      - dir: governor/
+        files: 27
+        loc: ~5000
+        criticality: CRÍTICO
+        notes: "Output guard, self-diagnosis, unified health, milestone recognition."
+      - dir: permissions/
+        files: 18
+        loc: ~3000
+        criticality: ALTO
+        notes: "Permission authority, research profile, policy enforcement."
+      - dir: memory/
+        files: 32
+        loc: ~10000
+        criticality: DEPRECADO
+        notes: "Eliminado. Sistema reemplazado por git HEAD + caps.yaml."
+      - dir: git/
+        files: 24
+        loc: ~2000
+        criticality: ALTO
+        notes: "Solo 4/24 migrados a Go gitflow. 20 herramientas Python sin equivalente."
+      - dir: model_integrity/
+        files: 8
+        criticality: MEDIO
+      - dir: research/
+        files: 6
+        criticality: BAJO (área Eidren)
+      - dir: snapshot/
+        files: 6
+        criticality: MEDIO
+      - dir: web/
+        files: 6
+        criticality: MEDIO
+      - dir: skills/
+        files: 5
+        criticality: MEDIO
+      - dir: visual/
+        files: 5
+        criticality: BAJO
+      - dir: protocols/
+        files: 4
+        criticality: MEDIO
+      - dir: ovav_status/
+        files: 4
+        criticality: MEDIO
+      - dir: knowledge/
+        files: 4
+        criticality: BAJO
+      - dir: sandbox/
+        files: 3
+        criticality: BAJO
+      - dir: education/
+        files: 13
+        criticality: BAJO (área Valeria)
+
+# ═══════════════════════════════════════════════════════════
+# 3. SISTEMAS DEPRECADOS — REFERENCIAS VIVAS
+# ═══════════════════════════════════════════════════════════
+deprecated_systems:
+  cleaned_at: 2026-06-22 UTC-5
+  cleaned_by: nadia (Sprint 3)
+  status: "27 archivos .ovav/ YAML limpiados. Python tools/ y docs/ pendientes."
+  
+  docs_with_stale_refs:
+    total: 11 archivos de 66
+    files:
+      - docs/RELEASE_NOTES.md
+      - docs/implementation/OVAV_INTEGRITY_MESH_AUDIT_2026-06-01.md
+      - docs/lab/OVAV_LIVING_INTELLIGENCE_EVALUATION_LAYER_THAVREN.md
+      - docs/contracts/MEMORY_PRIVACY_CONTRACT.md
+      - docs/contracts/ARTIFACT_RESULT_CONTRACT.md
+      - docs/runtime/04_RUNTIME_ENFORCEMENT.md
+      - docs/research/PERMISSION_EVOLUTION_DECISIONS.md
+      - docs/research/GLOBAL_PERMISSION_MODELS_AND_OVAV_CLASSIFICATION.md
+      - docs/security/06_SECURITY_FRAMEWORK.md
+      - docs/intelligence/02_ACTIVE_IDENTITY_PACKET.md
+    note: "05_SESSION_CAPSULE.md eliminado en S1-7."
+
+# ═══════════════════════════════════════════════════════════
+# 4. COBERTURA REAL — GO RUNTIME
+# ═══════════════════════════════════════════════════════════
+coverage_audit:
+  method: "go test -cover ./... ejecutado 2026-06-19 04:58 UTC-5"
+  discrepancies_vs_caps:
+    - package: cockpit
+      caps_claim: 63.4%
+      real: 62.8%
+      delta: "-0.6pp"
+    - package: cpanel
+      caps_claim: 81.8%
+      real: 79.7%
+      delta: "-2.1pp ⚠️"
+    - package: validators
+      caps_claim: 74.6%
+      real: 73.0%
+      delta: "-1.6pp"
+    - package: ows
+      caps_claim: 27.7%
+      real: 33.7%
+      delta: "+6.0pp (mejoró)"
+
+  packages:
+    critical_gaps:
+      - package: ows
+        coverage: 33.7%
+        loc: 5275
+        test_files: 4
+        severity: "🔴 CRÍTICO — Motor del workflow OVAV (owc/owd/owv)"
+        risk: "Si OWS falla, todo el sistema de worktrees colapsa."
+      - package: validators
+        coverage: 73.0%
+        source_files: 82
+        test_files: 1
+        severity: "🔴 CRÍTICO — 82 validadores con 1 solo test"
+        risk: "Imposible verificar que los validadores funcionan correctamente."
+      - package: cockpit
+        coverage: 62.8%
+        loc: 3165
+        severity: "🟡 ALTO — TUI principal del sistema"
+        risk: "Features rotos no detectados por falta de cobertura."
+      - package: infra
+        coverage: 0.0%
+        loc: 620
+        test_files: 0
+        severity: "🔴 CRÍTICO — Sistema de infraestructura nuevo sin tests"
+        risk: "Operaciones Cloudflare (DNS, túneles, tokens) sin validación automatizada."
+
+    moderate_gaps:
+      - package: license
+        coverage: 69.9%
+      - package: chronos
+        coverage: 67.6%
+      - package: economy
+        coverage: 75.7%
+      - package: doctor
+        coverage: 74.8%
+      - package: vault
+        coverage: 73.0%
+      - package: gitflow
+        coverage: 79.3%
+      - package: sbom
+        coverage: 71.9%
+
+    healthy:
+      - package: tools (100.0%)
+      - package: install (93.6%)
+      - package: convert (92.6%)
+      - package: config (92.0%)
+      - package: cli (88.0%)
+      - package: tailor (83.7%)
+      - package: profile (83.0%)
+
+    sin_cobertura:
+      - infra (0%, 620 LOC, 4 files)
+      - status (0%, ~150 LOC)
+      - project (0%, ~120 LOC)
+
+  coverage_promedio_real: 73.0%
+  coverage_promedio_caps: 78.1%
+  delta: "-5.1pp (caps.yaml sobreestima)"
+
+# ═══════════════════════════════════════════════════════════
+# 5. HERRAMIENTAS DUPLICADAS Y DEAD CODE
+# ═══════════════════════════════════════════════════════════
+duplication_and_dead_code:
+
+  functional_duplicates:
+    - area: "Git workflow"
+      python: "tools/git/ (24 archivos)"
+      go: "go-runtime/internal/gitflow/ (4 archivos)"
+      status: "⚠️ Duplicación parcial — Go solo cubre 2 funciones"
+    - area: "Validación del sistema"
+      python: "tools/validators/validate_all.py + 316 harnesses"
+      go: "go-runtime/internal/validators/ (82 archivos)"
+      status: "⚠️ Duplicación masiva — 316 harnesses Python sin migrar"
+    - area: "Instalación"
+      python: "tools/install/ovav_clean_uninstall.py"
+      go: "go-runtime/internal/install/ (12 archivos)"
+      status: "⚠️ Python aún referenciado en INSTALL.md"
+    - area: "Seguridad"
+      python: "tools/security/ (30 archivos)"
+      go: "validadores Go (parcial)"
+      status: "⚠️ Go solo cubre validación, no operaciones de seguridad"
+
+  dead_code_entry_points:
+    count: 39
+    description: "Archivos con __main__ que ningún otro archivo importa"
+    candidates:
+      cli: 21 archivos (ovav_public_export_gate.py, ovav_official_update.py, ovav_cpanel.py, etc.)
+      visual: 2 archivos
+      web: 3 archivos
+      migration: 1 archivo
+      varios: 12 archivos
+
+  fully_deprecated_directory:
+    path: tools/memory/
+    files: 32
+    loc: ~10000
+    status: "ELIMINADO"
+    reason: "Sistema reemplazado por git HEAD + caps.yaml como fuentes canónicas."
+
+# ═══════════════════════════════════════════════════════════
+# 6. INFRAESTRUCTURA Y SUPERFICIES
+# ═══════════════════════════════════════════════════════════
+infrastructure_audit:
+
+  ci_cd:
+    workflows: 6
+    active:
+      - ci.yml: "Go test + vet + fmt (COVERAGE_MIN_TOTAL: 30% → muy bajo)"
+      - deploy-cpanel.yml: "Staging (develop) + Production (tag v*)"
+      - red-team-cron.yml: "Semanal lunes 08:00 UTC-5"
+      - changelog.yml: "Auto-generación"
+      - infra-setup.yml: "Infraestructura v1"
+      - infra-setup-v2.yml: "Infraestructura v2"
+    issues:
+      - "COVERAGE_MIN_TOTAL: 30% es demasiado permisivo. Debería ser ≥70%"
+      - "Red Team cron configurado pero solo 4 reportes históricos"
+
+  git_hooks:
+    pre_commit: "❌ NO INSTALADO"
+    pre_push: "❌ NO INSTALADO"
+    severity: "CRÍTICO — Sin hooks locales, los desarrolladores pueden commitear sin validación."
+    pre_commit_config: ".pre-commit-config.yaml existe (ruff + gitleaks) pero no instalado en .git/hooks/"
+
+  vault:
+    path: .ovav/vault/tokens/
+    status: "⚠️ Directorio existe pero VACÍO"
+    tokens_stored: 0
+    expected_tokens: "CF_API_TOKEN, CF_API_KEY, CF_EMAIL, CF_ACCOUNT_ID"
+
+  cross_platform:
+    linux_amd64: "✅ Build OK (18MB)"
+    darwin_amd64: "✅ Build OK (18MB)"
+    windows_amd64: "✅ Build OK (18MB)"
+    testing: "❌ Solo compilación cruzada. Sin tests en Windows/Mac reales."
+    priority: "CEO decision D10: 'Probar en Windows ASAP' — aún pendiente."
+
+  surfaces:
+    ovav_dev: "No verificado en esta auditoría"
+    d678beea_ovav_dev: "No verificado en esta auditoría"
+    docs_ovav_dev: "No verificado en esta auditoría"
+    status_ovav_dev: "No verificado en esta auditoría"
+
+  mcp_tools:
+    caps_claim: "ovav_budget: LIVE (3/3 tools: status, alerts, pricing)"
+    reality: "No verificado — MCP config no encontrado en opencode.json de este worktree"
+    requires_investigation: true
+
+  agent_definitions:
+    opencode_json: "0 agentes (correcto — movidos a .opencode/agents/)"
+    opencode_agents_dir: "30+ agentes en .opencode/agents/"
+    duplicate_check: "✅ Sin duplicados — cumple con process_knowledge rule agent_definitions_single_source"
+
+  fish_functions:
+    repo_count: 11 archivos .fish
+    caps_claim: "13 funciones v6"
+    discrepancy: "caps dice 13, realidad son 11 en el repo"
+    locations:
+      - config/fish/ (6 funciones)
+      - tools/shell/ovav.fish
+      - go-runtime/internal/gitflow/ovav.fish
+      - docs/worktree/ (3 archivos de referencia)
+
+  external_dependencies:
+    cloudflare: "Workers, Pages, DNS, Tunnel, Access"
+    fly_io: "ovav-systems (dfw region)"
+    github: "Actions, Pages, OAuth"
+    go_dependencies: "5 externas (bubbletea, bubbles, lipgloss, go-git, yaml.v3)"
+    python_dependencies: "2 mínimas (PyYAML, pytest)"
+
+# ═══════════════════════════════════════════════════════════
+# 7. DEUDA TÉCNICA COMPLETA
+# ═══════════════════════════════════════════════════════════
+tech_debt_comprehensive:
+
+  p0_blocking:
+    - id: TD-DEPRECATED-MEMORY
+      name: "Eliminar tools/memory/ completo (32 archivos, 10K LOC)"
+      detail: "Sistema reemplazado por git HEAD + caps.yaml."
+      effort: "2-3h"
+      status: completado
+
+    - id: TD-STALE-REFS
+      name: "Limpiar referencias a sistemas deprecados"
+      detail: "Archivos .ovav/ YAML limpiados. tools/ Python y docs/ pendientes."
+      effort: "3-4h"
+      status: en_progreso
+
+    - id: TD-GIT-HOOKS
+      name: "Instalar y activar git hooks (pre-commit + pre-push)"
+      detail: ".pre-commit-config.yaml existe pero hooks no instalados en .git/hooks/"
+      effort: "30min"
+      status: pendiente
+
+    - id: TD-OWS-COVERAGE
+      name: "OWS coverage 33.7% → 80%+"
+      detail: "Motor del workflow (owc/owd/owv) con 5275 LOC y tests mínimos."
+      effort: "12-16h"
+      status: pendiente
+
+  p1_high:
+    - id: TD-VALIDATORS-TESTS
+      name: "82 validadores Go → solo 1 test file"
+      detail: "Agregar tests unitarios para cada validador. Coverage 73% → 90%."
+      effort: "16-20h"
+      status: pendiente
+
+    - id: TD-CLI-DEAD
+      name: "Eliminar 39 entry points Python sin imports"
+      detail: "Archivos CLI/visual/web/migration con __main__ que nadie importa."
+      effort: "1-2h (solo eliminación)"
+      status: pendiente
+
+    - id: TD-DOCS-STALE
+      name: "Actualizar 15 docs con referencias legacy"
+      detail: "docs/ con refs a sistemas deprecados."
+      effort: "2-3h"
+      status: pendiente
+
+    - id: TD-INSTALL-DOC
+      name: "INSTALL.md referencia python3 tools/ovav_runtime.py validate"
+      detail: "Actualizar a comando Go equivalente."
+      effort: "15min"
+      status: pendiente
+
+    - id: TD-CI-COVERAGE-GATE
+      name: "CI coverage gate 30% → 70%"
+      detail: "COVERAGE_MIN_TOTAL demasiado bajo. No protege contra regresiones."
+      effort: "15min"
+      status: pendiente
+
+  p2_medium:
+    - id: TD-VAULT-TOKENS
+      name: "Vault tokens/ vacío — poblar o documentar"
+      effort: "30min"
+      status: pendiente
+
+    - id: TD-FISH-COUNT
+      name: "Verificar fish functions: caps dice 13, realidad 11"
+      effort: "30min"
+      status: pendiente
+
+    - id: TD-MCP-VERIFY
+      name: "Verificar MCP ovav-budget tool status real"
+      effort: "30min"
+      status: pendiente
+
+    - id: TD-COCKPIT-COV
+      name: "Cockpit coverage 62.8% → 85%"
+      effort: "4-6h"
+      status: pendiente
+
+    - id: TD-CPANEL-COV
+      name: "cPanel coverage 79.7% → 90% (drift -2.1pp)"
+      effort: "2-3h"
+      status: pendiente
+
+  p3_background:
+    - id: TD-MIGRATE-GOVERNOR
+      name: "Migrar tools/governor/ (27 archivos) → Go"
+      effort: "20-30h"
+      status: deferred
+
+    - id: TD-MIGRATE-SECURITY
+      name: "Migrar tools/security/ (30 archivos) → Go"
+      effort: "25-35h"
+      status: deferred
+
+    - id: TD-MIGRATE-HARNESSES
+      name: "Migrar tools/harnesses/ (316 archivos) → Go"
+      effort: "80-120h (proyecto mayor)"
+      status: deferred
+
+    - id: TD-WINDOWS-TEST
+      name: "Probar OVAV en Windows real (CEO D10)"
+      effort: "4-6h"
+      status: pendiente
+
+# ═══════════════════════════════════════════════════════════
+# 8. FRENTES DE INVESTIGACIÓN PENDIENTES
+# ═══════════════════════════════════════════════════════════
+pending_investigation_fronts:
+  description: |
+    Áreas que requieren auditoría adicional para tener visibilidad 100%
+    del sistema OVAV. Estos frentes no se cubrieron en esta auditoría y
+    necesitan investigación dedicada.
+
+  critical:
+    - id: INV-SURFACE-HEALTH
+      name: "Verificar estado real de las 4 superficies LIVE"
+      detail: "ovav.dev, d678beea.ovav.dev, docs.ovav.dev, status.ovav.dev — HTTP status, SSL, tunnel routing."
+      assignee: "Doran (Install Engineer) o thavren"
+      effort: "30min"
+
+    - id: INV-RED-TEAM-GAP
+      name: "Auditar Red Team — 4 reportes vs cron semanal configurado"
+      detail: "¿Por qué solo 4 reportes si el cron es semanal? ¿R5 automated 22/22 realmente ejecutándose?"
+      assignee: "Diana (Security Auditor) o Kenji (Adversarial Intelligence)"
+      effort: "1h"
+
+    - id: INV-OWS-INTEGRITY
+      name: "Probar OWS end-to-end (owc → trabajo → owv → owd)"
+      detail: "¿Funciona el ciclo completo en este momento? ¿Hay bugs no detectados?"
+      assignee: "Soren (Implementador Senior) + Vella (QA)"
+      effort: "2h"
+
+    - id: INV-INSTALLER-E2E
+      name: "Probar instalador Go end-to-end en entorno limpio"
+      detail: "¿Funciona backup → apply → verify → rollback sin Python?"
+      assignee: "Doran (Install Engineer)"
+      effort: "3h"
+
+  high:
+    - id: INV-CONFIG-DRIFT
+      name: "Auditar drift entre config/ y runtime real"
+      detail: "config/fish/, config/git/, config/ssh/, config/wezterm/ — ¿alineados con lo que corre en producción?"
+      assignee: "Óscar (Performance Engineer)"
+      effort: "1h"
+
+    - id: INV-MCP-LIVENESS
+      name: "Verificar MCP ovav-budget tool — ¿realmente LIVE?"
+      detail: "caps.yaml declara 3/3 tools LIVE pero no hay MCP config en opencode.json del worktree."
+      assignee: "Nora (API & Security Engineer)"
+      effort: "30min"
+
+    - id: INV-FISH-FUNCTIONS
+      name: "Auditar fish functions — 11 vs 13 declaradas, ¿cuáles faltan?"
+      detail: "Verificar cada función fish, su equivalencia Go, y cobertura."
+      assignee: "thavren"
+      effort: "45min"
+
+    - id: INV-AGENT-RUNTIME
+      name: "Auditar tools/agent_runtime/ (62 archivos) — ¿qué es crítico vs auxiliar?"
+      detail: "Clasificar cada archivo como: activo necesario, reemplazable por Go, o dead code."
+      assignee: "Helena (Deep Explorer) + Aric (Systems Architect)"
+      effort: "3h"
+
+  medium:
+    - id: INV-PERMISSION-DRIFT
+      name: "Verificar drift de permission_authority.json vs realidad"
+      detail: "¿Los permisos declarados coinciden con los efectivos en runtime?"
+      assignee: "Diana (Security Auditor)"
+      effort: "1h"
+
+    - id: INV-DOC-ROT
+      name: "Auditoría completa de docs/ (66 archivos) — ¿cuáles son canon vs stale?"
+      detail: "Marcar cada doc como: canónico, referencia histórica, o para eliminar."
+      assignee: "Nadia (Documentation Engineer)"
+      effort: "4h"
+
+    - id: INV-CROSS-PLATFORM
+      name: "Plan de prueba Windows/macOS real (no solo cross-compile)"
+      detail: "CEO D10: probar en Windows ASAP. Definir plan, entornos, criterios."
+      assignee: "Óscar (Performance Engineer) + thavren"
+      effort: "2h (plan) + 6h (ejecución)"
+
+  background:
+    - id: INV-SKILLS-LIVENESS
+      name: "Verificar 21 skills en .opencode/skills/ — ¿todos funcionales?"
+      detail: "Cada skill .md referencia scripts. ¿Esos scripts existen y corren?"
+      assignee: "Ryn (Explorer)"
+      effort: "2h"
+
+    - id: INV-AUTO-TRIGGERS
+      name: "Auditar auto_triggers.yaml — 171 triggers, ¿cuáles realmente disparan?"
+      detail: "Clasificar triggers activos vs rotos vs obsoletos."
+      assignee: "Irene (Explorer rápida)"
+      effort: "2h"
+
+# ═══════════════════════════════════════════════════════════
+# 9. % REAL DE COMPLETITUD — PHASE 1
+# ═══════════════════════════════════════════════════════════
+completion_matrix:
+  dimensions:
+    - name: "Producto user-facing (cPanel, cockpit, ovav, tailor)"
+      percent: 95
+      weight: 15
+      weighted: 14.25
+
+    - name: "Gobernanza operacional (validators, security, governor)"
+      percent: 25
+      weight: 25
+      weighted: 6.25
+
+    - name: "Workflow system (OWS)"
+      percent: 40
+      weight: 15
+      weighted: 6.0
+
+    - name: "Deprecación sistemas legacy"
+      percent: 55
+      weight: 10
+      weighted: 5.5
+
+    - name: "Cobertura de tests Go runtime"
+      percent: 73
+      weight: 10
+      weighted: 7.3
+
+    - name: "Limpieza dead code y docs stale"
+      percent: 10
+      weight: 10
+      weighted: 1.0
+
+    - name: "Infraestructura y CI/CD"
+      percent: 55
+      weight: 10
+      weighted: 5.5
+
+    - name: "Seguridad operacional (git hooks, vault, secrets)"
+      percent: 40
+      weight: 5
+      weighted: 2.0
+
+  weighted_total: 47.8%
+  rounded: "~48%"
+
+  target_for_phase2: "≥85%"
+  gap_to_target: "37 puntos porcentuales (~350-450 horas de trabajo)"
+
+# ═══════════════════════════════════════════════════════════
+# 10. PLAN DE ACCIÓN — PRIORIZADO
+# ═══════════════════════════════════════════════════════════
+action_plan:
+  phase: "1.5 — Estabilización real antes de Phase 2"
+
+  sprint_1_immediate:
+    goal: "Eliminar lastre y asegurar fundamentos"
+    effort: "8-12h"
+    tasks:
+      - id: A1
+        task: "Eliminar tools/memory/ completo (32 archivos)"
+        effort: "2-3h"
+        impact: "Elimina 10K LOC de código deprecado, 94 ledger refs en un solo archivo"
+      - id: A2
+        task: "Instalar git hooks (pre-commit + pre-push)"
+        effort: "30min"
+        impact: "Previene commits sin validación"
+      - id: A3
+        task: "Eliminar 39 entry points dead code"
+        effort: "1-2h"
+        impact: "Reduce superficie de confusión"
+      - id: A4
+        task: "Actualizar CI coverage gate 30% → 70%"
+        effort: "15min"
+        impact: "Protege contra regresiones en CI"
+
+  sprint_2_coverage:
+    goal: "Cobertura de tests ≥80% en paquetes críticos"
+    effort: "30-40h"
+    tasks:
+      - id: B1
+        task: "OWS coverage 33.7% → 80% (5275 LOC, tests para handlers + policy + audit)"
+        effort: "12-16h"
+      - id: B2
+        task: "Validators: agregar tests para 82 validadores (1 → 20+ test files)"
+        effort: "16-20h"
+      - id: B3
+        task: "Cockpit coverage 62.8% → 80%"
+        effort: "4-6h"
+
+  sprint_3_cleanup:
+    goal: "Limpiar referencias deprecadas y docs stale"
+    effort: "8-12h"
+    tasks:
+      - id: C1
+        task: "Limpiar refs a sistemas legacy en tools/"
+        effort: "4-6h"
+      - id: C2
+        task: "Actualizar 15 docs con refs deprecadas"
+        effort: "2-3h"
+      - id: C3
+        task: "Verificar y corregir fish functions (11 vs 13)"
+        effort: "1h"
+
+  sprint_4_migration:
+    goal: "Migrar governor + security a Go (críticos para el sistema)"
+    effort: "45-65h"
+    tasks:
+      - id: D1
+        task: "Migrar tools/governor/ (27 archivos) → Go"
+        effort: "20-30h"
+      - id: D2
+        task: "Migrar tools/security/ (30 archivos) → Go"
+        effort: "25-35h"
+
+  sprint_5_hardening:
+    goal: "Infraestructura, instalador, cross-platform"
+    effort: "15-25h"
+    tasks:
+      - id: E1
+        task: "Probar OVAV en Windows real (CEO D10)"
+        effort: "4-6h"
+      - id: E2
+        task: "Installer E2E test en entorno limpio"
+        effort: "3h"
+      - id: E3
+        task: "Poblar vault tokens y documentar"
+        effort: "1h"
+      - id: E4
+        task: "Verificar superficies LIVE (4 URLs)"
+        effort: "1h"
+
+  sprint_6_verify:
+    goal: "Actualizar caps.yaml con estado post-sprints y decidir Phase 2"
+    effort: "2-3h"
+    tasks:
+      - id: F1
+        task: "Re-ejecutar auditoría completa"
+      - id: F2
+        task: "Actualizar caps.yaml con % real ≥85%"
+      - id: F3
+        task: "CEO sign-off para Phase 2"
+
+  total_effort_estimated: "108-167 horas"
+  timeline_estimated: "3-5 semanas (con squad de 4-5 personas)"
+
+# ═══════════════════════════════════════════════════════════
+# 11. METODOLOGÍA DE AUDITORÍA
+# ═══════════════════════════════════════════════════════════
+methodology:
+  tools_used:
+    - "find + wc para conteo de archivos y LOC"
+    - "grep para detección de referencias deprecadas"
+    - "go test -cover para cobertura real (no la reportada en caps)"
+    - "go build cross-platform para verificar compilación"
+    - "python3 para parseo de opencode.json y tui.json"
+    - "git log para historial y temporalidad"
+  limitations:
+    - "No se verificaron superficies HTTP (requiere connectivity externa)"
+    - "No se probó OWS end-to-end (requiere worktree real)"
+    - "No se ejecutó el installer en entorno limpio"
+    - "No se verificó MCP tool liveness"
+    - "La clasificación de 'dead code' usa heurística de imports (puede haber falsos positivos)"
+  reproducibility: "Todos los comandos usados están documentados. La auditoría es repetible."

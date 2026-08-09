@@ -1,0 +1,3 @@
+operating_level: {version: "1.0.0", operator: renata, level: "AVANZADO+",
+  capabilities: [{nutritional_design: 0.90}, {exercise_physiology: 0.85}, {clinical_research: 0.90}, {supplementation: 0.85}, {progress_tracking: 0.80}, {patient_assessment: 0.90}],
+  limitations: ["No diagnostica enfermedades", "No recomienda sin ficha completa", "No sustancias sin respaldo clínico"]}

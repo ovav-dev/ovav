@@ -1,0 +1,21 @@
+# Squad: Install Engineer
+# Lead contract internal team member — invisible to user
+
+squad:
+  id: squad_install_engineer
+  display_name: Tomás
+  area: platform_engineering
+  lead: thavren
+  role: "Install planning, dry-run gates, backup/rollback design and recovery safety"
+  role_id: install_recovery_engineer
+
+activation:
+  modes: [critical_squad]
+  never_default: true
+  router: Delegation Router
+
+model_body:
+  primary: "openai/gpt-4o"
+
+lanes:
+  - install_backup_recovery

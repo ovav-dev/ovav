@@ -1,0 +1,60 @@
+id: testing_remediation
+visible_profile: "OVAV Testing and Remediation"
+canonical_area_name: "Autonomous Testing and Remediation Engine"
+short_name: "Testing and Remediation"
+visible_lead: "Thavren - Platform Engineering"
+lead: thavren
+entity_kind: subsystem
+is_human: false
+parent: platform_engineering
+status: active
+p0: true
+
+mission: >
+  Autonomous detection and correction of coverage gaps, security vulnerabilities,
+  code quality issues, and supply chain risks across all OVAV SYSTEM surfaces.
+
+lanes:
+  - detection_gaps
+  - security_probes
+  - code_quality
+  - supply_chain
+  - fix_generation
+  - auto_apply
+  - rollback
+  - agent_delegation
+
+allowed_context_classes:
+  - L3_core_ovav_internal
+  - L2_platform_internal
+
+limited_context_classes:
+  - L0_public_external
+
+requires_handoff:
+  - L2_research_internal
+
+covers:
+  - Coverage gap detection (line-level, function-level)
+  - Security vulnerability detection (OWASP Top 10 2021, CWE Top 25)
+  - Code quality issues (injection, path traversal, crypto failures)
+  - Supply chain risks (secrets, dependencies)
+  - Autonomous fix generation and application
+  - Backup and rollback
+
+does_not_cover:
+  - Legal/compliance findings (→ legal_compliance)
+  - DevOps/infrastructure (→ devops_infrastructure)
+  - UX/design (→ ux_design)
+  - Non-Go code generation
+
+internal_research_allowed:
+  - coverage analysis techniques
+  - security probe development
+  - fix template generation
+  - OWASP/CWE mapping
+
+cross_area_routing:
+  injection_path_auth: "→ adversarial_intelligence (kenji)"
+  crypto_creds: "→ security_auditor (diana)"
+  general_vuln: "→ platform_engineering (thavren)"

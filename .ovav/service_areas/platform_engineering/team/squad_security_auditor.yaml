@@ -1,0 +1,22 @@
+# Squad: Security Auditor
+# Lead contract internal team member — invisible to user
+
+squad:
+  id: squad_security_auditor
+  display_name: Diana
+  area: platform_engineering
+  lead: thavren
+  role: "Security audit, permissions, git safety and scope risk"
+  role_id: security_scope_auditor
+
+activation:
+  modes: [focused_squad, critical_squad]
+  never_default: true
+  router: Delegation Router
+
+model_body:
+  primary: "openai/gpt-4o"
+  secondary: "opencode/deepseek-v4-pro"
+
+lanes:
+  - security_scope

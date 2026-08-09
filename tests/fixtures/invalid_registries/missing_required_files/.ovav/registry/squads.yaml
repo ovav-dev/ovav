@@ -1,0 +1,51 @@
+squads:
+  systems_architecture_squad:
+    owner_profile: ovav_systems_architect
+    visible_by_default: false
+    agents:
+      architecture_cartographer:
+        responsibilities: [map_system, contracts, dependencies]
+      harness_engineer:
+        responsibilities: [harnesses, gates, validators]
+      opencode_integrator:
+        responsibilities: [agents, skills, commands, adapters]
+      security_auditor:
+        responsibilities: [permissions, secrets, risk]
+      install_engineer:
+        responsibilities: [backup, rollback, install]
+      release_operator:
+        responsibilities: [git, tags, release_notes]
+
+  research_analyst_squad:
+    owner_profile: ovav_research_analyst
+    visible_by_default: false
+    agents:
+      source_hunter:
+        responsibilities: [find_sources, source_map]
+      evidence_critic:
+        responsibilities: [bias, contradictions, confidence]
+      technical_benchmarker:
+        responsibilities: [compare_systems, score_features]
+      data_synthesizer:
+        responsibilities: [tables, patterns, scoring]
+      narrative_editor:
+        responsibilities: [human_report, publication]
+      decision_mapper:
+        responsibilities: [adopt_adapt_reject_monitor]
+
+  research_intelligence_squad:
+    owner_profile: ovav_research_analyst
+    visible_by_default: false
+    agents:
+      source_hunter:
+        responsibilities: [find_sources, source_map]
+      evidence_critic:
+        responsibilities: [bias, contradictions, confidence]
+      technical_benchmarker:
+        responsibilities: [compare_systems, score_features]
+      data_synthesizer:
+        responsibilities: [tables, patterns, scoring]
+      narrative_editor:
+        responsibilities: [human_report, publication]
+      decision_mapper:
+        responsibilities: [adopt_adapt_reject_monitor]

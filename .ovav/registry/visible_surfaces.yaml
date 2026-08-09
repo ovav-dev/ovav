@@ -1,0 +1,19 @@
+# OVAV Visible Surfaces Registry
+# Tracks all externally visible surfaces (API endpoints, docs, TUI, CLI)
+# Required by registry_validator.go and surface_drift.go
+version: "1.0"
+surfaces:
+  - name: "cPanel"
+    url: "https://ovav-cpanel.fly.dev"
+    type: "web_dashboard"
+    status: "live"
+  - name: "docs.ovav.dev"
+    url: "https://docs.ovav.dev"
+    type: "documentation"
+    status: "live"
+  - name: "Cockpit TUI"
+    type: "cli_tui"
+    status: "live"
+  - name: "ovav CLI"
+    type: "cli"
+    status: "live"

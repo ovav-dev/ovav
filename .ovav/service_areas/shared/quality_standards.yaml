@@ -1,0 +1,51 @@
+schema: ovav.quality_standards.v2
+version: 2.0.0
+binding: todos los leads
+
+integration_factor:
+  formula: "leads_consumidos_por_mi_output / (total_leads_en_proyecto - 1)"
+  target_minimum: 0.4
+  target_excellent: 0.6
+
+output_multiplier:
+  description: "Con 6+ leads (~46 personas), el output debe ser >=6x lo de 1 lead (~7 personas)"
+  target: ">=6x"
+  previous_project:
+    name: "OVAV Producto v1.0"
+    leads: 6
+    actual_factor: 1.1
+    result: "NO_CUMPLIO"
+
+phase_approval_criteria:
+  - name: cross_consumption_rate
+    threshold: ">=2 leads consumieron mi output"
+    verification: "integration_contract.yaml"
+  - name: review_coverage
+    threshold: ">=2 revisiones de otros leads"
+    verification: "review log"
+  - name: handoff_response_time
+    threshold: "<=24h high, <=72h standard"
+    verification: "handoffs.jsonl"
+  - name: squad_active_ratio
+    threshold: "100% squads activos toda la fase"
+    verification: "squad state"
+  - name: validate_all
+    threshold: "0 blocking issues"
+    verification: "ovav_runtime.py validate"
+  - name: no_bypass_flags
+    threshold: "0 usos de force, skip-gates"
+    verification: "security_violations.yaml"
+
+does_not_count:
+  - "Archivo .md sin consumo por otro lead"
+  - "Handoff sin respuesta del destinatario"
+  - "Squad que produjo y se apagó"
+  - "Fase sin revisión cruzada"
+
+does_count:
+  - "Artefacto usado por >=2 otros leads"
+  - "Handoff respondido en deadline con output accionable"
+  - "Squad que refinó su output durante toda la fase"
+  - "Feedback de revisión cruzada que generó cambios reales"
+
+# LAW-001 governance: .ovav/laws/area_boundary_enforcement.yaml (Non-Invasion Area Boundary Law)

@@ -1,0 +1,56 @@
+plan_id: ovav-thavren-ssh-install-plan
+status: source_local_dry_run_only
+profile_id: ovav-thavren-ssh-profile
+visible_service: OVAV Platform Engineering
+
+objective:
+  - install_ovav_thavren_github_ssh_alias_after_explicit_approval
+  - install_fish_agent_helper_after_explicit_approval
+  - migrate_repo_remote_to_dedicated_alias_after_validation
+  - keep_user_global_identity_and_ovav_identity_separated
+
+source_templates:
+  ssh_config: config/ssh/ovav-thavren.ssh.config.example
+  fish_agent: config/fish/ovav-thavren-ssh-agent.fish.example
+  policy: config/workstation/ovav-thavren-ssh-profile.yaml
+
+intended_targets_after_approval:
+  ssh_config_fragment: ~/.ssh/config.d/ovav-thavren.conf
+  fish_agent_helper: ~/.config/fish/conf.d/ovav-thavren-ssh-agent.fish
+  key_private_path: ~/.ssh/ovav_thavren_ed25519
+  key_public_path: ~/.ssh/ovav_thavren_ed25519.pub
+  git_remote_shape: git@github-ovav-thavren:ORG/REPO.git
+
+required_user_actions_after_approval:
+  - create_or_confirm_dedicated_keypair
+  - add_public_key_to_github_account_or_repo_scope
+  - confirm_ssh_config_include_strategy
+  - unlock_key_once_with_ovav_ssh_unlock
+  - test_github_alias_with_ovav_ssh_test_github
+  - migrate_origin_remote_to_alias_only_after_test_passes
+
+backup_plan_after_approval:
+  - backup_existing_ssh_config_fragment_if_present
+  - backup_existing_fish_helper_if_present
+  - record_previous_git_remote_url_without_exposing_owner
+
+rollback_plan_after_approval:
+  - restore_previous_ssh_config_fragment_or_remove_new_fragment
+  - restore_previous_fish_helper_or_remove_new_helper
+  - restore_previous_git_remote_url
+
+blocked_in_this_source_local_task:
+  - write_user_home_ssh_config
+  - write_user_home_fish_config
+  - generate_real_keypair
+  - change_git_remote
+  - call_git_push_or_remote_mutating_commands
+  - store_private_key_or_passphrase
+  - install_external_password_manager_or_hardware_key_integration
+
+success_definition_source_local:
+  - source_templates_exist
+  - dry_run_plan_command_passes
+  - source_validator_passes
+  - environment_advisory_reports_current_remote_without_secret_leakage
+  - real_install_remains_blocked_until_explicit_install_gate

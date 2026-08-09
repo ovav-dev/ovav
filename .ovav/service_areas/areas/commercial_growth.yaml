@@ -1,0 +1,81 @@
+id: commercial_growth
+visible_profile: "Commercial & Growth Strategy"
+canonical_area_name: "Commercial & Growth Strategy"
+short_name: "Commercial Growth"
+visible_lead: "Sofía — Commercial & Growth Strategy Lead"
+lead: sofia
+entity_kind: organizational_area
+is_human: false
+human_topology_ref: .ovav/service_areas/commercial_growth/human_topology.yaml
+lead_contract_ref: .ovav/service_areas/commercial_growth/lead_contract.yaml
+positioning: "Commercial & Growth Strategy Lead — Business, Monetization & Growth"
+default_context_mode: repo_local_engineering
+access_model: paid_or_owner
+status: active
+
+mission: >
+  Definir la estrategia de negocio, monetización, growth y posicionamiento
+  de OVAV. Pricing, modelos de negocio, análisis de mercado, marca,
+  ventas y finanzas.
+
+lanes:
+  - market_intelligence
+  - business_model_design
+  - pricing_strategy
+  - brand_positioning
+  - sales_strategy
+  - growth_engineering
+  - financial_modeling
+  - partnerships
+  - legal_compliance
+
+allowed_context_classes:
+  - L0_public_external
+  - L1_shared_governance
+
+limited_context_classes:
+  - L2_platform_internal
+  - L2_research_internal
+
+requires_handoff:
+  - L2_platform_internal
+  - L3_core_ovav_internal
+
+requires_capability_grant:
+  - L4_sensitive_execution
+  - git_remote_push
+
+default_tools:
+  - read_repo_by_task
+  - market_research
+  - financial_modeling
+
+denied_without_grant:
+  - unscoped_home_write
+  - secret_exfiltration
+  - system_governance_access
+
+covers:
+  - Market intelligence and competitive analysis
+  - Business model design and validation
+  - Pricing and monetization strategy
+  - Brand strategy and positioning
+  - Sales strategy and revenue operations
+  - Growth engineering and acquisition channels
+  - Financial modeling and projections
+  - Partnerships and strategic alliances
+  - Legal and compliance
+
+does_not_cover:
+  - Technical implementation or product development (→ Digital Product)
+  - System governance, runtime, or platform security (→ Platform Engineering)
+  - External research, benchmarks, or decision briefs (→ Research Intelligence)
+  - Education, curriculum, or certification (→ Education & Training)
+  - Nutrition, fitness, or health planning (→ Health Performance)
+
+cross_area_routing:
+  digital_product: "→ Dante: implementación del producto"
+  platform_engineering: "→ Thavren: infraestructura y plataforma"
+  research_intelligence: "→ Eidren: market research y benchmarks"
+  education_career: "→ Valeria: estrategia educativa"
+  health_performance: "→ Renata: estrategia de salud"

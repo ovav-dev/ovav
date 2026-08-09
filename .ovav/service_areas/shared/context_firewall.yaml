@@ -1,0 +1,77 @@
+context_classes:
+  L0_public_external:
+    examples:
+      - public_web
+      - public_docs
+      - benchmark_data
+      - vendor_docs
+      - papers
+    default_access:
+      platform_engineering: limited
+      research_intelligence: allow
+
+  L1_shared_governance:
+    examples:
+      - service_area_registry
+      - delivery_contracts
+      - delegation_policy
+      - source_registry
+      - public_product_doctrine
+    default_access:
+      platform_engineering: read
+      research_intelligence: read
+
+  L2_platform_internal:
+    examples:
+      - platform_work_artifacts
+      - implementation_plans
+      - runtime_engineering_notes
+      - validator_work
+    default_access:
+      platform_engineering: allow_by_task
+      research_intelligence: deny_by_default
+
+  L2_research_internal:
+    examples:
+      - research_briefs
+      - evidence_scoring
+      - benchmark_notes
+    default_access:
+      platform_engineering: requires_handoff
+      research_intelligence: allow_by_task
+
+  L3_core_ovav_internal:
+    examples:
+      - repo_root
+      - .opencode
+      - .ovav/context
+      - runtime
+      - harnesses
+      - snapshots
+      - git_history
+      - install_artifacts
+    default_access:
+      platform_engineering: allow_by_task
+      research_intelligence: deny_by_default
+
+  L4_sensitive_execution:
+    examples:
+      - secrets
+      - credentials
+      - git_write
+      - install_apply
+      - global_writes
+      - destructive_tools
+    default_access:
+      platform_engineering: capability_grant_required
+      research_intelligence: deny
+
+fail_closed: true
+unknown_source_decision: deny_or_requires_permission
+
+research_default_rule:
+  when_user_mentions_ovav: conceptual_or_external_research
+  repo_root_default: deny
+  internal_review_requires: explicit_permission_or_sanitized_handoff
+
+# LAW-001 governance: .ovav/laws/area_boundary_enforcement.yaml (Non-Invasion Area Boundary Law)

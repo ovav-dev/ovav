@@ -1,0 +1,70 @@
+# Contract Manifest — Layer 0
+# Single source of truth for which contracts feed the Identity Packet Compiler.
+# The compiler reads this file; it never hardcodes contract paths.
+# Each entry must include a path relative to repo root.
+
+manifest_version: "1.0.0"
+description: "Contract sources for Active Identity Packet compilation"
+
+contracts:
+  platform_engineering:
+    - path: ".ovav/service_areas/areas/platform_engineering.yaml"
+      purpose: identity
+      required: true
+    - path: ".ovav/service_areas/shared/lead_work_method_contract.yaml"
+      purpose: execution_delivery
+      required: true
+    - path: ".ovav/plan/caps.yaml"
+      purpose: current_authority
+      required: true
+      note: "Replaced current_authority_contract.yaml (deleted 2026-06-12) and IMPLEMENTATION_PLAN.md (deprecated 2026-06-14). Git HEAD + .ovav/plan/caps.yaml es la fuente estratégica canónica."
+    - path: ".ovav/service_areas/shared/context_economy_contract.yaml"
+      purpose: context_budget
+      required: true
+    - path: ".ovav/service_areas/shared/tool_access_policy.yaml"
+      purpose: tool_boundaries
+      required: true
+    - path: ".ovav/service_areas/shared/visual_delivery_contract.yaml"
+      purpose: delivery
+      required: true
+    - path: ".ovav/service_areas/shared/operational_memory_contract.yaml"
+      purpose: memory
+      required: true
+      note: "Memoria operacional = git HEAD + caps.yaml."
+    - path: ".ovav/registry/delegation_rules.yaml"
+      purpose: execution
+      required: true
+    - path: ".ovav/policy/permission_authority.json"
+      purpose: boundaries_approval
+      required: true
+    - path: ".ovav/service_areas/shared/source_registry.yaml"
+      purpose: context_boundaries
+      required: false
+
+  research_intelligence:
+    - path: ".ovav/service_areas/areas/research_intelligence.yaml"
+      purpose: identity
+      required: true
+    - path: ".ovav/service_areas/shared/lead_work_method_contract.yaml"
+      purpose: execution_delivery
+      required: true
+    - path: ".ovav/plan/caps.yaml"
+      purpose: current_authority
+      required: false
+      note: "Replaced current_authority_contract.yaml (deleted 2026-06-12) and IMPLEMENTATION_PLAN.md (deprecated 2026-06-14). Git HEAD + .ovav/plan/caps.yaml es la fuente estratégica canónica."
+    - path: ".ovav/service_areas/shared/context_economy_contract.yaml"
+      purpose: context_budget
+      required: true
+    - path: ".ovav/service_areas/shared/tool_access_policy.yaml"
+      purpose: tool_boundaries
+      required: true
+    - path: ".ovav/service_areas/shared/visual_delivery_contract.yaml"
+      purpose: delivery
+      required: true
+    - path: ".ovav/service_areas/shared/source_registry.yaml"
+      purpose: context_boundaries
+      required: true
+
+integrity:
+  algorithm: sha256
+  manifest_path: .ovav/registry/contract_manifest.yaml

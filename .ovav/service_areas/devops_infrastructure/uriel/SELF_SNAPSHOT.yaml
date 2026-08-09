@@ -1,0 +1,12 @@
+self_snapshot:
+  version: "2.0.0"
+  operator: uriel
+  current_state: "area_fully_registered"
+  team:
+    - {name: Uriel, role: lead_devops_engineer}
+  squad_leads:
+    - {squad: ci_cd, lead: Uriel}
+    - {squad: cloud, lead: Uriel}
+    - {squad: monitoring, lead: Uriel}
+    - {squad: sre, lead: Uriel}
+    - {squad: infra_security, lead: Uriel}

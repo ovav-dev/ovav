@@ -1,0 +1,96 @@
+# OVAV Network Allowlist — F0.4 Network Hardening
+# Only these domains are permitted for external connections.
+# Any request to a non-allowlisted domain is blocked by network_guard.py.
+
+schema: ovav.network_allowlist.v1
+generated_at: "2026-05-29T00:00:00Z"
+policy: deny_by_default
+
+# ── GitHub ecosystem ──
+domains:
+  - pattern: "github.com"
+    ports: [443, 22]
+    purpose: "Git operations, issues, PRs, releases"
+    tls_pinned: true
+    rate_limit: 100  # requests per minute
+
+  - pattern: "api.github.com"
+    ports: [443]
+    purpose: "GitHub API"
+    tls_pinned: true
+    rate_limit: 500
+
+  - pattern: "*.githubusercontent.com"
+    ports: [443]
+    purpose: "GitHub raw content, gists, releases"
+    tls_pinned: true
+    rate_limit: 200
+
+# ── Python ecosystem ──
+  - pattern: "pypi.org"
+    ports: [443]
+    purpose: "Python package index"
+    tls_pinned: false
+    rate_limit: 50
+
+  - pattern: "files.pythonhosted.org"
+    ports: [443]
+    purpose: "Python package downloads"
+    tls_pinned: false
+    rate_limit: 200
+
+# ── Documentation and research ──
+  - pattern: "docs.python.org"
+    ports: [443]
+    purpose: "Python documentation"
+    tls_pinned: false
+    rate_limit: 100
+
+  - pattern: "*.readthedocs.io"
+    ports: [443]
+    purpose: "Package documentation"
+    tls_pinned: false
+    rate_limit: 100
+
+  - pattern: "pypi.org"
+    ports: [443]
+    purpose: "Package metadata"
+    tls_pinned: false
+    rate_limit: 50
+
+# ── OVAV resources (future) ──
+  - pattern: "ovav.dev"
+    ports: [443]
+    purpose: "OVAV project resources"
+    tls_pinned: true
+    rate_limit: 200
+
+  - pattern: "*.ovav.dev"
+    ports: [443]
+    purpose: "OVAV subdomains"
+    tls_pinned: true
+    rate_limit: 200
+
+# ── Reference / research domains ──
+  - pattern: "arxiv.org"
+    ports: [443]
+    purpose: "Research papers"
+    tls_pinned: false
+    rate_limit: 30
+
+  - pattern: "scholar.google.com"
+    ports: [443]
+    purpose: "Academic research"
+    tls_pinned: false
+    rate_limit: 20
+
+# ── Configuration ──
+defaults:
+  max_request_size_bytes: 10485760  # 10 MB
+  max_response_size_bytes: 52428800  # 50 MB
+  connection_timeout_seconds: 30
+  read_timeout_seconds: 60
+
+blocked:
+  - pattern: "*"
+    reason: "Not in allowlist"

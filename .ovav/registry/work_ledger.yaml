@@ -1,0 +1,736 @@
+work_ledger:
+  workstation_context:
+    wezterm_canonical_wsl: "/home/braka/.config/wezterm/wezterm.lua"
+    wezterm_windows_path: "C:\\Users\\Alexa\\.wezterm.lua"
+    wezterm_wsl_mount: "/mnt/c/Users/Alexa/.wezterm.lua"
+    wezterm_source: "/home/braka/Systems/OVAV/config/wezterm/wezterm.lua"
+    wezterm_fallback_source: "/home/braka/Systems/OVAV/config/wezterm/wezterm-fallback-minimal.lua"
+    wezterm_blocked_path: "C:\\Users\\Alexa\\AppData\\Roaming\\wezterm\\.wezterm.lua"
+    wezterm_blocked_note: "Esta ruta debe ser eliminada. Solo USERPROFILE está autorizado."
+    note: "Arquitectura v3: proxy en USERPROFILE delega a WSL canonical vía UNC. Fallback local si WSL offline. APPDATA eliminado."
+  event_template:
+    event_id: ''
+    timestamp: ''
+    segment: ''
+    service_profile: ''
+    lead: ''
+    lane: ''
+    phase: ''
+    harnesses: []
+    artifacts: []
+    evidence: []
+    files_touched: []
+    tests_run: []
+    risks: []
+    git_actions: []
+    status: ''
+    next_action: ''
+    memory_write: false
+    user_response_summary: ''
+  required_fields:
+  - event_id
+  - timestamp
+  - segment
+  - service_profile
+  - lead
+  - lane
+  - phase
+  - harnesses
+  - artifacts
+  - evidence
+  - files_touched
+  - tests_run
+  - risks
+  - git_actions
+  - status
+  - next_action
+  - memory_write
+  - user_response_summary
+  s12_segment:
+    segment: S12
+    phase: verify
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s13_segment:
+    segment: S13
+    phase: verify
+    service_profile: ovav_research_analyst
+    lead: eidren
+    lane: deep_research
+  s14_segment:
+    segment: S14
+    phase: verify
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s15_segment:
+    segment: S15
+    phase: verify
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s16_segment:
+    segment: S16
+    phase: archive
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: release_delivery
+  s17_segment:
+    segment: S17
+    phase: archive
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s18_segment:
+    segment: S18
+    phase: verify
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s19_segment:
+    segment: S19
+    phase: verify
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s20_segment:
+    segment: S20
+    phase: verify
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s21_segment:
+    segment: S21
+    phase: verify
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s22_segment:
+    segment: S22
+    phase: verify
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s23_segment:
+    segment: S23
+    phase: verify
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: opencode_system
+  s24_segment:
+    segment: S24
+    phase: verify
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: opencode_system
+  s25_segment:
+    segment: S25
+    phase: verify
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s26_segment:
+    segment: S26
+    phase: verify
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s27_segment:
+    segment: S27
+    phase: verify
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: install_governor
+  s28_segment:
+    segment: S28
+    phase: verify
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: install_governor
+  s29_segment:
+    segment: S29
+    phase: verify
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s30_segment:
+    segment: S30
+    phase: archive
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: release_delivery
+  s31_segment:
+    segment: S31
+    phase: archive
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s32_segment:
+    segment: S32
+    phase: verify
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s33_segment:
+    segment: S33
+    phase: verify
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s34_segment:
+    segment: S34
+    phase: verify
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s35_segment:
+    segment: S35
+    phase: verify
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s36_segment:
+    segment: S36
+    phase: verify
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s37_segment:
+    segment: S37
+    phase: verify
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s38_segment:
+    segment: S38
+    phase: verify
+    service_profile: ovav_research_analyst
+    lead: eidren
+    lane: source_verification
+  s39_segment:
+    segment: S39
+    phase: verify
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s40_segment:
+    segment: S40
+    phase: verify
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: opencode_system
+  s41_segment:
+    segment: S41
+    phase: verify
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s42_segment:
+    segment: S42
+    phase: verify
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s43_segment:
+    segment: S43
+    phase: verify
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: install_governor
+  s44_segment:
+    segment: S44
+    phase: verify
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s45_segment:
+    segment: S45
+    phase: archive
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: release_delivery
+  s46_segment:
+    segment: S46
+    phase: archive
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s47_segment:
+    segment: S47
+    phase: archive
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s48_segment:
+    segment: S48
+    phase: verify
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: opencode_system
+  s49_segment:
+    segment: S49
+    phase: apply
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: opencode_system
+  status_values:
+  - planned
+  - in_progress
+  - blocked
+  - complete
+  s50_segment:
+    segment: S50
+    phase: verify
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: opencode_system
+  s51_segment:
+    segment: S51
+    phase: verify
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s52_segment:
+    segment: S52
+    phase: verify
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s53_segment:
+    segment: S53
+    phase: verify
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: opencode_system
+  s54_segment:
+    segment: S54
+    phase: verify
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s55_segment:
+    segment: S55
+    phase: verify
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s56_segment:
+    segment: S56
+    phase: verify
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: install_governor
+  s57_segment:
+    segment: S57
+    phase: verify
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: install_governor
+  s58_segment:
+    segment: S58
+    phase: verify
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s59_segment:
+    segment: S59
+    phase: verify
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s60_segment:
+    segment: S60
+    phase: verify
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s61_segment:
+    segment: S61
+    phase: archive
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s62_segment:
+    segment: S62
+    phase: verify
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: opencode_system
+  s63_segment:
+    segment: S63
+    phase: verify
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: opencode_system
+  s64_segment:
+    segment: S64
+    phase: verify
+    service_profile: ovav_research_analyst
+    lead: eidren
+    lane: source_verification
+  s65_segment:
+    segment: S65
+    phase: verify
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s66_segment:
+    segment: S66
+    phase: verify
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s67_segment:
+    segment: S67
+    phase: archive
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s68_segment:
+    segment: S68
+    phase: init
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s69_segment:
+    segment: S69
+    phase: explore
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s70_segment:
+    segment: S70
+    phase: design
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s71_segment:
+    segment: S71
+    phase: design
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s72_segment:
+    segment: S72
+    phase: design
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s73_segment:
+    segment: S73
+    phase: design
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s74_segment:
+    segment: S74
+    phase: apply
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s75_segment:
+    segment: S75
+    phase: verify
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s76_segment:
+    segment: S76
+    phase: archive
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s77_segment:
+    segment: S77
+    phase: init
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s78_segment:
+    segment: S78
+    phase: explore
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s79_segment:
+    segment: S79
+    phase: proposal
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s80_segment:
+    segment: S80
+    phase: proposal
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s81_segment:
+    segment: S81
+    phase: design
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s82_segment:
+    segment: S82
+    phase: apply
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s83_segment:
+    segment: S83
+    phase: verify
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s84_segment:
+    segment: S84
+    phase: archive
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s85_segment:
+    segment: S85
+    phase: init
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s86_segment:
+    segment: S86
+    phase: apply
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s87_segment:
+    segment: S87
+    phase: apply
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s88_segment:
+    segment: S88
+    phase: apply
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s89_segment:
+    segment: S89
+    phase: verify
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s90_segment:
+    segment: S90
+    phase: verify
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s91_segment:
+    segment: S91
+    phase: verify
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s92_segment:
+    segment: S92
+    phase: archive
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+  s101_segment:
+    segment: S101
+    phase: init
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+    artifacts:
+    - .ovav/artifacts/S101/S101_BUILD10_PLANNING_FREEZE.md
+    evidence:
+    - .ovav/artifacts/S101/evidence/BUILD10_GAP_ANALYSIS.json
+    - .ovav/artifacts/S101/evidence/BUILD10_SEGMENT_MAP.json
+    files_touched:
+    - .ovav/artifacts/S101/
+    - .ovav/registry/work_ledger.yaml
+    status: complete
+    next_action: S102 Gate Hardening — Real Apply & Rollback
+  s143_segment:
+    event_id: s143_shell_hardening
+    timestamp: '2026-05-22T00:00:00Z'
+    segment: S143
+    phase: verify
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: developer_experience_automation
+    harnesses:
+    - check_s143_shell_hardening
+    artifacts:
+    - .ovav/artifacts/S143/S143_SHELL_HARDENING.md
+    evidence:
+    - .ovav/artifacts/S143/evidence/S143_SHELL_HARDENING_REPORT.json
+    files_touched:
+    - bin/ovav-shell
+    - tests/evals/test_ovav_shell_hardening.py
+    - tools/harnesses/check_s143_shell_hardening.py
+    - .ovav/artifacts/S143/S143_SHELL_HARDENING.md
+    - .ovav/registry/work_ledger.yaml
+    tests_run:
+    - python3 tools/harnesses/check_s143_shell_hardening.py
+    - python3 tests/evals/test_ovav_shell_hardening.py
+    - OVAV_EVIDENCE_MODE=strict python3 tools/ovav_runtime.py validate
+    risks: []
+    git_actions: []
+    status: complete
+    next_action: S144 Test Coverage & Performance Metrics
+    memory_write: false
+    user_response_summary: S143 hardened shell keyboard handling and added source-local
+      eval evidence.
+  s144_model_task_router:
+    event_id: s144_model_task_router
+    timestamp: '2026-05-22T00:00:00Z'
+    segment: S144
+    phase: verify
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+    harnesses:
+    - h_model_task_router
+    - check_s144_model_task_router
+    - h_model_task_router_metrics
+    artifacts:
+    - .ovav/artifacts/S144/S144_MODEL_TASK_ROUTER.md
+    evidence:
+    - .ovav/artifacts/S144/evidence/MODEL_TASK_ROUTE.json
+    - .ovav/artifacts/S144/evidence/MODEL_TASK_ROUTER_GATE_REPORT.json
+    - .ovav/artifacts/S144/evidence/MODEL_TASK_ROUTER_METRICS.json
+    files_touched:
+    - tools/harnesses/model_task_router.py
+    - tools/harnesses/check_s144_model_task_router.py
+    - tests/evals/test_model_task_router.py
+    - tests/fixtures/golden/model_task_router_cases.json
+    - bin/ovav
+    - .ovav/artifacts/S144/S144_MODEL_TASK_ROUTER.md
+    - .ovav/registry/work_ledger.yaml
+    tests_run:
+    - python3 bin/ovav model-route --task 'S144 model router implementation' --files
+      6 --risk runtime --write-evidence
+    - python3 bin/ovav model-route --task 'continue S144 test coverage and performance
+      metrics' --files 4 --sources 0 --write-evidence
+    - python3 tools/harnesses/check_s144_model_task_router.py --metrics
+    - python3 tests/evals/test_model_task_router.py
+    - OVAV_EVIDENCE_MODE=strict python3 tools/ovav_runtime.py validate
+    risks: []
+    git_actions: []
+    status: complete
+    next_action: Use model-route before selecting the next BUILD 16 hardening item.
+    memory_write: false
+    user_response_summary: S144 added an advisory model task router, golden routing
+      coverage and a performance baseline.
+  ev_context_optimization_20260523T050515Z:
+    event_id: ev_context_optimization_20260523T050515Z
+    timestamp: 20260523T050515Z
+    segment: S64
+    service_profile: ovav_research_analyst
+    lead: eidren
+    lane: source_verification
+    phase: verify
+    harnesses:
+    - h_research_context_optimizer
+    artifacts:
+    - .ovav/artifacts/S64/evidence/DYNAMIC_RESEARCH_CONTEXT_SNAPSHOT.json
+    evidence:
+    - Compacted 9205 chars to 316 chars (96.57% reduction)
+    files_touched:
+    - .ovav/artifacts/S64/evidence/DYNAMIC_RESEARCH_CONTEXT_SNAPSHOT.json
+    tests_run:
+    - check_research_context_optimizer
+    risks: []
+    git_actions: []
+    status: completed
+    next_action: Proceed with optimized, compact, evidence-ready query execution
+    memory_write: false
+    user_response_summary: Intelligent context optimization run successfully in background
+  ev_context_optimization_20260523T055210Z:
+    event_id: ev_context_optimization_20260523T055210Z
+    timestamp: 20260523T055210Z
+    segment: S64
+    service_profile: ovav_research_analyst
+    lead: eidren
+    lane: source_verification
+    phase: verify
+    harnesses:
+    - h_research_context_optimizer
+    artifacts:
+    - .ovav/artifacts/S64/evidence/DYNAMIC_RESEARCH_CONTEXT_SNAPSHOT.json
+    evidence:
+    - Compacted 9205 chars to 316 chars (96.57% reduction)
+    files_touched:
+    - .ovav/artifacts/S64/evidence/DYNAMIC_RESEARCH_CONTEXT_SNAPSHOT.json
+    tests_run:
+    - check_research_context_optimizer
+    risks: []
+    git_actions: []
+    status: completed
+    next_action: Proceed with optimized, compact, evidence-ready query execution
+    memory_write: false
+    user_response_summary: Intelligent context optimization run successfully in background
+  ev_research_sandbox_gate_20260523T055250Z:
+    event_id: ev_research_sandbox_gate_20260523T055250Z
+    timestamp: 20260523T055250Z
+    segment: S64
+    service_profile: ovav_research_analyst
+    lead: eidren
+    lane: source_verification
+    phase: verify
+    harnesses:
+    - h_research_sandbox_gate
+    artifacts:
+    - .ovav/artifacts/S64/evidence/SANDBOX_RESEARCH_FETCH_METADATA.json
+    evidence:
+    - Isolated sandbox retrieval for https://arxiv.org/abs/2605.12345 with dual-consent
+      verified.
+    files_touched:
+    - .ovav/artifacts/S64/evidence/SANDBOX_RESEARCH_FETCH_METADATA.json
+    tests_run:
+    - check_research_sandbox_gate
+    risks: []
+    git_actions: []
+    status: completed
+    next_action: Incorporate sandbox metadata into research brief
+    memory_write: false
+    user_response_summary: Dual-consent research sandbox gate executed for https://arxiv.org/abs/2605.12345
+  m1_global_control_bridge:
+    event_id: m1_global_control_bridge
+    timestamp: '2026-05-28T00:00:00Z'
+    segment: M1
+    phase: verify
+    service_profile: ovav_systems_architect
+    lead: thavren
+    lane: runtime_governance
+    harnesses:
+    - global_control_bridge_m1
+    - check_global_control_bridge_m1
+    artifacts:
+    - .ovav/artifacts/M1/GLOBAL_CONTROL_BRIDGE_M1.md
+    evidence:
+    - .ovav/artifacts/M1/evidence/GLOBAL_CONTROL_BRIDGE_M1_REPORT.json
+    - .ovav/artifacts/M1/evidence/GLOBAL_CONTROL_BRIDGE_M1_CHECK_REPORT.json
+    files_touched:
+    - tools/harnesses/global_control_bridge_m1.py
+    - tools/harnesses/check_global_control_bridge_m1.py
+    - tests/evals/test_global_control_bridge_m1.py
+    - .ovav/artifacts/M1/GLOBAL_CONTROL_BRIDGE_M1.md
+    - .ovav/registry/harnesses.yaml
+    - .ovav/registry/artifacts.yaml
+    - .ovav/registry/work_ledger.yaml
+    tests_run:
+    - python3 tools/harnesses/check_global_control_bridge_m1.py
+    - python3 tests/evals/test_global_control_bridge_m1.py
+    - OVAV_EVIDENCE_MODE=strict python3 tools/ovav_runtime.py validate
+    risks:
+    - actual global config/install behavior remains blocked
+    git_actions:
+    - git switch -c task/global-control-bridge-m1
+    status: complete
+    next_action: Use M1 as source-local global-intent triage; do not perform global writes.
+    memory_write: false
+    user_response_summary: M1 Global Control Bridge prepared as source-local decision/evidence bridge.

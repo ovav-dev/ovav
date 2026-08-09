@@ -1,0 +1,206 @@
+# OVAV Document Surface Registry v1.0
+# 
+# Mapea superficies de código → documentos afectados con reglas de actualización.
+# El Doc Alignment Trigger usa este registry para determinar qué docs actualizar
+# post-commit y cómo hacerlo de forma quirúrgica.
+#
+# schema: ovav.doc_surfaces.v1
+
+description: >
+  Registry que define para cada superficie de código qué documentos deben
+  revisarse/actualizarse, con qué tipo de actualización y en qué sección.
+  Prioridad: 1 (crítico) a 5 (informativo).
+
+surfaces:
+  # ═══ Herramientas de seguridad ═══
+  tools/security:
+    priority: 1
+    docs:
+      - file: docs/security/06_SECURITY_FRAMEWORK.md
+        update: section_append
+        target: "## Runtime Security Gates"
+        rule: "append_new_gate_entry"
+      - file: IMPLEMENTATION_PLAN.md
+        update: status_table
+        table_header: "Sistema | Estado"
+        row_match_pattern: "Security"
+        marker_column: 2
+
+  # ═══ Herramientas de validación ═══
+  tools/validators:
+    priority: 1
+    docs:
+      - file: docs/runtime/04_RUNTIME_ENFORCEMENT.md
+        update: section_append
+        target: "## Validadores Activos"
+        rule: "append_validator_entry"
+      - file: IMPLEMENTATION_PLAN.md
+        update: status_table
+        table_header: "Sistema | Estado"
+        row_match_pattern: "(Integrity Mesh|validators|validator)"
+        marker_column: 2
+      - file: docs/implementation/07_IMPLEMENTATION_ROADMAP.md
+        update: section_update
+        target: "## Validadores"
+        rule: "update_validator_count"
+
+  # ═══ Harnesses ═══
+  tools/harnesses:
+    priority: 2
+    docs:
+      - file: IMPLEMENTATION_PLAN.md
+        update: status_table
+        table_header: "Sistema | Estado"
+        row_match_pattern: "{module_name}"
+        marker_column: 2
+      - file: docs/implementation/07_IMPLEMENTATION_ROADMAP.md
+        update: section_append
+        target: "## Harnesses Activos"
+        rule: "append_harness_entry"
+
+  # ═══ Runtime del agente ═══
+  tools/agent_runtime:
+    priority: 1
+    docs:
+      - file: docs/runtime/04_RUNTIME_ENFORCEMENT.md
+        update: section_append
+        target: "## Runtime Components"
+        rule: "append_component_entry"
+      - file: docs/runtime/05_SESSION_CAPSULE.md
+        update: section_update
+        target: "## Session Lifecycle"
+        rule: "update_lifecycle_diagram"
+      - file: IMPLEMENTATION_PLAN.md
+        update: status_table
+        table_header: "Sistema | Estado"
+        row_match_pattern: "(State Sync|Session Capsule|Memory Governor|Knowledge Compiler|Pattern|Alignment|Transition|Criterion)"
+        marker_column: 2
+
+  # ═══ Git / Transport ═══
+  tools/github:
+    priority: 2
+    docs:
+      - file: docs/system/01_ARCHITECTURE.md
+        update: section_update
+        target: "## Git Transport"
+        rule: "update_transport_section"
+
+  # ═══ OpenCode Surface ═══
+  .opencode:
+    priority: 2
+    docs:
+      - file: docs/system/01_ARCHITECTURE.md
+        update: section_update
+        target: "## OpenCode Integration"
+        rule: "update_opencode_surface"
+      - file: IMPLEMENTATION_PLAN.md
+        update: status_table
+        table_header: "Sistema | Estado"
+        row_match_pattern: "(System Prompt|Behavioral|OpenCode)"
+        marker_column: 2
+
+  # ═══ OVAV Runtime (.ovav/) ═══
+  .ovav:
+    priority: 2
+    docs:
+      - file: docs/runtime/04_RUNTIME_ENFORCEMENT.md
+        update: section_update
+        target: "## OVAV Runtime"
+        rule: "update_runtime_section"
+      - file: docs/runtime/05_SESSION_CAPSULE.md
+        update: section_update
+        target: "## Runtime Context"
+        rule: "update_context_section"
+
+  # ═══ AGENTS.md (superficie raíz) ═══
+  AGENTS.md:
+    priority: 1
+    docs:
+      - file: docs/system/00_IDENTITY.md
+        update: section_update
+        target: "## System Instructions"
+        rule: "update_identity_section"
+      - file: IMPLEMENTATION_PLAN.md
+        update: status_table
+        table_header: "Sistema | Estado"
+        row_match_pattern: "(System Prompt|Behavioral)"
+        marker_column: 2
+
+  # ═══ Documentación misma ═══
+  docs/:
+    priority: 3
+    docs:
+      - file: docs/reference/08_DOC_AUTHORITY_MATRIX.md
+        update: section_update
+        target: "## Document Hierarchy"
+        rule: "update_hierarchy"
+
+  # ═══ Registry ═══
+  registry/:
+    priority: 2
+    docs:
+      - file: docs/reference/09_SOURCE_REGISTRY.md
+        update: section_update
+        target: "## Registry Structure"
+        rule: "update_registry_structure"
+      - file: IMPLEMENTATION_PLAN.md
+        update: status_table
+        table_header: "Sistema | Estado"
+        row_match_pattern: "Registry"
+        marker_column: 2
+
+  # ═══ Instalación ═══
+  tools/install:
+    priority: 3
+    docs:
+      - file: docs/workstation/OVAV_WEZTERM_WORKSPACE_ISOLATION.md
+        update: section_update
+        target: "## Installation"
+        rule: "update_install_section"
+
+  # ═══ Raíz del repo (README, RELEASE_NOTES) ═══
+  README.md:
+    priority: 3
+    docs: []
+    note: "README se actualiza manualmente; el trigger solo reporta"
+
+  RELEASE_NOTES.md:
+    priority: 3
+    docs: []
+    note: "Release notes se generan desde CHANGELOG; el trigger reporta"
+
+# ═══ Reglas de update_type ═══
+#
+# status_table:     Actualiza una fila en una tabla markdown (cambia marcador como ⬜→✅)
+# section_append:   Agrega contenido al final de una sección existente
+# section_update:   Reemplaza el contenido de una sección específica
+# section_insert:   Inserta nueva sección después de un target
+#
+# marker_column:    1-indexed column in the table that contains the status marker
+# row_match_pattern: regex or "{module_name}" placeholder to match the row
+
+# ═══ Commit keyword → doc heuristic (fallback cuando no hay entrada registry) ═══
+heuristics:
+  - keywords: ["transport", "https", "git push", "git fetch", "remote"]
+    docs:
+      - docs/system/01_ARCHITECTURE.md
+      - docs/security/06_SECURITY_FRAMEWORK.md
+  - keywords: ["validate", "validator", "severity", "filter", "check_"]
+    docs:
+      - docs/runtime/04_RUNTIME_ENFORCEMENT.md
+  - keywords: ["cpu", "threshold", "adaptive", "load", "performance"]
+    docs:
+      - docs/system/01_ARCHITECTURE.md
+  - keywords: ["packet", "evaluation", "trigger", "pipeline"]
+    docs:
+      - docs/implementation/07_IMPLEMENTATION_ROADMAP.md
+      - IMPLEMENTATION_PLAN.md
+  - keywords: ["capsule", "session", "budget", "context", "isolation"]
+    docs:
+      - docs/runtime/05_SESSION_CAPSULE.md
+  - keywords: ["memory", "governor", "classify", "redact", "poison"]
+    docs:
+      - docs/runtime/05_SESSION_CAPSULE.md
+  - keywords: ["install", "deploy", "global", "apply", "backup"]
+    docs:
+      - docs/workstation/OVAV_WEZTERM_WORKSPACE_ISOLATION.md

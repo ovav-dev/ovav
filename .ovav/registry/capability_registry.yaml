@@ -1,0 +1,174 @@
+schema: ovav.capability_registry.v1
+initialized_at: '2026-06-04T04:29:14.470562+00:00'
+capabilities:
+  nerve_bus:
+    id: nerve_bus
+    name: NerveBus — SNV spike train
+    state: active
+    domain: snv
+    since: '2026-06-02'
+    dependencies: []
+    registered_in: connectors/harnesses.yaml
+  knowledge_graph:
+    id: knowledge_graph
+    name: Knowledge Graph — operational memory graph
+    state: active
+    domain: snv
+    since: '2026-06-02'
+    dependencies:
+    - nerve_bus
+    registered_in: connectors/harnesses.yaml
+  hebbian_weights:
+    id: hebbian_weights
+    name: Hebbian Weights — associative learning
+    state: active
+    domain: snv
+    since: '2026-06-02'
+    dependencies:
+    - nerve_bus
+    registered_in: connectors/harnesses.yaml
+  temporal_cortex:
+    id: temporal_cortex
+    name: Temporal Cortex — trend projection
+    state: active
+    domain: snv
+    since: '2026-06-02'
+    dependencies:
+    - nerve_bus
+    - knowledge_graph
+    registered_in: connectors/harnesses.yaml
+  pattern_learner:
+    id: pattern_learner
+    name: Pattern Learner — session pattern detection
+    state: active
+    domain: snv
+    since: '2026-06-02'
+    dependencies:
+    - nerve_bus
+    - hebbian_weights
+    registered_in: connectors/harnesses.yaml
+  pain_scorer_d1:
+    id: pain_scorer_d1
+    name: PainScorer D1 — intelligent impact classifier
+    state: active
+    domain: snv
+    since: '2026-06-04'
+    dependencies:
+    - nerve_bus
+    - temporal_cortex
+    registered_in: connectors/harnesses.yaml
+  cli_rc10:
+    id: cli_rc10
+    name: CLI RC10 — NerveBus Live Experience
+    state: active
+    domain: cli
+    since: '2026-06-04'
+    dependencies:
+    - nerve_bus
+    - pain_scorer_d1
+    registered_in: connectors/harnesses.yaml
+  context_firewall:
+    id: context_firewall
+    name: Context Firewall v2 — 5-check pipeline
+    state: active
+    domain: session
+    since: '2026-05-30'
+    dependencies: []
+    registered_in: runtime
+  memory_governor:
+    id: memory_governor
+    name: Memory Governor — git HEAD + caps.yaml bound
+    state: active
+    domain: memory
+    since: '2026-05-30'
+    dependencies: []
+    registered_in: runtime
+  knowledge_compiler:
+    id: knowledge_compiler
+    name: Knowledge Compiler P0.2 — operational brain
+    state: active
+    domain: memory
+    since: '2026-06-02'
+    dependencies:
+    - memory_governor
+    - pattern_learner
+    registered_in: runtime
+  integrity_mesh:
+    id: integrity_mesh
+    name: Integrity Mesh F0-F4 — 62 validators
+    state: active
+    domain: security
+    since: '2026-05-28'
+    dependencies: []
+    registered_in: connectors/validators.yaml
+  lockdown_authority:
+    id: lockdown_authority
+    name: Lockdown Authority — centralized defense
+    state: active
+    domain: security
+    since: '2026-06-02'
+    dependencies:
+    - integrity_mesh
+    - pain_scorer_d1
+    registered_in: runtime
+  connector_bus:
+    id: connector_bus
+    name: ConnectorBus v2.0 — molecular integration
+    state: active
+    domain: connector
+    since: '2026-06-03'
+    dependencies: []
+    registered_in: connectors/*.yaml
+  tool_consolidator:
+    id: tool_consolidator
+    name: Tool Consolidator D4 — ecosystem scanner
+    state: verified
+    domain: cli
+    since: '2026-06-04'
+    dependencies:
+    - connector_bus
+    registered_in: null
+  capability_lifecycle:
+    id: capability_lifecycle
+    name: Capability Lifecycle D5 — formal state machine
+    state: verified
+    domain: governance
+    since: '2026-06-04'
+    dependencies:
+    - connector_bus
+    registered_in: null
+  mcp_rag:
+    id: mcp_rag
+    name: MCP/RAG sobre KC+SNV
+    state: proposed
+    domain: cli
+    since: '2026-06-03'
+    dependencies:
+    - knowledge_compiler
+    - knowledge_graph
+    registered_in: null
+    blocked: true
+    blocked_reason: 'Alignment 0.50 < 0.60 (67% progress — 2/3 gates: strong_connections
+      ✅, stable ✅)'
+    gates_progress:
+      alignment:
+        current: 0.5
+        required: 0.6
+        passed: false
+      strong_connections:
+        current: 5
+        required: 3
+        passed: true
+      stability:
+        passed: true
+    progress_pct: 67
+  tools_consolidation_target:
+    id: tools_consolidation_target
+    name: 'Tools consolidation: 367→~100 harnesses'
+    state: designed
+    domain: governance
+    since: '2026-06-04'
+    dependencies:
+    - tool_consolidator
+    registered_in: null
+last_updated: '2026-06-04T04:55:38.481937+00:00'

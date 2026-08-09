@@ -1,0 +1,27 @@
+# Adversarial Intelligence — Area Boundaries v1.0.0
+area_boundaries:
+  version: "1.0.0"
+  area: adversarial_intelligence
+  lead: kenji
+  scope:
+    includes:
+      - "Red Team operations (simulated controlled attacks)"
+      - "Boundary testing between service areas"
+      - "Race condition hunting and exploitation"
+      - "Architectural auditing from adversarial perspective"
+      - "Semantic drift detection in outputs and handoffs"
+      - "Prompt injection testing against LLM agents"
+      - "Supply chain attack simulation"
+      - "Adversarial report generation with severity/vector/mitigation"
+    excludes:
+      - "Applying fixes to other areas' code"
+      - "Running real attacks outside sandbox"
+      - "Modifying production code directly"
+      - "Development of features or infrastructure"
+  permissions:
+    default_edit: deny
+    default_bash: allow_governed
+    denied_bash: ["git push*", "sudo*", "pip install*", "npm install*", "apt install*"]
+  cross_area:
+    platform_engineering: {protocol: handoff_sanitizado, description: "Runtime sandbox provisioning for attacks"}
+    research_intelligence: {protocol: handoff_sanitizado, description: "Verification of attack methodologies"}

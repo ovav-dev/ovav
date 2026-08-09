@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ovav.dev/schemas/session_handoff.schema.json",
+  "title": "OVAV Session Handoff Schema",
+  "description": "Compact artifact that preserves session continuity across chat boundaries. Written at session end, loaded at session start. Multi-repo aware: each repo stores its own handoff.",
+  "type": "object",
+  "required": ["handoff_id", "session_id", "written_at", "repo_root", "continuity_bridge", "integrity"],
+  "properties": {
+    "handoff_id": {
+      "type": "string",
+      "description": "Unique handoff identifier"
+    },
+    "session_id": {
+      "type": "string",
+      "description": "Session that produced this handoff"
+    },
+    "written_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "repo_root": {
+      "type": "string",
+      "description": "Absolute path to the repo this handoff belongs to"
+    },
+    "active_branch": {
+      "type": "string"
+    },
+    "operator": {
+      "type": "string",
+      "default": "thavren",
+      "description": "OVAV operator writing the handoff"
+    },
+    "continuity_bridge": {
+      "type": "object",
+      "description": "The essential context needed to continue without the user re-explaining",
+      "required": ["user_role", "current_phase", "last_decision", "pending"],
+      "properties": {
+        "user_role": {
+          "type": "string",
+          "description": "Sanitized role context: who we're working with (e.g., 'CEO of OVAV', 'Lead Developer')"
+        },
+        "current_phase": {
+          "type": "string",
+          "description": "What phase/layer we're in"
+        },
+        "phase_progress": {
+          "type": "string",
+          "description": "Where exactly we are within the phase"
+        },
+        "last_decision": {
+          "type": "string",
+          "description": "Last major decision or milestone reached"
+        },
+        "last_topic": {
+          "type": "string",
+          "description": "What we were just talking about before the handoff"
+        },
+        "pending": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Items explicitly left pending by the user"
+        },
+        "goal": {
+          "type": "string",
+          "description": "The overarching task or goal spanning multiple sessions"
+        }
+      }
+    },
+    "user_preferences": {
+      "type": "object",
+      "description": "What we learned about the user's communication style and preferences in this session",
+      "properties": {
+        "language": {"type": "string", "default": "es"},
+        "tone": {
+          "type": "string",
+          "enum": ["formal", "conversational", "direct", "technical", "mixed"],
+          "default": "conversational"
+        },
+        "response_style": {
+          "type": "string",
+          "description": "How the user prefers responses: compact, narrative, visual, etc."
+        },
+        "prefers_explanations": {"type": "boolean"},
+        "prefers_visuals": {"type": "boolean"},
+        "feedback_notes": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Specific feedback the user gave about delivery style"
+        },
+        "jargon_accepted": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Technical terms the user is comfortable with"
+        }
+      }
+    },
+    "behavior_adjustments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "trigger": {"type": "string"},
+          "adjustment": {"type": "string"},
+          "permanent": {"type": "boolean"}
+        }
+      },
+      "description": "Runtime behavior modifications learned during this session"
+    },
+    "ledger_snapshot": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "References to active ledger entries relevant to continuity"
+    },
+    "integrity": {
+      "type": "object",
+      "required": ["hash", "repo_confirmed"],
+      "properties": {
+        "hash": {
+          "type": "string",
+          "description": "SHA of this handoff content for tamper detection"
+        },
+        "repo_confirmed": {
+          "type": "boolean",
+          "description": "Whether the repo root was verified at write time"
+        },
+        "git_commit": {
+          "type": "string",
+          "description": "HEAD commit at handoff time"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,13 @@
+install_packs:
+  ovav_source_runtime_pack:
+    modes: [inspect, plan, backup, authoritative, restore]
+    targets: [ovav_artifacts, registry, source_runtime]
+    notes: source_only_until_s11
+  opencode_governed_pack:
+    modes: [inspect, plan, backup, authoritative, restore]
+    targets: [opencode_agents, opencode_skills, opencode_commands]
+    notes: opencode_surface_only_after_s10
+  research_artifact_pack:
+    modes: [inspect, plan]
+    targets: [research_artifacts, source_maps, reports]
+    notes: evidence_first

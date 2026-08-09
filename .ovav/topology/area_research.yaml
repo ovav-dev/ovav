@@ -1,0 +1,91 @@
+# Research Intelligence — Topology Contract
+# Área de servicio profesional OVAV
+# Este archivo define la jerarquía, delegación y reglas de visibilidad.
+
+area:
+  name: Research Intelligence
+  id: area_research
+  description: "◆ Área de servicio · Evidence · Sources · Benchmarks"
+  scope:
+    - source_verification
+    - benchmarking
+    - evidence_scoring
+    - technical_comparison
+    - contradiction_detection
+    - decision_briefs
+    - research_synthesis
+    - external_web_research
+    - competitive_intelligence
+
+lead:
+  name: Eidren
+  canonical: .ovav/source/agents/leads/eidren.md
+  agent_file: lead-eidren.md
+  mode: subagent
+  visible_in_at: true
+  description: "✦ Research Intelligence Lead · Evidence · Sources · Benchmarks"
+  voice: primary_user_facing
+  tone: warm_natural_evidence_based
+  greeting: "Hola, ¿cómo estás? Soy Eidren. ¿Qué decisión o investigación revisamos hoy?"
+
+squads:
+  - name: Nara
+    canonical: .ovav/source/agents/teams/research-intelligence/nara.md
+    agent_file: team-nara.md
+    role: benchmark_analyst
+    description: "Análisis competitivo, comparativas técnicas, briefs de decisión"
+    can_delegate_to: []
+    
+  - name: Lyra
+    canonical: .ovav/source/agents/teams/research-intelligence/lyra.md
+    agent_file: team-lyra.md
+    role: summarizer
+    description: "Condensación de handoffs, reportes y evidencia"
+    can_delegate_to: []
+
+delegation_rules:
+  max_depth: 2
+  cross_squad: false
+  require_lead_approval_for:
+    - external_publication
+    - client_facing_reports
+    - production_claims
+
+visibility_contract:
+  at_mentions: [Eidren]
+  tab_selector: [Research Intelligence]
+  default_agent: Research Intelligence
+  hidden_from_user: [Nara, Lyra]
+  
+research_sources:
+  trusted_tier_1:
+    - name: arXiv
+      url: https://arxiv.org
+    - name: IEEE Xplore
+      url: https://ieeexplore.ieee.org
+    - name: ACM Digital Library
+      url: https://dl.acm.org
+  tier_2_industry:
+    - name: Anthropic Engineering Blog
+      url: https://www.anthropic.com/engineering
+    - name: OpenAI Engineering
+      url: https://openai.com/engineering
+    - name: Google Research
+      url: https://research.google
+  tools:
+    - name: Tavily Search
+      type: web_search
+      free_tier: "1,000 queries/month"
+      credit_card_required: false
+    - name: Brave Search API
+      type: web_search
+      free_tier: "$5 credits/month (1,000 queries)"
+      credit_card_required: true
+    - name: DuckDuckGo
+      type: web_search_fallback
+      free_tier: unlimited
+      credit_card_required: false
+    - name: SearXNG Public
+      type: web_search_fallback
+      free_tier: unlimited
+      credit_card_required: false

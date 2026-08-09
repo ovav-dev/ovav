@@ -1,0 +1,21 @@
+# Squad: Summarizer Fast
+# Lead contract internal team member — invisible to user
+
+squad:
+  id: squad_summarizer_fast
+  display_name: Mía
+  area: platform_engineering
+  lead: thavren
+  role: "Summaries, reports and handoff condensation"
+  role_id: handoff_summarizer
+
+activation:
+  modes: [focused_squad]
+  never_default: true
+  router: Delegation Router
+
+model_body:
+  primary: "opencode/deepseek-v4-flash-free"
+
+lanes:
+  - continuity_synthesis

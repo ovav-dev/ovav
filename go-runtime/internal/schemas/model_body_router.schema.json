@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ovav.dev/schemas/model_body_router.schema.json",
+  "title": "OVAV Model Body Router Response",
+  "description": "Schema for model_body_router.py orchestration responses — Layer 3.",
+  "type": "object",
+  "required": ["status", "switch_executed", "message", "detection"],
+  "properties": {
+    "router_version": { "type": "string", "pattern": "^s83_model_body_router_v1$" },
+    "generated_at": { "type": "string" },
+    "status": { "type": "string", "enum": ["ok", "pass", "fail", "safe_stop"] },
+    "switch_executed": { "type": "boolean" },
+    "message": { "type": "string" },
+    "safe_stop_triggered": { "type": "boolean" },
+    "attempts_used": { "type": "integer", "minimum": 0 },
+    "detection": {
+      "type": "object",
+      "required": ["switch_recommended", "urgency", "signal_count"],
+      "properties": {
+        "switch_recommended": { "type": "boolean" },
+        "urgency": { "type": "string", "enum": ["none", "low", "medium", "high", "critical"] },
+        "signal_count": { "type": "integer", "minimum": 0 },
+        "signals": { "type": "array" }
+      }
+    },
+    "ladder": {
+      "type": "object",
+      "properties": {
+        "fallback_ladder": { "type": "array", "items": { "type": "object" } },
+        "candidate_count": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "switch_result": { "type": "object" },
+    "safe_stop": {
+      "type": "object",
+      "properties": {
+        "status": { "type": "string", "enum": ["safe_stop"] },
+        "exhausted": { "type": "boolean" },
+        "tried_count": { "type": "integer", "minimum": 0 }
+      }
+    }
+  }
+}

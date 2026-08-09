@@ -1,0 +1,5 @@
+squad: {id: squad_api_security, display_name: Nora, area: digital_product, lead: dante, role: "API design (REST/GraphQL), authentication, OWASP compliance, encryption", role_id: api_security_engineer}
+activation: {modes: [focused_squad, critical_squad], never_default: true}
+model_body: {primary: "opencode-go/deepseek-v4-pro"}
+lanes: [backend, security]
+constraints: ["OWASP top 10 debe estar cubierto en cada release", "Secrets nunca en código — siempre en vault"]

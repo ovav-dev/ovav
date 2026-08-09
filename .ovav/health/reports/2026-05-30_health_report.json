@@ -1,0 +1,90 @@
+{
+  "timestamp": "2026-05-30T11:24:21.408354+00:00",
+  "overall_status": "CRITICAL",
+  "overall_score": 46,
+  "checks": [
+    {
+      "name": "living_integrity",
+      "status": "FAIL",
+      "score": 30,
+      "details": {
+        "output": "[OVAV Living Integrity] Scanning...\n\n  Status: CRITICAL\n  Files scanned: 1522\n  Drifts detected: 3\n  By severity: C=3 W=0 I=0 S=0\n  Auto-healed: 0\n\n  Drift details:\n    🔴 .ovav/quarantine/registry.json (unclassified, score=100)\n    🔴 tools/security/implementation_guard.py (immutable_source, score=95"
+      },
+      "duration_ms": 1083.8115215301514,
+      "error": ""
+    },
+    {
+      "name": "implementation_guard",
+      "status": "FAIL",
+      "score": 10,
+      "details": {
+        "criticals": 20,
+        "warnings": 7,
+        "orphans": 7,
+        "broken_integrations": 5
+      },
+      "duration_ms": 1728.736162185669,
+      "error": ""
+    },
+    {
+      "name": "risk_scorer",
+      "status": "PASS",
+      "score": 100,
+      "details": {
+        "risky_bash_score": 70,
+        "safe_read_score": 0
+      },
+      "duration_ms": 1.3761520385742188,
+      "error": ""
+    },
+    {
+      "name": "context_firewall_v2",
+      "status": "ERROR",
+      "score": 0,
+      "details": {},
+      "duration_ms": 0.0,
+      "error": "'L5Result' object has no attribute 'checks_passed'"
+    },
+    {
+      "name": "host_defense",
+      "status": "FAIL",
+      "score": 10,
+      "details": {
+        "gate": "ERROR"
+      },
+      "duration_ms": 766.8740749359131,
+      "error": ""
+    },
+    {
+      "name": "sbom",
+      "status": "FAIL",
+      "score": 30,
+      "details": {
+        "output": "[OVAV SBOM Verify] Checking supply chain integrity...\n  [PASS] Requirements hash: Requirements hash verified: e3b0c44298fc1c14...\n  [FAIL] MODIFIED: .ovav/quarantine/registry.json (79b6ac3efb6e... vs "
+      },
+      "duration_ms": 462.2066020965576,
+      "error": ""
+    },
+    {
+      "name": "provenance_checker",
+      "status": "PASS",
+      "score": 100,
+      "details": {
+        "source": "git_tracked",
+        "verified": true
+      },
+      "duration_ms": 20.281553268432617,
+      "error": ""
+    }
+  ],
+  "comparison": {
+    "has_baseline": false,
+    "message": "Primera ejecución — baseline creado"
+  },
+  "recommendations": [
+    "🔴 living_integrity: requiere atención inmediata (score: 30)",
+    "🔴 implementation_guard: requiere atención inmediata (score: 10)",
+    "🔴 host_defense: requiere atención inmediata (score: 10)",
+    "🔴 sbom: requiere atención inmediata (score: 30)"
+  ]
+}

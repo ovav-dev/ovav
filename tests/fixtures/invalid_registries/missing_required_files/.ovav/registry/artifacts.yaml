@@ -1,0 +1,35 @@
+artifacts:
+  project_discovery:
+    path: .ovav/artifacts/init/PROJECT_DISCOVERY.json
+    companion_path: .ovav/artifacts/init/PROJECT_DISCOVERY.md
+    phase: init
+  artifact_map:
+    path: .ovav/artifacts/init/ARTIFACT_MAP.md
+    phase: init
+  exploration_notes:
+    path: .ovav/artifacts/explore/EXPLORE.md
+    phase: explore
+  flow_map:
+    path: .ovav/artifacts/explore/FLOW_MAP.md
+    phase: explore
+  proposal:
+    path: .ovav/artifacts/proposal/PROPOSAL.md
+    phase: proposal
+  spec:
+    path: .ovav/artifacts/spec/SPEC.md
+    phase: spec
+  design:
+    path: .ovav/artifacts/design/DESIGN.md
+    phase: design
+  tasks:
+    path: .ovav/artifacts/tasks/TASKS.md
+    phase: tasks
+  apply_log:
+    path: .ovav/artifacts/apply/APPLY_LOG.md
+    phase: apply
+  verify_report:
+    path: .ovav/artifacts/verify/VERIFY.md
+    phase: verify
+  handoff_summary:
+    path: .ovav/artifacts/archive/HANDOFF.md
+    phase: archive

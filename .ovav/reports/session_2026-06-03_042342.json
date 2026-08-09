@@ -1,0 +1,106 @@
+{
+  "schema": "ovav.session_report.v1",
+  "generated_at": "2026-06-03T04:23:42.467725+00:00",
+  "session_id": "2026-06-03_042342",
+  "capsule_id": "unknown",
+  "branch": "task/implementaciones",
+  "git": {
+    "branch": "task/implementaciones",
+    "last_commits": [
+      "188aa80 feat(ux): TAB areas visibles + @ leads visibles — contrato CEO aprobado",
+      "ea424ca ledger: Research Mesh + @ surface + topology contracts cards",
+      "459cdcd chore: commit session evidence + gitignore evaluation dir",
+      "17e7495 feat(web): Brave Search re-enabled — now active with Tavily",
+      "c081fe9 feat(topology): area hierarchy contracts + governance rules",
+      "787ffd0 chore: update SBOM and core hashes post Research Mesh",
+      "aca39ab fix(web): Tavily Bearer auth + local api_keys.env config",
+      "ae0dd52 fix(web): Tavily first, Brave optional, no credit card default",
+      "95106ee feat(web): Research Mesh + @ surface fix",
+      "ecd709b feat(validators): gate automático de jerarquía de superficies UX"
+    ],
+    "modified_files": [],
+    "staged_files": []
+  },
+  "health": {
+    "overall_status": "HEALTHY",
+    "overall_score": 95,
+    "checks": {
+      "living_integrity": {
+        "status": "✅",
+        "raw": "✅ living_integrity: PASS (100/100) — 1757ms"
+      },
+      "implementation_guard": {
+        "status": "⚠️",
+        "raw": "⚠️ implementation_guard: WARN (65.4/100) — 25997ms"
+      },
+      "risk_scorer": {
+        "status": "✅",
+        "raw": "✅ risk_scorer: PASS (100/100) — 2ms"
+      },
+      "context_firewall_v2": {
+        "status": "✅",
+        "raw": "✅ context_firewall_v2: PASS (100/100) — 110ms"
+      },
+      "host_defense": {
+        "status": "✅",
+        "raw": "✅ host_defense: PASS (100/100) — 1017ms"
+      },
+      "sbom": {
+        "status": "✅",
+        "raw": "✅ sbom: PASS (100/100) — 480ms"
+      },
+      "provenance_checker": {
+        "status": "✅",
+        "raw": "✅ provenance_checker: PASS (100/100) — 123ms"
+      }
+    }
+  },
+  "integrity": {
+    "status": "CLEAN",
+    "drifts": 2,
+    "raw_output": "ned: 1602\n  Drifts detected: 2\n  By severity: C=0 W=0 I=0 S=2\n  Auto-healed: 2\n    ✓ .ovav/health/baseline.json\n    ✓ .ovav/health/reports/2026-06-03_health_report.json\n\n  Drift details:\n    ⚪ .ovav/health/baseline.json (mutable_runtime, score=0) [AUTHORIZED] [AUTO-HEALED]\n    ⚪ .ovav/health/reports/2026-06-03_health_report.json (mutable_runtime, score=0) [AUTHORIZED] [AUTO-HEALED]\n\n  CLEAN: 2 archivo(s) auto-curado(s) en dominios mutables. Sin amenazas detectadas.\n\n[OVAV Living Integrity] Done."
+  },
+  "implementation_guard": {
+    "total_modules": 478,
+    "criticals": 409,
+    "warnings": 1262,
+    "orphans": 0,
+    "broken_integrations": 1,
+    "top5_by_impact": [
+      {
+        "pair": "check_f1_architecture.py ↔ check_rego_policies.py",
+        "impact": 93,
+        "similarity": 83
+      },
+      {
+        "pair": "check_config_syntax.py ↔ check_harness_contract_alignment.py",
+        "impact": 85,
+        "similarity": 75
+      },
+      {
+        "pair": "validate_registries.py ↔ validate_skills.py",
+        "impact": 85,
+        "similarity": 75
+      },
+      {
+        "pair": "check_handoff_runtime_ux.py ↔ check_runtime_next_work.py",
+        "impact": 85,
+        "similarity": 85
+      },
+      {
+        "pair": "check_install_governor_sandbox.py ↔ check_install_sandbox_usability.py",
+        "impact": 85,
+        "similarity": 85
+      }
+    ]
+  },
+  "defense_gates": {
+    "defense_gate": {
+      "status": "clean",
+      "intrusions": 0,
+      "blockade": "inactive"
+    },
+    "sbom": "PASS"
+  },
+  "summary": "Sistema: HEALTHY (95/100) | Integridad: CLEAN | Implementation guard: 409 críticos, 0 huérfanos"
+}

@@ -1,0 +1,16 @@
+[Unit]
+Description=OVAV Backend (FastAPI)
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/braka/Systems/OVAV/web/backend
+Environment="HOME=/home/braka"
+ExecStart=/home/braka/.local/bin/uvicorn app.main:app --host 127.0.0.1 --port 8080
+Restart=always
+RestartSec=3
+StandardOutput=append:/tmp/ovav-backend-svc.log
+StandardError=append:/tmp/ovav-backend-svc.log
+
+[Install]
+WantedBy=default.target

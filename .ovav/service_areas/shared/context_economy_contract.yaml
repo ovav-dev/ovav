@@ -1,0 +1,137 @@
+context_economy_contract:
+  version: 1
+  purpose: >-
+    Keep OVAV context-efficient by loading only what the user's intent, risk,
+    missing evidence and closure requirements justify.
+
+  tiers:
+    T0_none:
+      use_for:
+        - acknowledgement
+        - trivial conversational turn
+      load: []
+      rule: No repo/internal context.
+    T1_tiny:
+      use_for:
+        - greetings
+        - simple consultations
+        - identity clarification
+      load:
+        - active identity/session rule already present in prompt
+        - exact user request
+      rule: No full plans, historical handoffs, broad artifacts, broad skills or squads.
+    T2_compact:
+      use_for:
+        - direct diagnosis
+        - command explanation
+        - small context card
+      load:
+        - AGENTS.md
+        - docs/26_RUNTIME_CONTEXT_BUDGET.md
+        - git log --oneline -5 + caps.yaml pending section when the user mentions a known topic
+        - exact relevant file or command output
+      rule: Escalate only when evidence is missing or risk increases.
+    T3_focused:
+      use_for:
+        - small implementation
+        - scoped OpenCode surface update
+        - validator repair
+      load:
+        - compact context pack
+        - touched files
+        - directly required contracts or validators
+      rule: Keep reads source-local and task-scoped through Context Gateway.
+    T4_full_scoped:
+      use_for:
+        - multi-file implementation
+        - cross-area handoff
+        - high-risk policy or runtime change
+      load:
+        - exact upstream artifacts
+        - affected registries/policies
+        - relevant validators and evidence paths
+      rule: Broad enough for correctness, never broad by default.
+    T5_closure_grade:
+      use_for:
+        - final validation
+        - close-layer dry-run
+        - commit readiness
+        - safety review
+      load:
+        - validation evidence
+        - git status/diff/log safety context
+        - exact changed files and closure artifacts
+      rule: Closure context is evidence-focused, not historical-dump focused.
+
+  escalation_rules:
+    - Greetings and simple consultations use tiny context.
+    - Do not preload full build plans, historical handoffs or broad artifact trees.
+    - Do not load all skills or harnesses by default.
+    - Do not activate squads by default.
+    - Do not work from zero on a known topic; read caps.yaml + recent git log before broad search.
+    - Escalate only because of intent, risk, missing evidence or closure requirements.
+    - Every escalation must have a reason.
+    - Validation breadth must match touched surfaces and closure risk.
+    - For long documents, broad repository scans or many-file comparisons, delegate exploration first and load only the compact synthesized findings into the lead context.
+    - Keep the lead context for judgment, architecture, safety and final delivery; do not spend it on bulk reading when a governed delegate can map the surface.
+
+  topic_recall_rules:
+    source: git HEAD + .ovav/plan/caps.yaml
+    contract: .ovav/service_areas/shared/operational_memory_contract.yaml
+    rule: >-
+      Topic recall is compact and selective. Derive operational context from
+      git HEAD (recent commits) + caps.yaml (plan status). No separate ledger
+      file. Memory state is derived from git HEAD + caps.yaml exclusively.
+    trigger_examples:
+      wezterm: check git log -- wezterm/ + caps.yaml for related caps.
+      opencode: check recent commits touching .opencode/ or AGENTS.md.
+      memory: check operational_memory_contract.yaml for current rules.
+
+  service_area_defaults:
+    research_intelligence:
+      default_tier: T1_tiny
+      default_context: public_external_and_shared_governance
+      rule: must not load repo/internal OVAV context by default; require explicit scoped permission or sanitized Platform Engineering handoff.
+    platform_engineering:
+      default_tier: T2_compact
+      default_context: source_local_by_task
+      rule: May use repo-local context only by task and Context Gateway approval; sensitive/execution context still requires explicit grant.
+
+  forbidden_defaults:
+    - full build plans
+    - historical handoffs
+    - broad .ovav/artifacts trees
+    - all skills loaded automatically
+    - all harnesses loaded automatically
+    - always-on squads
+    - repo/internal Research Intelligence context by default
+
+  compaction_recovery:
+    description: >-
+      OpenCode 1.17's compaction.auto with tail_turns: 2 and
+      preserve_recent_tokens: 3000, combined with the new context-overflow
+      retry, allows OVAV to be slightly more aggressive with context usage.
+    settings:
+      compaction_auto: true
+      tail_turns: 2
+      preserve_recent_tokens: 3000
+      context_overflow_retry: true
+    impact: >-
+      T3 and T4 tiers can carry ~10-15% more context before escalation,
+      since the host provides a safety net. Do not abuse this margin —
+      economy discipline still applies.
+
+  opencode_1_17_note:
+    description: >-
+      OpenCode 1.17+ provides context-overflow recovery and background subagent
+      support as internal runtime behaviors — they are NOT configured via top-level
+      keys in opencode.json. The 2026-06-11 post-mortem confirmed that "recovery"
+      and "background_agents" are NOT valid opencode.json schema keys. OVAV's
+      opencode.json only contains recognized schema keys.
+    context_overflow_retry: true
+    background_subagents_available: true
+    lesson: >-
+      Always validate opencode.json against the official schema before committing.
+      Host runtime features ≠ configuration keys.
+
+# LAW-001 governance: .ovav/laws/area_boundary_enforcement.yaml (Non-Invasion Area Boundary Law)

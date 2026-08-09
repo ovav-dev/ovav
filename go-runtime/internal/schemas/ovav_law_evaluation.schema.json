@@ -1,0 +1,172 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ovav.dev/schemas/ovav_law_evaluation.schema.json",
+  "title": "OVAV Law Evaluation Schema",
+  "description": "Schema for evaluating proposals against the 21 OVAV Laws. Every law must produce a result (PASS/FAIL/CHANGES_REQUIRED) with evidence.",
+  "type": "object",
+  "required": [
+    "evaluation_id",
+    "proposal_id",
+    "evaluated_at",
+    "evaluator",
+    "law_results",
+    "final_decision"
+  ],
+  "properties": {
+    "evaluation_id": {
+      "type": "string",
+      "description": "Unique identifier for this evaluation instance"
+    },
+    "proposal_id": {
+      "type": "string",
+      "description": "Reference to the proposal being evaluated"
+    },
+    "evaluated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of evaluation"
+    },
+    "evaluator": {
+      "type": "string",
+      "description": "Operator who performed the evaluation (e.g., thavren, eidren)"
+    },
+    "canonical_laws_source": {
+      "type": "string",
+      "default": ".ovav/laws/ovav_laws.yaml",
+      "description": "Path to the canonical laws YAML used for this evaluation"
+    },
+    "law_results": {
+      "type": "object",
+      "description": "Results for each of the 21 laws, grouped by family",
+      "required": [
+        "product_laws",
+        "authority_laws",
+        "identity_laws",
+        "context_tool_laws",
+        "execution_laws",
+        "security_evolution_laws"
+      ],
+      "properties": {
+        "product_laws": {
+          "type": "object",
+          "description": "LAW-01 through LAW-04",
+          "required": ["automation_useful", "practical_value", "friction_reduction", "intelligent_experience"],
+          "properties": {
+            "automation_useful": { "$ref": "#/$defs/law_result" },
+            "practical_value": { "$ref": "#/$defs/law_result" },
+            "friction_reduction": { "$ref": "#/$defs/law_result" },
+            "intelligent_experience": { "$ref": "#/$defs/law_result" }
+          }
+        },
+        "authority_laws": {
+          "type": "object",
+          "description": "LAW-05 through LAW-07",
+          "required": ["state_truth", "single_authority", "semantic_drift_free"],
+          "properties": {
+            "state_truth": { "$ref": "#/$defs/law_result" },
+            "single_authority": { "$ref": "#/$defs/law_result" },
+            "semantic_drift_free": { "$ref": "#/$defs/law_result" }
+          }
+        },
+        "identity_laws": {
+          "type": "object",
+          "description": "LAW-08 through LAW-10",
+          "required": ["persistent_identity", "service_area_alignment", "human_professional_delivery"],
+          "properties": {
+            "persistent_identity": { "$ref": "#/$defs/law_result" },
+            "service_area_alignment": { "$ref": "#/$defs/law_result" },
+            "human_professional_delivery": { "$ref": "#/$defs/law_result" }
+          }
+        },
+        "context_tool_laws": {
+          "type": "object",
+          "description": "LAW-11 through LAW-14",
+          "required": ["zero_trust_context", "minimum_sufficient_context", "governed_tools", "no_semantic_authorization"],
+          "properties": {
+            "zero_trust_context": { "$ref": "#/$defs/law_result" },
+            "minimum_sufficient_context": { "$ref": "#/$defs/law_result" },
+            "governed_tools": { "$ref": "#/$defs/law_result" },
+            "no_semantic_authorization": { "$ref": "#/$defs/law_result" }
+          }
+        },
+        "execution_laws": {
+          "type": "object",
+          "description": "LAW-15 through LAW-17",
+          "required": ["automatic_reflexes", "evidence_required", "intent_to_evidence_chain"],
+          "properties": {
+            "automatic_reflexes": { "$ref": "#/$defs/law_result" },
+            "evidence_required": { "$ref": "#/$defs/law_result" },
+            "intent_to_evidence_chain": { "$ref": "#/$defs/law_result" }
+          }
+        },
+        "security_evolution_laws": {
+          "type": "object",
+          "description": "LAW-18 through LAW-21",
+          "required": ["memory_firewall", "capability_lifecycle", "adversarial_future_stress", "governed_self_improvement"],
+          "properties": {
+            "memory_firewall": { "$ref": "#/$defs/law_result" },
+            "capability_lifecycle": { "$ref": "#/$defs/law_result" },
+            "adversarial_future_stress": { "$ref": "#/$defs/law_result" },
+            "governed_self_improvement": { "$ref": "#/$defs/law_result" }
+          }
+        }
+      }
+    },
+    "final_decision": {
+      "type": "string",
+      "enum": ["PASS", "PASS_WITH_CHANGES", "FAIL", "BLOCKED"],
+      "description": "Aggregate decision based on all law results"
+    },
+    "summary": {
+      "type": "object",
+      "properties": {
+        "total_evaluated": { "type": "integer", "minimum": 0, "maximum": 21 },
+        "passed": { "type": "integer" },
+        "failed": { "type": "integer" },
+        "changes_required": { "type": "integer" },
+        "skipped": { "type": "integer" },
+        "blocking_failures": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "required_changes": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "List of required changes if decision is PASS_WITH_CHANGES or FAIL"
+    }
+  },
+  "$defs": {
+    "law_result": {
+      "type": "object",
+      "required": ["law_id", "name", "result", "evidence"],
+      "properties": {
+        "law_id": {
+          "type": "string",
+          "pattern": "^LAW-\\d{2}$",
+          "description": "Law identifier (LAW-01 through LAW-21)"
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable law name"
+        },
+        "group": {
+          "type": "string",
+          "enum": ["product_laws", "authority_laws", "identity_laws", "context_tool_laws", "execution_laws", "security_evolution_laws"]
+        },
+        "result": {
+          "type": "string",
+          "enum": ["PASS", "FAIL", "CHANGES_REQUIRED", "SKIPPED"],
+          "description": "Evaluation result for this law"
+        },
+        "evidence": {
+          "type": "string",
+          "description": "Human-readable evidence supporting the result"
+        },
+        "severity": {
+          "type": "string",
+          "enum": ["required", "required_for_medium_plus", "required_for_user_visible", "required_for_implementation", "required_for_runtime_and_docs", "required_for_agent_role_changes", "required_for_profile_changes", "required_for_user_visible_agent_surface", "blocking", "required_for_nontrivial", "required_for_complex_or_critical", "blocking_for_memory_changes", "blocking_for_advanced_tools", "required_for_feedback_and_memory", "blocking_if_high"],
+          "description": "Severity level from the canonical laws YAML"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,1538 @@
+harnesses:
+  workspace_safety_gate:
+    tier: 10
+    trigger: before_repo_local_write_or_git_action
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+    domain: safety
+  h_protocol_access_gate:
+    tier: 10
+    trigger: before_protocol_access
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+    domain: protocol
+  h_protocol_audit_log:
+    tier: 10
+    trigger: after_protocol_access
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+    domain: protocol
+  h_protocol_circuit_breaker:
+    tier: 10
+    trigger: on_protocol_access_failure
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+    domain: protocol
+  h_git_stage_intelligence:
+    tier: 10
+    trigger: after_git_stage
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+    domain: git
+  h_git_change_manifest:
+    tier: 9
+    trigger: after_git_stage
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+    domain: git
+  h_git_pr_structure:
+    tier: 9
+    trigger: after_git_commit
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+    domain: git
+  h_segment_completion_detector:
+    tier: 10
+    trigger: on_segment_evidence_complete
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+    domain: closure
+  h_auto_close_executor:
+    tier: 10
+    trigger: on_segment_evidence_complete
+    side_effects: git_write_and_snapshot_create
+    owner_profile: ovav_systems_architect
+    domain: closure
+  check_auto_close_executor:
+    tier: 10
+    trigger: after_auto_close_complete
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+    domain: closure
+  h_session_close_label:
+    tier: 9
+    trigger: on_session_close
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+    domain: closure
+  h_verify_evidence:
+    tier: 10
+    trigger: before_close
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+    domain: closure|evidence
+    description: "Verifies evidence quality before task/session closure: file health, index consistency, format validity and drift detection."
+  context_budget:
+    tier: 9
+    trigger: context_requested
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  sdd_init:
+    tier: 10
+    trigger: project_unknown_or_stale
+    side_effects: project_local_artifacts_only
+    owner_profile: ovav_systems_architect
+  phase_dag:
+    tier: 10
+    trigger: before_phase_transition
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  artifact_dependency:
+    tier: 10
+    trigger: before_apply_or_verify
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  result_contract_runtime:
+    tier: 9
+    trigger: before_response_close
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  skill_context_loader:
+    tier: 9
+    trigger: skill_selected
+    side_effects: context_pack_only
+    owner_profile: ovav_systems_architect
+  memory_privacy_classifier:
+    tier: 10
+    trigger: memory_candidate_detected
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  memory_redactor:
+    tier: 10
+    trigger: sensitive_memory_detected
+    side_effects: redaction_only
+    owner_profile: ovav_systems_architect
+  memory_write_gateway:
+    tier: 10
+    trigger: memory_write_requested
+    side_effects: gated_write_only
+    owner_profile: ovav_systems_architect
+  memory_recall_filter:
+    tier: 9
+    trigger: memory_recall_requested
+    side_effects: filtered_read_only
+    owner_profile: ovav_systems_architect
+  install_plan:
+    tier: 8
+    trigger: install_requested
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  install_manifest:
+    tier: 8
+    trigger: install_requested
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  install_safety_gate:
+    tier: 10
+    trigger: before_install_apply
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  rollback_plan:
+    tier: 8
+    trigger: install_requested
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  thavren_e2e_runtime:
+    tier: 8
+    trigger: before_service_profile_close
+    side_effects: project_local_artifacts_only
+    owner_profile: ovav_systems_architect
+  thavren_e2e_report:
+    tier: 8
+    trigger: before_service_profile_close
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  eidren_e2e_runtime:
+    tier: 8
+    trigger: before_service_profile_close
+    side_effects: project_local_artifacts_only
+    owner_profile: ovav_research_analyst
+  p0_readiness_matrix:
+    tier: 8
+    trigger: before_dual_profile_governance
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  dual_profile_readiness:
+    tier: 8
+    trigger: before_dual_profile_governance
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  p0_governance_report:
+    tier: 8
+    trigger: before_dual_profile_close
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  check_dual_profile_readiness:
+    tier: 10
+    trigger: before_s14_close
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  evidence_mode:
+    tier: 10
+    trigger: before_validation
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  evidence_stability:
+    tier: 10
+    trigger: before_validation
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  stable_validation_runner:
+    tier: 10
+    trigger: before_validation
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  check_evidence_stability:
+    tier: 10
+    trigger: before_s15_close
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  build1_readiness:
+    tier: 8
+    trigger: before_build1_closure
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  source_local_acceptance:
+    tier: 8
+    trigger: before_build1_closure
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  build1_closure_report:
+    tier: 8
+    trigger: before_build1_closure
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  check_build1_closure:
+    tier: 10
+    trigger: before_s16_close
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  build2_segment_map:
+    tier: 8
+    trigger: before_build2_planning_freeze
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  build2_scope_boundaries:
+    tier: 8
+    trigger: before_build2_planning_freeze
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  build2_routing_matrix:
+    tier: 8
+    trigger: before_build2_planning_freeze
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  check_build2_planning_freeze:
+    tier: 10
+    trigger: before_s17_close
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  caution_policy:
+    tier: 8
+    trigger: on_ready_with_caution_classification
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  caution_gate:
+    tier: 9
+    trigger: before_action_evaluation
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  caution_graduation:
+    tier: 8
+    trigger: on_readiness_promotion_request
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  check_caution_policy_gates:
+    tier: 10
+    trigger: before_s18_close
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  seed_skill_trust:
+    tier: 10
+    trigger: before_s19_close
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  skill_graduation_policy:
+    tier: 8
+    trigger: on_readiness_promotion_request
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  skill_trust_report:
+    tier: 8
+    trigger: before_s19_close
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  check_seed_skill_trust:
+    tier: 10
+    trigger: before_s19_close
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  skill_eval_suite:
+    tier: 9
+    trigger: before_validation
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  adversarial_skill_cases:
+    tier: 9
+    trigger: before_validation
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  skill_eval_report:
+    tier: 8
+    trigger: before_close
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  check_skill_eval_adversarial:
+    tier: 10
+    trigger: before_s20_close
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  runtime_orchestrator:
+    tier: 8
+    trigger: on_user_message
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  runtime_command_router:
+    tier: 9
+    trigger: on_user_message
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  runtime_status_report:
+    tier: 8
+    trigger: before_close
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  check_runtime_orchestrator_cli:
+    tier: 10
+    trigger: before_s21_close
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  context_compaction:
+    tier: 9
+    trigger: context_requested
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  snapshot_continuity:
+    tier: 9
+    trigger: before_context_or_status
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  context_pack_report:
+    tier: 8
+    trigger: before_close
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  check_context_compaction_runtime:
+    tier: 10
+    trigger: before_s22_close
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  opencode_pack_simulation:
+    tier: 8
+    trigger: before_s24_close
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  opencode_pack_validator:
+    tier: 10
+    trigger: before_s24_close
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  opencode_pack_report:
+    tier: 8
+    trigger: before_s24_close
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  check_opencode_pack_simulation:
+    tier: 10
+    trigger: before_s24_close
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  memory_candidate_cases:
+    tier: 9
+    trigger: memory_candidate_detected
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  memory_gateway_proof:
+    tier: 10
+    trigger: before_s26_close
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  memory_gateway_report:
+    tier: 8
+    trigger: before_s26_close
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  check_memory_gateway_proof:
+    tier: 10
+    trigger: before_s26_close
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  install_sandbox:
+    tier: 10
+    trigger: before_s27_close
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  install_backup_plan:
+    tier: 10
+    trigger: before_s27_close
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  install_rollback_simulator:
+    tier: 10
+    trigger: before_s27_close
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  install_sandbox_report:
+    tier: 8
+    trigger: before_s27_close
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  check_install_governor_sandbox:
+    tier: 10
+    trigger: before_s27_close
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  source_global_plan:
+    tier: 10
+    trigger: before_s28_close
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  source_global_risk:
+    tier: 10
+    trigger: before_s28_close
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  source_global_approval_gate:
+    tier: 10
+    trigger: before_s28_close
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  source_global_plan_report:
+    tier: 8
+    trigger: before_s28_close
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  check_source_global_plan:
+    tier: 10
+    trigger: before_s28_close
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  build2_e2e_rc1:
+    tier: 10
+    trigger: before_s29_close
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  build2_rc1_readiness:
+    tier: 10
+    trigger: before_s29_close
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  build2_e2e_report:
+    tier: 8
+    trigger: before_s29_close
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  check_build2_e2e_rc1:
+    tier: 10
+    trigger: before_s29_close
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  build2_closure:
+    tier: 10
+    trigger: before_s30_close
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  build2_final_readiness:
+    tier: 10
+    trigger: before_s30_close
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  build2_closure_report:
+    tier: 8
+    trigger: before_s30_close
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  check_build2_closure:
+    tier: 10
+    trigger: before_s30_close
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  build3_segment_map:
+    tier: 8
+    trigger: before_build3_planning_freeze
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  build3_scope_boundaries:
+    tier: 8
+    trigger: before_build3_planning_freeze
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  build3_runtime_ux_requirements:
+    tier: 8
+    trigger: before_build3_planning_freeze
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  build3_auto_trigger_matrix:
+    tier: 8
+    trigger: before_build3_planning_freeze
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  check_build3_planning_freeze:
+    tier: 10
+    trigger: before_s31_close
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  runtime_next_work:
+    tier: 9
+    trigger: what_now_requested
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  runtime_next_report:
+    tier: 8
+    trigger: before_s32_close
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  check_runtime_next_work:
+    tier: 10
+    trigger: before_s32_close
+    side_effects: project_local_artifacts_only
+    owner_profile: ovav_systems_architect
+  harness_index:
+    tier: 9
+    trigger: harness_index_requested
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  context_default_entrypoint:
+    tier: 9
+    trigger: context_requested
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  context_default_report:
+    tier: 8
+    trigger: before_s33_close
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  check_context_default_harness_index:
+    tier: 10
+    trigger: before_s33_close
+    side_effects: project_local_artifacts_only
+    owner_profile: ovav_systems_architect
+  handoff_compaction:
+    tier: 9
+    trigger: compact_handoff_requested
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  runtime_daily_source:
+    tier: 9
+    trigger: daily_runtime_requested
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  runtime_ux_report:
+    tier: 8
+    trigger: before_s34_close
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  check_handoff_runtime_ux:
+    tier: 10
+    trigger: before_s34_close
+    side_effects: project_local_artifacts_only
+    owner_profile: ovav_systems_architect
+  evidence_ledger_index:
+    tier: 9
+    trigger: evidence_lookup_requested
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  runtime_workflow_hardening:
+    tier: 9
+    trigger: workflow_hardening_requested
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  runtime_usability_report:
+    tier: 8
+    trigger: before_s35_close
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  check_runtime_ux_hardening:
+    tier: 10
+    trigger: before_s35_close
+    side_effects: project_local_artifacts_only
+    owner_profile: ovav_systems_architect
+  close_workflow_assistant:
+    tier: 9
+    trigger: close_layer_requested
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  close_manifest_builder:
+    tier: 9
+    trigger: close_layer_requested
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  close_snapshot_plan:
+    tier: 9
+    trigger: close_layer_requested
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  check_runtime_close_assistant:
+    tier: 10
+    trigger: before_s36_close
+    side_effects: project_local_artifacts_only
+    owner_profile: ovav_systems_architect
+  thavren_workflow:
+    tier: 9
+    trigger: workflow_requested
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  thavren_task_router:
+    tier: 9
+    trigger: task_kind_routing_requested
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  thavren_workflow_report:
+    tier: 8
+    trigger: before_s37_close
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  check_thavren_practical_workflow:
+    tier: 10
+    trigger: before_s37_close
+    side_effects: project_local_artifacts_only
+    owner_profile: ovav_systems_architect
+  eidren_workflow:
+    tier: 9
+    trigger: workflow_requested
+    side_effects: read_only
+    owner_profile: ovav_research_analyst
+  eidren_task_router:
+    tier: 9
+    trigger: task_kind_routing_requested
+    side_effects: read_only
+    owner_profile: ovav_research_analyst
+  eidren_workflow_report:
+    tier: 8
+    trigger: before_s38_close
+    side_effects: artifact_write_only
+    owner_profile: ovav_research_analyst
+  check_eidren_practical_workflow:
+    tier: 10
+    trigger: before_s38_close
+    side_effects: project_local_artifacts_only
+    owner_profile: ovav_research_analyst
+  profile_workflow_hardening:
+    tier: 9
+    trigger: workflow_requested
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  profile_task_matrix:
+    tier: 9
+    trigger: task_kind_routing_requested
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  profile_workflow_report:
+    tier: 8
+    trigger: before_s39_close
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  check_profile_workflow_hardening:
+    tier: 10
+    trigger: before_s39_close
+    side_effects: project_local_artifacts_only
+    owner_profile: ovav_systems_architect
+  todo_progress_runtime:
+    tier: 9
+    trigger: todo_or_progress_requested
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  progress_state_report:
+    tier: 9
+    trigger: progress_report_requested
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  todo_action_router:
+    tier: 9
+    trigger: todo_action_routing_requested
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  check_todo_progress_runtime:
+    tier: 10
+    trigger: before_s41_close
+    side_effects: project_local_artifacts_only
+    owner_profile: ovav_systems_architect
+  memory_recall_ux:
+    tier: 9
+    trigger: memory_ux_requested
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  memory_candidate_preview:
+    tier: 9
+    trigger: memory_candidate_preview_requested
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  memory_recall_report:
+    tier: 8
+    trigger: memory_recall_report_requested
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  check_memory_recall_ux:
+    tier: 10
+    trigger: before_s42_close
+    side_effects: project_local_artifacts_only
+    owner_profile: ovav_systems_architect
+  install_sandbox_ux:
+    tier: 9
+    trigger: install_sandbox_preview_requested
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  install_preview_router:
+    tier: 9
+    trigger: install_sandbox_preview_requested
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  install_risk_rollback_guide:
+    tier: 9
+    trigger: install_sandbox_preview_requested
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  install_sandbox_ux_report:
+    tier: 8
+    trigger: install_sandbox_report_requested
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  check_install_sandbox_usability:
+    tier: 10
+    trigger: before_s43_close
+    side_effects: project_local_artifacts_only
+    owner_profile: ovav_systems_architect
+  build3_use_friction_e2e:
+    tier: 9
+    trigger: build3_use_friction_e2e_requested
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  build3_friction_score:
+    tier: 9
+    trigger: build3_use_friction_e2e_requested
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  build3_use_friction_report:
+    tier: 8
+    trigger: before_s44_close
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  check_build3_use_friction_e2e:
+    tier: 10
+    trigger: before_s44_close
+    side_effects: project_local_artifacts_only
+    owner_profile: ovav_systems_architect
+  build3_rc2_closure:
+    tier: 9
+    trigger: build3_rc2_closure_requested
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  build3_final_readiness:
+    tier: 9
+    trigger: build3_rc2_closure_requested
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  build3_closure_report:
+    tier: 8
+    trigger: before_s45_close
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  check_build3_rc2_closure:
+    tier: 10
+    trigger: before_s45_close
+    side_effects: project_local_artifacts_only
+    owner_profile: ovav_systems_architect
+  build4_segment_map:
+    tier: 8
+    trigger: before_build4_planning_freeze
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  build4_scope_boundaries:
+    tier: 8
+    trigger: before_build4_planning_freeze
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  preview_surface_graduation_policy:
+    tier: 8
+    trigger: before_build4_planning_freeze
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  build4_activation_order:
+    tier: 8
+    trigger: before_build4_planning_freeze
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  check_build4_planning_freeze:
+    tier: 10
+    trigger: before_s46_close
+    side_effects: project_local_artifacts_only
+    owner_profile: ovav_systems_architect
+  graduation_gate_runtime:
+    tier: 9
+    trigger: graduation_gate_requested
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  preview_surface_state:
+    tier: 9
+    trigger: preview_surface_state_requested
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  graduation_decision_report:
+    tier: 8
+    trigger: graduation_decision_report_requested
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  check_graduation_gate_runtime:
+    tier: 10
+    trigger: before_s47_close
+    side_effects: project_local_artifacts_only
+    owner_profile: ovav_systems_architect
+  opencode_repo_local_contract:
+    tier: 9
+    trigger: opencode_repo_local_contract_requested
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  opencode_repo_local_boundaries:
+    tier: 9
+    trigger: opencode_repo_local_contract_requested
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  opencode_repo_local_contract_report:
+    tier: 8
+    trigger: opencode_repo_local_contract_report_requested
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  check_opencode_repo_local_contract:
+    tier: 10
+    trigger: before_s48_close
+    side_effects: project_local_artifacts_only
+    owner_profile: ovav_systems_architect
+  opencode_repo_local_pack:
+    tier: 9
+    trigger: opencode_repo_local_pack_requested
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  opencode_repo_local_pack_writer:
+    tier: 9
+    trigger: opencode_repo_local_pack_requested
+    side_effects: project_local_artifacts_only
+    owner_profile: ovav_systems_architect
+  opencode_repo_local_pack_validator:
+    tier: 9
+    trigger: opencode_repo_local_pack_requested
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  opencode_repo_local_pack_report:
+    tier: 8
+    trigger: opencode_repo_local_pack_report_requested
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  check_opencode_repo_local_pack:
+    tier: 10
+    trigger: before_s49_close
+    side_effects: project_local_artifacts_only
+    owner_profile: ovav_systems_architect
+  opencode_repo_local_smoke:
+    tier: 9
+    trigger: opencode_repo_local_smoke_requested
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  opencode_session_manifest:
+    tier: 9
+    trigger: opencode_repo_local_smoke_requested
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  opencode_session_guidance:
+    tier: 9
+    trigger: opencode_repo_local_smoke_requested
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  opencode_repo_local_smoke_report:
+    tier: 8
+    trigger: opencode_repo_local_smoke_report_requested
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  check_opencode_repo_local_smoke:
+    tier: 10
+    trigger: before_s50_close
+    side_effects: project_local_artifacts_only
+    owner_profile: ovav_systems_architect
+  profile_session_contracts:
+    tier: 9
+    trigger: session_contracts_requested
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  profile_session_context:
+    tier: 9
+    trigger: session_contracts_requested
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  profile_session_policy:
+    tier: 9
+    trigger: session_contracts_requested
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  profile_session_contract_report:
+    tier: 8
+    trigger: session_contracts_report_requested
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  check_profile_session_contracts:
+    tier: 10
+    trigger: before_s51_close
+    side_effects: project_local_artifacts_only
+    owner_profile: ovav_systems_architect
+  opencode_repo_local_e2e:
+    tier: 9
+    trigger: opencode_repo_local_e2e_requested
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  opencode_repo_local_e2e_readiness:
+    tier: 9
+    trigger: opencode_repo_local_e2e_readiness_requested
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  opencode_repo_local_e2e_report:
+    tier: 8
+    trigger: opencode_repo_local_e2e_report_requested
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  check_opencode_repo_local_e2e_rc1:
+    tier: 10
+    trigger: before_s53_close
+    side_effects: project_local_artifacts_only
+    owner_profile: ovav_systems_architect
+  memory_read_probe_policy:
+    tier: 9
+    trigger: before_s54_close
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  memory_probe_boundaries:
+    tier: 9
+    trigger: before_s54_close
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  memory_probe_redaction_policy:
+    tier: 9
+    trigger: before_s54_close
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  memory_read_probe_policy_report:
+    tier: 8
+    trigger: before_s54_close
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  check_memory_read_probe_policy:
+    tier: 10
+    trigger: before_s54_close
+    side_effects: project_local_artifacts_only
+    owner_profile: ovav_systems_architect
+  memory_read_probe_sandbox:
+    tier: 9
+    trigger: before_s55_close
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  memory_probe_signal_simulator:
+    tier: 9
+    trigger: before_s55_close
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  memory_probe_candidate_filter:
+    tier: 9
+    trigger: before_s55_close
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  memory_read_probe_sandbox_report:
+    tier: 8
+    trigger: before_s55_close
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  check_memory_read_probe_sandbox:
+    tier: 10
+    trigger: before_s55_close
+    side_effects: project_local_artifacts_only
+    owner_profile: ovav_systems_architect
+  install_source_local_apply_policy:
+    tier: 9
+    trigger: before_s56_close
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  install_apply_boundaries:
+    tier: 9
+    trigger: before_s56_close
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  install_backup_rollback_gate:
+    tier: 9
+    trigger: before_s56_close
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  install_source_local_apply_policy_report:
+    tier: 8
+    trigger: before_s56_close
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  check_install_source_local_apply_policy:
+    tier: 10
+    trigger: before_s56_close
+    side_effects: project_local_artifacts_only
+    owner_profile: ovav_systems_architect
+  install_source_local_apply_sandbox:
+    tier: 9
+    trigger: before_s57_close
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  install_apply_sandbox_manifest:
+    tier: 9
+    trigger: before_s57_close
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  install_apply_rollback_sandbox:
+    tier: 9
+    trigger: before_s57_close
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  install_apply_sandbox_report:
+    tier: 8
+    trigger: before_s57_close
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  check_install_source_local_apply_sandbox:
+    tier: 10
+    trigger: before_s57_close
+    side_effects: project_local_artifacts_only
+    owner_profile: ovav_systems_architect
+  build4_graduation_e2e:
+    tier: 9
+    trigger: before_s58_close
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  build4_graduation_readiness:
+    tier: 9
+    trigger: before_s58_close
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  build4_graduation_e2e_report:
+    tier: 8
+    trigger: before_s58_close
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  check_build4_graduation_e2e_rc:
+    tier: 10
+    trigger: before_s58_close
+    side_effects: project_local_artifacts_only
+    owner_profile: ovav_systems_architect
+  build4_final_readiness:
+    tier: 9
+    trigger: before_s59_close
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  build4_surface_readiness_matrix:
+    tier: 9
+    trigger: before_s59_close
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  build4_blocked_surface_audit:
+    tier: 9
+    trigger: before_s59_close
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  build4_final_readiness_report:
+    tier: 8
+    trigger: before_s59_close
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  check_build4_final_readiness:
+    tier: 10
+    trigger: before_s59_close
+    side_effects: project_local_artifacts_only
+    owner_profile: ovav_systems_architect
+  build4_closure:
+    tier: 9
+    trigger: before_s60_close
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  build4_final_baseline:
+    tier: 9
+    trigger: before_s60_close
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  build4_closure_report:
+    tier: 8
+    trigger: before_s60_close
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  check_build4_closure:
+    tier: 10
+    trigger: before_s60_close
+    side_effects: project_local_artifacts_only
+    owner_profile: ovav_systems_architect
+  build5_opencode_ux_scope:
+    tier: 8
+    trigger: before_build5_planning_freeze
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  opencode_visible_role_policy:
+    tier: 8
+    trigger: before_build5_planning_freeze
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  opencode_identity_guard_policy:
+    tier: 8
+    trigger: before_build5_planning_freeze
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  build5_opencode_ux_report:
+    tier: 8
+    trigger: before_build5_planning_freeze
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  check_build5_opencode_visible_role_freeze:
+    tier: 10
+    trigger: before_s61_close
+    side_effects: project_local_artifacts_only
+    owner_profile: ovav_systems_architect
+  opencode_command_surface:
+    tier: 9
+    trigger: opencode_command_surface_requested
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  opencode_agent_surface:
+    tier: 9
+    trigger: opencode_agent_surface_requested
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  opencode_skill_surface:
+    tier: 9
+    trigger: opencode_skill_surface_requested
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  opencode_identity_guard:
+    tier: 10
+    trigger: opencode_identity_guard_requested
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  opencode_command_surface_report:
+    tier: 8
+    trigger: opencode_command_surface_report_requested
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  check_opencode_command_surface:
+    tier: 10
+    trigger: before_s62_close
+    side_effects: project_local_artifacts_only
+    owner_profile: ovav_systems_architect
+  platform_engineering_session_rc:
+    tier: 9
+    trigger: platform_engineering_session_requested
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  check_platform_engineering_session_rc:
+    tier: 10
+    trigger: before_s63_close
+    side_effects: project_local_artifacts_only
+    owner_profile: ovav_systems_architect
+  research_intelligence_session_rc:
+    tier: 9
+    trigger: research_intelligence_session_requested
+    side_effects: read_only
+    owner_profile: ovav_research_analyst
+  check_research_intelligence_session_rc:
+    tier: 10
+    trigger: before_s64_close
+    side_effects: project_local_artifacts_only
+    owner_profile: ovav_research_analyst
+  harness_intelligence_router:
+    tier: 10
+    trigger: on_user_message
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  check_harness_intelligence_router:
+    tier: 10
+    trigger: before_s64_close
+    side_effects: project_local_artifacts_only
+    owner_profile: ovav_systems_architect
+  repo_local_work_loop:
+    tier: 10
+    trigger: on_user_message
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  check_repo_local_work_loop:
+    tier: 10
+    trigger: before_s65_close
+    side_effects: project_local_artifacts_only
+    owner_profile: ovav_systems_architect
+  visible_surface_cleanup:
+    tier: 9
+    trigger: before_s65_close
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  check_visible_surface_cleanup:
+    tier: 9
+    trigger: before_s65_close
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  opencode_usability_e2e:
+    tier: 9
+    trigger: opencode_usability_e2e_requested
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  check_opencode_usability_e2e:
+    tier: 10
+    trigger: before_s66_close
+    side_effects: project_local_artifacts_only
+    owner_profile: ovav_systems_architect
+  opencode_surface_freshness:
+    tier: 9
+    trigger: before_s66_close
+    side_effects: read_only
+    owner_profile: ovav_systems_architect
+  check_opencode_surface_freshness:
+    tier: 9
+    trigger: before_s66_close
+    side_effects: project_local_artifacts_only
+    owner_profile: ovav_systems_architect
+  build5_closure:
+    tier: 8
+    trigger: before_s67_close
+    side_effects: artifact_write_only
+    owner_profile: ovav_systems_architect
+  check_build5_closure:
+    tier: 10
+    trigger: before_s67_close
+    side_effects: project_local_artifacts_only
+    owner_profile: ovav_systems_architect
+  check_protocol_access_gate:
+    tier: 10
+    trigger: before_s121_close
+    side_effects: project_local_artifacts_only
+    owner_profile: ovav_systems_architect
+    domain: protocol
+  check_protocol_audit_log:
+    tier: 10
+    trigger: before_s121_close
+    side_effects: project_local_artifacts_only
+    owner_profile: ovav_systems_architect
+    domain: protocol
+  check_protocol_circuit_breaker:
+    tier: 10
+    trigger: before_s121_close
+    side_effects: project_local_artifacts_only
+    owner_profile: ovav_systems_architect
+    domain: protocol
+  check_git_stage_intelligence:
+    tier: 10
+    trigger: before_s125_close
+    side_effects: project_local_artifacts_only
+    owner_profile: ovav_systems_architect
+    domain: git
+  check_git_change_manifest:
+    tier: 10
+    trigger: before_s125_close
+    side_effects: project_local_artifacts_only
+    owner_profile: ovav_systems_architect
+    domain: git
+  check_human_response_contract:
+    tier: 9
+    trigger: before_response_close
+    description: "Validates that agent's final response adheres to the compact, human-first contract."
+    owner_profile: ovav_systems_architect
+    owner_lane: runtime_governance
+    source: go_runtime/internal/validators/agent_ux_visual_delivery.go
+    side_effects: none
+    risk_level: low
+    evals_required: true
+    enabled: true
+  h_research_context_optimizer:
+    tier: 10
+    trigger: on_user_message
+    description: "Intelligently compacts large context sizes over 2,000 characters to prevent token saturation."
+    owner_profile: ovav_research_analyst
+    owner_lane: source_verification
+    source: go_runtime/internal/validators/context_firewall.go
+    side_effects: artifact_write_only
+    risk_level: low
+    enabled: true
+  check_research_context_optimizer:
+    tier: 10
+    trigger: before_close
+    description: "Verifies that the context optimizer produces mathematically measurable >95% size reduction and database self-update."
+    owner_profile: ovav_research_analyst
+    owner_lane: source_verification
+    source: go_runtime/internal/validators/context_firewall_v2.go
+    side_effects: read_only
+    risk_level: low
+    enabled: true
+  global_control_bridge_m1:
+    tier: 10
+    trigger: before_action_evaluation
+    description: "Source-local global-intent triage bridge; emits decisions and evidence without global writes."
+    owner_profile: ovav_systems_architect
+    owner_lane: runtime_governance
+    source: go_runtime/internal/governor/governor_cycle.go
+    side_effects: artifact_write_only
+    risk_level: medium
+    enabled: true
+  check_global_control_bridge_m1:
+    tier: 10
+    trigger: before_validation
+    description: "Validates M1 blocked-surface invariants, plan-only install posture and registry coverage."
+    owner_profile: ovav_systems_architect
+    owner_lane: runtime_governance
+    source: go_runtime/internal/governor/bridge.go
+    side_effects: project_local_artifacts_only
+    risk_level: medium
+    enabled: true
+  check_host_config_drift:
+     tier: 10
+     trigger: before_validation
+     description: "Detects host OpenCode config files (~/.config/opencode/) that shadow or override OVAV repo authority."
+     owner_profile: ovav_systems_architect
+     owner_lane: runtime_governance
+     path: tools/validators/check_host_config_drift.py
+     side_effects: read_only
+     risk_level: medium
+     enabled: true
+  # ── Evaluation Layer (Phase 1.1–1.2, 2, 3) ────────────────────────────
+  check_ovav_law_compliance:
+     tier: 9
+     trigger: before_implementation
+     description: "Validates all 21 OVAV laws structure, authority sources, and F0 integrations."
+     owner_profile: ovav_systems_architect
+     owner_lane: evaluation_layer
+     source: go_runtime/internal/validators/behavioral_directives.go
+     side_effects: read_only
+     risk_level: low
+     enabled: true
+  decision_packet_validator:
+     tier: 9
+     trigger: before_implementation_medium_plus
+     description: "Pre-implementation gate: validates decision packet against 21 laws with auto-activation."
+     owner_profile: ovav_systems_architect
+     owner_lane: evaluation_layer
+     source: go_runtime/internal/validators/architecture_compliance.go
+     side_effects: read_only
+     risk_level: medium
+     enabled: true
+  triple_reality_stress_gate:
+     tier: 9
+     trigger: after_decision_packet_valid
+     description: "Stress-tests proposals against 3 scenarios (operational, adversarial, future)."
+     owner_profile: ovav_systems_architect
+     owner_lane: evaluation_layer
+     source: go_runtime/internal/validators/zero_trust.go
+     side_effects: read_only
+     risk_level: medium
+     enabled: true
+  red_team_lens_evaluator:
+     tier: 9
+     trigger: after_stress_gate_complex_plus
+     description: "Evaluates proposals through 5 adversarial lenses (builder, reviewer, attacker, maintainer, user)."
+     owner_profile: ovav_systems_architect
+     owner_lane: evaluation_layer
+     source: go-runtime/internal/validators/red_team_audit.go
+     side_effects: read_only
+     risk_level: medium
+     enabled: true
+  semantic_drift_detector:
+     tier: 9
+     trigger: before_close_or_implementation
+     description: "Scans repo for authority conflicts across docs, registry, config, permissions and runtime."
+     owner_profile: ovav_systems_architect
+     owner_lane: evaluation_layer
+     source: go_runtime/internal/validators/canonical_integrity.go
+     side_effects: read_only
+     risk_level: medium
+     enabled: true
+  evaluation_pipeline_runner:
+     tier: 8
+     trigger: before_implementation_medium_plus
+     description: "Full evaluation pipeline: Decision Packet → Laws → Stress Gate → Red Team → Drift → Final Decision."
+     owner_profile: ovav_systems_architect
+     owner_lane: evaluation_layer
+     source: go_runtime/internal/validators/living_integrity.go
+     side_effects: read_only
+     risk_level: medium
+     enabled: true
+  # ── Evaluation Layer Phase 4 ─────────────────────────────────────────
+  intent_to_evidence_chain:
+     tier: 9
+     trigger: after_implementation
+     description: "Validates complete traceability: intent → decision → execution → evidence → risk → learning."
+     owner_profile: ovav_systems_architect
+     owner_lane: evaluation_layer
+     source: go_runtime/internal/validators/harness_contract_alignment.go
+     side_effects: read_only
+     risk_level: medium
+     enabled: true
+  check_zero_trust_context:
+     tier: 9
+     trigger: before_context_load
+     description: "Classifies context entries by source, tier, and profile permission. Blocks unclassified context."
+     owner_profile: ovav_systems_architect
+     owner_lane: evaluation_layer
+     source: go_runtime/internal/validators/zero_trust.go
+     side_effects: read_only
+     risk_level: medium
+     enabled: true
+  check_memory_firewall:
+     tier: 9
+     trigger: on_memory_write_or_recall
+     description: "Validates memory entries against firewall rules: required fields, no permission grants, expiry and confidence required."
+     owner_profile: ovav_systems_architect
+     owner_lane: evaluation_layer
+     source: go_runtime/internal/validators/memory_policy.go
+     side_effects: read_only
+     risk_level: medium
+     enabled: true
+  session_handoff:
+    tier: 8
+    trigger: session_start_and_session_end
+    description: "Session continuity bridge: writes handoff at end, restores context at start. Multi-repo aware."
+    owner_profile: ovav_systems_architect
+    owner_lane: runtime_governance
+    path: tools/agent_runtime/session_handoff.py
+    side_effects: project_local_artifacts_only
+    risk_level: low
+    enabled: true
+  harness_task_router:
+    tier: 10
+    trigger: files_touched_detected
+    description: "Phase 6 — Routes file changes, task types, service areas and risk levels into deterministic validator requirements."
+    owner_profile: ovav_systems_architect
+    owner_lane: evaluation_layer
+    source: go_runtime/internal/validators/harness_integrity.go
+    side_effects: read_only
+    risk_level: low
+    enabled: true
+  host_defense_logger:
+    tier: 10
+    trigger: host_config_drift_detected
+    description: "Forensic tracking for host config intrusions: origin, type, vector, target, evidence hash, session context. Outputs to host_defense_events.jsonl."
+    owner_profile: ovav_systems_architect
+    owner_lane: security
+    path: tools/security/host_defense_logger.py
+    side_effects: artifact_write_only
+    risk_level: low
+    enabled: true
+  host_defense_responder:
+    tier: 10
+    trigger: host_config_drift_critical
+    description: "Automated tiered response to host intrusions: info=log, warning=alert, critical=quarantine+alert, deadly=lockdown."
+    owner_profile: ovav_systems_architect
+    owner_lane: security
+    path: tools/security/host_defense_responder.py
+    side_effects: file_move_and_artifact_write
+    risk_level: medium
+    enabled: true
+  silent_fail_cortex:
+    tier: 9
+    trigger: before_implementation
+    description: "AST scanner for except Exception: pass patterns. Publishes to NerveBus. PainScorer-integrated."
+    owner_profile: ovav_systems_architect
+    owner_lane: security
+    path: tools/agent_runtime/silent_fail_cortex.py
+    side_effects: artifact_write_only
+    risk_level: low
+    enabled: true
+  h_subagent_context_pack:
+    tier: 9
+    trigger: before_delegation
+    description: "Packs context for OVAV subagent delegation. Injects agent profile, workspace state, skill directives, and permission boundaries into the delegation payload. Feeds into delegation_router entry."
+    owner_profile: ovav_systems_architect
+    owner_lane: runtime_governance
+    source: go-runtime/internal/runtime/delegation.go
+    side_effects: read_only
+    risk_level: medium
+    enabled: true
+  h_subagent_result_absorber:
+    tier: 9
+    trigger: after_delegation
+    description: "Captures structured result from subagent execution: status, evidence, files_touched, findings. Writes to session memory and updates delegation ledger. Feeds into work_report_builder and result_contract validation."
+    owner_profile: ovav_systems_architect
+    owner_lane: runtime_governance
+    source: go-runtime/internal/runtime/delegation.go
+    side_effects: project_local_artifacts_only
+    risk_level: low
+    enabled: true
+  h_delegation_trigger:
+    tier: 9
+    trigger: before_delegation
+    description: "Evaluates whether delegation is warranted based on task complexity, file count, architecture change, and delegation_rules.yaml thresholds. Gates the delegation_router entry."
+    owner_profile: ovav_systems_architect
+    owner_lane: runtime_governance
+    source: go-runtime/internal/runtime/delegation.go
+    side_effects: read_only
+    risk_level: medium
+    enabled: true
+  h_do_not_delegate_guard:
+    tier: 9
+    trigger: before_delegation
+    description: "Blocks delegation for trivial tasks: pure explanation, single-file low-risk edits, typos, no-code-required. Enforces do_not_delegate_when rules from delegation_rules.yaml."
+    owner_profile: ovav_systems_architect
+    owner_lane: runtime_governance
+    source: go-runtime/internal/runtime/delegation.go
+    side_effects: read_only
+    risk_level: low
+    enabled: true
+  h_skill_score_gate:
+    tier: 9
+    trigger: before_delegation
+    description: "Scores task against available skills. Routes to highest-scoring skill cluster. Prevents mismatch between task kind and agent skill profile."
+    owner_profile: ovav_systems_architect
+    owner_lane: runtime_governance
+    source: go-runtime/internal/runtime/delegation.go
+    side_effects: read_only
+    risk_level: medium
+    enabled: true
+  h_result_contract:
+    tier: 9
+    trigger: after_delegation
+    description: "Validates subagent result against the negotiated result_contract (human_compact_operational or human_evidence_operational). Blocks delivery if contract terms are unmet."
+    owner_profile: ovav_systems_architect
+    owner_lane: runtime_governance
+    source: go-runtime/internal/runtime/delegation.go
+    side_effects: read_only
+    risk_level: high
+    enabled: true
+  h_work_report_builder:
+    tier: 9
+    trigger: after_delegation
+    description: "Builds structured work report from subagent output: files_touched, findings, evidence, next_actions. Feeds into session memory and delegation ledger."
+    owner_profile: ovav_systems_architect
+    owner_lane: runtime_governance
+    source: go-runtime/internal/runtime/delegation.go
+    side_effects: project_local_artifacts_only
+    risk_level: low
+    enabled: true
+  h_human_response_translator:
+    tier: 9
+    trigger: before_delivery
+    description: "Translates structured result into CEO-ready human response: compact summary, evidence links, pending decisions. Enforces output contract (BrevityRail, icons, tables)."
+    owner_profile: ovav_systems_architect
+    owner_lane: runtime_governance
+    source: go-runtime/internal/runtime/delegation.go
+    side_effects: read_only
+    risk_level: low
+    enabled: true
+  generate_smoke_tests:
+    tier: 8
+    trigger: after_implementation
+    description: "Auto-generates pytest smoke tests for harnesses. Feeds evaluation pipeline and NerveBus."
+    owner_profile: ovav_systems_architect
+    owner_lane: quality
+    source: go_runtime/internal/cli/freshsmoke.go
+    side_effects: file_create_and_artifact_write
+    risk_level: low
+    enabled: true
+

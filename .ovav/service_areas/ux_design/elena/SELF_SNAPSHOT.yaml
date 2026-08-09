@@ -1,0 +1,1 @@
+self_snapshot: {version: "2.0.0", operator: elena, current_state: "area_fully_registered", team: [{name: Elena, role: ux_design_lead}], squad_leads: [{squad: design_system, lead: Elena}, {squad: ux_research, lead: Elena}, {squad: accessibility, lead: Elena}, {squad: prototyping, lead: Elena}]}

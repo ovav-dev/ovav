@@ -1,0 +1,71 @@
+# OVAV ConnectorBus — Handoff Auto-Trigger v1.0
+# Activa handoffs automáticos cuando un lead completa un entregable.
+
+schema: ovav.connector_bus.handoff_trigger.v1
+version: 1.0.0
+
+triggers:
+  # Research → Commercial: cuando claims están validados
+  - on: "evidence/claims_validation.md updated"
+    from_lead: eidren
+    to_lead: sofia
+    action: "handoff_request"
+    priority: high
+    message: "Claims validados. Revisar claims degradados/retirados antes de usarlos en marketing."
+
+  # Commercial → Web: cuando pricing está listo
+  - on: "business/pricing_final.md updated"
+    from_lead: sofia
+    to_lead: dante
+    action: "handoff_request"
+    priority: critical
+    message: "Pricing final listo. Actualizar checkout flow con tiers y precios reales."
+
+  # Education → Web: cuando tutoriales están listos
+  - on: "education/tutoriales_interactivos.md updated"
+    from_lead: valeria
+    to_lead: dante
+    action: "handoff_request"
+    priority: high
+    message: "Tutoriales listos. Integrar en /docs/tutoriales."
+
+  # Health → Commercial: cuando disclaimers están listos
+  - on: "health/disclaimer_regulatorio_final.md updated"
+    from_lead: renata
+    to_lead: sofia
+    action: "handoff_request"
+    priority: high
+    message: "Disclaimer médico-legal listo. Incluir en legal framework y términos de servicio."
+
+  # Platform → Web: cuando build pipeline está listo
+  - on: "tools/build/package_ovav_product.py updated"
+    from_lead: thavren
+    to_lead: dante
+    action: "handoff_request"
+    priority: standard
+    message: "Build pipeline listo. Integrar con CI/CD de la web."
+
+  # Research → Education: cuando evidence está validado
+  - on: "evidence/evidence_pack_publico.md updated"
+    from_lead: eidren
+    to_lead: valeria
+    action: "handoff_request"
+    priority: standard
+    message: "Evidence pack público listo. Usar datos reales en tutoriales y certificación."
+
+rules:
+  # Handoffs deben confirmarse en ≤24h (high) o ≤72h (standard)
+  response_time:
+    critical: 4h
+    high: 24h
+    standard: 72h
+
+  # Si no hay respuesta, escalar a Thavren
+  escalation:
+    after: "deadline + 4h"
+    escalate_to: thavren
+
+  # Handoff tracking
+  tracking:
+    log: ".ovav/runtime/logs/handoffs.jsonl"
+    metrics: ["response_time", "completion_rate", "escalation_rate"]

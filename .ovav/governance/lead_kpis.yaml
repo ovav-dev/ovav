@@ -1,0 +1,82 @@
+schema: ovav.governance.lead_kpis.v1
+created: '2026-06-10T06:12:01.474158+00:00'
+leads:
+  thavren:
+    area: Platform Engineering & DX
+    metrics:
+      system_uptime_pct:
+        target: 99.0
+        current: 100.0
+        weight: 20
+      validator_coverage_pct:
+        target: 100.0
+        current: 100.0
+        weight: 15
+      auto_trigger_coverage_pct:
+        target: 100.0
+        current: 100.0
+        weight: 15
+      security_gates_pass_rate:
+        target: 95.0
+        current: 100.0
+        weight: 20
+      commits_per_session:
+        target: 1.0
+        current: 3.0
+        weight: 10
+      response_time_category:
+        target: fast
+        current: fast
+        weight: 10
+      bugs_introduced:
+        target: 0.0
+        current: 0.0
+        weight: 10
+  eidren:
+    area: Evidence & Decision Intelligence
+    metrics:
+      source_quality_score:
+        target: 80.0
+        current: 0.0
+        weight: 25
+      benchmark_accuracy_pct:
+        target: 85.0
+        current: 0.0
+        weight: 25
+      research_completion_rate:
+        target: 90.0
+        current: 0.0
+        weight: 20
+      evidence_citations_per_brief:
+        target: 3.0
+        current: 0.0
+        weight: 15
+      verification_speed_hours:
+        target: 2.0
+        current: 0.0
+        weight: 15
+  dante:
+    area: Digital Product Engineering
+    metrics:
+      build_success_rate:
+        target: 95.0
+        current: 0.0
+        weight: 25
+      deploy_frequency_weekly:
+        target: 3.0
+        current: 0.0
+        weight: 20
+      code_review_turnaround_hours:
+        target: 4.0
+        current: 0.0
+        weight: 20
+      test_coverage_pct:
+        target: 80.0
+        current: 0.0
+        weight: 20
+      bug_fix_time_hours:
+        target: 24.0
+        current: 0.0
+        weight: 15
+evaluation_cycle: monthly
+auto_report_enabled: true

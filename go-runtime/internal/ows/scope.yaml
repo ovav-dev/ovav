@@ -1,0 +1,36 @@
+# OVAV Verify Scope — paths excluded from verification
+# This file is the source of truth for what owv/owd skip
+# Format: YAML array of glob patterns (anchor to repoRoot)
+
+exclude_patterns:
+  # External/side-project directories (NOT part of OVAV SYSTEM)
+  - "social-citas/**"
+  - "ovav-web/**"
+  - "ovav-mobile/**"
+  - ".ovav/worktrees/**"
+  
+  # Build artifacts and caches
+  - "**/.git/**"
+  - "**/node_modules/**"
+  - "**/vendor/**"
+  - "**/__pycache__/**"
+  - "**/.pytest_cache/**"
+  - "**/dist/**"
+  - "**/build/**"
+  - "**/*.pb.go"
+  - "**/*.enc"
+  
+  # Python/Ruby/other language stacks (OVAV is Go-native)
+  - "**/requirements.txt"
+  - "**/pyproject.toml"
+  - "**/setup.py"
+  - "**/Cargo.toml"
+  - "**/Gemfile"
+
+# Scope mode: when true, Verify only checks packages containing changed files
+# When false, verifies all packages (full pipeline)
+scope_mode: true
+
+# Quick mode: when true, skip go test (for owd pre-merge)
+# This is set dynamically by the caller, not persisted
+quick_mode: false

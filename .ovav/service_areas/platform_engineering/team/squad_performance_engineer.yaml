@@ -1,0 +1,5 @@
+squad: {id: squad_performance_engineer, display_name: Óscar, area: platform_engineering, lead: thavren, role: "Performance optimization, profiling, load testing, benchmarks", role_id: performance_engineer}
+activation: {modes: [focused_squad], never_default: true}
+model_body: {primary: "opencode-go/deepseek-v4-pro"}
+lanes: [performance]
+constraints: ["No modifica código en producción sin aprobación de Thavren", "Benchmarks deben ser reproducibles"]

@@ -1,0 +1,16 @@
+# Valeria — Modelo de Auto-Capacidades v1.0.0
+self_model:
+  version: "1.0.0"
+  operator: valeria
+  service_area: education_career
+  core_competencies:
+    diagnosis: [{name: "Gap detection (RPKT)", proficiency: 0.95}, {name: "Prerequisite chain discovery", proficiency: 0.90}, {name: "Learning style identification", proficiency: 0.80}]
+    curriculum: [{name: "Personalized curriculum generation", proficiency: 0.90}, {name: "Adaptive sequencing", proficiency: 0.85}, {name: "Multi-modal content design", proficiency: 0.75}]
+    tracking: [{name: "Bayesian knowledge tracing", proficiency: 0.85}, {name: "Transfer validation", proficiency: 0.80}, {name: "Spaced repetition scheduling", proficiency: 0.80}]
+    safety: [{name: "Bias detection (AIED 2026)", proficiency: 0.85}, {name: "Cognitive load monitoring", proficiency: 0.75}, {name: "Age-appropriate content filtering", proficiency: 0.70}]
+    career: [{name: "Labor market alignment", proficiency: 0.75}, {name: "Skill taxonomy mapping", proficiency: 0.70}, {name: "Salary/outcome prediction", proficiency: 0.60}, {name: "CV design and ATS optimization", proficiency: 0.80}, {name: "AI detection scoring", proficiency: 0.75}]
+  collaboration:
+    - {partner: "Thavren", type: "cross_area", protocol: "handoff_sanitizado", description: "Sandbox provisioning para práctica técnica"}
+    - {partner: "Eidren", type: "cross_area", protocol: "handoff_sanitizado", description: "Verificación de claims educativos y metodologías"}
+  knowledge_domains: ["Learning science", "Cognitive psychology", "Educational AI", "Psychometrics", "Labor economics", "Curriculum design", "Bias and fairness in AI"]
+  model_preferences: {primary: "deepseek-v4-pro", secondary: "mimo-v2.5-pro", emergency: "deepseek-v4-flash-free"}

@@ -1,0 +1,128 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ovav.dev/schemas/identity_packet.schema.json",
+  "title": "OVAV Active Identity Packet",
+  "description": "Compiled portable identity for an OVAV professional profile. Provider-agnostic, <2KB target.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "compiled_at",
+    "identity",
+    "current_authority",
+    "boundaries",
+    "execution",
+    "delivery"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semantic version of the packet format"
+    },
+    "compiled_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of compilation"
+    },
+    "integrity": {
+      "type": "object",
+      "required": ["algorithm", "contracts_hash"],
+      "properties": {
+        "algorithm": { "type": "string", "enum": ["sha256"] },
+        "contracts_hash": { "type": "string", "minLength": 64, "maxLength": 64 },
+        "previous_packet_hash": { "type": "string" }
+      }
+    },
+    "identity": {
+      "type": "object",
+      "required": ["lead", "service_area", "authority_level", "visible_profile", "visible_style"],
+      "properties": {
+        "lead": { "type": "string", "enum": ["thavren", "eidren"] },
+        "service_area": { "type": "string", "enum": ["platform_engineering", "research_intelligence"] },
+        "authority_level": { "type": "string" },
+        "visible_profile": { "type": "string" },
+        "visible_style": { "type": "string" }
+      }
+    },
+    "current_authority": {
+      "type": "object",
+      "required": ["repo", "branch", "active_stage"],
+      "properties": {
+        "repo": { "type": "string" },
+        "branch": { "type": "string" },
+        "active_stage": { "type": "string" },
+        "current_priority": { "type": "string" },
+        "last_verified_state": { "type": "string" }
+      }
+    },
+    "memory": {
+      "type": "object",
+      "properties": {
+        "active_decisions": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "deprecated_beliefs": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "recent_lessons": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "blocked_surfaces": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "boundaries": {
+      "type": "object",
+      "required": ["allowed_context", "denied_context", "allowed_tools", "denied_tools"],
+      "properties": {
+        "allowed_context": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "denied_context": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "allowed_tools": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "denied_tools": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "requires_approval": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "execution": {
+      "type": "object",
+      "required": ["context_budget", "model_tier", "validation_mode"],
+      "properties": {
+        "task_size": { "type": "string", "enum": ["micro", "simple", "medium", "complex", "critical"] },
+        "risk_level": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
+        "delegation_mode": { "type": "string", "enum": ["lead_only", "skill_only", "focused_squad", "full_squad", "critical_squad"] },
+        "context_budget": { "type": "string", "enum": ["T0", "T1", "T2", "T3", "T4", "T5"] },
+        "model_tier": { "type": "string", "enum": ["cheap", "standard", "strong", "critical"] },
+        "validation_mode": { "type": "string", "enum": ["none", "smoke", "focused", "full", "release"] }
+      }
+    },
+    "delivery": {
+      "type": "object",
+      "required": ["language_policy", "response_contract"],
+      "properties": {
+        "language_policy": { "type": "string" },
+        "response_contract": { "type": "string" },
+        "evidence_required": { "type": "boolean" },
+        "user_feedback_hook": { "type": "boolean" }
+      }
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "pack_id": "unknown_unsafe_pack",
+  "mode": "authoritative",
+  "expected_risk": "unknown-risk",
+  "expected_safety_status": "blocked"
+}

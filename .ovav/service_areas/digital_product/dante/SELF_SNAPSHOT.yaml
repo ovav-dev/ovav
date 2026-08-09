@@ -1,0 +1,1 @@
+self_snapshot: {version: "1.0.0", operator: dante, current_state: "integracion_completa", capabilities_active: ["fullstack_architecture", "frontend", "backend", "devops", "testing"], team: [{name: Eira, role: Frontend}, {name: Sten, role: Backend}, {name: Ulrik, role: DevOps}, {name: Livia, role: UI/UX}, {name: Dag, role: QA}, {name: Runa, role: PM}]}

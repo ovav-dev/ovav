@@ -1,0 +1,86 @@
+{
+  "discovery": {
+    "confidence_signals": [
+      {
+        "confidence": 0.99,
+        "signal": "project_type",
+        "value": "generic_docs"
+      },
+      {
+        "confidence": 0.9,
+        "signal": "languages",
+        "value": [
+          "markdown",
+          "python",
+          "typescript"
+        ]
+      },
+      {
+        "confidence": 0.85,
+        "signal": "tooling",
+        "value": [
+          "docs",
+          "pytest"
+        ]
+      }
+    ],
+    "framework_tooling_signals": [
+      "docs",
+      "pytest"
+    ],
+    "important_files": [
+      ".gitignore",
+      ".opencode/.gitignore",
+      ".opencode/package-lock.json",
+      ".opencode/package.json",
+      "AGENTS.md",
+      "README.md",
+      ".ovav/registry/schema/README.md",
+      ".ovav/runtime/artifacts/README.md",
+      ".ovav/runtime/ledger/README.md",
+      ".ovav/runtime/reports/README.md",
+      "tests/adversarial/README.md",
+      "tests/evals/README.md",
+      "tests/fixtures/README.md",
+      "tests/fixtures/projects/generic_docs_minimal/README.md",
+      "tests/fixtures/projects/python_cli_minimal/README.md",
+      "tests/fixtures/projects/python_cli_minimal/pyproject.toml",
+      "tests/fixtures/projects/web_vite_minimal/README.md",
+      "tests/fixtures/projects/web_vite_minimal/index.html",
+      "tests/fixtures/projects/web_vite_minimal/package.json",
+      "tests/fixtures/projects/web_vite_minimal/vite.config.ts",
+      "tests/golden/README.md",
+      "tools/git/README.md",
+      "tools/harnesses/README.md",
+      "tools/memory/README.md",
+      "tools/opencode/README.md",
+      "tools/skills/README.md",
+      "tools/validators/README.md"
+    ],
+    "language_signals": [
+      "markdown",
+      "python",
+      "typescript"
+    ],
+    "missing_recommended_files": [],
+    "package_manager_signals": [],
+    "project_type": "generic_docs"
+  },
+  "next_actions": [
+    "review PROJECT_DISCOVERY artifacts",
+    "confirm test/build/lint commands before apply",
+    "continue to explore phase if discovery is accepted"
+  ],
+  "project": {
+    "name": "ovav",
+    "root": "."
+  },
+  "risks": [],
+  "run_id": "sdd-init",
+  "schema_version": 1,
+  "sdd_artifact_recommendations": [
+    ".ovav/artifacts/init/PROJECT_DISCOVERY.json",
+    ".ovav/artifacts/init/PROJECT_DISCOVERY.md",
+    ".ovav/artifacts/explore/EXPLORE.md"
+  ]
+}

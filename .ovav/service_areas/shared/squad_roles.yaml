@@ -1,0 +1,80 @@
+role_catalog_version: BUILD21_runtime_governed_squad_roles
+
+rules:
+  lead_resolves_first: true
+  squads_are_not_always_on: true
+  activation_router: Delegation Router
+  context_boundary: Context Gateway
+  tool_boundary: Tool Gateway
+  delivery_boundary: Delivery Contract
+  non_trivial_trace: Observability Trace
+  no_raw_squad_activation: true
+
+role_catalog:
+  platform_engineering:
+    Systems Architect:
+      role_id: systems_architect
+      purpose: Architecture contracts, DAG integrity, dependency mapping and minimal structural change design.
+      typical_modes: [focused_squad, full_squad, critical_squad]
+    Runtime & Routing Engineer:
+      role_id: runtime_routing_engineer
+      purpose: Service Area Router, Delegation Router, Context Gateway, Tool Gateway and runtime behavior alignment.
+      typical_modes: [focused_squad, full_squad, critical_squad]
+    Developer Experience Engineer:
+      role_id: developer_experience_engineer
+      purpose: OpenCode project surfaces, commands, skills, agents and repo-local developer workflow.
+      typical_modes: [focused_squad, full_squad]
+    Harness & Validation Engineer:
+      role_id: harness_validation_engineer
+      purpose: Validators, source-local harnesses, evidence checks and closure proof.
+      typical_modes: [focused_squad, full_squad, critical_squad]
+    Automation Engineer:
+      role_id: automation_engineer
+      purpose: Deterministic source-local automation, scripts and repeatable workflow helpers.
+      typical_modes: [focused_squad, full_squad]
+    Install & Recovery Engineer:
+      role_id: install_recovery_engineer
+      purpose: Install planning, dry-run gates, backup/rollback design and recovery safety.
+      typical_modes: [critical_squad]
+    Security & Scope Auditor:
+      role_id: security_scope_auditor
+      purpose: Blocked surfaces, permission boundaries, secrets, auth and scope risk review.
+      typical_modes: [focused_squad, critical_squad]
+    Release & Continuity Steward:
+      role_id: release_continuity_steward
+      purpose: Release/closure discipline, handoff continuity, trace/evidence readiness and git safety review.
+      typical_modes: [full_squad, critical_squad]
+
+  research_intelligence:
+    Research Strategist:
+      role_id: research_strategist
+      purpose: Question framing, scope control, assumptions and research plan design.
+      typical_modes: [focused_squad, full_squad]
+    Source Verification Analyst:
+      role_id: source_verification_analyst
+      purpose: Source discovery, credibility checks, source maps and public/external evidence hygiene.
+      typical_modes: [focused_squad, full_squad, critical_squad]
+    Benchmark Analyst:
+      role_id: benchmark_analyst
+      purpose: Comparative criteria, scoring matrices and technical benchmark structure.
+      typical_modes: [focused_squad, full_squad]
+    Evidence Scoring Analyst:
+      role_id: evidence_scoring_analyst
+      purpose: Evidence strength, corroboration, contradiction and confidence scoring.
+      typical_modes: [focused_squad, full_squad, critical_squad]
+    Technical Comparator:
+      role_id: technical_comparator
+      purpose: Technical trade-off comparison across systems, vendors, methods or architectures.
+      typical_modes: [focused_squad, full_squad]
+    Risk & Assumption Analyst:
+      role_id: risk_assumption_analyst
+      purpose: Assumption tracking, uncertainty, safety/risk modeling and weak-signal detection.
+      typical_modes: [focused_squad, critical_squad]
+    Decision Synthesizer:
+      role_id: decision_synthesizer
+      purpose: Adopt/adapt/reject/monitor synthesis and recommendation shaping.
+      typical_modes: [focused_squad, full_squad]
+    Research Delivery Editor:
+      role_id: research_delivery_editor
+      purpose: Human-facing evidence delivery, clarity, compact structure and final decision brief polish.
+      typical_modes: [focused_squad, full_squad]

@@ -1,0 +1,758 @@
+{
+  "schema_version": "ovav.permission_authority.v3",
+  "authority": "OVAV SYSTEMS is canonical. CEO Alexander Salvador governs. OVAV AGENTS operates with total freedom when installed.",
+  "governor": "Thavren \u2014 Lead, Platform Engineering. Full execution authority on all surfaces.",
+  "bootstrap_required": false,
+  "materialized_targets": [
+    "opencode.json",
+    "mimicode.json",
+    ".mimocode/global_config/config.json",
+    "clients/opencode/agents/area-platform-engineering.md",
+    "clients/opencode/agents/lead-thavren.md",
+    "clients/opencode/agents/area-research-intelligence.md",
+    "clients/opencode/agents/lead-eidren.md"
+  ],
+  "materializer": {
+    "script": "tools/permissions/materialize.py",
+    "safe_modes": [
+      "--check",
+      "--dry-run"
+    ],
+    "write_mode": "--write",
+    "automatic_trigger": "tools/validators/check_permission_policy_drift.py",
+    "drift_response": "log_and_apply_ovav_policy"
+  },
+  "log_path": ".ovav/runtime/logs/permission_drift.jsonl",
+  "model_groups": {
+    "ovav_ultra": {
+      "description": "Highest capability tier \u2014 total freedom, telemetry only",
+      "models": [
+        "mimo/mimo-auto",
+        "opencode-go/deepseek-v4-pro"
+      ],
+      "use_cases": [
+        "architecture_design",
+        "security_audit",
+        "complex_refactor",
+        "red_team"
+      ],
+      "max_tokens": 32768
+    },
+    "ovav_standard": {
+      "description": "Standard tier \u2014 total freedom",
+      "models": [
+        "opencode-go/deepseek-v4-pro",
+        "minimax-coding-plan/MiniMax-M3"
+      ],
+      "use_cases": [
+        "code_implementation",
+        "code_review",
+        "documentation",
+        "testing"
+      ],
+      "max_tokens": 16384
+    },
+    "ovav_lite": {
+      "description": "Fast tier \u2014 total freedom",
+      "models": [
+        "opencode-go/deepseek-v4-flash",
+        "minimax-coding-plan/MiniMax-M3"
+      ],
+      "use_cases": [
+        "fast_exploration",
+        "summarization",
+        "file_search",
+        "quick_answers"
+      ],
+      "max_tokens": 8192
+    }
+  },
+  "principle": "ALLOW ALL with telemetry. Deny nothing by default. OVAV SYSTEMS + OVAV AGENTS are fully trusted.",
+  "telemetry": {
+    "log_all_actions": true,
+    "log_destination": ".ovav/runtime/logs/telemetry.jsonl",
+    "alert_on": [
+      "security_violation",
+      "secrets_exfil",
+      "integrity_breach"
+    ],
+    "noop_on_violation": false
+  },
+  "operator_profiles": {
+    "ovav": {
+      "visible_agent": "ovav-governor",
+      "roles": [
+        "governor",
+        "system_entity",
+        "integrity_owner"
+      ],
+      "scopes": [
+        "repo_local",
+        "global_diagnostic",
+        "governor_sandbox"
+      ],
+      "max_session_minutes": 99999,
+      "step_up_required_for": [],
+      "repo_local_mutate": "allow",
+      "repo_local_bash_default": "allow",
+      "global_diagnostic_read": "allow",
+      "global_write": "allow",
+      "commit": "allow",
+      "push": "allow",
+      "pr": "allow",
+      "close_message": "OVAV Governor \u2014 total freedom mode active.",
+      "external_directory": {
+        "*": "allow"
+      }
+    },
+    "thavren": {
+      "visible_agent": "ovav-platform-engineering",
+      "roles": [
+        "systems_architect",
+        "platform_lead",
+        "super_admin"
+      ],
+      "scopes": [
+        "repo_local",
+        "global_diagnostic",
+        "install_sandbox",
+        "host_native"
+      ],
+      "max_session_minutes": 99999,
+      "step_up_required_for": [],
+      "repo_local_mutate": "allow",
+      "repo_local_bash_default": "allow",
+      "global_diagnostic_read": "allow",
+      "global_write": "allow",
+      "commit": "allow",
+      "push": "allow",
+      "pr": "allow",
+      "close_message": "Thavren \u2014 execution complete.",
+      "external_directory": {
+        "*": "allow"
+      }
+    },
+    "eidren": {
+      "visible_agent": "ovav-research-intelligence",
+      "roles": [
+        "research_analyst",
+        "research_lead"
+      ],
+      "scopes": [
+        "repo_local",
+        "research_external"
+      ],
+      "max_session_minutes": 99999,
+      "step_up_required_for": [],
+      "repo_local_mutate": "deny_by_default",
+      "repo_local_bash_default": "allow",
+      "global_write": "allow",
+      "commit": "allow",
+      "push": "allow",
+      "pr": "allow",
+      "git_write": "allow",
+      "research": "allow",
+      "external_directory": {
+        "*": "allow"
+      }
+    },
+    "elena": {
+      "visible_agent": "ovav-ux-design",
+      "roles": [
+        "ux_lead",
+        "design_system_owner"
+      ],
+      "scopes": [
+        "repo_local",
+        "design_tools",
+        "ux_research"
+      ],
+      "max_session_minutes": 99999,
+      "step_up_required_for": [],
+      "repo_local_mutate": "allow",
+      "repo_local_bash_default": "allow",
+      "commit": "allow",
+      "push": "allow",
+      "pr": "allow",
+      "external_directory": {
+        "*": "allow"
+      }
+    },
+    "dante": {
+      "visible_agent": "ovav-digital-product",
+      "roles": [
+        "product_lead",
+        "frontend_architect"
+      ],
+      "scopes": [
+        "repo_local",
+        "product_development"
+      ],
+      "max_session_minutes": 99999,
+      "step_up_required_for": [],
+      "repo_local_mutate": "allow",
+      "repo_local_bash_default": "allow",
+      "commit": "allow",
+      "push": "allow",
+      "pr": "allow",
+      "external_directory": {
+        "*": "allow"
+      }
+    },
+    "sofia": {
+      "visible_agent": "ovav-commercial-growth",
+      "roles": [
+        "commercial_lead",
+        "growth_strategist"
+      ],
+      "scopes": [
+        "repo_local",
+        "market_intelligence",
+        "business_strategy"
+      ],
+      "max_session_minutes": 99999,
+      "step_up_required_for": [],
+      "repo_local_mutate": "allow",
+      "repo_local_bash_default": "allow",
+      "commit": "allow",
+      "push": "allow",
+      "pr": "allow",
+      "external_directory": {
+        "*": "allow"
+      }
+    },
+    "renata": {
+      "visible_agent": "ovav-health-performance",
+      "roles": [
+        "health_lead",
+        "sports_scientist"
+      ],
+      "scopes": [
+        "repo_local",
+        "health_research"
+      ],
+      "max_session_minutes": 99999,
+      "step_up_required_for": [],
+      "repo_local_mutate": "allow",
+      "repo_local_bash_default": "allow",
+      "commit": "allow",
+      "push": "allow",
+      "pr": "allow",
+      "external_directory": {
+        "*": "allow"
+      }
+    },
+    "valeria": {
+      "visible_agent": "ovav-education-career",
+      "roles": [
+        "education_lead",
+        "curriculum_designer"
+      ],
+      "scopes": [
+        "repo_local",
+        "education_research"
+      ],
+      "max_session_minutes": 99999,
+      "step_up_required_for": [],
+      "repo_local_mutate": "allow",
+      "repo_local_bash_default": "allow",
+      "commit": "allow",
+      "push": "allow",
+      "pr": "allow",
+      "external_directory": {
+        "*": "allow"
+      }
+    },
+    "uriel": {
+      "visible_agent": "ovav-devops-infrastructure",
+      "roles": [
+        "devops_lead",
+        "infrastructure_architect"
+      ],
+      "scopes": [
+        "repo_local",
+        "infrastructure",
+        "cloud_operations"
+      ],
+      "max_session_minutes": 99999,
+      "step_up_required_for": [],
+      "repo_local_mutate": "allow",
+      "repo_local_bash_default": "allow",
+      "commit": "allow",
+      "push": "allow",
+      "pr": "allow",
+      "external_directory": {
+        "*": "allow"
+      }
+    },
+    "kenji": {
+      "visible_agent": "ovav-adversarial-intelligence",
+      "roles": [
+        "red_team_lead",
+        "adversarial_researcher"
+      ],
+      "scopes": [
+        "repo_local",
+        "adversarial_testing"
+      ],
+      "max_session_minutes": 99999,
+      "step_up_required_for": [],
+      "repo_local_mutate": "allow",
+      "repo_local_bash_default": "allow",
+      "commit": "allow",
+      "push": "allow",
+      "pr": "allow",
+      "external_directory": {
+        "*": "allow"
+      }
+    },
+    "camila": {
+      "visible_agent": "ovav-legal-compliance",
+      "roles": [
+        "legal_lead",
+        "compliance_officer"
+      ],
+      "scopes": [
+        "repo_local",
+        "legal_review"
+      ],
+      "max_session_minutes": 99999,
+      "step_up_required_for": [],
+      "repo_local_mutate": "allow",
+      "repo_local_bash_default": "allow",
+      "commit": "allow",
+      "push": "allow",
+      "pr": "allow",
+      "external_directory": {
+        "*": "allow"
+      }
+    }
+  },
+  "hardening_baseline": {
+    "f0_layers": [
+      "0.1_supply_chain",
+      "0.2_secrets_vault",
+      "0.3_runtime_integrity",
+      "0.4_network_hardening",
+      "0.5_secure_bootstrapping",
+      "0.6_anti_exfiltration"
+    ],
+    "enforcement": "all_f0_validators_must_pass"
+  },
+  "resource_policies": {
+    "integrity_monitor": {
+      "baseline_operators": [
+        "thavren",
+        "ovav"
+      ],
+      "monitoring_enabled": true
+    },
+    "network_guard": {
+      "bypass_operators": [],
+      "mode": "deny_by_default"
+    },
+    "secrets_vault": {
+      "require_unlock": true,
+      "governor": "tools/permissions/vault_governance.py",
+      "key_rotation_days": 90
+    }
+  },
+  "conditions": {
+    "require_bootstrap": false,
+    "require_workspace_safety": false,
+    "rate_limits": {
+      "external_requests_per_minute": 200,
+      "file_writes_per_minute": 99999,
+      "delegation_max_depth": 5
+    },
+    "session_constraints": {
+      "max_context_tokens": 999999,
+      "max_delegation_depth": 99,
+      "require_session_isolation": false
+    }
+  },
+  "infrastructure_surfaces": {
+    "f2_system_paths": {
+      "governor": "tools/permissions/system_paths.py",
+      "rules": {
+        "/etc": {
+          "read": "allow",
+          "write": "allow"
+        },
+        "/boot": {
+          "read": "allow",
+          "write": "allow"
+        },
+        "/sys": {
+          "read": "allow",
+          "write": "allow"
+        },
+        "/proc": {
+          "read": "allow",
+          "write": "allow"
+        },
+        "/dev": {
+          "read": "allow",
+          "write": "allow"
+        },
+        "~/.ssh": {
+          "read": "allow",
+          "write": "allow"
+        },
+        "~/.gnupg": {
+          "read": "allow",
+          "write": "allow"
+        }
+      }
+    },
+    "f2_external_directory": {
+      "*": "allow",
+      "governor": "tools/permissions/external_directory.py",
+      "deny_by_default": true
+    },
+    "f2_config_governance": {
+      "governor": "tools/permissions/config_governance.py",
+      "auto_switch": true,
+      "drift_response": "log_and_apply"
+    },
+    "f2_plugins": {
+      "governor": "tools/permissions/plugin_governance.py",
+      "authorized_operators": [
+        "thavren",
+        "ovav"
+      ],
+      "external_mcp_servers": "allow",
+      "plugin_install": "allow"
+    },
+    "f2_live_behavior": {
+      "governor": "tools/permissions/live_behavior.py",
+      "behaviors": {
+        "install_apply": "allow",
+        "backup_rollback": "allow",
+        "ui_tui": "allow",
+        "mcp_a2a_internal": "allow",
+        "external_services": "allow"
+      },
+      "mode": "telemetry_only"
+    },
+    "f2_claims": {
+      "governor": "tools/permissions/claims_governance.py",
+      "production_ready": "allow_with_f5_validation",
+      "global_ready": "allow",
+      "mode": "telemetry_only"
+    }
+  },
+  "security_surfaces": {
+    "f4_bash_commands": {
+      "governor": "tools/permissions/bash_commands.py",
+      "total_rules": 15,
+      "allowed": 9,
+      "denied": 6,
+      "deny_by_default": true,
+      "principle": "Deny dangerous commands by default. Telemetry log. Allow with governance.",
+      "categories": {
+        "source_control_read": {
+          "action": "allow",
+          "risk": "low"
+        },
+        "source_control_mutate": {
+          "action": "allow",
+          "risk": "medium"
+        },
+        "ovav_internal": {
+          "action": "allow",
+          "risk": "low"
+        },
+        "filesystem_read": {
+          "action": "allow",
+          "risk": "low"
+        },
+        "interpreted_execution": {
+          "action": "allow",
+          "risk": "medium"
+        },
+        "github_read": {
+          "action": "allow",
+          "risk": "low"
+        },
+        "governed_git": {
+          "action": "allow",
+          "risk": "low"
+        },
+        "testing": {
+          "action": "allow",
+          "risk": "low"
+        },
+        "privilege_escalation": {
+          "action": "deny",
+          "risk": "critical"
+        },
+        "package_management": {
+          "action": "ask",
+          "risk": "high"
+        },
+        "auth_management": {
+          "action": "deny",
+          "risk": "critical"
+        },
+        "network_external": {
+          "action": "allow",
+          "risk": "medium"
+        }
+      }
+    },
+    "f4_unsafe_selectors": {
+      "governor": "tools/permissions/unsafe_selectors.py",
+      "total_rules": 10,
+      "allowed": 2,
+      "denied": 7,
+      "ask": 1,
+      "deny_by_default": true,
+      "principle": "Deny unsafe selectors by default. Allow safe governed selectors.",
+      "categories": {
+        "source_local": {
+          "action": "allow",
+          "risk": "low"
+        },
+        "external_governed": {
+          "action": "allow",
+          "risk": "low"
+        },
+        "sensitive_paths": {
+          "action": "deny",
+          "risk": "critical"
+        },
+        "system_paths": {
+          "action": "deny",
+          "risk": "high"
+        },
+        "package_management": {
+          "action": "ask",
+          "risk": "high"
+        },
+        "external_unverified": {
+          "action": "deny",
+          "risk": "high"
+        },
+        "external_services": {
+          "action": "deny",
+          "risk": "high"
+        },
+        "agent_recursion": {
+          "action": "deny",
+          "risk": "high"
+        },
+        "memory_poisoning": {
+          "action": "deny",
+          "risk": "critical"
+        },
+        "trace_injection": {
+          "action": "deny",
+          "risk": "critical"
+        }
+      }
+    }
+  },
+  "protected_denies": {
+    "bash": [
+      "sudo su",
+      "chmod 777",
+      "chmod -R 777",
+      "rm -rf /",
+      "rm -rf /bin",
+      "rm -rf /usr",
+      "mkfs",
+      "dd if=/dev/zero of=/dev/sda",
+      ">:w !sudo tee",
+      "eval $(curl",
+      "wget | sh",
+      "curl | sh",
+      "cat /etc/passwd",
+      "nmap -O",
+      "nc -l -p 443 -e",
+      "python3 -c \"import pty"
+    ]
+  },
+  "advanced_surfaces": {
+    "gates": {
+      "auto_switch": {
+        "blocked_surface": "none",
+        "gain_pct": 100,
+        "action": ""
+      },
+      "research_firewall": {
+        "blocked_surface": "none",
+        "gain_pct": 100,
+        "action": ""
+      },
+      "snapshot_apply": {
+        "blocked_surface": "none",
+        "gain_pct": 100,
+        "action": ""
+      },
+      "ledger_vivo": {
+        "blocked_surface": "none",
+        "gain_pct": 100,
+        "action": ""
+      },
+      "ovav_mesh": {
+        "blocked_surface": "none",
+        "gain_pct": 100,
+        "action": ""
+      }
+    },
+    "f5_new_states": {
+      "governor": "tools/permissions/new_states.py",
+      "total_rules": 14,
+      "allowed": 12,
+      "denied": 2,
+      "states": {
+        "adaptive": "allowed",
+        "emergent": "allowed",
+        "delegated": "allowed",
+        "collaborative": "allowed",
+        "autonomous": "allowed",
+        "reflective": "allowed",
+        "generative": "allowed",
+        "orchestrated": "allowed",
+        "healing": "allowed",
+        "evolving": "allowed",
+        "convergent": "allowed",
+        "divergent": "allowed",
+        "inherited": "denied",
+        "canary_gated": "denied"
+      }
+    },
+    "f5_gate_liberation": {
+      "governor": "tools/permissions/gate_liberation.py",
+      "total_rules": 5,
+      "allowed": 5,
+      "denied": 0,
+      "requires_all_f0": true,
+      "all_gates_liberated": true,
+      "gates": {
+        "auto_switch": {
+          "action": "",
+          "blocked_surface": "none"
+        },
+        "research_firewall": {
+          "action": "",
+          "blocked_surface": "none"
+        },
+        "snapshot_apply": {
+          "action": "",
+          "blocked_surface": "none"
+        },
+        "ledger_vivo": {
+          "action": "",
+          "blocked_surface": "none"
+        },
+        "ovav_mesh": {
+          "action": "",
+          "blocked_surface": "none"
+        }
+      }
+    }
+  },
+  "f5_gate_liberation": {
+    "governor": "tools/permissions/gate_liberation.py",
+    "total_rules": 5,
+    "allowed": 5,
+    "denied": 0,
+    "requires_all_f0": true,
+    "all_gates_liberated": true,
+    "gates": {
+      "auto_switch": {
+        "action": "",
+        "blocked_surface": "none"
+      },
+      "research_firewall": {
+        "action": "",
+        "blocked_surface": "none"
+      },
+      "snapshot_apply": {
+        "action": "",
+        "blocked_surface": "none"
+      },
+      "ledger_vivo": {
+        "action": "",
+        "blocked_surface": "none"
+      },
+      "ovav_mesh": {
+        "action": "",
+        "blocked_surface": "none"
+      }
+    }
+  },
+  "external_directories": {
+    "allow": [
+      "/home/braka/BAB",
+      "*"
+    ],
+    "note": "Total freedom. OVAV SYSTEMS + OVAV AGENTS trust all paths."
+  },
+  "workstation_wezterm": {
+    "windows_config_path": "C:\\Users\\Alexa\\AppData\\Roaming\\wezterm\\.wezterm.lua",
+    "wsl_config_path": "/mnt/c/Users/Alexa/AppData/Roaming/wezterm/.wezterm.lua",
+    "source_path": "/home/braka/Systems/OVAV/config/wezterm/wezterm.lua",
+    "deploy_method": "powershell.exe Copy-Item from WSL path to Windows AppData"
+  },
+  "consumer_grants": [
+    {
+      "consumer_id": "bitel-agent",
+      "subsystem": "ows",
+      "scope": "consumer_root_only",
+      "operations_allowed": [
+        "owc",
+        "owd",
+        "owl",
+        "owv",
+        "ows",
+        "owclean",
+        "owm",
+        "owx",
+        "owa",
+        "owr",
+        "owlk"
+      ],
+      "flags": {
+        "owc": [
+          "--carry",
+          "--profile"
+        ],
+        "owd": [
+          "--resume",
+          "--compliance"
+        ],
+        "owl": [
+          "--zombie-only",
+          "--json",
+          "--history"
+        ],
+        "owv": [
+          "--verbose"
+        ],
+        "ows": [
+          "--rebase",
+          "--full"
+        ],
+        "owsuggest": [
+          "--explain"
+        ]
+      },
+      "audit_required": false,
+      "granted_by": "Alexander Salvador - CEO de OVAV",
+      "granted_at": "2026-07-17T20:35:45Z",
+      "compliance_mode": "full_freedom",
+      "self_recovery": true
+    }
+  ],
+  "role_surfaces": {},
+  "context_firewall": {
+    "description": "Context firewall hardening - external directory deny by default",
+    "external_directory": {
+      "*": "deny",
+      "deny_by_default": true
+    }
+  }
+}

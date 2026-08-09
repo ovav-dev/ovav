@@ -1,0 +1,3 @@
+squad: {id: "squad_frontend", display_name: "Elena", area: digital_product, lead: dante, role: "Frontend development (React/Vue/Svelte)", role_id: "frontend_engineer"}
+activation: {modes: [focused_squad], never_default: true}
+model_body: {primary: "opencode-go/deepseek-v4-pro"}

@@ -1,0 +1,25 @@
+session_capsule_policy:
+  version: 1
+  purpose: >-
+    Session capsule was removed in v2.0. This policy file is kept as a placeholder
+    to satisfy governance checks. The session capsule mechanism is inactive and must
+    not be invoked by any runtime, router, or agent.
+
+  capsule:
+    active: false
+    removed_in_version: "2.0"
+    reason: >-
+      Session capsule was removed due to complexity, latency overhead, and the
+      availability of simpler context management via the Context Gateway and
+      Memory Governor. Its responsibilities are now handled by those subsystems.
+
+  rules:
+    - do_not_invoke_capsule: true
+    - capsule_endpoints_are_noop: true
+    - any_capsule_reference_is_a_governance_violation: true
+
+  governance_note: >-
+    LAW-001 (Non-Invasion Area Boundary Law) and the Context Firewall enforce
+    session isolation. The capsule removal does not reduce the security boundary.
+
+# LAW-001 governance: .ovav/laws/area_boundary_enforcement.yaml (Non-Invasion Area Boundary Law)

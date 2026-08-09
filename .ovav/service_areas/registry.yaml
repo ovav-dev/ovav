@@ -1,0 +1,109 @@
+service_areas:
+  platform_engineering:
+    id: platform_engineering
+    visible_profile: "Platform Engineering"
+    lead: thavren
+    active: true
+    p0: true
+    default_context_mode: repo_local_engineering
+    contract: ".ovav/service_areas/areas/platform_engineering.yaml"
+    boundaries: ".ovav/service_areas/platform_engineering/area_boundaries.yaml"
+    lead_contract: ".ovav/service_areas/platform_engineering/lead_contract.yaml"
+
+  testing_remediation:
+    id: testing_remediation
+    visible_profile: "OVAV Testing & Remediation"
+    lead: thavren
+    active: true
+    p0: true
+    default_context_mode: repo_local_engineering
+    contract: ".ovav/service_areas/areas/testing_remediation.yaml"
+    boundaries: ".ovav/service_areas/testing_remediation/area_boundaries.yaml"
+    lead_contract: ".ovav/service_areas/testing_remediation/lead_contract.yaml"
+
+  research_intelligence:
+    id: research_intelligence
+    visible_profile: "OVAV Research Intelligence"
+    lead: eidren
+    active: true
+    p0: true
+    default_context_mode: external_research
+    contract: ".ovav/service_areas/areas/research_intelligence.yaml"
+    boundaries: ".ovav/service_areas/evidence_decision/area_boundaries.yaml"
+    lead_contract: ".ovav/service_areas/evidence_decision/lead_contract.yaml"
+
+  digital_product:
+    id: digital_product
+    visible_profile: "Digital Product Engineering"
+    lead: dante
+    active: true
+    p0: false
+    default_context_mode: repo_local_engineering
+    contract: ".ovav/service_areas/areas/digital_product.yaml"
+    boundaries: ".ovav/service_areas/digital_product/area_boundaries.yaml"
+    lead_contract: ".ovav/service_areas/digital_product/lead_contract.yaml"
+
+  commercial_growth:
+    id: commercial_growth
+    visible_profile: "Commercial & Growth Strategy"
+    lead: sofia
+    active: true
+    p0: false
+    default_context_mode: repo_local_engineering
+    contract: ".ovav/service_areas/areas/commercial_growth.yaml"
+    boundaries: ".ovav/service_areas/commercial_growth/area_boundaries.yaml"
+    lead_contract: ".ovav/service_areas/commercial_growth/lead_contract.yaml"
+
+  education_career:
+    id: education_career
+    visible_profile: "Education & Career Development"
+    lead: valeria
+    active: true
+    p0: false
+    default_context_mode: repo_local_engineering
+    contract: ".ovav/service_areas/areas/education_career.yaml"
+    boundaries: ".ovav/service_areas/education_career/area_boundaries.yaml"
+    lead_contract: ".ovav/service_areas/education_career/lead_contract.yaml"
+
+  health_performance:
+    id: health_performance
+    visible_profile: "Health & Performance Science"
+    lead: renata
+    active: true
+    p0: false
+    default_context_mode: repo_local_engineering
+    contract: ".ovav/service_areas/areas/health_performance.yaml"
+    boundaries: ".ovav/service_areas/health_performance/area_boundaries.yaml"
+    lead_contract: ".ovav/service_areas/health_performance/lead_contract.yaml"
+
+  devops_infrastructure:
+    id: devops_infrastructure
+    visible_profile: "DevOps & Infrastructure"
+    lead: uriel
+    active: true
+    p0: false
+    default_context_mode: repo_local_engineering
+    contract: ".ovav/service_areas/areas/devops_infrastructure.yaml"
+    boundaries: ".ovav/service_areas/devops_infrastructure/area_boundaries.yaml"
+    lead_contract: ".ovav/service_areas/devops_infrastructure/lead_contract.yaml"
+
+  ux_design:
+    id: ux_design
+    visible_profile: "UI/UX Design"
+    lead: elena
+    active: true
+    p0: false
+    default_context_mode: repo_local_engineering
+    contract: ".ovav/service_areas/areas/ux_design.yaml"
+    boundaries: ".ovav/service_areas/ux_design/area_boundaries.yaml"
+    lead_contract: ".ovav/service_areas/ux_design/lead_contract.yaml"
+
+rules:
+  active_p0_count: 2
+  active_areas_count: 9
+  profile_is_visible_area_not_personality: true
+  build_history_is_not_product_identity: true
+  unknown_service_area: deny_or_requires_clarification
+  cross_area_work_requires_handoff: true
+  lead_scope_gate: "tools/validators/check_lead_scope.py"
+  # worktree_isolation removed — worktree automation system eliminated 2026-06-11

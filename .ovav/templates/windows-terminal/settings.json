@@ -1,0 +1,102 @@
+{
+  "$schema": "https://aka.ms/terminal-profiles-schema",
+  "defaultProfile": "{YOUR-UBUNTU-GUID}",
+  "startupSize": {
+    "rows": 40,
+    "columns": 120
+  },
+  "profiles": {
+    "defaults": {
+      "font": {
+        "face": "JetBrainsMono Nerd Font",
+        "size": 12
+      },
+      "padding": "8, 8, 8, 8",
+      "useAcrylic": true,
+      "acrylicOpacity": 0.85,
+      "cursorShape": "filledBox",
+      "cursorColor": "#FFFFFF"
+    },
+    "list": [
+      {
+        "name": "Ubuntu-24.04",
+        "source": "Windows.Terminal.Wsl",
+        "guid": "{YOUR-UBUNTU-GUID}",
+        "colorScheme": "Tango Dark",
+        "commandline": "wsl.exe -d Ubuntu-24.04 -- fish",
+        "icon": "ms-appx:///ProfileIcons/{9acb9455-ca41-5af1-895f-720416cf4c81}.png",
+        "startingDirectory": "~"
+      },
+      {
+        "name": "PowerShell 7",
+        "guid": "{YOUR-PWSH7-GUID}",
+        "commandline": "pwsh.exe -NoLogo",
+        "colorScheme": "Tango Dark",
+        "icon": "ms-appx:///ProfileIcons/{61c54bbd-c2c6-5271-96e7-009a571024ae}.png"
+      },
+      {
+        "name": "PowerShell 5.1",
+        "guid": "{YOUR-PWSH5-GUID}",
+        "commandline": "powershell.exe",
+        "colorScheme": "Campbell",
+        "icon": "ms-appx:///ProfileIcons/{61c54bbd-c2c6-5271-96e7-009a571024ae}.png",
+        "hidden": true
+      },
+      {
+        "name": "WezTerm SSH",
+        "guid": "{YOUR-WEZTERM-GUID}",
+        "commandline": "wezterm.exe start --class wezterm-ssh",
+        "colorScheme": "Tango Dark",
+        "hidden": false
+      }
+    ]
+  },
+  "schemes": [
+    {
+      "name": "Tango Dark",
+      "background": "#000000",
+      "foreground": "#FFFFFF",
+      "black": "#000000",
+      "red": "#CC0000",
+      "green": "#4E9A06",
+      "yellow": "#C4A000",
+      "blue": "#3465A4",
+      "purple": "#75507B",
+      "cyan": "#06989A",
+      "white": "#D3D7CF",
+      "brightBlack": "#555753",
+      "brightRed": "#EF2929",
+      "brightGreen": "#8AE234",
+      "brightYellow": "#FCE94F",
+      "brightBlue": "#729FCF",
+      "brightPurple": "#AD7FA8",
+      "brightCyan": "#34E2E2",
+      "brightWhite": "#EEEEEC"
+    }
+  ],
+  "keybindings": [
+    { "command": { "action": "splitPane", "split": "horizontal" }, "keys": "alt+shift+plus" },
+    { "command": { "action": "splitPane", "split": "vertical" }, "keys": "alt+shift+-" },
+    { "command": "closePane", "keys": "ctrl+shift+w" },
+    { "command": "newTab", "keys": "ctrl+shift+t" },
+    { "command": "nextTab", "keys": "ctrl+pgdn" },
+    { "command": "prevTab", "keys": "ctrl+pgup" },
+    { "command": "closeTab", "keys": "ctrl+w" },
+    { "command": { "action": "switchToTab", "index": 0 }, "keys": "ctrl+shift+1" },
+    { "command": { "action": "switchToTab", "index": 1 }, "keys": "ctrl+shift+2" },
+    { "command": { "action": "switchToTab", "index": 2 }, "keys": "ctrl+shift+3" },
+    { "command": { "action": "moveFocus", "direction": "up" }, "keys": "alt+up" },
+    { "command": { "action": "moveFocus", "direction": "down" }, "keys": "alt+down" },
+    { "command": { "action": "moveFocus", "direction": "left" }, "keys": "alt+left" },
+    { "command": { "action": "moveFocus", "direction": "right" }, "keys": "alt+right" },
+    { "command": { "action": "resizePane", "direction": "up" }, "keys": "alt+shift+up" },
+    { "command": { "action": "resizePane", "direction": "down" }, "keys": "alt+shift+down" },
+    { "command": { "action": "resizePane", "direction": "left" }, "keys": "alt+shift+left" },
+    { "command": { "action": "resizePane", "direction": "right" }, "keys": "alt+shift+right" },
+    { "command": { "action": "quakeMode" }, "keys": "ctrl+`" },
+    { "command": "toggleFullscreen", "keys": "f11" },
+    { "command": "find", "keys": "ctrl+shift+f" },
+    { "command": "copy", "keys": "ctrl+shift+c" },
+    { "command": "paste", "keys": "ctrl+shift+v" }
+  ]
+}

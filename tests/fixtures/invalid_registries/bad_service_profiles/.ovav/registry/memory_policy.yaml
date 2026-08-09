@@ -1,0 +1,26 @@
+memory_policy:
+  privacy_tags:
+    public_project: store_if_useful
+    internal_project: store_scoped
+    sensitive_local: redact_then_confirm
+    secret: deny
+    identity_or_personal: minimize_and_scope
+  write_pipeline:
+    - h_memory_privacy_classifier
+    - h_memory_redactor
+    - h_memory_poison_guard
+    - h_memory_write_gateway
+  recall_pipeline:
+    - h_memory_recall_filter
+  scope_hierarchy:
+    - customer_memory
+    - project_memory
+    - service_profile_memory
+    - operator_memory
+    - session_memory
+  engram:
+    active: optional
+    healthcheck: automatic_when_memory_needed
+    direct_write: deny
+    fallback_when_inactive: artifact_fallback
+    fallback_artifact_root: .ovav/artifacts

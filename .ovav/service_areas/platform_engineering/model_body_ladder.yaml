@@ -1,0 +1,440 @@
+# Model Body Ladder — Platform Engineering v4.0
+# Provider: OpenCode Go (subscription — 14 modelos pagos, 0 free)
+# Catálogo oficial: https://opencode.ai/docs/go
+# updated: 2026-06-07 — Thavren (catálogo completo OpenCode Go)
+
+model_body_ladder:
+  version: "4.0.0"
+  area: platform_engineering
+  strategy: "opencode_go_paid_tiered_intelligent_routing"
+  source: "https://opencode.ai/docs/go"
+  total_models: 14
+  zero_free_models: true
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # CATÁLOGO COMPLETO OPENCODE GO — 14 modelos (todos pagos, suscripción $10/mes)
+  # ═══════════════════════════════════════════════════════════════════════════
+  catalog:
+    # ── TIER 1: LEAD — Razonamiento profundo, arquitectura, decisiones ──
+    deepseek-v4-pro:
+      provider: opencode-go
+      tier: lead
+      strengths: [reasoning, coding, architecture, multi_file]
+      context: 128k
+      use_for: "decisión arquitectónica, implementación compleja, criterio"
+
+    qwen3.7-max:
+      provider: opencode-go
+      tier: lead
+      strengths: [coding, reasoning, implementation, safety]
+      context: 128k
+      use_for: "implementación pesada, refactors, seguridad"
+
+    minimax-m3:
+      provider: opencode-go
+      tier: lead
+      strengths: [coding, testing, qa, coverage]
+      context: 128k
+      use_for: "testing exhaustivo, QA, edge cases"
+
+    glm-5.1:
+      provider: opencode-go
+      tier: lead
+      strengths: [pattern_recognition, review, consistency, security]
+      context: 128k
+      use_for: "code review, patrones, auditoría de seguridad"
+
+    # ── TIER 2: STRONG — Implementación fuerte, análisis ──
+    qwen3.7-plus:
+      provider: opencode-go
+      tier: strong
+      strengths: [coding, general_purpose, implementation]
+      context: 128k
+      use_for: "implementación sólida, parches complejos, análisis"
+
+    glm-5:
+      provider: opencode-go
+      tier: strong
+      strengths: [general_purpose, implementation, analysis]
+      context: 128k
+      use_for: "tareas generales, implementación, análisis de código"
+
+    minimax-m2.7:
+      provider: opencode-go
+      tier: strong
+      strengths: [coding, implementation, planning]
+      context: 128k
+      use_for: "planificación de instalación, implementación estructurada"
+
+    kimi-k2.6:
+      provider: opencode-go
+      tier: strong
+      strengths: [exploration, research, long_context]
+      context: 128k
+      use_for: "investigación profunda, exploración exhaustiva"
+
+    # ── TIER 3: DEEP — Exploración profunda, investigación ──
+    mimo-v2.5-pro:
+      provider: opencode-go
+      tier: deep
+      strengths: [research, exploration, benchmarking, comparison]
+      context: 128k
+      use_for: "análisis competitivo, benchmarks, briefs de decisión"
+
+    kimi-k2.5:
+      provider: opencode-go
+      tier: deep
+      strengths: [exploration, codebase_mapping, context_packs]
+      context: 128k
+      use_for: "mapeo de dependencias, exploración de codebase"
+
+    minimax-m2.5:
+      provider: opencode-go
+      tier: deep
+      strengths: [balanced, analysis, exploration]
+      context: 128k
+      use_for: "análisis balanceado, exploración general"
+
+    # ── TIER 4: FAST — Velocidad, tareas ligeras ──
+    deepseek-v4-flash:
+      provider: opencode-go
+      tier: fast
+      strengths: [speed, quick_search, light_tasks]
+      context: 64k
+      use_for: "búsquedas rápidas, escaneos, tareas ligeras"
+
+    qwen3.6-plus:
+      provider: opencode-go
+      tier: fast
+      strengths: [speed, summarization, light_implementation]
+      context: 64k
+      use_for: "resúmenes, handoffs, parches pequeños, síntesis"
+
+    mimo-v2.5:
+      provider: opencode-go
+      tier: fast
+      strengths: [speed, exploration, quick_analysis]
+      context: 64k
+      use_for: "exploración rápida, diagnóstico ligero"
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # THAVREN — Platform Engineering Lead
+  # ═══════════════════════════════════════════════════════════════════════════
+  thavren:
+    primary:
+      model_id: "opencode-go/deepseek-v4-pro"
+      reason: "mejor razonamiento + código para decisiones de arquitectura"
+    secondary:
+      model_id: "opencode-go/qwen3.7-max"
+      reason: "fallback mismo tier, fuerte en implementación"
+    tertiary:
+      model_id: "opencode-go/minimax-m3"
+      reason: "tercer tier lead, orientado a testing/cobertura"
+    fallback:
+      model_id: "opencode-go/glm-5.1"
+      reason: "cuarto lead, patrones y revisión"
+    budget:
+      model_id: "opencode-go/deepseek-v4-flash"
+      reason: "respuesta rápida para diagnósticos ligeros"
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # EIDREN — Research Intelligence Lead
+  # ═══════════════════════════════════════════════════════════════════════════
+  eidren:
+    primary:
+      model_id: "opencode-go/deepseek-v4-pro"
+      reason: "razonamiento profundo para scoring de evidencia"
+    secondary:
+      model_id: "opencode-go/mimo-v2.5-pro"
+      reason: "orientado a investigación, benchmarks, comparativas"
+    tertiary:
+      model_id: "opencode-go/kimi-k2.6"
+      reason: "exploración profunda, contexto largo"
+    fallback:
+      model_id: "opencode-go/qwen3.7-max"
+      reason: "fallback lead tier"
+    budget:
+      model_id: "opencode-go/qwen3.6-plus"
+      reason: "búsquedas rápidas, verificación ligera"
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # OVAV — Governor (solo cuando requiere interacción textual)
+  # ═══════════════════════════════════════════════════════════════════════════
+  ovav:
+    note: "OVAV no depende de un modelo. Solo usa modelo para reportes de estado."
+    model_id: "opencode-go/qwen3.6-plus"
+    reason: "mínimo necesario para reportes — no consume recursos lead"
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # SQUAD — PLATFORM ENGINEERING (11 miembros)
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  # ── ARIC: Systems Architect — diseño multi-archivo, DAG, dependencias ──
+  aric:
+    primary:
+      model_id: "opencode-go/deepseek-v4-pro"
+      reason: "mejor para diseño arquitectónico y dependencias"
+    secondary:
+      model_id: "opencode-go/qwen3.7-max"
+      reason: "fuerte en implementación de diseños complejos"
+    tertiary:
+      model_id: "opencode-go/minimax-m3"
+      reason: "testing de arquitectura"
+    fallback:
+      model_id: "opencode-go/glm-5.1"
+      reason: "revisión de patrones arquitectónicos"
+
+  # ── SOREN: Senior Implementer — refactors pesados, tests, multi-archivo ──
+  soren:
+    primary:
+      model_id: "opencode-go/qwen3.7-max"
+      reason: "excelente para implementación pesada y refactors"
+    secondary:
+      model_id: "opencode-go/deepseek-v4-pro"
+      reason: "cuando se requiere razonamiento arquitectónico"
+    tertiary:
+      model_id: "opencode-go/minimax-m3"
+      reason: "testing de implementación"
+    fallback:
+      model_id: "opencode-go/glm-5"
+      reason: "implementación sólida general"
+
+  # ── ZARA: Security Auditor — permisos, secretos, scope risk ──
+  zara:
+    primary:
+      model_id: "opencode-go/glm-5.1"
+      reason: "especialista en patrones y detección de anomalías"
+    secondary:
+      model_id: "opencode-go/deepseek-v4-pro"
+      reason: "razonamiento profundo para riesgos complejos"
+    tertiary:
+      model_id: "opencode-go/qwen3.7-max"
+      reason: "análisis de seguridad en código"
+    fallback:
+      model_id: "opencode-go/minimax-m3"
+      reason: "cobertura de edge cases de seguridad"
+
+  # ── VELLA: QA Engineer — testing, regresiones, edge cases ──
+  vella:
+    primary:
+      model_id: "opencode-go/minimax-m3"
+      reason: "orientado a testing exhaustivo y cobertura"
+    secondary:
+      model_id: "opencode-go/qwen3.7-plus"
+      reason: "testing de implementación general"
+    tertiary:
+      model_id: "opencode-go/deepseek-v4-pro"
+      reason: "edge cases complejos que requieren deep reasoning"
+    fallback:
+      model_id: "opencode-go/glm-5.1"
+      reason: "revisión de patrones en tests"
+
+  # ── VIREK: Code Reviewer — pre-commit, secretos, patrones ──
+  virek:
+    primary:
+      model_id: "opencode-go/glm-5.1"
+      reason: "detección de patrones, consistencia de estilo"
+    secondary:
+      model_id: "opencode-go/deepseek-v4-pro"
+      reason: "revisión profunda cuando hay ambigüedad"
+    tertiary:
+      model_id: "opencode-go/qwen3.7-plus"
+      reason: "revisión general de código"
+    fallback:
+      model_id: "opencode-go/minimax-m2.7"
+      reason: "revisión estructurada"
+
+  # ── DORAN: Install Engineer — planificación, backup/rollback, seguridad ──
+  doran:
+    primary:
+      model_id: "opencode-go/qwen3.7-max"
+      reason: "precisión en planificación de instalación"
+    secondary:
+      model_id: "opencode-go/minimax-m2.7"
+      reason: "planificación estructurada y metódica"
+    tertiary:
+      model_id: "opencode-go/deepseek-v4-pro"
+      reason: "cuando hay decisiones de seguridad críticas"
+    fallback:
+      model_id: "opencode-go/glm-5"
+      reason: "backup/rollback planning"
+
+  # ── NARA: Benchmark Analyst — análisis competitivo, comparativas ──
+  nara:
+    primary:
+      model_id: "opencode-go/mimo-v2.5-pro"
+      reason: "especialista en investigación y comparativas"
+    secondary:
+      model_id: "opencode-go/deepseek-v4-pro"
+      reason: "razonamiento profundo para briefs de decisión"
+    tertiary:
+      model_id: "opencode-go/kimi-k2.6"
+      reason: "investigación exhaustiva"
+    fallback:
+      model_id: "opencode-go/qwen3.7-max"
+      reason: "análisis comparativo general"
+
+  # ── RYN: Fast Explorer — búsqueda rápida, patrones de archivos ──
+  ryn:
+    primary:
+      model_id: "opencode-go/deepseek-v4-flash"
+      reason: "máxima velocidad para escaneos rápidos"
+    secondary:
+      model_id: "opencode-go/qwen3.6-plus"
+      reason: "rápido, adecuado para búsquedas"
+    tertiary:
+      model_id: "opencode-go/mimo-v2.5"
+      reason: "exploración rápida alternativa"
+    fallback:
+      model_id: "opencode-go/glm-5"
+      reason: "si la búsqueda requiere más profundidad"
+
+  # ── ORIN: Deep Explorer — mapeo de dependencias, context packs ──
+  orin:
+    primary:
+      model_id: "opencode-go/mimo-v2.5-pro"
+      reason: "exploración profunda y mapeo exhaustivo"
+    secondary:
+      model_id: "opencode-go/kimi-k2.5"
+      reason: "mapeo de codebase, contexto largo"
+    tertiary:
+      model_id: "opencode-go/kimi-k2.6"
+      reason: "exploración de última generación"
+    fallback:
+      model_id: "opencode-go/deepseek-v4-pro"
+      reason: "si se requiere razonamiento arquitectónico"
+
+  # ── LYRA: Summarizer — handoffs, reportes, evidencia condensada ──
+  lyra:
+    primary:
+      model_id: "opencode-go/qwen3.6-plus"
+      reason: "rápido y eficiente para síntesis"
+    secondary:
+      model_id: "opencode-go/deepseek-v4-flash"
+      reason: "velocidad para resúmenes"
+    tertiary:
+      model_id: "opencode-go/mimo-v2.5"
+      reason: "síntesis rápida alternativa"
+    fallback:
+      model_id: "opencode-go/glm-5"
+      reason: "si el resumen requiere procesar más contexto"
+
+  # ── KAEL: Junior Implementer — parches pequeños, fixtures, ediciones ──
+  kael:
+    primary:
+      model_id: "opencode-go/qwen3.7-plus"
+      reason: "sólido para implementación, sin gastar tier lead"
+    secondary:
+      model_id: "opencode-go/glm-5"
+      reason: "buen generalista para parches"
+    tertiary:
+      model_id: "opencode-go/minimax-m2.7"
+      reason: "implementación estructurada"
+    fallback:
+      model_id: "opencode-go/qwen3.6-plus"
+      reason: "rápido para ediciones simples"
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # RUTEO INTELIGENTE POR TIPO DE TAREA
+  # ═══════════════════════════════════════════════════════════════════════════
+  routing:
+    task_routing:
+      architecture_design:
+        primary: "opencode-go/deepseek-v4-pro"
+        secondary: "opencode-go/qwen3.7-max"
+        reason: "razonamiento arquitectónico profundo"
+      heavy_implementation:
+        primary: "opencode-go/qwen3.7-max"
+        secondary: "opencode-go/deepseek-v4-pro"
+        reason: "implementación pesada, refactors multi-archivo"
+      security_audit:
+        primary: "opencode-go/glm-5.1"
+        secondary: "opencode-go/deepseek-v4-pro"
+        reason: "detección de patrones, vulnerabilidades"
+      code_review:
+        primary: "opencode-go/glm-5.1"
+        secondary: "opencode-go/qwen3.7-plus"
+        reason: "consistencia, patrones, secretos"
+      testing_qa:
+        primary: "opencode-go/minimax-m3"
+        secondary: "opencode-go/qwen3.7-plus"
+        reason: "cobertura exhaustiva, edge cases"
+      install_planning:
+        primary: "opencode-go/qwen3.7-max"
+        secondary: "opencode-go/minimax-m2.7"
+        reason: "precisión, seguridad, backup/rollback"
+      benchmarking:
+        primary: "opencode-go/mimo-v2.5-pro"
+        secondary: "opencode-go/deepseek-v4-pro"
+        reason: "análisis comparativo profundo"
+      research_evidence:
+        primary: "opencode-go/deepseek-v4-pro"
+        secondary: "opencode-go/mimo-v2.5-pro"
+        reason: "scoring de fuentes, verificación de claims"
+      deep_exploration:
+        primary: "opencode-go/mimo-v2.5-pro"
+        secondary: "opencode-go/kimi-k2.5"
+        reason: "mapeo exhaustivo, context packs"
+      quick_exploration:
+        primary: "opencode-go/deepseek-v4-flash"
+        secondary: "opencode-go/qwen3.6-plus"
+        reason: "velocidad, escaneos ligeros"
+      small_patches:
+        primary: "opencode-go/qwen3.7-plus"
+        secondary: "opencode-go/glm-5"
+        reason: "edits rápidos, fixtures"
+      summarization:
+        primary: "opencode-go/qwen3.6-plus"
+        secondary: "opencode-go/deepseek-v4-flash"
+        reason: "síntesis eficiente"
+      conversation_diagnosis:
+        primary: "opencode-go/qwen3.6-plus"
+        secondary: "opencode-go/deepseek-v4-flash"
+        reason: "respuesta compacta, diagnóstico ligero"
+
+    # Auto-fallback ladder (todos OpenCode Go, sin providers externos)
+    auto_fallback:
+      primary_exhausted:
+        - step: 1
+          action: "switch_to_secondary"
+          description: "usar secundario del mismo agente"
+        - step: 2
+          action: "switch_to_tertiary"
+          description: "usar terciario del mismo agente"
+        - step: 3
+          action: "switch_to_fallback"
+          description: "último modelo asignado al agente"
+        - step: 4
+          action: "switch_to_any_lead"
+          description: "cualquier modelo lead tier disponible"
+        - step: 5
+          action: "switch_to_any_strong"
+          description: "cualquier modelo strong tier disponible"
+        - step: 6
+          action: "switch_to_fast"
+          description: "deepseek-v4-flash — último recurso funcional"
+      all_exhausted: "safe_stop_and_alert_user"
+
+    auto_detect:
+      credit_exhaustion: true
+      consecutive_errors_threshold: 3
+      latency_spike_threshold_ms: 30000
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # REGLAS GLOBALES
+  # ═══════════════════════════════════════════════════════════════════════════
+  rules:
+    provider: "opencode-go"
+    subscription: "$10/mes — 14 modelos pagos"
+    zero_free_models: true
+    no_openai: true
+    no_anthropic: true
+    no_google: true
+    no_external_providers: true
+    lead_minimum_tier: "lead"
+    heavy_squad_minimum_tier: "strong"
+    light_squad_maximum_tier: "strong"
+    summarizer_maximum_tier: "fast"
+    exhausted_action: "safe_stop_and_alert_user"
+    cross_provider_fallback: "none"
+    model_family: "opencode-go"

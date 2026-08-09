@@ -1,0 +1,53 @@
+$ python3 tools/validators/check_service_area_governance.py
+returncode=0
+PASS service area governance
+
+
+$ python3 tools/validators/check_build18_launch_pack.py
+returncode=0
+PASS build18 launch pack
+
+
+$ python3 tools/validators/check_agent_runtime_service_area_router.py
+returncode=0
+PASS agent runtime service area router
+
+
+$ python3 tools/validators/check_agent_runtime_enforcement.py
+returncode=0
+PASS agent runtime enforcement
+
+
+$ python3 tools/validators/check_opencode_runtime_wiring.py
+returncode=0
+PASS opencode runtime wiring
+
+
+$ python3 tools/validators/check_squad_normalization.py
+returncode=0
+PASS squad normalization
+
+
+$ python3 tools/validators/check_agent_ux_visual_delivery.py
+returncode=0
+PASS agent ux visual delivery
+
+
+$ python3 tools/validators/check_context_economy_and_active_connections.py
+returncode=0
+PASS context economy and active connections
+
+
+$ python3 tools/validators/check_tool_readiness_matrix.py
+returncode=0
+PASS tool readiness matrix
+
+
+$ python3 tools/validators/check_final_launch_current_authority.py
+returncode=0
+PASS final launch current authority
+
+
+$ python3 tools/validators/validate_all.py
+returncode=0
+validation passed

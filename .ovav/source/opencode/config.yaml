@@ -1,0 +1,161 @@
+version: '1.0'
+schema: https://opencode.ai/config.json
+runtime:
+  model: opencode-go/deepseek-v4-pro
+  small_model: opencode-go/deepseek-v4-flash
+  default_agent: Platform Engineering
+  instructions:
+  - AGENTS.md
+  agent: {}
+mcp:
+  ovav-budget:
+    type: local
+    command:
+    - python3
+    - tools/mcp/ovav_mcp_server.py
+    - budget
+    enabled: true
+  ovav-browser:
+    type: local
+    command:
+    - go
+    - run
+    - -C
+    - go-runtime
+    - ./cmd/browser_server
+    enabled: true
+    args:
+    - --no-headless
+  # MCP Consumer Servers
+  ovav-figma:
+    type: local
+    command:
+    - /home/braka/Systems/OVAV/tools/mcp/consumer/bin/ovav-mcp-figma
+    enabled: true
+    env:
+      FIGMA_TOKEN: "${FIGMA_TOKEN}"
+  ovav-memory:
+    type: local
+    command:
+    - /home/braka/Systems/OVAV/bin/ovav-mcp-memory
+    enabled: true
+  ovav-sqlite:
+    type: local
+    command:
+    - /home/braka/Systems/OVAV/tools/mcp/consumer/bin/ovav-mcp-sqlite
+    enabled: false
+  ovav-git:
+    type: local
+    command:
+    - /home/braka/Systems/OVAV/tools/mcp/consumer/bin/ovav-mcp-git
+    enabled: true
+  ovav-design-system:
+    type: local
+    command:
+    - /home/braka/Systems/OVAV/tools/mcp/consumer/bin/ovav-mcp-design-system
+    enabled: true
+plugins:
+- .opencode/plugins/ovav-monitor.js
+providers:
+  openai:
+    options:
+      timeout: 300000
+  opencode:
+    options:
+      timeout: 300000
+permissions:
+  edit: allow
+  bash:
+    '*': allow
+    OVAV_EVIDENCE_MODE=strict python3 tools/ovav_runtime.py validate: allow
+    apt install *: deny
+    gh auth login*: deny
+    gh auth status*: allow
+    gh auth token*: deny
+    gh issue list*: allow
+    gh issue view*: allow
+    gh pr create*: ask
+    gh pr list*: allow
+    gh pr merge*: deny
+    gh pr status*: allow
+    gh pr view*: allow
+    gh release *: deny
+    gh repo view*: allow
+    git add *: allow
+    git branch --show-current: allow
+    git branch -d *: allow
+    git branch -D *: deny
+    git commit*: allow
+    git diff*: allow
+    git log*: allow
+    git ls-remote *: allow
+    git push --force *: deny
+    git push -f *: deny
+    git push*: deny
+    git remote -v: allow
+    git rev-parse*: allow
+    git status*: allow
+    go run ./go-runtime/cmd/ovav/ sbom*: allow
+    go run ./go-runtime/cmd/ovav/ validate*: allow
+    go run ./go-runtime/internal/validators/cmd/validate/*: allow
+    npm install *: deny
+    npm run build*: allow
+    npm run lint*: allow
+    npm run test*: allow
+    npm run typecheck*: allow
+    npm test*: allow
+    pip install *: deny
+    pytest*: allow
+    python3 -B tools/github/ovav_gh_issue_gate.py*: allow
+    python3 -B tools/github/ovav_git_push_gate.py*: allow
+    python3 -B tools/permissions/materialize.py*: allow
+    python3 -B tools/permissions/ovav_permission_authority.py*: allow
+    python3 -B tools/validators/*.py: allow
+    python3 -m pytest*: allow
+    python3 tools/github/ovav_gh_issue_gate.py*: allow
+    python3 tools/github/ovav_git_push_gate.py*: allow
+    python3 tools/harnesses/check_*.py: allow
+    python3 tools/harnesses/workspace_safety_gate.py*: allow
+    python3 tools/install/*: deny
+    python3 tools/install_gateway/*: deny
+    python3 tools/memory/*: deny
+    python3 tools/ovav_runtime.py*: allow
+    python3 tools/permissions/materialize.py*: allow
+    python3 tools/permissions/ovav_permission_authority.py*: allow
+    python3 tools/protocols/*: deny
+    python3 tools/validators/*.py: allow
+    sudo *: deny
+  external_directory:
+    /home/braka/*: allow
+    /home/braka/..ovav/source/configs/wezterm/*: allow
+    /home/braka/.config/ovav/*: allow
+    /home/braka/.local/share/ovav/*: allow
+    /home/braka/.local/state/ovav-opencode/*: allow
+    /home/braka/Labs/mimocode/data/memory/*: allow
+    /tmp/opencode/*: allow
+    /mnt/c/Users/Alexa/*: allow
+references:
+  spec:
+    path: docs
+    description: OVAV spec documents — reference for architecture, contracts, implementation
+      plan, and authority matrix. Use before implementing or modifying governance
+      structures.
+  contracts:
+    path: .ovav/service_areas/shared
+    description: OVAV runtime contracts — visual delivery, safe stop, context economy.
+      Use when output format, error handling, or budget decisions are needed.
+    hidden: true
+  registry:
+    path: .ovav/registry
+    description: OVAV registries — active context ledger, auto triggers, capability
+      scores. Use for state continuity and trigger-aware work.
+    hidden: true
+compaction:
+  auto: true
+  preserve_recent_tokens: 3000
+  tail_turns: 2
+tool_output:
+  max_bytes: 4096
+  max_lines: 80
+user:
+  username: Alexander Salvador

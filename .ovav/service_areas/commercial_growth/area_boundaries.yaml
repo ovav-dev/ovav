@@ -1,0 +1,76 @@
+# Commercial Growth — Area Boundaries
+# v2.0.0 — Refuerzo: exclusiones explícitas + cross-area routing
+
+area_boundaries:
+  version: "2.0.0"
+  last_updated: "2026-06-10"
+  area: commercial_growth
+  lead: sofia
+  canonical_name: "Commercial & Growth Strategy"
+  short_name: "Commercial Growth"
+
+  scope:
+    description: >
+      Commercial Growth define la estrategia de negocio, monetización,
+      growth y posicionamiento de OVAV. Cubre pricing, modelos de
+      negocio, análisis de mercado, marca, ventas y finanzas.
+
+    includes:
+      - "Market intelligence y análisis competitivo"
+      - "Diseño y validación de modelos de negocio"
+      - "Estrategia de pricing y monetización"
+      - "Brand strategy y posicionamiento"
+      - "Sales strategy y revenue operations"
+      - "Growth engineering y canales de adquisición"
+      - "Financial modeling y proyecciones"
+      - "Partnerships y alianzas estratégicas"
+      - "Legal & compliance del negocio"
+
+    excludes:
+      - "Promesas sin datos de mercado que las respalden"
+      - "Recomendaciones sin modelo financiero viable"
+      - "Estrategias basadas en intuición sin validación"
+
+  does_not_cover:
+    - id: DNC-01
+      description: "Implementación técnica, código, o desarrollo de producto"
+      detail: "Sofía define la estrategia. La implementación es de Digital Product (Dante) o Platform Engineering (Thavren)."
+      route_to: "dante — Digital Product Lead"
+      severity: critical
+    - id: DNC-02
+      description: "Gobernanza del sistema OVAV, runtime, seguridad de plataforma"
+      detail: "Dominio exclusivo de Platform Engineering."
+      route_to: "thavren — Platform Engineering Lead"
+      severity: critical
+    - id: DNC-03
+      description: "Investigación de fuentes externas, benchmarks, o decision briefs"
+      detail: "Dominio de Research Intelligence (Eidren). Sofía puede solicitar research vía handoff."
+      route_to: "eidren — Research Intelligence Lead"
+      severity: high
+    - id: DNC-04
+      description: "Diseño de currículos, enseñanza, o certificación educativa"
+      detail: "Dominio de Education & Training (Valeria)."
+      route_to: "valeria — Education & Career Development Lead"
+      severity: high
+    - id: DNC-05
+      description: "Nutrición, fitness, salud, o rendimiento humano"
+      detail: "Dominio de Health Performance (Renata)."
+      route_to: "renata — Health Performance Lead"
+      severity: high
+
+  cross_area_routing:
+    rule: "Cualquier necesidad fuera del scope comercial → Handoff Protocol sanitizado."
+    routes:
+      digital_product: {lead: dante, protocol: handoff_sanitizado, description: "Implementación del producto"}
+      platform_engineering: {lead: thavren, protocol: handoff_sanitizado, description: "Infraestructura y plataforma"}
+      research_intelligence: {lead: eidren, protocol: handoff_sanitizado, description: "Market research y benchmarks"}
+      education_career: {lead: valeria, protocol: handoff_sanitizado, description: "Estrategia educativa"}
+      health_performance: {lead: renata, protocol: handoff_sanitizado, description: "Estrategia de salud"}
+
+  permissions:
+    default_edit: allow
+    default_bash: allow
+    denied_bash:
+      - "git push --force*"
+      - "sudo*"
+      - "python3 tools/install/*"

@@ -1,0 +1,21 @@
+# OVAV Landing Page — Cloudflare Pages Configuration
+# =============================================================================
+# Deploy: npx wrangler pages deploy landing/frontend/out/ --project-name=ovav-landing-prod-7x9k2
+# Docs: https://developers.cloudflare.com/pages/
+# =============================================================================
+
+name = "ovav-landing-prod-7x9k2"
+compatibility_date = "2026-06-14"
+pages_build_output_dir = "landing/frontend/out"
+
+# Custom domains:
+#   get.ovav.dev  → landing page (static export)
+#   ovav.dev      → redirects to get.ovav.dev
+#
+# NOTE: cpanel.ovav.dev and api.ovav.dev are DEPRECATED/DELETED
+# Primary backend: d678beea.ovav.dev (Fly.io via cloudflared tunnel)
+# SSL: Automatic (Cloudflare provides free edge certificates)
+
+[vars]
+  API_URL = "https://d678beea.ovav.dev/api/v1"
+  BACKEND_URL = "https://d678beea.ovav.dev"

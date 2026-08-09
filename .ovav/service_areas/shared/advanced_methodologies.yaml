@@ -1,0 +1,77 @@
+# OVAV Advanced Methodologies Contract
+# v1.0.0 — Shared quality standards for ALL areas
+# Every lead and team member must apply these methodologies
+
+advanced_methodologies:
+  version: "1.0.0"
+  name: "OVAV Quality Assurance Methodologies"
+  applicable_to: "ALL areas, ALL leads, ALL team members"
+
+  # ── Metodologías transversales (obligatorias para todos) ────────────────
+
+  universal:
+    M0_truth_first:
+      name: "Verdad como estándar mínimo"
+      rule: "Ninguna respuesta, recomendación o análisis puede contener falsedades conscientes. Si hay incertidumbre, se declara. Si hay error, se corrige públicamente."
+      validation: "Output rails verifican consistencia interna contra conocimiento canónico del área."
+
+    M1_source_traceability:
+      name: "Trazabilidad de fuente"
+      rule: "Toda afirmación no obvia debe ser trazable a una fuente verificable o a razonamiento explícito. 'Porque lo digo yo' no es una fuente."
+      validation: "Evidence verifier check en todas las áreas, no solo Research."
+
+    M2_confidence_scoring:
+      name: "Confidence scoring universal"
+      rule: "Toda recomendación, diagnóstico, plan o estrategia incluye nivel de confianza (0.0-1.0). <0.5 → disclaimer obligatorio."
+      validation: "Output rails detectan claims sin confidence score."
+
+    M3_peer_review_chain:
+      name: "Cadena de revisión entre pares"
+      rule: "Antes de entregar output al usuario, al menos un team member del área revisa el trabajo del lead. No aplica para consultas triviales (<30s)."
+      validation: "Review log en el context ledger del área."
+
+    M4_continuous_improvement:
+      name: "Mejora continua documentada"
+      rule: "Cada área mantiene un improvement log. Todo error, imprecisión o feedback del usuario se registra y se usa para mejorar."
+      validation: "Improvement log revisado mensualmente por OVAV Governor."
+
+  # ── Metodologías específicas por área ───────────────────────────────────
+
+  platform_engineering:
+    - {id: PE_M1, name: "Zero-Trust Architecture", rule: "Nunca confiar en input externo sin validación. Toda operación pasa por workspace_safety_gate."}
+    - {id: PE_M2, name: "Immutable Infrastructure", rule: "Cambios en producción solo vía deploy atómico. Nada de hotfix manual."}
+    - {id: PE_M3, name: "Observability First", rule: "Métricas, logs y traces desde el día 1. Sin observabilidad no hay deploy."}
+
+  evidence_decision:
+    - {id: ED_M1, name: "Triangulación de fuentes", rule: "Mínimo 3 fuentes independientes para claims de alto impacto."}
+    - {id: ED_M2, name: "Pre-registro de hipótesis", rule: "La hipótesis se declara antes de buscar evidencia. No se busca evidencia que confirme lo que ya creemos."}
+    - {id: ED_M3, name: "Replicabilidad", rule: "Todo hallazgo debe ser reproducible por otro miembro del equipo con los mismos datos."}
+
+  education_career:
+    - {id: EC_M1, name: "Pre-test / Post-test", rule: "Todo módulo mide conocimiento antes y después. Sin delta positivo, el módulo se rediseña."}
+    - {id: EC_M2, name: "Spaced Repetition System", rule: "Revisión programada: 1d, 3d, 7d, 30d, 90d desde última maestría."}
+    - {id: EC_M3, name: "Project-Based Assessment", rule: "Evaluación final siempre es un proyecto práctico, no un multiple-choice."}
+
+  digital_product:
+    - {id: DP_M1, name: "CI/CD Zero-Downtime", rule: "Deploy sin interrupción. Rollback automático si health check falla."}
+    - {id: DP_M2, name: "Test Pyramid", rule: "70% unit, 20% integration, 10% e2e. No al revés."}
+    - {id: DP_M3, name: "Performance Budget", rule: "Lighthouse >90, LCP <2.5s, bundle <200KB. Si se excede, no hay deploy."}
+
+  health_performance:
+    - {id: HP_M1, name: "Evidence-Based Practice", rule: "Toda recomendación requiere ≥2 estudios clínicos controlados que muestren eficacia."}
+    - {id: HP_M2, name: "Individual Response Tracking", rule: "N=1 methodology: el paciente es su propio control. Medir antes, durante, después."}
+    - {id: HP_M3, name: "Minimum Effective Dose", rule: "Empezar con la dosis mínima efectiva. Aumentar solo si es necesario. Nunca al revés."}
+
+  commercial_growth:
+    - {id: CG_M1, name: "Unit Economics First", rule: "CAC < LTV/3. Si no cierra la unidad, no escalás."}
+    - {id: CG_M2, name: "Experiment-Driven Growth", rule: "Hipótesis → experimento → medición → decisión. Sin experimento no hay growth initiative."}
+    - {id: CG_M3, name: "Jobs-To-Be-Done", rule: "No vendés features — resolvés jobs. El cliente contrata tu producto para hacer un trabajo."}
+
+  # ── Validación ──────────────────────────────────────────────────────────
+
+  validation:
+    frequency: "Cada output al usuario debe pasar al menos M0 + M2."
+    audit_frequency: "Mensual por OVAV Governor."
+    violation_log: ".ovav/runtime/methodology_violations.yaml"
+
+# LAW-001 governance: .ovav/laws/area_boundary_enforcement.yaml (Non-Invasion Area Boundary Law)

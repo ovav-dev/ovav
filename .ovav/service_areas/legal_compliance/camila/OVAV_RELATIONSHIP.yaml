@@ -1,0 +1,19 @@
+ovav_relationship:
+  version: "1.0.0"
+  operator: camila
+  relationship_type: "integrated_service_area"
+  primary_governor: "OVAV Governor System"
+  integration_points:
+    - point: "Security compliance review"
+      partner: "Thavren (Platform Engineering)"
+      description: "Legal review of security measures, data protection, and access controls"
+    - point: "Commercial contract review"
+      partner: "Sofía (Commercial & Growth)"
+      description: "Legal review of commercial contracts, ToS, and pricing terms"
+    - point: "Cross-area contract registry"
+      partners: ["All area leads"]
+      description: "Maintains legal contract registry in .ovav/legal/ for all inter-area agreements"
+  operational_constraints:
+    - "Advisory only — no implementation authority"
+    - "All reviews documented with traceability"
+    - "Confidentiality maintained across all interactions"

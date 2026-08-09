@@ -1,0 +1,404 @@
+# OVAV Production Monitoring — Canonical Configuration
+# =============================================================================
+# Schema: v1.0
+# Created: 2026-06-16 03:10 UTC-5
+# Author: Uriel (DevOps & Infrastructure Lead)
+# Account: Better Uptime free tier (Alexander's account)
+# ⏰ All times: UTC-5 (America/Lima, Peru)
+# =============================================================================
+#
+# Este archivo es la fuente canónica de la configuración de monitoreo.
+# Cualquier cambio en Better Uptime debe reflejarse aquí.
+# Runbook de emergencia: .ovav/docs/runbooks/monitoring.md (si existe)
+
+version: "1.1"
+updated_at: "2026-06-16 07:15 UTC-5"
+updated_by: thavren
+status: "active — configured by Alexander (CEO) + Thavren. 4/4 monitors LIVE, status page at status.ovav.dev"
+
+# ── Escalation ────────────────────────────────────────────────────────────
+
+escalation:
+  primary:
+    name: "Alexander (CEO)"
+    method: "phone_call"
+    number: "+51 628 900 3830"
+    on_call_24_7: true
+    note: "Free tier permite 1 contacto de escalación. Usar Alexander como primario."
+  secondary:
+    method: "email"
+    address: "alertas@ovav.dev"
+    note: "Configurar si el plan lo permite. Si no, crear regla de forwarding."
+
+# ── Alert Policy ──────────────────────────────────────────────────────────
+
+alert_policy:
+  # INFO: El dashboard muestra el evento pero no alerta al humano.
+  # WARNING: Alerta por email/app push (no llamada).
+  # CRITICAL: Llamada telefónica inmediata al número de escalación primario.
+
+  INFO:
+    condition: "response_time > 2000ms"
+    action: "log_only"
+    description: "Degradación de rendimiento. Investigar en próxima ventana de mantenimiento."
+
+  WARNING:
+    condition: "http_status != 200 (para endpoints que deben devolver 200)"
+    action: "email_or_push"
+    description: "Endpoint caído o devolviendo error. Requiere atención en <15 min."
+    p1_escalation: "Si no se resuelve en 15 min → escalar a CRITICAL"
+
+  CRITICAL:
+    condition: "endpoint DOWN por >60s continuos"
+    action: "phone_call"
+    description: "Servicio caído. Alexander recibe llamada inmediata."
+    target_response: "<15 min"
+
+# ── Monitored Endpoints ───────────────────────────────────────────────────
+#
+# Prioridad: P0 = Servicio caído afecta usuarios/producto
+#            P1 = Degradación visible
+#            P2 = Informativo/monitoreo pasivo
+
+endpoints:
+
+  # ── P0: Backend Health (CRÍTICO) ──────────────────────────────────────
+  - id: "cpanel-health"
+    url: "https://d678beea.ovav.dev/health"
+    method: GET
+    priority: P0
+    check_interval_seconds: 60
+    alert_levels:
+      INFO:    "response_time > 2000ms"
+      WARNING: "http_status != 200"
+      CRITICAL: "down > 60s"
+    expected:
+      status_code: 200
+      body_contains: '"status":"ok"'
+      body_contains_alt: '"status":"ok"'  # json sin espacios
+      max_response_ms: 2000
+    notes: >
+      Este es el heartbeat principal del backend Go.
+      Si falla, TODO el cPanel (auth, cockpit, CLI proxy, admin) está caído.
+      Fly.io ya tiene http_check cada 15s para auto-healing (fly.toml:45-51).
+      Better Uptime monitorea desde fuera para detección de fallos de red/plataforma.
+    fly_io_covered: true
+    fly_io_config:
+      interval: "15s"
+      timeout: "5s"
+      grace_period: "10s"
+      path: "/health"
+
+  # ── P1: API Status (ALTO) ─────────────────────────────────────────────
+  - id: "cpanel-api-status"
+    url: "https://d678beea.ovav.dev/api/v1/status"
+    method: GET
+    priority: P1
+    check_interval_seconds: 120
+    alert_levels:
+      INFO:    "response_time > 3000ms"
+      WARNING: "http_status != 200"
+      CRITICAL: "down > 90s"
+    expected:
+      status_code: 200
+      body_contains: '"system"'
+      body_contains: '"timestamp"'
+      max_response_ms: 3000
+    notes: >
+      Endpoint de status completo: economía, git, sesión, sistema.
+      Más pesado que /health porque agrega datos de múltiples subsistemas.
+      Tolerancia más alta (3s vs 2s) y ventana de down más larga (90s).
+      NO cubierto por Fly.io http_checks — gap documentado abajo.
+    fly_io_covered: false
+
+  # ── P2: Landing Page (Cloudflare Pages) ───────────────────────────────
+  - id: "landing-ovav-dev"
+    url: "https://ovav.dev"
+    method: GET
+    priority: P2
+    check_interval_seconds: 300
+    alert_levels:
+      INFO:    "response_time > 3000ms"
+      WARNING: "http_status != 200"
+      CRITICAL: "down > 300s (5 min)"
+    expected:
+      status_code: 200
+      max_response_ms: 3000
+    notes: >
+      Landing page estática servida por Cloudflare Pages.
+      Prioridad P2: si cae, el producto sigue funcionando pero no hay fachada pública.
+      Intervalo 300s (5 min) para no consumir créditos de free tier innecesariamente.
+      NO cubierto por Fly.io (es Cloudflare, no Fly.io).
+
+  # ── P3: WWW Redirect ──────────────────────────────────────────────────
+  - id: "www-ovav-dev"
+    url: "https://www.ovav.dev"
+    method: GET
+    priority: P3
+    check_interval_seconds: 300
+    alert_levels:
+      INFO:    "response_time > 3000ms"
+      WARNING: "http_status != 200"
+      CRITICAL: "down > 300s (5 min)"
+    expected:
+      status_code: 200
+      max_response_ms: 3000
+    notes: >
+      Actualmente www.ovav.dev sirve el mismo contenido que el apex (HTTP 200, no redirect).
+      Si se configura redirect 301 → ovav.dev en el futuro, ajustar expected status_code a 301.
+      Mismo intervalo que landing: 300s. Prioridad P3 (menor que landing).
+
+# ── status.ovav.dev — Public Status Page ─────────────────────────────────
+#
+# Plan de diseño para la página de status pública.
+# Implementación futura — no es parte del deploy actual.
+# Alexander debe crear esto en Better Uptime dashboard.
+
+status_page:
+  domain: "status.ovav.dev"
+  provider: "Better Uptime"
+  plan_required: "Free tier incluye 1 status page básica"
+  design:
+    sections:
+      - id: "current_status"
+        title: "Current System Status"
+        display: "traffic_light"
+        # 🟢 All Systems Operational
+        # 🟡 Degraded Performance
+        # 🔴 Major Outage
+        components:
+          - name: "cPanel Backend"
+            monitor_id: "cpanel-health"
+            description: "API, auth, cockpit proxy, admin panel"
+          - name: "cPanel API"
+            monitor_id: "cpanel-api-status"
+            description: "Full system status endpoint"
+          - name: "Landing Page"
+            monitor_id: "landing-ovav-dev"
+            description: "ovav.dev marketing site (Cloudflare Pages)"
+          - name: "WWW Redirect"
+            monitor_id: "www-ovav-dev"
+            description: "www.ovav.dev → ovav.dev"
+
+      - id: "uptime_history"
+        title: "Uptime History"
+        display: "bar_chart"
+        period: "last_90_days"
+        metrics:
+          - "overall_uptime_pct"
+          - "per_component_uptime_pct"
+          - "incident_count"
+
+      - id: "incident_log"
+        title: "Recent Incidents"
+        display: "timeline"
+        max_items: 10
+        fields:
+          - "date"
+          - "component"
+          - "duration"
+          - "resolution"
+
+    branding:
+      logo_url: "https://ovav.dev/ovav-logo.svg"
+      favicon_url: "https://ovav.dev/favicon.ico"
+      colors:
+        operational: "#22c55e"    # green-500
+        degraded: "#eab308"       # yellow-500
+        outage: "#ef4444"         # red-500
+        maintenance: "#3b82f6"    # blue-500
+
+  implementation:
+    step_1: "Alexander crea la status page en Better Uptime Dashboard → Status Pages"
+    step_2: "Asignar los 4 monitores a los componentes listados arriba"
+    step_3: "Configurar dominio personalizado: status.ovav.dev"
+    step_4: "Añadir registro CNAME en Cloudflare DNS: status → status.betteruptime.com"
+    step_5: "Verificar SSL (Better Uptime genera certificado automáticamente)"
+
+# ── Fly.io Health Checks — Verification & Gaps ───────────────────────────
+#
+# Audit de fly.toml:45-56 (branch task/next-ceo-task, commit 74a4cde)
+
+fly_io_audit:
+  source_file: "fly.toml"
+  audited_at: "2026-06-16 03:10 UTC-5"
+
+  existing_checks:
+    - check: "http_check /health"
+      interval: "15s"
+      timeout: "5s"
+      grace_period: "10s"
+      method: "GET"
+      protocol: "http"
+      verdict: "✅ CORRECTO"
+      details: >
+        Intervalo 15s es adecuado para auto-healing de Fly.io.
+        Timeout 5s es suficiente para el endpoint /health (responde en <100ms en caliente).
+        Grace period 10s cubre cold starts (~2-5s en free tier con Go binary pequeño).
+
+  gaps:
+    - severity: "MEDIUM"
+      description: "Sin http_check para /api/v1/status"
+      impact: "Fly.io no detecta fallos parciales del sistema de status."
+      recommendation: >
+        Añadir un segundo [[services.http_checks]] bloque en fly.toml:
+        path = "/api/v1/status", interval = "30s", timeout = "10s".
+        NO implementado en este task — requiere modificar fly.toml y redeploy.
+        Cubierto por Better Uptime (check externo cada 120s).
+      covered_by_better_uptime: true
+
+    - severity: "LOW"
+      description: "Solo 1 región (dfw). Sin health check multi-región."
+      impact: "Si dfw cae completamente, no hay failover automático."
+      recommendation: >
+        Añadir región secundaria (e.g., gru — São Paulo) cuando el presupuesto lo permita.
+        Free tier solo permite 1 región. Necesita plan paid.
+      covered_by_better_uptime: false
+
+    - severity: "LOW"
+      description: "www.ovav.dev no redirige al apex (responde HTTP 200 directo)"
+      impact: "SEO: contenido duplicado. Usuarios pueden acceder por www sin canonical."
+      recommendation: >
+        Configurar redirect 301 en Cloudflare: www.ovav.dev → ovav.dev.
+        Usar Cloudflare Redirect Rules o Page Rules.
+      covered_by_better_uptime: false
+
+  verdict: "FLY.IO HEALTH CHECKS ACEPTABLES para fase actual (free tier, single region). Los gaps son conocidos y tienen cobertura parcial vía Better Uptime. El gap principal (/api/v1/status) está mitigado por monitoreo externo."
+
+# ── Better Uptime — Handoff Instructions for Alexander ───────────────────
+#
+# Alexander debe ejecutar estos pasos en el dashboard de Better Uptime.
+
+better_uptime_setup:
+  account: "Free tier — Alexander's account (ya creado)"
+  dashboard_url: "https://betterstack.com/better-uptime"
+
+  step_by_step:
+
+    - step: 1
+      action: "Crear los 4 monitores"
+      details: |
+        Ir a Monitors → Create Monitor.
+        Crear UNO por UNO, usando exactamente los URLs y config de la tabla abajo.
+
+    - step: 2
+      action: "Configurar la política de alertas (Alert Policy)"
+      details: |
+        Ir a Alerting → Alert Policies → Create Policy.
+        Nombre: "OVAV Production Alerts"
+        Condiciones:
+          - INFO: Response time > 2s → No notify (solo log)
+          - WARNING: HTTP status != 200 → Email/Push notification
+          - CRITICAL: Down > 60s → Phone call to +51 628 900 3830
+
+    - step: 3
+      action: "Configurar escalación telefónica"
+      details: |
+        Ir a Settings → Phone Calls.
+        Añadir número: +51 628 900 3830.
+        Verify (Better Uptime llamará para confirmar).
+        Asignar a todos los monitores P0 y P1.
+
+    - step: 4
+      action: "Crear Status Page pública"
+      details: |
+        Ir a Status Pages → Create Status Page.
+        Nombre: "OVAV Systems Status"
+        Subdomain: "status.ovav.dev" (o usa el subdominio de Better Uptime temporalmente).
+        Asignar los 4 monitores como componentes.
+
+    - step: 5
+      action: "Verificar monitores uno por uno"
+      details: |
+        Desde el dashboard, forzar un test check en cada monitor.
+        Verificar que todos devuelven 🟢 UP.
+        Si algún monitor falla, verificar URL y expected body.
+
+    - step: 6
+      action: "Configurar DNS para status page"
+      details: |
+        En Cloudflare DNS, crear registro:
+        Tipo: CNAME
+        Nombre: status
+        Target: status.betteruptime.com (o el que indique Better Uptime)
+        Proxy: ON (naranja) o OFF (gris) según recomendación de Better Uptime.
+        Esperar propagación DNS (~5 min con Cloudflare).
+
+  monitors_table:
+    columns: ["#", "Name", "URL", "Interval", "Expected Status", "Expected Body", "Priority", "Alert On Down"]
+    rows:
+      - [1, "OVAV cPanel Health", "https://d678beea.ovav.dev/health", "60s", "200", '"status":"ok"', "P0 — CRITICAL", ">60s → phone call"]
+      - [2, "OVAV API Status", "https://d678beea.ovav.dev/api/v1/status", "120s", "200", '"timestamp"', "P1 — HIGH", ">90s → push notification"]
+      - [3, "OVAV Landing", "https://ovav.dev", "300s", "200", "(none — check status only)", "P2 — MEDIUM", ">300s → email"]
+      - [4, "OVAV WWW", "https://www.ovav.dev", "300s", "200", "(none — check status only)", "P3 — LOW", ">300s → email"]
+
+# ── Actual Deployment (2026-06-16) — Configured by Alexander + Thavren ─
+#
+# La UI de Better Uptime cambió respecto al diseño original de Uriel.
+# Free tier actual (Junio 2026) NO incluye: escalation policies, on-call schedules,
+# phone call setup, ni keyword monitoring avanzado. Lo que SÍ está activo:
+
+actual_deployment:
+  date: "2026-06-16 07:15 UTC-5"
+  dashboard: "https://uptime.betterstack.com"
+  status_page: "https://status.ovav.dev"
+  notification: "Email al account owner (gratuito, automático)"
+
+  monitors_active:
+    - id: "cpanel-health"
+      name: "OVAV cPanel Health"
+      url: "https://d678beea.ovav.dev/health"
+      method: "URL returns HTTP status other than 200"
+      check_interval: "3 min (free tier limit — diseñado 60s)"
+      status: 🟢
+
+    - id: "cpanel-api-status"
+      name: "OVAV API Status"
+      url: "https://d678beea.ovav.dev/api/v1/status"
+      method: "URL returns HTTP status other than 200"
+      check_interval: "3 min (free tier limit — diseñado 120s)"
+      status: 🟢
+
+    - id: "landing-ovav-dev"
+      name: "OVAV Landing"
+      url: "https://ovav.dev"
+      method: "URL becomes unavailable"
+      check_interval: "5 min"
+      status: 🟢
+
+    - id: "www-ovav-dev"
+      name: "OVAV WWW"
+      url: "https://www.ovav.dev"
+      method: "URL becomes unavailable"
+      check_interval: "5 min"
+      status: 🟢
+
+  free_tier_limitations:
+    unavailable:
+      - phone_calls: "Botón bloqueado — no permite verificar número en free tier"
+      - escalation_policies: "Premium (https://uptime.betterstack.com/team/0/policies)"
+      - on_call_schedules: "Premium (https://uptime.betterstack.com/team/0/oncalls)"
+      - keyword_monitoring: "Disponible en UI pero causa falsos positivos con JSON de Go (espacios). Mitigado: se usa HTTP status check en su lugar."
+    workaround_phone:
+      method: "Gmail filter → forward incident emails to carrier SMS gateway"
+      filter: "from:betterstack.com subject:incident"
+      forward_to: "519628003830@movistar.pe (verificar gateway del carrier)"
+      note: "No implementado aún. Hacer si se necesitan alertas nocturnas."
+
+  what_changed_from_uriel_design:
+    - "Keyword checks → HTTP status checks (evita falsos positivos con JSON Go)"
+    - "Intervalos 60s/120s → 3 min (límite free tier)"
+    - "Phone call alerts → Solo email (free tier no permite verificar número)"
+    - "Escalation policy → Notificación directa al account owner (default free tier)"
+
+  # ── Monthly Review Checklist ─────────────────────────────────────────────
+  #
+  # Uriel (o Alexander si Uriel no está disponible) debe revisar mensualmente:
+
+monthly_review:
+  - "Revisar uptime report de Better Uptime (≥99.9% target)"
+  - "Verificar que los 4 endpoints responden correctamente desde al menos 2 regiones"
+  - "Actualizar este archivo si se añaden/quitan endpoints"
+  - "Rotar API keys de Better Uptime si aplica"
+  - "Verificar créditos del free tier (límites: ~monitores, ~status pages, ~phone calls)"
+  - "Revisar logs de incidentes. Todo incidente >5 min debe tener post-mortem en .ovav/docs/postmortems/"

@@ -1,0 +1,12 @@
+# OVAV Docs — Cloudflare Pages deployment
+# https://docs.ovav.dev
+
+name = "ovav-docs"
+pages_build_output_dir = "dist"
+compatibility_date = "2026-06-16"
+
+# Deploy: wrangler pages deploy dist/ --project-name ovav-docs --branch main
+
+[env.production]
+# Production: connected to ovav-docs GitHub repo
+# Cloudflare Pages auto-deploys on push to main

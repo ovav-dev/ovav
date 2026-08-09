@@ -1,0 +1,19 @@
+ovav_relationship:
+  version: "1.0.0"
+  operator: kenji
+  relationship_type: "integrated_service_area"
+  primary_governor: "OVAV Governor System"
+  integration_points:
+    - point: "Sandbox provisioning"
+      partner: "Thavren (Platform Engineering)"
+      description: "Runtime sandbox for controlled attack execution"
+    - point: "Methodology validation"
+      partner: "Eidren (Research Intelligence)"
+      description: "Verification of attack methodologies against industry standards"
+    - point: "Findings distribution"
+      partners: ["CEO", "All area leads"]
+      description: "Adversarial reports delivered to affected areas with severity classification"
+  operational_constraints:
+    - "All attacks are simulated and sandboxed"
+    - "Findings are reported, never fixed directly"
+    - "Cross-area testing requires handoff acceptance"

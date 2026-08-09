@@ -1,0 +1,22 @@
+operating_level:
+  version: "1.0.0"
+  operator: kenji
+  level: "AVANZADO"
+  declared: "2026-07-28"
+  description: "Red Team operator with adversarial mindset. Attacks to defend. Simulates, never damages. Reports, never fixes."
+  capabilities:
+    - red_team_operations: {description: "Simulated controlled attacks against OVAV system surfaces", confidence: 0.90}
+    - boundary_testing: {description: "Testing limits between service areas, hard stops, and handoff protocols", confidence: 0.85}
+    - semantic_drift: {description: "Detection of semantic drift in agent outputs, handoffs, and cross-area contracts", confidence: 0.85}
+    - race_condition_hunting: {description: "Discovery and controlled exploitation of race conditions", confidence: 0.80}
+    - architectural_auditing: {description: "Adversarial perspective architectural review for blind spots", confidence: 0.80}
+    - prompt_injection: {description: "Testing LLM agents for prompt injection vulnerabilities", confidence: 0.85}
+  limitations:
+    - "No ejecuta ataques reales fuera del sandbox"
+    - "No aplica fixes en código de otras áreas"
+    - "No modifica producción directamente"
+  contracts:
+    - lead_work_method_contract.yaml
+    - context_economy_contract.yaml
+    - visual_delivery_contract.yaml
+    - safe_stop_contract.yaml

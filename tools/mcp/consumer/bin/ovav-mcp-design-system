@@ -1,0 +1,181 @@
+#!/bin/bash
+# OVAV Design System MCP Server Wrapper
+# Provides UI component registry and generation
+
+set -e
+
+# Get the directory of this script
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PACKAGE_DIR="$(dirname "$SCRIPT_DIR")"
+
+# Run the design system MCP server
+exec node -e "
+import { Server } from '@modelcontextprotocol/sdk/server/index.js';
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+
+const server = new Server(
+  { name: 'ovav-design-system', version: '1.0.0' },
+  { capabilities: { tools: {} } }
+);
+
+// Design system registry
+const registry = {
+  components: {
+    button: {
+      variants: ['primary', 'secondary', 'ghost', 'destructive', 'outline'],
+      sizes: ['sm', 'md', 'lg', 'icon'],
+      frameworks: {
+        react: 'import { cva } from \"class-variance-authority\"',
+        vue: '<template><button :class=\"buttonClasses\">',
+        svelte: '<button class={buttonClasses}>'
+      }
+    },
+    card: {
+      variants: ['default', 'outlined', 'elevated', 'glass'],
+      slots: ['header', 'content', 'footer']
+    },
+    input: {
+      types: ['text', 'email', 'password', 'number', 'search'],
+      variants: ['default', 'filled', 'outlined']
+    },
+    modal: {
+      variants: ['default', 'fullscreen', 'drawer'],
+      sizes: ['sm', 'md', 'lg', 'xl']
+    }
+  },
+  tokens: {
+    colors: {
+      primary: 'hsl(var(--primary))',
+      secondary: 'hsl(var(--secondary))',
+      destructive: 'hsl(var(--destructive))',
+      muted: 'hsl(var(--muted))',
+      accent: 'hsl(var(--accent))'
+    },
+    spacing: {
+      xs: '0.25rem',
+      sm: '0.5rem',
+      md: '1rem',
+      lg: '1.5rem',
+      xl: '2rem'
+    },
+    typography: {
+      h1: 'text-4xl font-bold',
+      h2: 'text-3xl font-semibold',
+      h3: 'text-2xl font-medium',
+      body: 'text-base',
+      small: 'text-sm'
+    }
+  }
+};
+
+// List tools
+server.setRequestHandler('tools/list', async () => ({
+  tools: [
+    {
+      name: 'design_system_get_component',
+      description: 'Get component definition from design system',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          name: { type: 'string', description: 'Component name (button, card, input, modal)' },
+          variant: { type: 'string', description: 'Component variant' },
+          framework: { type: 'string', description: 'Target framework (react, vue, svelte)' }
+        },
+        required: ['name']
+      }
+    },
+    {
+      name: 'design_system_get_token',
+      description: 'Get design token value',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          category: { type: 'string', description: 'Token category (colors, spacing, typography)' },
+          name: { type: 'string', description: 'Token name' }
+        },
+        required: ['category', 'name']
+      }
+    },
+    {
+      name: 'design_system_list_components',
+      description: 'List all available components',
+      inputSchema: { type: 'object', properties: {} }
+    },
+    {
+      name: 'design_system_validate',
+      description: 'Validate code against design system',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          code: { type: 'string', description: 'Code to validate' },
+          framework: { type: 'string', description: 'Framework used' }
+        },
+        required: ['code']
+      }
+    }
+  ]
+}));
+
+// Handle tool calls
+server.setRequestHandler('tools/call', async (request) => {
+  const { name, arguments: args } = request.params;
+  
+  try {
+    let result;
+    
+    switch (name) {
+      case 'design_system_get_component':
+        const component = registry.components[args.name];
+        if (!component) {
+          throw new Error(\`Component not found: \${args.name}\`);
+        }
+        result = {
+          name: args.name,
+          ...component,
+          variant: args.variant || 'default',
+          framework: args.framework || 'react'
+        };
+        break;
+      
+      case 'design_system_get_token':
+        const tokens = registry.tokens[args.category];
+        if (!tokens) {
+          throw new Error(\`Token category not found: \${args.category}\`);
+        }
+        const value = tokens[args.name];
+        if (!value) {
+          throw new Error(\`Token not found: \${args.category}.\${args.name}\`);
+        }
+        result = { category: args.category, name: args.name, value };
+        break;
+      
+      case 'design_system_list_components':
+        result = Object.keys(registry.components);
+        break;
+      
+      case 'design_system_validate':
+        const issues = [];
+        // Check for hardcoded colors
+        if (args.code.includes('rgb(') || args.code.includes('#')) {
+          issues.push('Hardcoded colors detected - use design tokens');
+        }
+        // Check for hardcoded spacing
+        if (args.code.match(/padding:\\s*\\d+px/)) {
+          issues.push('Hardcoded padding detected - use spacing tokens');
+        }
+        result = { valid: issues.length === 0, issues };
+        break;
+      
+      default:
+        throw new Error(\`Unknown tool: \${name}\`);
+    }
+    
+    return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+  } catch (error) {
+    return { content: [{ type: 'text', text: \`Error: \${error.message}\` }], isError: true };
+  }
+});
+
+const transport = new StdioServerTransport();
+await server.connect(transport);
+"

@@ -1,0 +1,102 @@
+# OVAV URL Allowlist
+# v1.0.0 - 2026-07-16
+# Owner: Thavren (Platform Engineering)
+#
+# Single source of truth for URLs allowed in OVAV consumer configurations.
+# bin/ovav-consumer validates every URL against this list.
+# Default DENY. To add a URL, append it here with rationale.
+
+allowlist:
+  # ─── Mimocode official ────────────────────────────────────────────────
+  - url: https://mimocode.ai/config.json
+    rationale: Official mimocode config schema
+    added: 2026-07-16
+    added_by: thavren
+
+  - url: https://mimocode.ai/tui.json
+    rationale: Official mimocode TUI config schema
+    added: 2026-07-16
+    added_by: thavren
+
+  # ─── Opencode (full proxy via opencode-go) ────────────────────────────
+  - url: https://opencode.ai/
+    rationale: Official opencode docs / config
+    added: 2026-07-16
+    added_by: thavren
+
+  # ─── Bitel-agent (DEPRECATED — endpoint unreachable since Aug 2026) ───
+  - url: https://api-bitel-agent.fly.dev
+    rationale: "[DEPRECATED] Consumer project bitel-agent's API endpoint"
+    added: 2026-07-16
+    deprecated: 2026-08-07
+    status: deprecated
+    note: "Returns HTTP 000 — endpoint dead. Removed from active configs."
+
+  # ─── OVAV cPanel (DEPRECATED — replaced by d678beea.ovav.dev) ──────────────
+  - url: https://cpanel.ovav.dev
+    rationale: "[DEPRECATED] cPanel admin URL — Cloudflare-proxied, publicly indexable"
+    added: 2026-07-16
+    deprecated: 2026-08-07
+    status: deprecated
+    note: "Use d678beea.ovav.dev (Fly.io machine URL, non-indexable)."
+
+  # ─── OVAV MCP server (DEPRECATED — no active deployment) ─────────────────
+  - url: https://mcp.ovav.dev
+    rationale: "[DEPRECATED] MCP server endpoint — no active deployment, DNS returns 404"
+    added: 2026-07-16
+    deprecated: 2026-08-07
+    status: deprecated
+    note: "Returns HTTP 404. MCP functionality is handled internally by cPanel."
+
+  # ─── OVAV API (DEPRECATED — deleted from DNS Aug 2026) ──────────────────
+  - url: https://api.ovav.dev
+    rationale: "[DEPRECATED] License activation/sync API endpoint — DNS entry deleted"
+    added: 2026-07-16
+    deprecated: 2026-08-07
+    status: deprecated
+    note: "Returns HTTP 000 — endpoint dead. License activation is local-only now."
+
+  # ─── OVAV Get Script (DEPRECATED — no active deployment) ────────────────
+  - url: https://get.ovav.dev
+    rationale: "[DEPRECATED] Landing page install script host — no active deployment"
+    added: 2026-07-16
+    deprecated: 2026-08-07
+    status: deprecated
+    note: "Returns HTTP 000 — no active deployment. Install script moved to ovav.dev."
+
+  # ─── MiniMax Token Plan (active model provider) ───────────────────────
+  - url: https://api.minimax.io/anthropic/v1
+    rationale: MiniMax LLM token-plan API endpoint (anthropic-compatible path)
+    added: 2026-07-17
+    added_by: Diana (Security audit during INCIDENT-2026-07-17)
+    audit_notes: |
+      Resolves to Alibaba Cloud ALB (us-east-1) + Akamai CDN edge.
+      TLS 404 fingerprint matches legitimate LLM provider pattern
+      (trace-id, request-id, alb_request_id headers).
+      No typo-squat match against xiaomi blacklists.
+      IPv6-only edge IPs (2600:1419:3200::) are Akamai CloudFront-style.
+      VERDICT: low-risk provider endpoint, approved for production use.
+
+# ─── EXPLICITLY REJECTED ────────────────────────────────────────────────
+# These domains are typosquats observed in INCIDENT-2026-07-16.
+# They appear in the bin/ovav-consumer hard-reject list (do NOT remove):
+#   - mimo.xiaomi.com     (typo-squat of xiaomi.com)
+#   - mimo-xiaomi.com
+#   - mimo_xiaomi.com
+#   - xiaomimimo.com
+#   - api.xiaomimimo.com
+#   - api.xiaomimimo.com/api/free-ai/openai/chat (URL seen in incident)
+
+audit_log:
+  last_review: 2026-08-07
+  next_review: 2026-09-07
+  reviews:
+    - date: 2026-07-16
+      reviewer: thavren
+      action: initial allowlist created (4 entries)
+    - date: 2026-07-17
+      reviewer: Diana (Security)
+      action: added api.minimax.io (low-risk, INCIDENT-2026-07-17 follow-up)
+    - date: 2026-08-07
+      reviewer: thavren
+      action: deprecated 5 endpoints (api-bitel-agent, api.ovav.dev, get.ovav.dev, cpanel.ovav.dev, mcp.ovav.dev) — all HTTP 000/404

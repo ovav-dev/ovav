@@ -1,0 +1,53 @@
+# CEO Consumer Waiver — bt-sys-react
+# Generated 2026-07-16 after INCIDENT-2026-07-16 cleanup
+# Consumer: Bitel Agent system (Bitel call center frontend)
+# Root: /home/braka/Work/web/products/bt-sys-react
+
+consumer_id: bt-sys-react
+approved_by: Alexander Salvador
+approved_at: 2026-07-16T22:00:00Z
+
+scope:
+  # Which OVAV subsystems this consumer can access
+  subsystems:
+    - ows   # OVAV Worktree System
+
+  # Which OWS commands this consumer can invoke
+  capabilities:
+    - owc
+    - owd
+    - owl
+    - owv
+    - ows
+    - owm
+    - owa
+    - owclean
+    # owx and owlk intentionally excluded (DANGEROUS - audit-required)
+
+  # Boundaries — limits on what the consumer can do
+  boundaries:
+    git_operations: consumer_root_only     # NEVER touch OVAV from consumer
+    audit_required: true                   # Log every command to OVAV audit
+    isolation: .worktrees/                 # Worktrees under consumer's own dir
+    network_egress: deny_all               # No network access by default
+
+  # URLs the consumer config touches (allowlist-validated)
+  urls:
+    - https://api-bitel-agent.fly.dev     # Bitel Agent API (CEO verified)
+
+rationale: |
+  Bitel-agent (call center frontend at /home/braka/Work/web/products/bt-sys-react)
+  needs OWS Worktree System for parallel feature development on the Bitel frontend
+  without interfering with the main dev branch. After the INCIDENT-2026-07-16
+  cleanup, this waiver is the official authorization path replacing the
+  insecure provider-changes/*.sh scripts that previously injected consumer_grants
+  directly into permission_authority.json.
+
+  Use case: Braka (CEO) develops Bitel features in isolation, opening PRs to
+  the bt-sys-react main branch. Each feature uses owv (verify) and owd (finalize)
+  to integrate with OVAV validators before PR.
+
+# Optional metadata
+expires_at: 2027-07-16T00:00:00Z      # When the grant expires (1 year)
+review_cycle: 90d                        # Periodic review cadence
+audit_destination: .ovav/runtime/logs/security_hooks.jsonl

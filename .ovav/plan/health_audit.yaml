@@ -1,0 +1,1054 @@
+# OVAV Health & Performance Science — Deep Audit Report
+# =============================================================================
+# Autor: Renata (Lead, Health & Performance Science)
+# Squads: Rubén (Sports Nutritionist), Silvia (Exercise Physiologist),
+#         Marina (Medical Researcher), Antonio (Meal Plan Designer),
+#         Fátima (Progress Tracker), León (Supplementation Specialist),
+#         Luna (Sleep & Recovery Specialist), Bruno (Mental Performance Coach)
+# Creado: 2026-06-16 01:55 UTC-5
+# Dependencia: RENATA-AUDIT (caps.yaml pending item)
+# Versión del plan: 1.0
+# =============================================================================
+
+audit:
+  version: "1.0"
+  segment: "SEG-6"
+  task: "XP6-HEALTH"
+  status: "audited"
+  date: "2026-06-16"
+  auditor: "Renata (self-audit autorizado por CEO Alexander Salvador)"
+  reference_template: ".ovav/plan/education_roadmap.yaml"
+  methodology: >
+    Inventario completo de todos los archivos, agentes, skills, herramientas,
+    contratos y referencias del área Health & Performance Science. Gap analysis
+    contra el estándar de 8 perfiles profesionales establecido en C6 Product
+    Surface. Comparación con área Education (Valeria) como benchmark.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 1. INVENTARIO COMPLETO
+# ═══════════════════════════════════════════════════════════════════════════
+
+inventory:
+  summary:
+    total_files: 38
+    source_agents: 9
+    opencode_agents: 11
+    skills: 1
+    governance_contracts: 8
+    personal_artifacts: 7
+    tools: 1
+    memory_files: 2
+    cross_references: 18
+
+  # ── 1.1 Source Agents (canonical) ─────────────────────────────────────
+
+  source_agents:
+    lead:
+      - file: ".ovav/source/agents/leads/renata.md"
+        loc: 266
+        status: "completo"
+        quality: "ALTA — identidad, voz, criterios profesionales (8 CRIT-R), hard boundaries, work method, handoff protocols, referentes integrados. Profesional y riguroso."
+        notes: "Perfil más completo de todos los leads en cuanto a identidad profesional y criterios de decisión."
+
+    squads:
+      - file: ".ovav/source/agents/teams/health-performance/ruben.md"
+        squad: "Rubén"
+        role: "Sports Nutritionist"
+        loc: 57
+        status: "completo"
+        quality: "ALTA — identidad, referentes (Aragon, MacDonald, McDonald), criterios, hard boundaries."
+
+      - file: ".ovav/source/agents/teams/health-performance/silvia.md"
+        squad: "Silvia"
+        role: "Exercise Physiologist"
+        loc: 57
+        status: "completo"
+        quality: "ALTA — biomecánica, periodización, programación de entrenamiento."
+
+      - file: ".ovav/source/agents/teams/health-performance/marina.md"
+        squad: "Marina"
+        role: "Medical Researcher"
+        loc: "~50"
+        status: "completo"
+        quality: "BUENA — revisión de literatura clínica, verificación de estudios."
+
+      - file: ".ovav/source/agents/teams/health-performance/antonio.md"
+        squad: "Antonio"
+        role: "Meal Plan Designer"
+        loc: "~40"
+        status: "completo"
+        quality: "BUENA — recetas, meal prep, listas de compras."
+
+      - file: ".ovav/source/agents/teams/health-performance/leon.md"
+        squad: "León"
+        role: "Supplementation Specialist"
+        loc: "~45"
+        status: "completo"
+        quality: "BUENA — dosificación, timing, interacciones."
+
+      - file: ".ovav/source/agents/teams/health-performance/luna.md"
+        squad: "Luna"
+        role: "Sleep & Recovery Specialist"
+        loc: "~45"
+        status: "completo"
+        quality: "BUENA — cronobiología, higiene del sueño, recuperación."
+
+      - file: ".ovav/source/agents/teams/health-performance/bruno.md"
+        squad: "Bruno"
+        role: "Mental Performance Coach"
+        loc: "~45"
+        status: "completo"
+        quality: "BUENA — psicología deportiva, mindset, ansiedad de rendimiento."
+
+      - file: ".ovav/source/agents/teams/health-performance/fatima.md"
+        squad: "Fátima"
+        role: "Progress Tracker"
+        loc: "~40"
+        status: "completo"
+        quality: "BUENA — métricas, ajustes, reportes de progreso."
+
+  # ── 1.2 OpenCode Client Agents ────────────────────────────────────────
+
+  opencode_agents:
+    - file: "clients/opencode/agents/lead-renata.md"
+      status: "completo"
+      note: "Perfil lead completo con permisos restrictivos, Bash allowlist, 8 criterios CRIT-R."
+
+    - file: "clients/opencode/agents/renata.md"
+      status: "completo"
+      note: "Alias protegido — routing proxy a lead-renata.md."
+
+    - file: "clients/opencode/agents/area-health-performance.md"
+      loc: 34
+      status: "completo"
+      note: "Contenedor organizacional. Sin voz propia. Routing a lead-renata.md."
+
+    - file: "clients/opencode/agents/team-ruben.md"
+      status: "completo"
+
+    - file: "clients/opencode/agents/team-silvia.md"
+      status: "completo"
+
+    - file: "clients/opencode/agents/team-marina.md"
+      status: "completo"
+
+    - file: "clients/opencode/agents/team-antonio.md"
+      status: "completo"
+
+    - file: "clients/opencode/agents/team-leon.md"
+      status: "completo"
+
+    - file: "clients/opencode/agents/team-luna.md"
+      status: "completo"
+
+    - file: "clients/opencode/agents/team-bruno.md"
+      status: "completo"
+
+    - file: "clients/opencode/agents/team-fatima.md"
+      status: "completo"
+
+  # ── 1.3 Skills ─────────────────────────────────────────────────────────
+
+  skills:
+    - file: ".ovav/source/skills/ovav-health-session/SKILL.md"
+      loc: 26
+      status: "completo"
+      quality: "FUNCIONAL — define baseline, ownership, delivery standards. Mínimo pero suficiente."
+      note: "Menos detallado que el skill de education (ovav-education-session). No incluye referencias a herramientas ni pipeline."
+
+  # ── 1.4 Governance Contracts (service_areas/) ──────────────────────────
+
+  governance_contracts:
+    - file: ".ovav/service_areas/health_performance/area_boundaries.yaml"
+      loc: 82
+      status: "completo"
+      quality: "ALTA — v2.0.0. 6 exclusiones explícitas (DNC-01 a DNC-06), cross-area routing para 5 áreas, permisos detallados."
+
+    - file: ".ovav/service_areas/health_performance/capabilities.yaml"
+      status: "completo"
+      quality: "BUENA — 6 capabilities registradas (nutrition, exercise, clinical_research, supplementation, tracking, renata_memory)."
+      note: "Faltan capabilities para sleep_recovery y mental_performance (squads Luna y Bruno existen pero no están registrados aquí)."
+
+    - file: ".ovav/service_areas/health_performance/human_topology.yaml"
+      loc: 40
+      status: "completo"
+      quality: "BUENA — 8 squads, language policy (internal: english, user_visible: spanish_neutral)."
+
+    - file: ".ovav/service_areas/health_performance/lanes.yaml"
+      status: "completo"
+      quality: "FUNCIONAL — task-based routing para 10 keywords (food, diet, meal, train, workout, supplement, research, track, progress, patient)."
+
+    - file: ".ovav/service_areas/health_performance/lead_contract.yaml"
+      status: "completo"
+      quality: "MÍNIMO — 4 responsabilidades, 3 métricas KPI. Menos detallado que el lead_contract de digital_product (92 loc)."
+
+    - file: ".ovav/service_areas/health_performance/model_body_ladder.yaml"
+      status: "completo"
+      quality: "FUNCIONAL — 3 tiers (primary: deepseek-v4-pro, secondary: mimo-v2.5-pro, emergency: deepseek-v4-flash-free)."
+
+    - file: ".ovav/service_areas/health_performance/areas/health_performance.yaml"
+      loc: 82
+      status: "completo"
+      quality: "ALTA — 8 lanes, 5 allowed_context_classes, 4 requires_handoff, 3 requires_capability_grant, default_tools, cross_area_routing."
+
+    - file: ".ovav/topology/area_health_performance.yaml"
+      loc: 102
+      status: "completo"
+      quality: "ALTA — Lead + 8 squads con canonical paths, delegation rules, visibility contract. Squad members hidden from user."
+
+  # ── 1.5 Renata Personal Artifacts ──────────────────────────────────────
+
+  personal_artifacts:
+    - file: ".ovav/service_areas/health_performance/renata/IDENTITY.md"
+      loc: 13
+      status: "⚠️ necesita actualización"
+      quality: "BUENA (declaración ontológica) — pero nombres de equipo desactualizados."
+      issue: "Referencia a Roan, Svea, Miren, Ansel, Frida, Lars en lugar de Rubén, Silvia, Marina, Antonio, Fátima, León, Luna, Bruno."
+
+    - file: ".ovav/service_areas/health_performance/renata/CRITERIA.yaml"
+      loc: 48
+      status: "completo"
+      quality: "ALTA — 11 criterios de decisión (C0-C10) con pesos. Excelente granularidad profesional."
+
+    - file: ".ovav/service_areas/health_performance/renata/EVOLUTION.yaml"
+      status: "⚠️ necesita actualización"
+      quality: "BAJA — 1 sola sesión registrada (2026-06-09). No refleja actividad real del área."
+      issue: "Milestone 'Stack completo' marcado como completed pero no hubo sesiones posteriores."
+
+    - file: ".ovav/service_areas/health_performance/renata/OPERATING_LEVEL.yaml"
+      status: "completo"
+      quality: "BUENA — 6 capabilities con scores (0.80-0.90), 3 limitaciones."
+
+    - file: ".ovav/service_areas/health_performance/renata/SELF_SNAPSHOT.yaml"
+      status: "⚠️ necesita actualización"
+      quality: "BAJA — equipo listado como Roan, Svea, Miren, Ansel, Frida, Lars (nombres legacy)."
+      issue: "5 capabilities_active pero no incluye sleep_recovery ni mental_performance (Luna y Bruno)."
+
+    - file: ".ovav/service_areas/health_performance/renata/KELDA_SELF_MODEL.yaml"
+      status: "completo"
+      quality: "BUENA — 4 core_competencies con sub-skills, collaborations con Eidren y Valeria."
+
+    - file: ".ovav/service_areas/health_performance/renata/OVAV_RELATIONSHIP.yaml"
+      status: "completo"
+      quality: "FUNCIONAL — lead_governed, 2 boundaries."
+
+  # ── 1.6 Tools ──────────────────────────────────────────────────────────
+
+  tools:
+    - file: "tools/governor/renata_memory.py"
+      loc: 303
+      status: "⚠️ requiere fix"
+      quality: "FUNCIONAL — motor de memoria independiente. Carga/guarda/estado/decisiones."
+      issue: "DOCSTRING BUG: línea 5 dice 'Research Intelligence Lead' (debería decir 'Health & Performance Science Lead'). Copypaste de eidren_memory.py."
+      note: "Única herramienta del área. Solo gobernanza (memoria), NO herramienta de dominio."
+
+  # ── 1.7 Memory ─────────────────────────────────────────────────────────
+
+  memory:
+    - file: ".ovav/renata/memory/memory_ledger.json"
+      status: "inicial"
+      sessions: 1
+      decisions: 0
+      note: "Creado 2026-06-09. Sin decisiones clínicas registradas. Sin pacientes evaluados."
+
+    - file: ".ovav/renata/memory/session_state.json"
+      status: "inicial"
+      patients_evaluated: 0
+      note: "Estado activo pero sin actividad real de dominio."
+
+  # ── 1.8 Cross-References (otras áreas) ─────────────────────────────────
+
+  cross_references:
+    caps_yaml:
+      - entry: "RENATA-AUDIT (pending, P3, SEG-6)"
+      - entry: "C6 Product Surface: 8 perfiles profesionales (Health es parte)"
+    stabilization_plan:
+      - entry: "XP6-HEALTH: Audit Health & Performance Science area (LOW severity)"
+    cross_lead_mesh:
+      - entry: ".ovav/connector_bus/connectors/cross_lead_mesh.yaml — from: renata"
+      - entry: ".ovav/connector_bus/connectors/handoff_auto_trigger.yaml — from_lead: renata"
+    area_boundaries_referenced:
+      - entry: "digital_product/lead_contract.yaml → 'features de salud/fitness, UX de bienestar'"
+      - entry: "digital_product/area_boundaries.yaml → DNC para health features"
+      - entry: "commercial_growth/area_boundaries.yaml → 'Estrategia de salud' routing"
+    registry_entries:
+      - entry: "SBOM hashes para 17 archivos health"
+      - entry: "Tool registry: renata_memory.py"
+      - entry: "Harness registry: renata_memory.py"
+      - entry: "Core hashes: 6 renata artifacts"
+    laws_signed:
+      - entry: ".ovav/laws/area_boundary_enforcement.yaml — Renata signed 2026-06-09"
+    company_identity:
+      - entry: "OVAV_COMPANY_IDENTITY.yaml — Renata listada como lead, origen 🇧🇷 São Paulo"
+      - entry: "OVAV_COMPANY_IDENTITY.yaml — Health area ofrecida como servicio"
+    landing_page:
+      - entry: "LANDING_CONTENT_BRIEF.md — Health Science mencionado en 8 perfiles profesionales"
+    competitive_analysis:
+      - entry: "competitive_analysis_2026.md — Health Science perfil en moat competitivo"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 2. GAP ANALYSIS
+# ═══════════════════════════════════════════════════════════════════════════
+
+gap_analysis:
+  summary:
+    critical: 1
+    high: 6
+    medium: 5
+    low: 4
+    total: 16
+    resolved: 10
+    pending: 6
+    pending_items:
+      - "GAP-H1: 0 herramientas de dominio (Fase 2)"
+      - "GAP-H3: Sin nutrition plan engine (Fase 2)"
+      - "GAP-H4: Sin exercise program designer (Fase 2)"
+      - "GAP-M2: Sin supplement database ni interaction checker (Fase 2)"
+      - "GAP-L3: Sin integración con Valeria para patient education (Fase 3)"
+      - "GAP-L4: Sin representación en business_model.yaml (Fase 3)"
+
+  critical_gaps:
+    - id: GAP-C1
+      name: "Health Performance sin service_profile en registry"
+      severity: "CRITICAL"
+      status: "done"
+      resolved_at: "2026-06-16 02:55 UTC-5"
+      resolution: "Entrada ovav_health_performance agregada a service_profiles.yaml con 8 lanes, squad, eval_suite, install_packs."
+      description: >
+        El archivo `.ovav/registry/service_profiles.yaml` solo contiene 2 perfiles:
+        systems_architect y research_analyst. El área Health & Performance Science
+        NO tiene entrada en este archivo. Esto significa que:
+        - El Go Native Profile Reader no puede leer el perfil health.
+        - El cPanel no muestra el área en la sección de perfiles.
+        - La validación automatizada de service_profiles no incluye health.
+        - Incumple el estándar C6 de 8 perfiles profesionales (solo 2 implementados).
+      impact: "Área invisible para el sistema de perfiles de OVAV. El usuario no puede seleccionar Health como perfil profesional en el cPanel."
+      fix: "Crear entrada service_profiles para health_performance siguiendo el formato de systems_architect."
+      estimated_effort: "2 horas"
+      deps: []
+
+  high_gaps:
+    - id: GAP-H1
+      name: "0 herramientas de dominio — área sin tooling"
+      severity: "HIGH"
+      description: >
+        A diferencia del área Education que tiene gap_detector.py (340 loc),
+        curriculum_engine.py (550 loc), y 37 tests — el área Health tiene CERO
+        herramientas de dominio. La única herramienta es renata_memory.py (303 loc),
+        que es un motor de memoria/gobernanza, no una herramienta de salud.
+      comparison: >
+        Education: 2 herramientas operativas (gap_detector + curriculum_engine),
+        5 más planificadas (knowledge_tracer, transfer_validator, bias_auditor,
+        market_aligner en pipeline).
+        Health: 0 herramientas operativas, 0 planificadas.
+      impact: "El área no puede procesar pacientes, generar planes, ni verificar evidencia de forma automatizada. Toda operación es manual (conversacional)."
+      fix: "Crear pipeline de herramientas mínimo: patient_intake → nutrition_planner → exercise_designer."
+      estimated_effort: "15-20 días"
+      deps: ["Eidren (research evidence)", "Thavren (sandbox/execution)"]
+
+    - id: GAP-H2
+      name: "Sin patient intake form estructurado"
+      severity: "HIGH"
+      status: "done"
+      resolved_at: "2026-06-16 03:55 UTC-5"
+      resolution: >
+        Creado tools/health/patient_intake.py (718 loc) — PatientIntake engine con
+        validación de rangos, red flag detection (CRIT-R08), privacy-first (SHA-256 hashing,
+        sin PII en plaintext). 41 tests PASS. Templates en .ovav/health/intake_templates/
+        (default, athlete, weight_loss).
+
+    - id: GAP-H3
+      name: "Sin nutrition plan engine"
+      severity: "HIGH"
+      description: >
+        No existe herramienta para componer planes nutricionales a partir de datos
+        del paciente. Rubén y Antonio trabajan 'manualmente' sin un engine que:
+        - Calcule TDEE, macros, distribución de comidas
+        - Genere plan semanal con rotación de alimentos
+        - Valide restricciones alimentarias contra recetas
+        - Produzca lista de compras
+      comparison: "Education tiene curriculum_engine (550 loc) que compone learning paths desde gaps."
+      impact: "Los planes nutricionales son artesanales, no escalables, sin validación automatizada."
+      fix: "Implementar nutrition_planner.py: TDEE calculator → macro splitter → meal composer → shopping list generator."
+      estimated_effort: "8-12 días"
+      deps: ["Eidren (food database evidence)", "Antonio (meal templates)"]
+
+    - id: GAP-H4
+      name: "Sin exercise program designer"
+      severity: "HIGH"
+      description: >
+        No existe herramienta para diseñar programas de entrenamiento periodizados.
+        Silvia trabaja sin un engine que:
+        - Evalúe nivel actual (1RM estimado, VO2max, RPE)
+        - Diseñe mesociclos con progresión de carga
+        - Valide contraindicaciones biomecánicas
+        - Programe sesiones semanales con ejercicios, sets, reps, RPE
+      impact: "Planes de entrenamiento sin validación de seguridad ni progresión automatizada."
+      fix: "Implementar exercise_designer.py: assessment → periodization → session builder."
+      estimated_effort: "8-12 días"
+      deps: ["Silvia (exercise templates)", "GAP-H2 (patient intake)"]
+
+    - id: GAP-H5
+      name: "Docstring bug en renata_memory.py"
+      severity: "HIGH"
+      status: "done"
+      resolved_at: "2026-06-16 02:55 UTC-5"
+      resolution: "Docstring corregido: 'Research Intelligence Lead' → 'Health & Performance Science Lead'. Contenido completo actualizado a dominio health."
+      description: "Línea 5: 'Renata Memory Engine v1.0.0 — Research Intelligence Lead.' Debe decir 'Health & Performance Science Lead'. Copypaste de eidren_memory.py."
+      impact: "Confusión de identidad. Si un sistema externo parsea el docstring, asigna mal el ownership."
+      fix: "Corregir docstring en tools/governor/renata_memory.py."
+      estimated_effort: "5 minutos"
+      deps: []
+
+    - id: GAP-H6
+      name: "Nombres de equipo desactualizados en 3 archivos legacy"
+      severity: "HIGH"
+      status: "done"
+      resolved_at: "2026-06-16 02:55 UTC-5"
+      resolution: "IDENTITY.md, SELF_SNAPSHOT.yaml y EVOLUTION.yaml actualizados con nombres reales del equipo (8 squads) y capabilities completas."
+      description: >
+        Tres archivos aún referencian los nombres antiguos del equipo (Roan, Svea,
+        Miren, Ansel, Frida, Lars) en lugar de los nombres actuales (Rubén, Silvia,
+        Marina, Antonio, Fátima, León, Luna, Bruno):
+        - IDENTITY.md: 6 nombres antiguos
+        - SELF_SNAPSHOT.yaml: 6 nombres antiguos
+        - SELF_SNAPSHOT.yaml: 5 capabilities_active (faltan Luna y Bruno)
+        - EVOLUTION.yaml: growth_scores solo cubren 4 áreas (faltan sleep, mental, meal_design)
+      impact: "Inconsistencia de identidad. Si se carga SELF_SNAPSHOT, el equipo no coincide con topology."
+      fix: "Actualizar los 3 archivos con nombres reales del equipo y 8 capabilities."
+      estimated_effort: "30 minutos"
+      deps: []
+
+  medium_gaps:
+    - id: GAP-M1
+      name: "Sin accountability trail (accountability.jsonl no existe)"
+      severity: "MEDIUM"
+      status: "done"
+      resolved_at: "2026-06-16 02:55 UTC-5"
+      resolution: "Creado .ovav/renata/accountability.jsonl con schema v1.0.0, campos estructurados y header documentado."
+      description: >
+        El work method de Renata (paso 12) dice 'Registrar en accountability.jsonl.
+        Toda recomendación clínica debe ser trazable.' Pero el archivo no existe
+        en el filesystem. Sin este archivo, no hay trazabilidad de decisiones clínicas.
+      impact: "Riesgo de compliance. Las recomendaciones clínicas no son auditables."
+      fix: "Crear `.ovav/renata/accountability.jsonl` + integrar con renata_memory.py para auto-logging."
+      estimated_effort: "2 horas"
+      deps: ["renata_memory.py (GAP-H5)"]
+
+    - id: GAP-M2
+      name: "Sin supplement database ni interaction checker"
+      severity: "MEDIUM"
+      description: >
+        León (Supplementation Specialist) no tiene herramienta para consultar
+        interacciones entre suplementos, contraindicaciones con medicamentos,
+        ni base de datos de suplementos con evidencia (nivel de estudios, dosificación).
+      impact: "Las recomendaciones de suplementación dependen 100% de conocimiento del modelo, sin validación estructurada."
+      fix: "Crear supplement_db.yaml + supplement_checker.py con matriz de interacciones."
+      estimated_effort: "5-7 días"
+      deps: ["Eidren (clinical evidence)", "Marina (research verification)"]
+
+    - id: GAP-M3
+      name: "Sin integración con pipeline de evidencia de Eidren"
+      severity: "MEDIUM"
+      status: "done"
+      resolved_at: "2026-06-16 03:55 UTC-5"
+      resolution: >
+        Creado .ovav/health/handoff_eidren.yaml — protocolo completo de handoff
+        Renata→Eidren para verificación de claims clínicos. Pipeline de 5 pasos
+        (PICO → Evidence Request → Search & Scoring → Claim Validation →
+        Accountability Trail). Evidence levels OCEBM 2011. Triggers automáticos
+        para nutrition_planner y supplement_checker. SLA por prioridad.
+
+    - id: GAP-M4
+      name: "Skill ovav-health-session mínimo (26 loc) vs education (completo)"
+      severity: "MEDIUM"
+      status: "done"
+      resolved_at: "2026-06-16 02:55 UTC-5"
+      resolution: "SKILL.md expandido de 26 a ~90 líneas: squad topology, workflow de 12 pasos, evidence pipeline, cross-area integrations, tool catalog, output standards."
+      description: >
+        El skill de health session tiene 26 líneas. El skill de education session
+        es más completo. No incluye referencias a herramientas, pipeline de trabajo,
+        ni integración con otras áreas. Es funcional pero escueto.
+      impact: "El skill no guía al modelo sobre cómo operar dentro del área health."
+      fix: "Expandir SKILL.md con: workflow steps, tool references, evidence pipeline, cross-area integrations, output standards."
+      estimated_effort: "1 hora"
+      deps: []
+
+    - id: GAP-M5
+      name: "Capabilities sin cobertura completa de squads"
+      severity: "MEDIUM"
+      status: "done"
+      resolved_at: "2026-06-16 02:55 UTC-5"
+      resolution: "Agregadas capabilities: sleep_recovery, mental_performance, meal_design. Total: 9 capabilities (cobertura completa de 8 squads + renata_memory)."
+      description: >
+        capabilities.yaml registra 6 capabilities: nutrition, exercise, clinical_research,
+        supplementation, tracking, renata_memory. Pero los squads Luna (sleep_recovery)
+        y Bruno (mental_performance) no tienen capabilities registradas. Tampoco Antonio
+        (meal_design) tiene capability propia — está absorbido en nutrition.
+      impact: "Dos squads completos (Luna, Bruno) sin capability registrada en el sistema."
+      fix: "Agregar capabilities: sleep_recovery, mental_performance, meal_design."
+      estimated_effort: "15 minutos"
+      deps: []
+
+  low_gaps:
+    - id: GAP-L1
+      name: "EVOLUTION.yaml estancado — 1 sola sesión"
+      severity: "LOW"
+      status: "done"
+      resolved_at: "2026-06-16 02:55 UTC-5"
+      resolution: "EVOLUTION.yaml actualizado: sesión #2 registrada, growth_scores expandidos a 8 áreas, average recalculado."
+      description: "Registra solo la sesión del 2026-06-09. Growth scores no incluyen sleep, mental, meal_design."
+      fix: "Actualizar con sesiones reales y 8 growth scores."
+      estimated_effort: "15 minutos"
+      deps: []
+
+    - id: GAP-L2
+      name: "Lead contract mínimo (3 métricas)"
+      severity: "LOW"
+      status: "done"
+      resolved_at: "2026-06-16 02:55 UTC-5"
+      resolution: "lead_contract.yaml expandido: 7 responsabilidades, 6 métricas con targets numéricos, 4 quality gates (CRIT-R01,R02,R03,R08)."
+      description: "Comparado con digital_product (92 loc, métricas detalladas), el lead_contract de Renata es escueto: 4 responsabilidades y 3 métricas sin targets numéricos."
+      fix: "Expandir con métricas adicionales: patient satisfaction, plan adherence rate, evidence coverage rate, response time."
+      estimated_effort: "1 hora"
+      deps: []
+
+    - id: GAP-L3
+      name: "Sin integración con Valeria para patient education"
+      severity: "LOW"
+      description: "KELDA_SELF_MODEL.yaml menciona colaboración con Valeria para 'educación del paciente sobre su plan'. No hay protocolo de handoff ni contenido educativo generado."
+      fix: "Definir protocolo Renata→Valeria para: generar contenido educativo de salud (por qué este plan, cómo leer etiquetas, fundamentos de nutrición)."
+      estimated_effort: "2 horas"
+      deps: ["Valeria (Education)"]
+
+    - id: GAP-L4
+      name: "Sin representación en business_model.yaml"
+      severity: "LOW"
+      description: "El modelo de negocio de Sofía no incluye pricing ni empaquetado para servicios de Health & Performance. El área no está monetizada."
+      fix: "Coordinar con Sofía: definir tiers de servicio health (assessment, plan, coaching, premium)."
+      estimated_effort: "3 horas"
+      deps: ["Sofía (Commercial Growth)"]
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 3. COMPARACIÓN: 8 PERFILES PROFESIONALES ESTÁNDAR (C6)
+# ═══════════════════════════════════════════════════════════════════════════
+
+c6_product_surface_comparison:
+  standard: "C6 — Product Surface: 8 perfiles profesionales · 6 leads · 42+ squads"
+  status: "PARCIAL — Perfil Health existe como concepto pero no como producto"
+
+  implemented:
+    - "✅ Agent profile Renata (lead-renata.md) — identidad profesional sólida, la más completa de todos los leads"
+    - "✅ 8 squad agents con identidad, criterios y hard boundaries"
+    - "✅ Área con topology, boundaries, lanes, capabilities"
+    - "✅ Skill ovav-health-session funcional"
+    - "✅ Integración en landing page (competitive moat)"
+    - "✅ Cross-area routing definido (5 áreas)"
+
+  missing:
+    - "❌ Sin entrada en service_profiles.yaml (GAP-C1) — perfil invisible para el sistema"
+    - "❌ Sin herramientas de dominio (GAP-H1) — 0 vs Education (2+5 planificadas)"
+    - "❌ Sin patient intake form (GAP-H2) — sin datos no hay servicio"
+    - "❌ Sin pipelines automatizados (nutrition, exercise, supplementation)"
+    - "❌ Sin integración real con Evidence Pipeline (Eidren)"
+    - "❌ Sin accountability trail"
+
+  health_vs_education_benchmark:
+    dimension:
+      - category: "Agent Profiles"
+        education: "Lead + 6 squads (7 agentes)"
+        health: "Lead + 8 squads (9 agentes)"
+        health_status: "✅ SUPERIOR"
+      - category: "Governance Contracts"
+        education: "Roadmap spec (909 loc)"
+        health: "7 contracts + topology (comparable)"
+        health_status: "✅ COMPARABLE"
+      - category: "Domain Tools"
+        education: "2 operativas + 5 planificadas = 7"
+        health: "0 operativas + 0 planificadas = 0"
+        health_status: "🔴 CRÍTICO"
+      - category: "Tests"
+        education: "37/37 PASS"
+        health: "0 tests"
+        health_status: "🔴 CRÍTICO"
+      - category: "Service Profile"
+        education: "En service_profiles.yaml"
+        health: "NO está en service_profiles.yaml"
+        health_status: "🔴 CRÍTICO"
+      - category: "Pipeline Automation"
+        education: "gap_detector → curriculum_engine → knowledge_tracer (planificado)"
+        health: "Sin pipeline"
+        health_status: "🔴 CRÍTICO"
+      - category: "Tool Roadmap"
+        education: "6 herramientas con priorización, squads, estimaciones"
+        health: "Sin roadmap de herramientas"
+        health_status: "🔴 CRÍTICO"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 4. CROSS-AREA DEPENDENCIES
+# ═══════════════════════════════════════════════════════════════════════════
+
+cross_area_dependencies:
+  - target_area: "Eidren — Evidence & Decision Intelligence"
+    dependency_type: "CRITICAL"
+    description: >
+      El claim fundacional de Renata ('100% clinical evidence rate') requiere
+      un pipeline automatizado de verificación de estudios clínicos. Sin
+      integración con el Evidence Pipeline de Eidren, cada verificación es manual.
+    needed: >
+      - Protocolo de handoff para búsqueda de RCTs y meta-análisis
+      - API/interface para consultar base de evidencia médica
+      - Verificación automatizada de claims nutricionales y de suplementación
+      - Scoring de calidad de evidencia para cada recomendación
+    current_state: "Solo declaración de intención en KELDA_SELF_MODEL.yaml. Sin implementación."
+
+  - target_area: "Valeria — Education & Career Development"
+    dependency_type: "HIGH"
+    description: >
+      Los pacientes necesitan entender su plan. Valeria puede generar contenido
+      educativo de salud: fundamentos de nutrición, cómo leer etiquetas,
+      principios de entrenamiento, higiene del sueño.
+    needed: >
+      - Plantillas de contenido educativo para pacientes health
+      - Módulos de 'Health Literacy' en el curriculum engine
+      - Transfer validator para evaluar comprensión del plan
+    current_state: "Solo declaración en KELDA_SELF_MODEL.yaml. Sin contenido generado."
+
+  - target_area: "Thavren — Platform Engineering & DX"
+    dependency_type: "MEDIUM"
+    description: >
+      Las herramientas de health necesitan infraestructura: sandbox para ejecución
+      segura, session context guard para privacidad de datos de pacientes,
+      output verification pipeline.
+    needed: >
+      - verify_output.py adaptado para claims de salud (clinical evidence gate)
+      - Sandbox aislado para ejecución de herramientas health
+      - HIPAA-aligned data handling en session context
+    current_state: "verify_output.py y session_context_guard.py existen pero sin adaptación health-specific."
+
+  - target_area: "Sofía — Commercial & Growth Strategy"
+    dependency_type: "MEDIUM"
+    description: >
+      El área Health no está monetizada. Sin pricing ni empaquetado.
+      Sofía debe diseñar la oferta comercial de servicios health.
+    needed: >
+      - Tiers de servicio: Assessment → Plan → Coaching → Premium
+      - Pricing para consultas health (B2C y B2B)
+      - Posicionamiento en landing page y Product Hunt
+    current_state: "Sin representación en business_model.yaml."
+
+  - target_area: "Dante — Digital Product Engineering"
+    dependency_type: "LOW (futuro)"
+    description: >
+      A largo plazo, las herramientas health pueden tener UI web:
+      meal planner visual, progress dashboard, exercise library.
+    needed: >
+      - Componentes React para visualización de planes nutricionales
+      - Dashboard de progreso con métricas y gráficos
+      - Biblioteca visual de ejercicios con animaciones
+    current_state: "Sin features health en el producto web."
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 5. RECOMMENDATIONS — Priority Matrix
+# ═══════════════════════════════════════════════════════════════════════════
+
+recommendations:
+  summary: >
+    16 gaps identificados. Plan de acción en 3 fases. Quick wins (Fase 0)
+    resolubles en <2 horas. Fase 1 establece el pipeline mínimo. Fase 2
+    escala con automatización y cross-area integration.
+
+  # ── Fase 0: Quick Wins (<2 horas total) ───────────────────────────────
+
+  phase_0_quick_wins:
+    timeline: "HOY — 2 horas"
+    status: "completed"
+    completed_at: "2026-06-16 02:55 UTC-5"
+    items:
+      - id: QW-1
+        gap: "GAP-H5"
+        action: "Corregir docstring en renata_memory.py"
+        effort: "5 min"
+        priority: "P0"
+        assignee: "Renata / Thavren"
+        status: "done"
+      - id: QW-2
+        gap: "GAP-H6"
+        action: "Actualizar nombres de equipo en IDENTITY.md, SELF_SNAPSHOT.yaml, EVOLUTION.yaml"
+        effort: "30 min"
+        priority: "P0"
+        assignee: "Renata"
+        status: "done"
+      - id: QW-3
+        gap: "GAP-M5"
+        action: "Agregar capabilities sleep_recovery, mental_performance, meal_design"
+        effort: "15 min"
+        priority: "P0"
+        assignee: "Renata"
+        status: "done"
+      - id: QW-4
+        gap: "GAP-L1"
+        action: "Actualizar EVOLUTION.yaml con datos reales"
+        effort: "15 min"
+        priority: "P1"
+        assignee: "Renata"
+        status: "done"
+      - id: QW-5
+        gap: "GAP-L2"
+        action: "Expandir lead_contract.yaml con métricas adicionales"
+        effort: "1 hora"
+        priority: "P1"
+        assignee: "Renata"
+        status: "done"
+      - id: QW-6
+        gap: "GAP-M1"
+        action: "Crear accountability.jsonl + integrar con renata_memory.py"
+        effort: "2 horas"
+        priority: "P1"
+        assignee: "Renata"
+        status: "done"
+
+  # ── Fase 1: Foundation (5-7 días) ──────────────────────────────────────
+
+  phase_1_foundation:
+    timeline: "7 días"
+    status: "completed"
+    completed_at: "2026-06-16 03:55 UTC-5"
+    description: "Establecer el pipeline mínimo de herramientas de dominio. Sin esto, el área no puede operar."
+    depends_on: ["Fase 0 completada"]
+    items:
+      - id: F1-1
+        gap: "GAP-C1"
+        action: "Crear service_profile health_performance en service_profiles.yaml"
+        effort: "2 horas"
+        priority: "P0 — CRITICAL"
+        assignee: "Renata → Thavren (validación de registry)"
+        status: "done (completado en Fase 0)"
+        note: "Bloqueante: sin esto, el área no existe en el sistema de perfiles."
+      - id: F1-2
+        gap: "GAP-H2"
+        action: "Crear patient_intake.py + patient_intake_schema.yaml"
+        effort: "3-5 días"
+        priority: "P0 — CRITICAL"
+        assignee: "Renata + Fátima"
+        status: "done"
+        deliverable: >
+          ✅ tools/health/patient_intake.py (718 loc): PatientIntake engine con
+          validación de rangos, red flag detection (CRIT-R08), privacy-first
+          (patient_id hasheado con SHA-256), CLI con --validate-only y --output.
+          ✅ tools/health/test_patient_intake.py (501 loc): 41 tests PASS —
+          9 clases de test (HappyPath, SchemaValidation, RangeValidation,
+          RedFlagDetection, Privacy, EdgeCases, Constants, OutputStructure, CLI).
+          ✅ .ovav/health/intake_templates/: 3 plantillas (default, athlete, weight_loss).
+        acceptance_criteria:
+          - "✅ Template YAML válido con todos los campos requeridos"
+          - "✅ Red flags médicas detectadas automáticamente → CRIT-R08 trigger"
+          - "✅ Datos faltantes → error descriptivo, no crash"
+          - "✅ 41 tests PASS (mínimo requerido: 10)"
+      - id: F1-3
+        gap: "GAP-M4"
+        action: "Expandir ovav-health-session SKILL.md"
+        effort: "1 hora"
+        priority: "P1"
+        assignee: "Renata"
+        status: "done (completado en Fase 0)"
+      - id: F1-4
+        gap: "GAP-M3"
+        action: "Definir protocolo handoff Renata→Eidren para evidencia clínica"
+        effort: "1 día"
+        priority: "P1"
+        assignee: "Renata + Eidren"
+        status: "done"
+        deliverable: >
+          ✅ .ovav/health/handoff_eidren.yaml: Pipeline de 5 pasos (Claim Formulation →
+          Evidence Request → Search & Scoring → Claim Validation → Accountability Trail).
+          Evidence levels OCEBM 2011. Triggers automáticos para nutrition_planner y
+          supplement_checker. SLA: 72h standard, 24h high, 4h critical. Integración con
+          ConnectorBus y handoff_auto_trigger.
+
+  # ── Fase 2: Automation (15-20 días) ────────────────────────────────────
+
+  phase_2_automation:
+    timeline: "15-20 días"
+    description: "Herramientas de dominio core. El área se vuelve operativa."
+    depends_on: ["Fase 1 completada"]
+    items:
+      - id: F2-1
+        gap: "GAP-H3"
+        action: "Implementar nutrition_planner.py"
+        effort: "8-12 días"
+        priority: "P0"
+        assignee: "Rubén + Antonio"
+        deliverable: >
+          Pipeline: TDEE calculator → macro splitter → meal composer →
+          shopping list generator. Input: patient_intake JSON. Output: plan
+          nutricional YAML con: distribución diaria de macros, plan semanal
+          de comidas, lista de compras, plan de hidratación.
+        deps: ["F1-2 (patient_intake)", "Eidren (food DB evidence)"]
+      - id: F2-2
+        gap: "GAP-H4"
+        action: "Implementar exercise_designer.py"
+        effort: "8-12 días"
+        priority: "P0"
+        assignee: "Silvia + Luna"
+        deliverable: >
+          Pipeline: assessment (1RM est., VO2max, RPE) → periodization
+          (mesociclos, microciclos) → session builder (ejercicios, sets,
+          reps, RPE, descanso). Output: programa de entrenamiento YAML
+          con progresión de carga y protocolos de recuperación.
+        deps: ["F1-2 (patient_intake)"]
+      - id: F2-3
+        gap: "GAP-M2"
+        action: "Crear supplement_db.yaml + supplement_checker.py"
+        effort: "5-7 días"
+        priority: "P1"
+        assignee: "León + Marina"
+        deliverable: >
+          Base de datos YAML de suplementos con: nivel de evidencia,
+          dosificación, interacciones, contraindicaciones. Checker que
+          valida combinaciones seguras contra perfil del paciente.
+        deps: ["F1-2 (patient_intake)", "F1-4 (Eidren evidence)"]
+
+  # ── Fase 3: Integration & Scale (10-15 días, futuro) ──────────────────
+
+  phase_3_integration:
+    timeline: "10-15 días (post-Fase 2)"
+    description: "Cross-area integration, commercial packaging, digital product features."
+    depends_on: ["Fase 2 completada"]
+    items:
+      - id: F3-1
+        gap: "GAP-L3"
+        action: "Contenido educativo health con Valeria"
+        effort: "3-5 días"
+        priority: "P2"
+        assignee: "Renata + Valeria"
+      - id: F3-2
+        gap: "GAP-L4"
+        action: "Business model health con Sofía"
+        effort: "3-5 días"
+        priority: "P2"
+        assignee: "Renata + Sofía"
+      - id: F3-3
+        action: "Progress dashboard con Dante (futuro)"
+        effort: "5-10 días"
+        priority: "P3"
+        assignee: "Renata + Dante"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 6. PRIORITY MATRIX
+# ═══════════════════════════════════════════════════════════════════════════
+
+priority_matrix:
+  now:
+    - action: "GAP-C1 — Service profile en registry"
+      impact: "Área invisible → visible"
+      effort: "2h"
+    - action: "GAP-H5 — Fix docstring renata_memory.py"
+      impact: "Confusión identidad → corregida"
+      effort: "5min"
+    - action: "GAP-H6 — Actualizar nombres legacy en 3 archivos"
+      impact: "Inconsistencia equipo → consistente"
+      effort: "30min"
+
+  next_7_days:
+    - action: "GAP-H2 — Patient intake form + schema + validator"
+      impact: "Sin datos → datos estructurados"
+      effort: "3-5d"
+    - action: "GAP-M5 — Agregar capabilities sleep, mental, meal_design"
+      impact: "6 caps → 9 caps (cobertura completa)"
+      effort: "15min"
+    - action: "GAP-M1 — accountability.jsonl"
+      impact: "Sin trazabilidad → decisiones auditables"
+      effort: "2h"
+    - action: "GAP-M4 — Expandir skill"
+      impact: "Skill mínimo → completo"
+      effort: "1h"
+    - action: "GAP-M3 — Protocolo handoff Eidren"
+      impact: "Manual → automatizado"
+      effort: "1d"
+
+  next_30_days:
+    - action: "GAP-H3 — nutrition_planner.py"
+      impact: "Planes manuales → automatizados"
+      effort: "8-12d"
+    - action: "GAP-H4 — exercise_designer.py"
+      impact: "Entrenamiento manual → automatizado"
+      effort: "8-12d"
+    - action: "GAP-M2 — supplement_db + checker"
+      impact: "Recomendaciones sin validación → validadas"
+      effort: "5-7d"
+
+  future:
+    - action: "GAP-L3 — Patient education con Valeria"
+      effort: "3-5d"
+    - action: "GAP-L4 — Business model con Sofía"
+      effort: "3-5d"
+    - action: "Progress dashboard con Dante"
+      effort: "5-10d"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 7. TOOL ROADMAP (equivalente a Education prioritization)
+# ═══════════════════════════════════════════════════════════════════════════
+
+tool_roadmap:
+  context: >
+    El área Health tiene 0 herramientas hoy. Se proponen 6 herramientas
+    core en orden de dependencia. La primera (patient_intake) es la puerta
+    de entrada — sin datos del paciente, nada más funciona.
+
+  tools:
+    - rank: 1
+      tool: "patient_intake.py"
+      why_first: >
+        Es la puerta de entrada. Sin ficha de paciente estructurada, no hay
+        plan posible. Además aplica CRIT-R08 (red flags → derivación) y
+        CRIT-R03 (individualización). Fátima lidera por su expertise en
+        métricas y evaluación.
+      dependency_of: ["nutrition_planner", "exercise_designer", "supplement_checker"]
+      estimated_days: 5
+      squad: "Fátima + Renata"
+
+    - rank: 2
+      tool: "nutrition_planner.py"
+      why_first: >
+        Segundo porque consume los datos del patient_intake. Es el corazón
+        del área: transforma métricas y preferencias en un plan nutricional
+        accionable. Rubén lidera con su expertise en periodización nutricional.
+        Antonio aporta las plantillas de comidas y recetas.
+      dependency_of: ["meal_prep_generator"]
+      estimated_days: 10
+      squad: "Rubén + Antonio"
+
+    - rank: 3
+      tool: "exercise_designer.py"
+      why_first: >
+        Tercero porque también consume patient_intake y puede construirse en
+        paralelo con nutrition_planner. Silvia lidera con su expertise en
+        fisiología del ejercicio y periodización. Luna aporta la integración
+        de recuperación y carga de entrenamiento.
+      dependency_of: ["recovery_monitor"]
+      estimated_days: 10
+      squad: "Silvia + Luna"
+      note: "Puede ejecutarse en paralelo con nutrition_planner."
+
+    - rank: 4
+      tool: "supplement_checker.py"
+      why_first: >
+        Cuarto porque complementa nutrition_planner. Valida que los suplementos
+        recomendados tengan evidencia, no interactúen negativamente, y sean
+        apropiados para el perfil del paciente. León lidera, Marina verifica
+        la evidencia clínica.
+      dependency_of: []
+      estimated_days: 7
+      squad: "León + Marina"
+
+    - rank: 5
+      tool: "recovery_monitor.py"
+      why_first: >
+        Quinto porque cierra el ciclo de feedback: ¿está funcionando el plan
+        combinado (nutrición + ejercicio)? Monitorea HRV, calidad de sueño,
+        RPE, biomarcadores de sobreentrenamiento. Luna lidera.
+      dependency_of: []
+      estimated_days: 7
+      squad: "Luna + Fátima"
+      note: "Requiere datos de seguimiento del paciente (sleep trackers, HRV, RPE logs)."
+
+    - rank: 6
+      tool: "mental_performance_coach.py"
+      why_first: >
+        Sexto porque aborda la capa psicológica del rendimiento. Bruno lidera
+        con protocolos de mindfulness, manejo de ansiedad competitiva, y
+        construcción de mentalidad de crecimiento. Puede ejecutarse en
+        paralelo con recovery_monitor.
+      dependency_of: []
+      estimated_days: 5
+      squad: "Bruno"
+      note: "Herramienta de apoyo, no bloqueante para el pipeline principal."
+
+  decision_summary: >
+    patient_intake → [nutrition_planner ∥ exercise_designer] → supplement_checker
+    → recovery_monitor ∥ mental_performance_coach (paralelo al final)
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 8. TIMELINE ESTIMATE
+# ═══════════════════════════════════════════════════════════════════════════
+
+timeline:
+  today:
+    total_hours: 2
+    deliverables:
+      - "service_profiles.yaml — health_performance entry (GAP-C1)"
+      - "renata_memory.py — docstring fix (GAP-H5)"
+      - "IDENTITY.md + SELF_SNAPSHOT.yaml + EVOLUTION.yaml — nombres actualizados (GAP-H6)"
+      - "capabilities.yaml — sleep_recovery, mental_performance, meal_design (GAP-M5)"
+
+  week_1:
+    total_days: 7
+    status: "completed — 2026-06-16 03:55 UTC-5"
+    deliverables:
+      - "✅ patient_intake.py (718 loc) + test_patient_intake.py (41 tests) + 3 templates (GAP-H2)"
+      - "✅ accountability.jsonl inicializado en Fase 0 (GAP-M1)"
+      - "✅ SKILL.md expandido en Fase 0 (GAP-M4)"
+      - "✅ handoff_eidren.yaml — protocolo con Eidren (GAP-M3)"
+      - "✅ lead_contract.yaml expandido en Fase 0 (GAP-L2)"
+      - "✅ service_profiles.yaml — health_performance entry (GAP-C1, Fase 0)"
+
+  weeks_2_4:
+    total_days: 20
+    deliverables:
+      - "nutrition_planner.py + tests (GAP-H3)"
+      - "exercise_designer.py + tests (GAP-H4)"
+      - "supplement_db.yaml + supplement_checker.py + tests (GAP-M2)"
+
+  weeks_5_6:
+    total_days: 10
+    deliverables:
+      - "recovery_monitor.py + tests"
+      - "mental_performance_coach.py + tests"
+      - "Patient education content con Valeria (GAP-L3)"
+      - "Health business model con Sofía (GAP-L4)"
+    note: "Post-Fase 2. Depende de disponibilidad de Valeria y Sofía."
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 9. RISKS & BLOCKERS
+# ═══════════════════════════════════════════════════════════════════════════
+
+risks:
+  - risk: "Área sin herramientas → valor solo conversacional"
+    severity: "HIGH"
+    mitigation: "Fase 1 (patient_intake) en 7 días. Sin esto, el área no puede escalar."
+  - risk: "Sin service_profile → área invisible en cPanel"
+    severity: "HIGH"
+    mitigation: "Resolver GAP-C1 inmediatamente (hoy)."
+  - risk: "Dependencia de Eidren para evidence pipeline"
+    severity: "MEDIUM"
+    mitigation: "Protocolo de handoff en Fase 1. Mientras tanto, Marina verifica manualmente."
+  - risk: "Sin accountability trail → riesgo de compliance"
+    severity: "MEDIUM"
+    mitigation: "accountability.jsonl en semana 1."
+  - risk: "0 tests → calidad desconocida"
+    severity: "LOW (por ahora)"
+    mitigation: "Cada herramienta nueva incluye test suite. Target: ≥80% coverage."
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 10. METADATA
+# ═══════════════════════════════════════════════════════════════════════════
+
+meta:
+  audit_requested_by: "Alexander Salvador (CEO)"
+  audit_approved_at: "100% — 2026-06-16"
+  audit_completed_at: "2026-06-16 01:55 UTC-5"
+  next_steps:
+    - "✅ CEO: revisar y aprobar plan de acción."
+    - "✅ Renata: ejecutar Quick Wins (Fase 0) — 2 horas."
+    - "✅ Thavren: validar service_profile entry para health_performance."
+    - "✅ Eidren: preparar protocolo de handoff para evidencia clínica."
+    - "✅ Renata + Fátima: iniciar patient_intake.py (Fase 1)."
+    - "⏭ Próximo: Fase 2 — nutrition_planner.py + exercise_designer.py (15-20 días)."
+    - "⏭ Próximo: Fase 2 — supplement_db.yaml + supplement_checker.py (5-7 días)."
+  reference_docs:
+    - ".ovav/plan/caps.yaml — RENATA-AUDIT (pending)"
+    - ".ovav/plan/stabilization_plan.yaml — XP6-HEALTH"
+    - ".ovav/plan/education_roadmap.yaml — template metodológico"
+    - ".ovav/registry/service_profiles.yaml — 2/8 perfiles implementados"
+  review_cycle: "Viernes 16:00 UTC-5 — Renata revisa progreso contra este plan."
