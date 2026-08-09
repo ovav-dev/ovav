@@ -214,7 +214,7 @@ end
 -- TAB BAR — OVAV styled with workspace accent
 -- ═══════════════════════════════════════════════════════════════════════════════
 wezterm.on('format-tab-title', function(tab, tabs, panes, _, hover, _)
-  local tab_id = tostring(tab:tab_id())
+  local tab_id = tostring(tab.tab_id)
   if not wezterm.GLOBAL['ovav_tab_ws_' .. tab_id] then
     wezterm.GLOBAL['ovav_tab_ws_' .. tab_id] = wezterm.GLOBAL.ovav_workspace or 'home'
   end
@@ -227,10 +227,10 @@ wezterm.on('format-tab-title', function(tab, tabs, panes, _, hover, _)
   local same_ws_count = 0
   if tabs then
     for _, t in ipairs(tabs) do
-      local tws = wezterm.GLOBAL['ovav_tab_ws_' .. tostring(t:tab_id())] or wezterm.GLOBAL.ovav_workspace or 'home'
+      local tws = wezterm.GLOBAL['ovav_tab_ws_' .. tostring(t.tab_id)] or wezterm.GLOBAL.ovav_workspace or 'home'
       if tws == ws_name then
         same_ws_count = same_ws_count + 1
-        if t:tab_id() == tab:tab_id() then tab_index = same_ws_count end
+        if t.tab_id == tab.tab_id then tab_index = same_ws_count end
       end
     end
   end
@@ -238,7 +238,7 @@ wezterm.on('format-tab-title', function(tab, tabs, panes, _, hover, _)
   local label = ws.label
   if same_ws_count > 1 then label = ws.label .. ' ' .. tab_index end
 
-  if tab:is_active() then
+  if tab.is_active then
     return {
       { Foreground = { Color = accent } }, { Text = ws.icon .. ' ' },
       { Foreground = { Color = P.fg_bright } }, { Text = label .. ' ' },
@@ -329,11 +329,6 @@ config.wsl_domains = {
     distribution = 'Ubuntu-24.04',
     username = 'braka',
     default_prog = { 'fish', '-l' },
-    -- Env vars passed to WSL
-    env = {
-      LANG = 'en_US.UTF-8',
-      TERM = 'xterm-256color',
-    },
   },
 }
 
@@ -341,10 +336,7 @@ config.wsl_domains = {
 -- On Windows, wsl.exe is in PATH and resolves to WSL2
 config.default_prog = { 'wsl.exe', '-d', 'Ubuntu-24.04', '--', 'fish', '-l' }
 
--- Make new panes/tabs spawn into WSL domain by default
-config.spawn_strategy = 'WSL'
-
--- Set WSL as default domain
+-- Set WSL as default domain for new panes/tabs
 config.default_domain = 'WSL:Ubuntu-24.04'
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -414,7 +406,7 @@ config.keys = {
   { key = 'D', mods = 'ALT|SHIFT', action = act.SplitVertical { domain = 'CurrentPaneDomain' } },
 
   -- Tab management
-  { key = 't', mods = 'CTRL|SHIFT', action = act.SpawnTab 'CurrentPaneDomain' },
+  { key = 't', mods = 'CTRL|SHIFT', action = act.SpawnTab { DefaultDomain = {} } },
   { key = 'w', mods = 'CTRL|SHIFT', action = act.CloseCurrentTab { confirm = true } },
   { key = 'Tab', mods = 'CTRL', action = act.ActivateTabRelative(1) },
   { key = 'Tab', mods = 'CTRL|SHIFT', action = act.ActivateTabRelative(-1) },
