@@ -29,6 +29,7 @@ const (
 	ProviderAnthropic  Provider = "anthropic"
 	ProviderOpenRouter Provider = "openrouter"
 	ProviderAzure      Provider = "azure"
+	ProviderMiniMax    Provider = "minimax"
 )
 
 // Config holds OVAV-CONNECT configuration
@@ -51,7 +52,12 @@ func LoadConfig() *Config {
 	}
 
 	// Detect provider from environment
-	if key := os.Getenv("OPENAI_API_KEY"); key != "" {
+	if key := os.Getenv("MINIMAX_API_KEY"); key != "" {
+		cfg.Provider = ProviderMiniMax
+		cfg.APIKey = key
+		cfg.BaseURL = getEnv("MINIMAX_BASE_URL", "https://api.minimaxi.chat/v1")
+		cfg.Model = getEnv("MINIMAX_MODEL", "MiniMax-Text-01")
+	} else if key := os.Getenv("OPENAI_API_KEY"); key != "" {
 		cfg.Provider = ProviderOpenAI
 		cfg.APIKey = key
 		cfg.BaseURL = getEnv("OPENAI_BASE_URL", "https://api.openai.com/v1")

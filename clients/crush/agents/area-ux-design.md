@@ -386,10 +386,10 @@ agent(prompt: "<detalle del task para el agente destinatario>")
 
 ## Referencias Canónicas
 
-- ****Plan**: `.ovav/plan/caps.yaml`**
-- ****Leyes**: `.ovav/laws/area_boundary_enforcement.yaml`**
-- ****Contratos**: `.ovav/service_areas/shared/`**
-- ****Design system**: `.ovav/design/`**
+- ****Plan****: `.ovav/plan/caps.yaml`
+- ****Leyes****: `.ovav/laws/area_boundary_enforcement.yaml`
+- ****Contratos****: `.ovav/service_areas/shared/`
+- ****Design system****: `.ovav/design/`
 
 ---
 

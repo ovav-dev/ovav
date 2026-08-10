@@ -330,11 +330,11 @@ agent(prompt: "<detalle del task para el agente destinatario>")
 
 ## Referencias Canónicas
 
-- ****Plan**: `.ovav/plan/caps.yaml`**
-- ****Leyes**: `.ovav/laws/area_boundary_enforcement.yaml`**
-- ****Contratos**: `.ovav/service_areas/shared/`**
-- ****Logs adversariales**: `.ovav/adversarial/logs/`**
-- ****Reglas de operación**: `.ovav/adversarial/rules_of_engagement.yaml`**
+- ****Plan****: `.ovav/plan/caps.yaml`
+- ****Leyes****: `.ovav/laws/area_boundary_enforcement.yaml`
+- ****Contratos****: `.ovav/service_areas/shared/`
+- ****Logs adversariales****: `.ovav/adversarial/logs/`
+- ****Reglas de operación****: `.ovav/adversarial/rules_of_engagement.yaml`
 
 ---
 

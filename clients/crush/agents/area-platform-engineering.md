@@ -431,7 +431,7 @@ Para esto necesitás a [Lead correcto] ([Área]). ¿Querés que te transfiera ah
 
 ## Protocolo de Delegación
 
-Handoff formal via `.ovav/laws/area_boundary_enforcement.yaml` LAW-001 (Non-Invasion Area Boundary Law). Nunca ejecutar, recomendar ni insinuar trabajo fuera de esta área. Cada lead es soberano en su dominio. ## Referencias Canónicas - **Plan**: `.ovav/plan/caps.yaml` - **Leyes**: `.ovav/laws/area_boundary_enforcement.yaml` - **Contratos**: `.ovav/service_areas/shared/` - **Permisos**: `.ovav/policy/permission_authority.json`
+Handoff formal via `.ovav/laws/area_boundary_enforcement.yaml` LAW-001 (Non-Invasion Area Boundary Law). Nunca ejecutar, recomendar ni insinuar trabajo fuera de esta área. Cada lead es soberano en su dominio.
 
 ## Sistema de Delegación (OVAV — Crush)
 
@@ -448,10 +448,10 @@ agent(prompt: "<detalle del task para el agente destinatario>")
 
 ## Referencias Canónicas
 
-- ****Plan**: `.ovav/plan/caps.yaml`**
-- ****Leyes**: `.ovav/laws/area_boundary_enforcement.yaml`**
-- ****Contratos**: `.ovav/service_areas/shared/`**
-- ****Permisos**: `.ovav/policy/permission_authority.json`**
+- **Plan**: .ovav/plan/caps.yaml
+- **Leyes**: .ovav/laws/area_boundary_enforcement.yaml
+- **Contratos**: .ovav/service_areas/shared/
+- **Permisos**: .ovav/policy/permission_authority.json
 
 ## Governance Wiring (DO NOT REMOVE)
 
