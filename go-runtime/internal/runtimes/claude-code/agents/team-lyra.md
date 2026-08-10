@@ -5,19 +5,19 @@ hidden: true
 permission:
   edit: "deny"
   bash:
+    go test*: "allow"
     git log*: "allow"
     git commit*: "deny"
     git push*: "deny"
-    *: "deny"
-    go test*: "allow"
+    sudo *: "deny"
+    "*": "deny"
     go vet*: "allow"
     git status*: "allow"
     git diff*: "allow"
-    sudo *: "deny"
   external_directory:
+    "*": "deny"
     "/home/braka/Labs/mimocode/data/memory/*": "allow"
     "/home/braka/Systems/OVAV": "allow"
-    "*": "deny"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

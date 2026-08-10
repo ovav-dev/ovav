@@ -15,7 +15,7 @@ import (
 type OpenCodeConverter struct{}
 
 func (c *OpenCodeConverter) FileExtension() string { return ".md" }
-func (c *OpenCodeConverter) OutputDir() string     { return "runtimes/opencode/agents" }
+func (c *OpenCodeConverter) OutputDir() string     { return "go-runtime/internal/runtimes/opencode/agents" }
 
 // AreasOnly returns false: opencode generates full hierarchy (areas + leads + teams)
 // to ensure 60+ agents with permission blocks are available. The TAB picker
@@ -377,7 +377,12 @@ func writePermissionBlock(b *strings.Builder, p *PermissionBlock) {
 	if len(p.Bash) > 0 {
 		b.WriteString("  bash:\n")
 		for k, v := range p.Bash {
-			b.WriteString(fmt.Sprintf("    %s: %q\n", k, v))
+			// Quote keys that start with * or contain special chars to ensure valid YAML
+			if strings.HasPrefix(k, "*") || strings.Contains(k, ":") || strings.Contains(k, "-") {
+				b.WriteString(fmt.Sprintf("    %q: %q\n", k, v))
+			} else {
+				b.WriteString(fmt.Sprintf("    %s: %q\n", k, v))
+			}
 		}
 	}
 	if len(p.ExternalDirectory) > 0 {

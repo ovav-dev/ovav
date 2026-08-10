@@ -12,7 +12,7 @@ import (
 type ClaudeCodeConverter struct{}
 
 func (c *ClaudeCodeConverter) FileExtension() string { return ".md" }
-func (c *ClaudeCodeConverter) OutputDir() string     { return "runtimes/claude-code/agents" }
+func (c *ClaudeCodeConverter) OutputDir() string     { return "go-runtime/internal/runtimes/claude-code/agents" }
 
 // AreasOnly returns false: Claude Code's agent system is hierarchical and
 // distinguishes areas / leads / subagents via the `type:` frontmatter field,

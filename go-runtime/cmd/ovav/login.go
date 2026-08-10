@@ -112,15 +112,12 @@ func cmdLogin(args []string) int {
 		}
 	}
 
-	// Read seed (hidden input)
-	fmt.Print("Seed: ")
-	seedBytes, err := term.ReadPassword(int(syscall.Stdin))
-	fmt.Println()
+	// Read seed (supports both TTY interactive and pipe input)
+	seed, err := readSeedFromPipeOrTerminal()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "❌ Cannot read seed: %v\n", err)
 		return 1
 	}
-	seed := strings.TrimSpace(string(seedBytes))
 	if seed == "" {
 		fmt.Fprintln(os.Stderr, "❌ Seed cannot be empty")
 		return 1
@@ -419,11 +416,23 @@ func cmdLoginWeb(force bool) int {
 	}
 
 	seedBytes, err := term.ReadPassword(int(syscall.Stdin))
-	fmt.Println()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "❌ Cannot read seed: %v\n", err)
-		return 1
+		// Fallback for pipe/non-TTY input
+		if strings.Contains(err.Error(), "inappropriate ioctl for device") ||
+			strings.Contains(err.Error(), "not a typewriter") {
+			reader := bufio.NewReader(os.Stdin)
+			line, readErr := reader.ReadString('\n')
+			if readErr != nil {
+				fmt.Fprintf(os.Stderr, "❌ Cannot read seed: %v\n", readErr)
+				return 1
+			}
+			seedBytes = []byte(line)
+		} else {
+			fmt.Fprintf(os.Stderr, "❌ Cannot read seed: %v\n", err)
+			return 1
+		}
 	}
+	fmt.Println()
 	seed := strings.TrimSpace(string(seedBytes))
 
 	// If user pressed Enter with no input, use existing seed
@@ -730,6 +739,30 @@ func fetchVaultJWT(seed, machineID, hostname string) (string, error) {
 		return "", err
 	}
 	return result.JWT, nil
+}
+
+// readSeedFromPipeOrTerminal reads the seed from stdin.
+// It first tries term.ReadPassword (for interactive TTY input).
+// If that fails with "inappropriate ioctl for device" (pipe input), it falls
+// back to reading a line from stdin with echo enabled.
+func readSeedFromPipeOrTerminal() (string, error) {
+	fmt.Print("Seed: ")
+	seedBytes, err := term.ReadPassword(int(syscall.Stdin))
+	if err != nil {
+		// Fallback for pipe/non-TTY input: read line with echo
+		if strings.Contains(err.Error(), "inappropriate ioctl for device") ||
+			strings.Contains(err.Error(),("not a typewriter")) {
+			reader := bufio.NewReader(os.Stdin)
+			line, readErr := reader.ReadString('\n')
+			if readErr != nil {
+				return "", readErr
+			}
+			return strings.TrimSpace(line), nil
+		}
+		return "", err
+	}
+	fmt.Println()
+	return strings.TrimSpace(string(seedBytes)), nil
 }
 
 func humanDuration(d time.Duration) string {

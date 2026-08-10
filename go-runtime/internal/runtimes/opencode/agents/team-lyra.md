@@ -15,11 +15,11 @@ permission:
     git commit*: "deny"
     git push*: "deny"
     sudo *: "deny"
-    *: "deny"
+    "*": "deny"
   external_directory:
+    "/home/braka/Labs/mimocode/data/memory/*": "allow"
     "/home/braka/Systems/OVAV": "allow"
     "*": "deny"
-    "/home/braka/Labs/mimocode/data/memory/*": "allow"
 steps: 8
 ---
 

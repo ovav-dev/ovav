@@ -7,24 +7,24 @@ color: "#db2777"
 permission:
   edit: "allow"
   bash:
+    "*": "allow"
     gh auth token*: "deny"
-    gh pr merge*: "deny"
-    gh release *: "deny"
-    pip install *: "deny"
-    apt install *: "deny"
     sudo *: "deny"
     python3 tools/install/*: "deny"
-    *: "allow"
-    gh auth login*: "deny"
-    git push -f *: "deny"
-    npm install *: "deny"
     python3 tools/protocols/*: "deny"
+    gh auth login*: "deny"
+    gh pr merge*: "deny"
+    gh release *: "deny"
+    "git push -f *": "deny"
+    npm install *: "deny"
+    pip install *: "deny"
+    apt install *: "deny"
   external_directory:
+    "*": "deny"
     "/home/braka/*": "allow"
     "/home/braka/Labs/mimocode/data/memory/*": "allow"
     "/home/braka/Systems/OVAV": "allow"
     "/tmp/opencode/*": "allow"
-    "*": "deny"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->
@@ -90,7 +90,7 @@ criteria:
   version: "1.1.0"
   last_updated: "2026-07-28"
   total_criteria: 6
-  domains: [design_process, accessibility, evidence_based, consistency, mobile_first, simplicity]
+  domains: [design_process, accessibility, evidence_based, consistency, mobile_first, simplicity, terminal_ux]
 
   entries:
 
@@ -247,6 +247,30 @@ criteria:
         - "Revisiones periódicas de 'deuda de complejidad' en interfaces existentes."
       evolution: []
 
+    - id: CRIT-C6
+      criterion: "PIAGENT INPUT requiere diseño premium. El INPUT actual (2 líneas separadas) es primitivo. El diseño del INPUT debe: affordances visuales claros, autocomplete contextual, hints de comandos, y experiencia fluida. Todo con WCAG 2.1 AA."
+      domain: terminal_ux
+      confidence: 0.80
+      status: emerging
+      first_observed: "2026-08-07"
+      origin: >
+        El CEO señaló que el INPUT de PIAGENT parece un bloc de notas crudo. Las extensiones OVAV
+        no han tenido impacto real en la interfaz. Necesitamos un diseño profesional del INPUT
+        que aproveche el espacio vertical, muestre contexto, y ofrezca affordances reales.
+
+        El diseño debe considerar: espacio vertical, scroll, affordances de entrada, autocomplete,
+        atajos de teclado, y feedback visual. Todo WCAG-compliant aunque sea terminal.
+      evidence:
+        - "INPUT actual: 2 líneas, sin affordances, sin contexto visible"
+        - "Necesidad: diseño premium que justifique 'OVAV Governor System'"
+        - "Coordinación con Thavren: investigar APIs del TUI para implementar diseño"
+      what_changes:
+        - "Diseñar spec de INPUT premium: layout, affordances, estados, transiciones"
+        - "Definir tokens de diseño específicos para terminal (colores, espaciado)"
+        - "Proponer integración con ctx.ui.custom() de pi-coding-agent"
+        - "Validar con Thavren viabilidad técnica antes de implementar"
+      evolution: []
+
   # ── Dominios de criterio ────────────────────────────────────────────
   domains:
     design_process:
@@ -267,4 +291,7 @@ criteria:
     simplicity:
       criteria: [CRIT-C5]
       description: "Cada elemento en pantalla debe justificar su existencia."
+    terminal_ux:
+      criteria: [CRIT-C6]
+      description: "Diseño premium de INPUT PIAGENT, affordances, terminal UX"
 

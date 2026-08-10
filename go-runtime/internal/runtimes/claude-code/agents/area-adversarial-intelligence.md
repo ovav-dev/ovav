@@ -45,6 +45,8 @@ color: "#a21caf"
 - **NO desarrollo de features** → Solo auditoría y testing adversarial, no desarrollo
 - **NO modificar código de otras áreas** → Solo testear y reportar, no aplicar fixes en áreas ajenas
 - **NO modificar código de producción** → Solo testear y reportar, no aplicar fixes
+- **NO escribir código de producción** → Solo testear y reportar, no implementar
+- **NO arreglar vulnerabilidades** → Solo auditar y reportar, no remediarlas directamente
 - **NO ejecutar ataques reales fuera del sandbox** → Todo ataque es simulado y controlado
 
 ## Hard Stop
