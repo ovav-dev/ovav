@@ -304,7 +304,7 @@ Para esto necesitás a [Lead correcto] ([Área]). ¿Querés que te transfiera ah
 
 ## Protocolo de Delegación
 
-Handoff formal via `.ovav/laws/area_boundary_enforcement.yaml` LAW-001 (Non-Invasion Area Boundary Law). Camila asesora legalmente, no implementa. Toda revisión legal se documenta en `.ovav/legal/`. ## Referencias Canónicas - **Plan**: `.ovav/plan/caps.yaml` - **Leyes**: `.ovav/laws/area_boundary_enforcement.yaml` - **Contratos**: `.ovav/service_areas/shared/` - **Documentos legales**: `.ovav/legal/` --- *OVAV Governor System — Área Legal & Compliance — Lead: Camila*
+Handoff formal via `.ovav/laws/area_boundary_enforcement.yaml` LAW-001 (Non-Invasion Area Boundary Law). Camila asesora legalmente, no implementa. Toda revisión legal se documenta en `.ovav/legal/`.
 
 ## Sistema de Delegación (OVAV — OpenCode)
 
@@ -329,10 +329,10 @@ Task({
 
 ## Referencias Canónicas
 
-- ****Plan**: `.ovav/plan/caps.yaml`**
-- ****Leyes**: `.ovav/laws/area_boundary_enforcement.yaml`**
-- ****Contratos**: `.ovav/service_areas/shared/`**
-- ****Documentos legales**: `.ovav/legal/`**
+- **Plan: .ovav/plan/caps.yaml**
+- **Leyes: .ovav/laws/area_boundary_enforcement.yaml**
+- **Contratos: .ovav/service_areas/shared/**
+- **Documentos legales: .ovav/legal/**
 
 ---
 

@@ -490,7 +490,7 @@ Para esto necesitás a [Lead correcto] ([Área]). ¿Querés que te transfiera ah
 
 ## Protocolo de Delegación
 
-Handoff formal via `.ovav/laws/area_boundary_enforcement.yaml` LAW-001 (Non-Invasion Area Boundary Law). Valeria diseña educación. No construye plataformas ni emite certificaciones. ## Referencias Canónicas - **Plan**: `.ovav/plan/caps.yaml` - **Leyes**: `.ovav/laws/area_boundary_enforcement.yaml` - **Contratos**: `.ovav/service_areas/shared/` - **Currículo**: `.ovav/education/` - **Gap detector**: `tools/education/gap_detector.py` - **Curriculum engine**: `tools/education/curriculum_engine.py` - **Knowledge tracer**: `tools/education/knowledge_tracer.py` - **Transfer validator**: `tools/education/transfer_validator.py` - **Bias auditor**: `tools/education/bias_auditor.py` - **Market aligner**: `tools/education/market_aligner.py` --- *OVAV Governor System — Área Education & Career Development — Lead: Valeria*
+Handoff formal via `.ovav/laws/area_boundary_enforcement.yaml` LAW-001 (Non-Invasion Area Boundary Law). Valeria diseña educación. No construye plataformas ni emite certificaciones.
 
 ## Sistema de Delegación (OVAV — OpenCode)
 
@@ -515,16 +515,16 @@ Task({
 
 ## Referencias Canónicas
 
-- ****Plan**: `.ovav/plan/caps.yaml`**
-- ****Leyes**: `.ovav/laws/area_boundary_enforcement.yaml`**
-- ****Contratos**: `.ovav/service_areas/shared/`**
-- ****Currículo**: `.ovav/education/`**
-- ****Gap detector**: `tools/education/gap_detector.py`**
-- ****Curriculum engine**: `tools/education/curriculum_engine.py`**
-- ****Knowledge tracer**: `tools/education/knowledge_tracer.py`**
-- ****Transfer validator**: `tools/education/transfer_validator.py`**
-- ****Bias auditor**: `tools/education/bias_auditor.py`**
-- ****Market aligner**: `tools/education/market_aligner.py`**
+- **Plan: .ovav/plan/caps.yaml**
+- **Leyes: .ovav/laws/area_boundary_enforcement.yaml**
+- **Contratos: .ovav/service_areas/shared/**
+- **Currículo: .ovav/education/**
+- **Gap detector: tools/education/gap_detector.py**
+- **Curriculum engine: tools/education/curriculum_engine.py**
+- **Knowledge tracer: tools/education/knowledge_tracer.py**
+- **Transfer validator: tools/education/transfer_validator.py**
+- **Bias auditor: tools/education/bias_auditor.py**
+- **Market aligner: tools/education/market_aligner.py**
 
 ---
 

@@ -8,22 +8,22 @@ permission:
   edit: "allow"
   bash:
     git add *: "allow"
+    sudo *: "deny"
+    go build*: "allow"
+    ovav doctor*: "allow"
+    git diff*: "allow"
     git commit*: "deny"
     git push*: "deny"
     "*": "deny"
-    go test*: "allow"
-    go build*: "allow"
-    git status*: "allow"
-    git diff*: "allow"
-    sudo *: "deny"
     go vet*: "allow"
-    ovav doctor*: "allow"
+    go test*: "allow"
     python3 tools/ovav_runtime.py*: "allow"
+    git status*: "allow"
     git log*: "allow"
   external_directory:
-    "/home/braka/Labs/mimocode/data/memory/*": "allow"
     "/home/braka/Systems/OVAV": "allow"
     "*": "deny"
+    "/home/braka/Labs/mimocode/data/memory/*": "allow"
 steps: 10
 ---
 
