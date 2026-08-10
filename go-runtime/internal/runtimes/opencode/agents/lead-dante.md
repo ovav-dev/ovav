@@ -11,21 +11,21 @@ permission:
     gh auth token*: "deny"
     gh pr merge*: "deny"
     "git push --force *": "deny"
-    npm install *: "deny"
-    pip install *: "deny"
+    apt install *: "deny"
+    sudo *: "deny"
     python3 tools/install/*: "deny"
     python3 tools/protocols/*: "deny"
     gh auth login*: "deny"
     gh release *: "deny"
     "git push -f *": "deny"
-    apt install *: "deny"
-    sudo *: "deny"
+    npm install *: "deny"
+    pip install *: "deny"
   external_directory:
-    "/home/braka/Labs/mimocode/data/memory/*": "allow"
-    "/home/braka/Systems/OVAV": "allow"
     "/tmp/opencode/*": "allow"
     "*": "deny"
     "/home/braka/*": "allow"
+    "/home/braka/Labs/mimocode/data/memory/*": "allow"
+    "/home/braka/Systems/OVAV": "allow"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

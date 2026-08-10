@@ -24,7 +24,7 @@ func (w *WorkspaceSafety) Weight() int { return 15 }
 
 // requiredSurfaceFiles are files that must reference workspace_safety_gate.
 var requiredSurfaceFiles = map[string]string{
-	"platform_agent": "go-runtime/internal/runtimes/opencode/agents/area-platform-engineering.md",
+	"platform_agent": ".ovav/service_areas/platform_engineering/area_boundaries.yaml",
 	"auto_triggers":  ".ovav/registry/auto_triggers.yaml",
 }
 

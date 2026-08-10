@@ -5,19 +5,19 @@ hidden: true
 permission:
   edit: "allow"
   bash:
+    git status*: "allow"
     git log*: "allow"
-    git add *: "allow"
-    go vet*: "allow"
-    go test*: "allow"
-    ovav status*: "allow"
-    git commit*: "deny"
-    git push*: "deny"
-    go build*: "allow"
     go run*: "allow"
     go mod*: "allow"
-    ovav doctor*: "allow"
-    git status*: "allow"
+    ovav status*: "allow"
     git diff*: "allow"
+    git add *: "allow"
+    git commit*: "deny"
+    git push*: "deny"
+    go vet*: "allow"
+    go test*: "allow"
+    go build*: "allow"
+    ovav doctor*: "allow"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

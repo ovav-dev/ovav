@@ -14,9 +14,9 @@ permission:
     go: "allow"
     python3: "allow"
   external_directory:
-    "*": "deny"
     "/home/braka/Systems/OVAV": "allow"
     "/tmp/opencode": "allow"
+    "*": "deny"
 instructions:
   - "AGENTS.md"
   - ".ovav/service_areas/shared/visual_delivery_contract.yaml"

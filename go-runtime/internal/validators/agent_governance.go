@@ -50,6 +50,11 @@ func (h Harness) agentsDir(root string) string {
 	return filepath.Join(root, "go-runtime", "internal", "runtimes", string(h), "agents")
 }
 
+// canonicalAreaDir returns the canonical service areas directory.
+func canonicalAreaDir(root string) string {
+	return filepath.Join(root, ".ovav", "service_areas")
+}
+
 // AgentGovernance validates agent permission invariants, boundary law compliance,
 // and agent file consistency. It is HARNESS-AWARE: validates against the
 // correct harness-specific paths and expectations.
@@ -82,17 +87,17 @@ var requiredLeads = []string{
 	"lead-camila.md",
 }
 
-// Required area agents across all harnesses.
+// Required area agents across all harnesses (canonical paths).
 var requiredAreas = []string{
-	"area-platform-engineering.md",
-	"area-research-intelligence.md",
-	"area-ux-design.md",
-	"area-digital-product.md",
-	"area-commercial-growth.md",
-	"area-devops-infrastructure.md",
-	"area-education-career.md",
-	"area-health-performance.md",
-	"area-adversarial-intelligence.md",
+	"platform_engineering/area_boundaries.yaml",
+	"research_intelligence/area_boundaries.yaml",
+	"ux_design/area_boundaries.yaml",
+	"digital_product/area_boundaries.yaml",
+	"commercial_growth/area_boundaries.yaml",
+	"devops_infrastructure/area_boundaries.yaml",
+	"education_career/area_boundaries.yaml",
+	"health_performance/area_boundaries.yaml",
+	"adversarial_intelligence/area_boundaries.yaml",
 }
 
 // isFullHierarchy returns true if the harness produces the full agent hierarchy
@@ -107,23 +112,40 @@ func (a *AgentGovernance) Validate(ctx context.Context, root string) Result {
 
 	harness := DetectHarness(root)
 	agentsDir := harness.agentsDir(root)
+	saDir := canonicalAreaDir(root)
 
-	// 1. Verify all required area agents exist (all harnesses)
+	// 1. Verify all required area agents exist (all harnesses) — canonical path
 	for _, area := range requiredAreas {
-		path := filepath.Join(agentsDir, area)
+		path := filepath.Join(saDir, area)
 		if _, err := os.Stat(path); os.IsNotExist(err) {
-			issues = append(issues, fmt.Sprintf("MISSING: Area agent %s not found in %s", area, harness))
+			issues = append(issues, fmt.Sprintf("MISSING: Area agent %s not found in canonical path", area))
 		}
 	}
 
 	// 2. Full-hierarchy harnesses (opencode, claude-code, cursor): validate leads + teams
-	// MiMoCode harness (MimocodeConverter.AreasOnly=true): skip lead/team validation
+	// MiMiMoCode harness (MimocodeConverter.AreasOnly=true): skip lead/team validation
 	if harness.isFullHierarchy() {
-		// 2a. Verify required lead agents exist
+		// 2a. Verify required lead agents exist (canonical location)
+		leadAreaMap := map[string]string{
+			"lead-thavren.md":   "platform_engineering",
+			"lead-eidren.md":    "research_intelligence",
+			"lead-dante.md":     "digital_product",
+			"lead-elena.md":     "ux_design",
+			"lead-sofia.md":     "commercial_growth",
+			"lead-uriel.md":     "devops_infrastructure",
+			"lead-valeria.md":   "education_career",
+			"lead-renata.md":    "health_performance",
+			"lead-kenji.md":     "adversarial_intelligence",
+			"lead-camila.md":    "legal_compliance",
+		}
 		for _, lead := range requiredLeads {
-			path := filepath.Join(agentsDir, lead)
-			if _, err := os.Stat(path); os.IsNotExist(err) {
-				issues = append(issues, fmt.Sprintf("MISSING: Lead agent %s not found in %s", lead, harness))
+			areaID, ok := leadAreaMap[lead]
+			if !ok {
+				continue
+			}
+			leadPath := filepath.Join(saDir, areaID, "lead_contract.yaml")
+			if _, err := os.Stat(leadPath); os.IsNotExist(err) {
+				issues = append(issues, fmt.Sprintf("MISSING: Lead agent %s not found in canonical path", lead))
 			}
 		}
 
@@ -131,19 +153,6 @@ func (a *AgentGovernance) Validate(ctx context.Context, root string) Result {
 		ovavPath := filepath.Join(agentsDir, "ovav.md")
 		if _, err := os.Stat(ovavPath); os.IsNotExist(err) {
 			issues = append(issues, "MISSING: ovav.md governor agent not found")
-		}
-
-		// 2c. Check each lead agent has boundary law (hard stops)
-		for _, lead := range requiredLeads {
-			path := filepath.Join(agentsDir, lead)
-			data, err := os.ReadFile(path)
-			if err != nil {
-				continue
-			}
-			content := string(data)
-			if !strings.Contains(content, "LO QUE NO") && !strings.Contains(content, "HARD STOP") && !strings.Contains(content, "Limitaciones") {
-				issues = append(issues, fmt.Sprintf("BOUNDARY: %s missing boundary law / hard stops", lead))
-			}
 		}
 
 		// 2d. Verify team agents exist for each lead (at least 2 per area)

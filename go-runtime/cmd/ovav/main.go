@@ -644,7 +644,7 @@ func cmdProfile(args []string) int {
 	rest := args[1:]
 
 	switch sub {
-	case "list":
+	case "list", "show":
 		return profile.CmdList(rest)
 	case "apply":
 		return profile.CmdApply(rest)
@@ -3154,7 +3154,7 @@ func cliRuntimeOS() string {
 // ── infra command ──────────────────────────────────────────────────────────
 
 func cmdInfra(args []string) int {
-	if len(args) == 0 {
+	if len(args) == 0 || args[0] == "--help" || args[0] == "-h" {
 		fmt.Println("OVAV Infrastructure Manager")
 		fmt.Println()
 		fmt.Println("Commands:")

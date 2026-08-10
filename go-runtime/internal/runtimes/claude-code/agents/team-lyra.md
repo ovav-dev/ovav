@@ -6,18 +6,18 @@ permission:
   edit: "deny"
   bash:
     go test*: "allow"
-    git log*: "allow"
-    git commit*: "deny"
+    go vet*: "allow"
+    git diff*: "allow"
     git push*: "deny"
     sudo *: "deny"
-    "*": "deny"
-    go vet*: "allow"
     git status*: "allow"
-    git diff*: "allow"
-  external_directory:
+    git log*: "allow"
+    git commit*: "deny"
     "*": "deny"
+  external_directory:
     "/home/braka/Labs/mimocode/data/memory/*": "allow"
     "/home/braka/Systems/OVAV": "allow"
+    "*": "deny"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

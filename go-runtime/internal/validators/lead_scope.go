@@ -5,12 +5,13 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 	"time"
+
+	"gopkg.in/yaml.v3"
 )
 
-// LeadScope validates that each lead agent file in go-runtime/internal/runtimes/opencode/agents/lead-*.md
-// includes a scope definition section (## Funciones Autorizadas or equivalent).
+// LeadScope validates that each lead contract in .ovav/service_areas/*/lead_contract.yaml
+// includes scope definition (covers and does_not_cover sections).
 // Replaces: check_lead_scope.py
 type LeadScope struct{}
 
@@ -23,31 +24,17 @@ func (l *LeadScope) Description() string {
 }
 func (l *LeadScope) Weight() int { return 5 }
 
-const leadAgentsDir = "go-runtime/internal/runtimes/claude-code/agents"
-
-// Scope section headers that satisfy the requirement.
-var scopeHeaders = []string{
-	"## Funciones Autorizadas",
-	"## Authorized Functions",
-	"## Scope",
-	"## Scope Definition",
-	"## Authorized Scope",
-	"## Funciones",
-	"## Autorizadas",
-	"## Ámbito Autorizado",
-}
-
 func (l *LeadScope) Validate(ctx context.Context, root string) Result {
 	start := time.Now()
 	var issues []string
 
-	agentsDir := filepath.Join(root, leadAgentsDir)
-	entries, err := os.ReadDir(agentsDir)
+	saDir := filepath.Join(root, ".ovav", "service_areas")
+	entries, err := os.ReadDir(saDir)
 	if err != nil {
-		issues = append(issues, fmt.Sprintf("cannot read lead agents directory: %s: %v", agentsDir, err))
+		issues = append(issues, fmt.Sprintf("cannot read service areas directory: %s: %v", saDir, err))
 		return Result{
 			ID: l.ID(), Name: l.Name(), Status: "fail", Weight: l.Weight(),
-			Message:  "FAIL lead scope — cannot access lead agents directory",
+			Message:  "FAIL lead scope — cannot access service areas directory",
 			Issues:   issues,
 			Duration: time.Since(start),
 		}
@@ -57,34 +44,42 @@ func (l *LeadScope) Validate(ctx context.Context, root string) Result {
 	missingCount := 0
 
 	for _, entry := range entries {
-		if entry.IsDir() {
+		if !entry.IsDir() {
 			continue
 		}
-		if !strings.HasPrefix(entry.Name(), "lead-") || !strings.HasSuffix(entry.Name(), ".md") {
+		leadContractPath := filepath.Join(saDir, entry.Name(), "lead_contract.yaml")
+		data, err := os.ReadFile(leadContractPath)
+		if err != nil {
+			continue
+		}
+
+		var doc map[string]interface{}
+		if err := yaml.Unmarshal(data, &doc); err != nil {
+			issues = append(issues, fmt.Sprintf("cannot parse lead_contract.yaml in %s: %v", entry.Name(), err))
 			continue
 		}
 
 		leadCount++
-		fullPath := filepath.Join(agentsDir, entry.Name())
-		data, err := os.ReadFile(fullPath)
-		if err != nil {
-			issues = append(issues, fmt.Sprintf("cannot read lead file: %s: %v", entry.Name(), err))
-			continue
-		}
-
-		content := string(data)
 		hasScope := false
-		for _, header := range scopeHeaders {
-			if strings.Contains(content, header) {
+		if lc, ok := doc["lead_contract"].(map[string]interface{}); ok {
+			if _, hasCovers := lc["covers"]; hasCovers {
 				hasScope = true
-				break
+			}
+			if _, hasDNC := lc["does_not_cover"]; hasDNC {
+				hasScope = true
+			}
+			if _, hasResp := lc["responsibilities"]; hasResp {
+				hasScope = true
+			}
+			if _, hasAuth := lc["authority"]; hasAuth {
+				hasScope = true
 			}
 		}
 
 		if !hasScope {
 			missingCount++
 			issues = append(issues, fmt.Sprintf(
-				"lead file %s missing scope definition section (expected: '## Funciones Autorizadas' or equivalent)",
+				"lead %s missing scope definition (covers/does_not_cover/responsibilities/authority)",
 				entry.Name(),
 			))
 		}
@@ -103,7 +98,7 @@ func (l *LeadScope) Validate(ctx context.Context, root string) Result {
 	}
 
 	if leadCount == 0 {
-		issues = append(issues, "no lead-*.md files found in agents directory")
+		issues = append(issues, "no lead_contract.yaml files found in service areas")
 		return Result{
 			ID: l.ID(), Name: l.Name(), Status: "fail", Weight: l.Weight(),
 			Message:  "FAIL lead scope — no lead files found",

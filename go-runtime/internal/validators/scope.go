@@ -29,18 +29,18 @@ func ClearChangedFiles() {
 // in the current branch (vs the parent branch).
 // If a scope path doesn't exist in the worktree, the validator is skipped entirely.
 var ValidatorScope = map[string][]string{
-	"agent_governance":          {"go-runtime/internal/runtimes/opencode/agents/", "go-runtime/internal/runtimes/claude-code/agents/"},
+	"agent_governance":          {".ovav/service_areas/", "go-runtime/internal/runtimes/claude-code/agents/"},
 	"agent_runtime_enforcement": {"tools/agent_runtime/"},
 	"squad_normalization":       {"tools/agent_runtime/"},
 	"tool_config_profiles":      {"tools/cli/"},
-	"service_area_router":       {"go-runtime/internal/runtimes/opencode/agents/"},
-	"agent_ux_visual_delivery":  {"go-runtime/internal/runtimes/opencode/agents/"},
-	"cross_target_consistency":  {"go-runtime/internal/runtimes/opencode/agents/"},
+	"service_area_router":       {".ovav/service_areas/"},
+	"agent_ux_visual_delivery":  {".ovav/service_areas/"},
+	"cross_target_consistency":  {".ovav/service_areas/"},
 	"feedback_loop":             {"tools/agent_runtime/"},
 	"rego_policies":             {"tools/permissions/"},
 	"f1_architecture":           {"tools/f1/"},
-	"context_firewall_v2":       {".ovav/service_areas/", "go-runtime/internal/runtimes/opencode/agents/", "go-runtime/internal/runtimes/claude-code/agents/"},
-	"context_firewall":          {".ovav/service_areas/", "go-runtime/internal/runtimes/opencode/agents/", "go-runtime/internal/runtimes/claude-code/agents/"},
+	"context_firewall_v2":       {".ovav/service_areas/"},
+	"context_firewall":          {".ovav/service_areas/"},
 	// caps_chronos_alignment: only runs when caps.yaml was modified in the branch.
 	// During owd pre-merge, if caps.yaml was not touched by the feature branch,
 	// the validator is skipped since caps.yaml will be updated post-merge from develop.

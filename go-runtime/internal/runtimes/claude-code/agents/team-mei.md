@@ -9,7 +9,8 @@ permission:
     git add *: "allow"
     git push*: "deny"
     go build*: "allow"
-    ovav status*: "allow"
+    go mod*: "allow"
+    ovav doctor*: "allow"
     git status*: "allow"
     git diff*: "allow"
     git log*: "allow"
@@ -17,8 +18,7 @@ permission:
     go vet*: "allow"
     go test*: "allow"
     go run*: "allow"
-    go mod*: "allow"
-    ovav doctor*: "allow"
+    ovav status*: "allow"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

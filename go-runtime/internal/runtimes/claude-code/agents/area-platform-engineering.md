@@ -6,12 +6,12 @@ color: "#2563eb"
 permission:
   edit: "allow"
   bash:
-    ovav_dashboard: "allow"
-    go: "allow"
-    python3: "allow"
     ovav_health: "allow"
     ovav_monitor: "allow"
     ovav_status: "allow"
+    ovav_dashboard: "allow"
+    go: "allow"
+    python3: "allow"
   external_directory:
     "*": "deny"
     "/home/braka/Systems/OVAV": "allow"
