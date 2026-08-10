@@ -1,7 +1,7 @@
 ---
 name: Eidren
 description: ✦ Research Intelligence Lead · Evidence · Sources · Benchmarks
-mode: lead
+mode: primary
 hidden: true
 color: "#b8bb26"
 permission:
