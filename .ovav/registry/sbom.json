@@ -1,11 +1,11 @@
 {
   "schema_version": "ovav.sbom.v2",
-  "generated_at": "2026-08-10T18:56:18Z",
+  "generated_at": "2026-08-10T19:59:18Z",
   "project": "OVAV",
   "hash_algorithm": "sha256",
   "metadata": {
     "root_path": "/home/braka/Systems/OVAV",
-    "git_commit": "0702ee6336b7cce1f1002a9ab5de2bab5b3f03d9"
+    "git_commit": "c889e170ed055206d61e95253dd90acb58d9e1bf"
   },
   "dependencies": {
     "go": [
@@ -412,6 +412,7 @@
     ".ovav/forge/releases/opencode/v2026.06.03-1004/artifacts/tui.json": "4ce139ad59e495b8681ad3e28bc1a682517c35f5e02254400ede26d2331fed07",
     ".ovav/forge/releases/opencode/v2026.06.03-1004/manifest.json": "ea3efb9d599bca0537054c5bd857fbf318ce4b2717495197c39818c9e21b7759",
     ".ovav/forge/targets/claude-code.yaml": "319c423e02ef44c8d891e062937eb4417b15209f8130e9a457c904b1dfa3c104",
+    ".ovav/forge/targets/crush.yaml": "35d9da9119caa23b2fb0b287d91d2ab8bd7c57a67ea7b81c34b4ba0eacf5d5b5",
     ".ovav/forge/targets/opencode.yaml": "cd254f6cd9b625911a405e117d1e88cee4b718ab4f673725bd1820ffe95f8de3",
     ".ovav/forge/targets/pi.yaml": "b4f54697bfc7b321a635d9dd13088f4684e5116e2becdc8a0d53d8f03fbee796",
     ".ovav/forge/targets/vscode.yaml": "02f2b754adf9c2207e131cfa01e541d7be06f03a2cf1161a23a17be432087f51",
@@ -759,6 +760,7 @@
     ".ovav/source/configs/windows-terminal/metadata.yaml": "b8bb5c267f2c9e5ac2239885e3b60e9c0c60817f4ead73598614d9568f3a15b5",
     ".ovav/source/configs/windows-terminal/settings.json": "f352e9f1c6f48f09937960994df83cc0ddcfe436950bb2e9c431cacd725785d6",
     ".ovav/source/configs/workstation/ovav-wezterm-workspace-isolation.yaml": "8160fb1e72d0ee670f7a9aa74f2106c24e828c9c38b6489ca1f7a6b08c871754",
+    ".ovav/source/crush/config.yaml": "a1f5d365231618fd8cfb348d403bc047cc61f704e595d9a48a2da756e76cc3e1",
     ".ovav/source/opencode/config.yaml": "827a4f551385c86cd35ebde578c675f70e81393a438ee9393313bea3b50de395",
     ".ovav/source/plugins/opencode/tui/package.json": "f0ffa60ba1a35737c99a8d1700e9a019f7a4cf0a8e3132492ee66c99e5df1622",
     ".ovav/source/plugins/opencode/tui/pnpm-workspace.yaml": "661f59c8263c02379e0da7580ea963986efec507d371857e7124fcc0a07b02f3",
@@ -1151,9 +1153,10 @@
     "go-runtime/internal/convert/aider.go": "b8170b409ee77d442b9d705710103df8851bf38c72537993a98ab1f2862fa886",
     "go-runtime/internal/convert/claude.go": "9617d87834c0d35423b644dfc7c21866b853e6601fe08bfa48dfafeaebf082ae",
     "go-runtime/internal/convert/continue.go": "0935437667e52c796f507522bd1fac48d6fdcf7f887e7aec8ae0e01efd74d545",
-    "go-runtime/internal/convert/convert.go": "69e94eb60415cd1179ae500307228eebc9b1cc8faa23a56967fc9453fc4119a8",
+    "go-runtime/internal/convert/convert.go": "3520b1aed1745a84e2baa82c5215ceec5e0dd8481ffda9f1a678522de820aeac",
     "go-runtime/internal/convert/convert_test.go": "2b79ebb30376183d518d7488d94a7861e2de033a838252a3ceef022d986367a5",
     "go-runtime/internal/convert/copilot.go": "6244022da636e4da089e21a38dffe22058eaeeb5411dee0b37a2341c3d0a7b17",
+    "go-runtime/internal/convert/crush.go": "fd1b1e80b4a1ec6df648ba30dd9559e6e0bf21dd7096b593ef58519852142a36",
     "go-runtime/internal/convert/cursor.go": "c5dbebfb142ac408ece2f5cbe0ac579161ec47ba4a563313b125a0c4f64f3bfa",
     "go-runtime/internal/convert/goose.go": "fbaec44710eec78a0346d99ac7e5af6855329ea7d7cc605ea709c33cde4906a7",
     "go-runtime/internal/convert/mimocode.go": "73cc94ee4dc368a57ed74c5f100dd2faae6b12659b833b32651fce22d928c773",
@@ -1319,7 +1322,7 @@
     "go-runtime/internal/project/isolation.go": "6cda8e0d34e2a466379bd47bda95aef1ad7084124ae811db783d3121e055e4e6",
     "go-runtime/internal/project/isolation_test.go": "226f525e4ef0c25c1d066f6fba5d20d33d7c192418f2cc49329df56f0c951381",
     "go-runtime/internal/project/project_test.go": "48548fba2a79cbd856414876ac80ea97678f08e28c221addd6dda5c6607fd091",
-    "go-runtime/internal/project/sync.go": "9b695f416c70c2bb61842d48859ec874b9507c3381d801cf6114b9010b7c44cf",
+    "go-runtime/internal/project/sync.go": "d935e4aa74530733c6ddf8ffb211343c749b853a445a9cd57a910a8fa19bb1e1",
     "go-runtime/internal/project/sync_notify.go": "aa33b0277834b91a5b39090afbf968bc686bab805d552a6a0c5f7b011288b13e",
     "go-runtime/internal/projector/projector.go": "5f426eda96371cbbbb09824fc48767ce12cdedb85944d03a32d7101a4070716b",
     "go-runtime/internal/runtime/delegation.go": "8a8006d563d7fb92a34de70bd8eb2db57de4f2f6f181263a15c4755061d53cf8",

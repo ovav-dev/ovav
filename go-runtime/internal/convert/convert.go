@@ -148,6 +148,7 @@ const (
 	TargetContinue  Target = "continue"
 	TargetAider     Target = "aider"
 	TargetGoose     Target = "goose"
+	TargetCrush     Target = "crush"
 )
 
 // RuntimeConverter transforms OVAV canonical agents into CLI-specific output.
@@ -186,13 +187,14 @@ var converters = map[Target]RuntimeConverter{
 	TargetContinue:  &ContinueConverter{},
 	TargetAider:     &AiderConverter{},
 	TargetGoose:     &GooseConverter{},
+	TargetCrush:     &CrushConverter{},
 }
 
 // AvailableTargets returns all registered converter targets.
 // Mimocode is listed first as the default (free XIAOMI model).
 func AvailableTargets() []Target {
 	return []Target{
-		TargetMimocode, TargetOpenCode, TargetClaude, TargetCursor,
+		TargetMimocode, TargetOpenCode, TargetCrush, TargetClaude, TargetCursor,
 		TargetWindsurf, TargetCopilot, TargetContinue, TargetAider, TargetGoose,
 	}
 }
