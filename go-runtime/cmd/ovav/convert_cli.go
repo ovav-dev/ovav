@@ -391,6 +391,8 @@ func getInjectTargets(env string) []injectionTarget {
 			// Fish config → ~/.config/fish/
 			{"fish", "fish/config.fish", filepath.Join(home, ".config", "fish", "config.fish")},
 			{"fish-aliases", "commands/aliases.fish", filepath.Join(home, ".config", "fish", "aliases.fish")},
+			// OVAV function file → conf.d/ (overrides PATH binary for "ovav" command)
+			{"fish-ovav-func", "fish/ovav.fish", filepath.Join(home, ".config", "fish", "conf.d", "ovav.fish")},
 			// Fish conf.d files → ~/.config/fish/conf.d/
 			{"fish-conf-10", "fish/10-ovav-color-profile.fish", filepath.Join(home, ".config", "fish", "conf.d", "10-ovav-color-profile.fish")},
 			{"fish-conf-20", "fish/20-ovav-wezterm-osc7.fish", filepath.Join(home, ".config", "fish", "conf.d", "20-ovav-wezterm-osc7.fish")},
