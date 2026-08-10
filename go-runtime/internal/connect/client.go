@@ -62,9 +62,18 @@ func LoadConfig() *Config {
 		cfg.APIKey = key
 		cfg.BaseURL = getEnv("OPENAI_BASE_URL", "https://api.openai.com/v1")
 	} else if key := os.Getenv("ANTHROPIC_API_KEY"); key != "" {
-		cfg.Provider = ProviderAnthropic
-		cfg.APIKey = key
-		cfg.BaseURL = getEnv("ANTHROPIC_BASE_URL", "https://api.anthropic.com/v1")
+		// MiniMax Direct API keys start with "sk-cp-"
+		// Anthropic real API keys start with "sk-ant-"
+		if strings.HasPrefix(key, "sk-cp-") {
+			cfg.Provider = ProviderMiniMax
+			cfg.APIKey = key
+			cfg.BaseURL = getEnv("ANTHROPIC_API_ENDPOINT", "https://api.minimax.io/anthropic/v1")
+			cfg.Model = getEnv("ANTHROPIC_MODEL", "minimax/MiniMax-M2.7")
+		} else {
+			cfg.Provider = ProviderAnthropic
+			cfg.APIKey = key
+			cfg.BaseURL = getEnv("ANTHROPIC_BASE_URL", "https://api.anthropic.com/v1")
+		}
 	} else if key := os.Getenv("OPENROUTER_API_KEY"); key != "" {
 		cfg.Provider = ProviderOpenRouter
 		cfg.APIKey = key
