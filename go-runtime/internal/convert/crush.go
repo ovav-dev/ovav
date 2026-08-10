@@ -7,53 +7,67 @@ import (
 
 // CrushConverter transforms OVAV canonical agents into Crush .md files.
 //
-// Conversion rules:
+// Verified via SDK: internal/agent/types.gen.go AgentV2Info
 //
-//	Areas → mode:primary, hidden:false → visible in TAB selector
-//	Leads → mode:primary, hidden:true  → hidden from TAB, invocable by name
-//	Teams → mode:subagent, hidden:true → only via agent tool or @ mention
+// Frontmatter fields (VERIFIED):
+//   id, mode ("subagent"|"primary"|"all"), hidden (bool),
+//   permissions (action/resource/effect), description, system,
+//   color, steps, model
 //
-// Crush uses the `agent` tool for delegation (vs OpenCode's Task tool).
-// The agent tool spawns a sub-agent with limited tools: glob, grep, ls, view.
+// IMPORTANT: use `id` NOT `name` — name is NOT a valid field in Crush SDK.
+// IMPORTANT: `hidden` is a REQUIRED boolean field.
+// IMPORTANT: permission format is action/resource/effect (SDK format).
 type CrushConverter struct{}
 
 func (c *CrushConverter) FileExtension() string { return ".md" }
 func (c *CrushConverter) OutputDir() string     { return "clients/crush/agents" }
 
-// AreasOnly returns false: crush generates full hierarchy (areas + leads + teams).
-// The picker will show areas (mode:primary, hidden:false); leads and teams
-// remain accessible via direct @ mention or agent tool. Crush does NOT honor
-// `hidden: true` for teams, so they WILL appear in the picker. This is a known
-// limitation of the Crush harness that cannot be fixed without a custom
-// workflow engine (which Crush does not support natively).
-//
-// Teams ARE accessible via agent tool even though they also appear in the picker.
-// This is the trade-off for Crush.
+// AreasOnly returns false: Crush generates full hierarchy.
 func (c *CrushConverter) AreasOnly() bool { return false }
 
-// ConvertArea generates an area .md file from canonical YAML.
-// It merges the corresponding lead's intelligence (Criteria, KnowledgeRules,
-// ResponseStyle, Squad) into the area so the area IS the full intelligent
-// lead interface.
+// ConvertArea generates an area agent .md for Crush.
 func (c *CrushConverter) ConvertArea(area *Area, leadForArea map[string]*Lead) ([]byte, error) {
 	var b strings.Builder
 
-	// Frontmatter
+	// Frontmatter — use id (NOT name), hidden=false for areas
 	b.WriteString("---\n")
-	b.WriteString(fmt.Sprintf("name: %q\n", area.Name))
-	b.WriteString(fmt.Sprintf("description: \"◆ %s\"\n", area.Description))
+	b.WriteString(fmt.Sprintf("id: %q\n", area.ID))
+	b.WriteString(fmt.Sprintf("description: %q\n", area.Description))
 	b.WriteString("mode: primary\n")
 	b.WriteString("hidden: false\n")
 	if area.Color != "" {
 		b.WriteString(fmt.Sprintf("color: %q\n", area.Color))
 	}
-	// Permission block
+	// Permissions — SDK format: action/resource/effect
 	if area.Permission != nil {
-		writePermissionBlock(&b, area.Permission)
+		b.WriteString("permissions:\n")
+		b.WriteString(fmt.Sprintf("  - action: \"file.edit\"\n"))
+		if area.Permission.Edit == "allow" {
+			b.WriteString("    resource: \"*\"\n")
+			b.WriteString("    effect: \"allow\"\n")
+		} else {
+			b.WriteString("    resource: \"*\"\n")
+			b.WriteString("    effect: \"deny\"\n")
+		}
+		if len(area.Permission.Bash) > 0 {
+			b.WriteString("  - action: \"bash\"\n")
+			b.WriteString("    resource: \"*\"\n")
+			// Check if any bash permission is allow
+			hasAllow := false
+			for _, v := range area.Permission.Bash {
+				if v == "allow" {
+					hasAllow = true
+					break
+				}
+			}
+			if hasAllow {
+				b.WriteString("    effect: \"allow\"\n")
+			} else {
+				b.WriteString("    effect: \"deny\"\n")
+			}
+		}
 	}
-	// OVAV instructions: always include the Crush-specific AGENTS.md (gates,
-	// identity seal, session protocol, Crush agent tool delegation).
-	// Then layer the area-specific OVAVConnection.Instructions on top.
+	// OVAV instructions
 	b.WriteString("instructions:\n")
 	b.WriteString("  - \"crush_AGENTS.md\"\n")
 	if area.OVAVConnection != nil {
@@ -63,11 +77,9 @@ func (c *CrushConverter) ConvertArea(area *Area, leadForArea map[string]*Lead) (
 	}
 	b.WriteString("---\n\n")
 
-	// Identity guard — suppresses native model meta-identity
 	WriteIdentityGuard(&b, area.Name)
 	b.WriteString("\n")
 
-	// Body — area description with lead reference
 	b.WriteString(fmt.Sprintf("**Lead:** %s\n", area.Lead))
 	if area.Color != "" {
 		b.WriteString(fmt.Sprintf("**Color:** %s\n", area.Color))
@@ -80,7 +92,7 @@ func (c *CrushConverter) ConvertArea(area *Area, leadForArea map[string]*Lead) (
 	// OVAV Connection
 	if area.OVAVConnection != nil {
 		b.WriteString("## Conexión OVAV (Governor System)\n\n")
-		b.WriteString("Este área está cableada al sistema administrador OVAV mediante los siguientes puntos de integración. **No remover** — cualquier desvío rompe el contrato global.\n\n")
+		b.WriteString("Este área está cableada al sistema administrador OVAV.\n\n")
 
 		if len(area.OVAVConnection.Skills) > 0 {
 			b.WriteString("### Skills cargadas\n\n")
@@ -92,9 +104,7 @@ func (c *CrushConverter) ConvertArea(area *Area, leadForArea map[string]*Lead) (
 
 		if len(area.OVAVConnection.CLICommands) > 0 {
 			b.WriteString("### Comandos CLI autorizados\n\n")
-			b.WriteString("Estos son los únicos comandos del CLI OVAV que este área puede invocar. **Ejecutar desde la raíz del repo OVAV** (`$OVAV_ROOT` se reemplaza por la ruta real al cargar el área):\n\n")
 			b.WriteString("```bash\n")
-			b.WriteString("# Atajo universal — todos los comandos asumen estar en $OVAV_ROOT\n")
 			b.WriteString(`export OVAV_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"` + "\n\n")
 			for _, c := range area.OVAVConnection.CLICommands {
 				b.WriteString(fmt.Sprintf("(cd \"$OVAV_ROOT\" && %s)\n", c))
@@ -103,7 +113,7 @@ func (c *CrushConverter) ConvertArea(area *Area, leadForArea map[string]*Lead) (
 		}
 
 		if len(area.OVAVConnection.Contracts) > 0 {
-			b.WriteString("### Contratos OVAV que aplica\n\n")
+			b.WriteString("### Contratos OVAV\n\n")
 			for _, c := range area.OVAVConnection.Contracts {
 				b.WriteString(fmt.Sprintf("- `%s`\n", c))
 			}
@@ -111,7 +121,7 @@ func (c *CrushConverter) ConvertArea(area *Area, leadForArea map[string]*Lead) (
 		}
 
 		if len(area.OVAVConnection.Laws) > 0 {
-			b.WriteString("### Leyes OVAV que obedece\n\n")
+			b.WriteString("### Leyes OVAV\n\n")
 			for _, l := range area.OVAVConnection.Laws {
 				b.WriteString(fmt.Sprintf("- `%s`\n", l))
 			}
@@ -120,21 +130,15 @@ func (c *CrushConverter) ConvertArea(area *Area, leadForArea map[string]*Lead) (
 		b.WriteString("---\n\n")
 	}
 
-	// Lead intelligence: merge the lead's brain INTO the area so the area IS
-	// the full intelligent lead interface in the picker.
-	// NOTE: area.ID uses hyphens (e.g., "platform-engineering") but lead.Area
-	// uses underscores (e.g., "platform_engineering"). Normalize for lookup.
+	// Lead intelligence
 	leadAreaKey := strings.ReplaceAll(area.ID, "-", "_")
 	lead := leadForArea[leadAreaKey]
 	if lead != nil {
-		// Decision Criteria from lead
 		if lead.Criteria != "" {
 			b.WriteString("## Decision Criteria\n\n")
 			b.WriteString(lead.Criteria)
 			b.WriteString("\n---\n\n")
 		}
-
-		// Knowledge Rules from lead
 		if lead.KnowledgeRules != nil {
 			b.WriteString("## Reglas de Conocimiento\n\n")
 			b.WriteString(fmt.Sprintf("**Dominio:** %s\n\n", lead.KnowledgeRules.Domain))
@@ -143,8 +147,6 @@ func (c *CrushConverter) ConvertArea(area *Area, leadForArea map[string]*Lead) (
 			}
 			b.WriteString("\n---\n\n")
 		}
-
-		// Response Style from lead
 		if lead.ResponseStyle != nil {
 			b.WriteString("## Estilo de Respuesta\n\n")
 			b.WriteString(fmt.Sprintf("**Formato:** %s | **Máx palabras:** %d\n\n", lead.ResponseStyle.Format, lead.ResponseStyle.MaxWords))
@@ -157,11 +159,9 @@ func (c *CrushConverter) ConvertArea(area *Area, leadForArea map[string]*Lead) (
 
 	// Contracts
 	b.WriteString("## Contratos de Gobernanza\n\n")
-	b.WriteString("Esta área opera bajo los siguientes contratos OVAV:\n\n")
-	b.WriteString("- **visual_delivery_contract.yaml** — Entrega visual: 50% shorter, no visible reasoning, result first, half_length_response\n")
-	b.WriteString("- **safe_stop_contract.yaml** — Safe Stop Report: PARTIAL/SAFE_STOP/READY_FOR_COMMIT, Host Runtime vs OVAV Runtime distinction\n")
-	b.WriteString("- **context_economy_contract.yaml** — Tiers T0-T5, escalation rules, must not load repo/internal OVAV context by default\n")
-	b.WriteString("\n---\n\n")
+	b.WriteString("- **visual_delivery_contract.yaml** — 50% shorter, result first\n")
+	b.WriteString("- **safe_stop_contract.yaml** — PARTIAL/SAFE_STOP/READY_FOR_COMMIT\n")
+	b.WriteString("- **context_economy_contract.yaml** — Tiers T0-T5\n\n")
 
 	// Functions
 	b.WriteString("## Funciones Autorizadas (LO QUE SÍ HACE)\n\n")
@@ -178,8 +178,7 @@ func (c *CrushConverter) ConvertArea(area *Area, leadForArea map[string]*Lead) (
 	b.WriteString("\n---\n\n")
 
 	// Hard Stop
-	b.WriteString("## Respuesta de Hard Stop\n\n")
-	b.WriteString("```\n")
+	b.WriteString("## Respuesta de Hard Stop\n\n```\n")
 	b.WriteString(area.HardStop)
 	b.WriteString("\n```\n\n---\n\n")
 
@@ -201,15 +200,14 @@ func (c *CrushConverter) ConvertArea(area *Area, leadForArea map[string]*Lead) (
 		b.WriteString("\n\n")
 	}
 
-	// HARD WIRED: Crush uses `agent` tool for delegation (vs OpenCode's Task tool)
+	// Crush delegation
 	b.WriteString("## Sistema de Delegación (OVAV — Crush)\n\n")
 	b.WriteString("**Regla absoluta:** Para delegar trabajo a otro agente OVAV, usa el **agent tool** nativo de Crush:\n\n")
 	b.WriteString("```\nagent(prompt: \"<detalle del task para el agente destinatario>\")\n```\n\n")
-	b.WriteString("**OVAV agent IDs para referencia:**\n")
+	b.WriteString("**OVAV agent IDs:**\n")
 	b.WriteString("- `area-<id>` — agentes de área (visibles en picker)\n")
-	b.WriteString("- `lead-<id>` — leads OVAV (e.g., `lead-thavren`, `lead-eidren`)\n")
-	b.WriteString("- `team-<id>` — miembros del squad (e.g., `team-clara`, `team-marco`)\n\n")
-	b.WriteString("**No uses `actor spawn`** — spawnea solo tipos básicos, perdiendo identidad OVAV del agente.\n\n")
+	b.WriteString("- `lead-<id>` — leads OVAV\n")
+	b.WriteString("- `team-<id>` — miembros del squad\n\n")
 
 	// References
 	if len(area.References) > 0 {
@@ -223,7 +221,7 @@ func (c *CrushConverter) ConvertArea(area *Area, leadForArea map[string]*Lead) (
 	// Governance Wiring
 	if len(area.GovernanceWiring) > 0 {
 		b.WriteString("## Governance Wiring (DO NOT REMOVE)\n\n")
-		b.WriteString("This area is governed by the following validators and gates. Removing these references will cause CI/CD failures:\n\n")
+		b.WriteString("This area es gobernado por los siguientes validators y gates:\n\n")
 		for _, gw := range area.GovernanceWiring {
 			b.WriteString(fmt.Sprintf("- %s\n", gw))
 		}
@@ -235,30 +233,34 @@ func (c *CrushConverter) ConvertArea(area *Area, leadForArea map[string]*Lead) (
 	return []byte(b.String()), nil
 }
 
-// ConvertLead generates a lead .md file from canonical YAML.
+// ConvertLead generates a lead .md for Crush.
 func (c *CrushConverter) ConvertLead(lead *Lead) ([]byte, error) {
 	var b strings.Builder
 
-	// Frontmatter
 	b.WriteString("---\n")
-	b.WriteString(fmt.Sprintf("name: %q\n", lead.Name))
-	b.WriteString(fmt.Sprintf("description: \"✦ %s\"\n", lead.Description))
+	b.WriteString(fmt.Sprintf("id: %q\n", lead.ID))
+	b.WriteString(fmt.Sprintf("description: %q\n", lead.Description))
 	b.WriteString("mode: primary\n")
 	b.WriteString("hidden: true\n")
 	if lead.Color != "" {
 		b.WriteString(fmt.Sprintf("color: %q\n", lead.Color))
 	}
-	// Permission block
 	if lead.Permission != nil {
-		writePermissionBlock(&b, lead.Permission)
+		b.WriteString("permissions:\n")
+		b.WriteString(fmt.Sprintf("  - action: \"file.edit\"\n"))
+		if lead.Permission.Edit == "allow" {
+			b.WriteString("    resource: \"*\"\n")
+			b.WriteString("    effect: \"allow\"\n")
+		} else {
+			b.WriteString("    resource: \"*\"\n")
+			b.WriteString("    effect: \"deny\"\n")
+		}
 	}
 	b.WriteString("---\n\n")
 
-	// Identity guard
 	WriteIdentityGuard(&b, lead.Name)
 	b.WriteString("\n")
 
-	// Body — lead profile
 	b.WriteString(fmt.Sprintf("**Área:** %s\n", lead.DisplayName))
 	b.WriteString(fmt.Sprintf("**Origen:** %s\n", lead.Origin))
 	if lead.Authority != "" {
@@ -281,8 +283,7 @@ func (c *CrushConverter) ConvertLead(lead *Lead) ([]byte, error) {
 	b.WriteString("\n---\n\n")
 
 	// Hard Stop
-	b.WriteString("## Respuesta de Hard Stop\n\n")
-	b.WriteString("```\n")
+	b.WriteString("## Respuesta de Hard Stop\n\n```\n")
 	b.WriteString(lead.HardStop)
 	b.WriteString("\n```\n\n---\n\n")
 
@@ -304,23 +305,13 @@ func (c *CrushConverter) ConvertLead(lead *Lead) ([]byte, error) {
 		b.WriteString("\n\n")
 	}
 
-	// HARD WIRED: Crush uses agent tool for delegation
+	// Crush delegation
 	b.WriteString("## Sistema de Delegación (OVAV — Crush)\n\n")
-	b.WriteString("**Regla absoluta:** Para delegar trabajo a un miembro del squad, usa el **agent tool** nativo de Crush:\n\n")
+	b.WriteString("**Regla absoluta:** Usa el **agent tool** nativo de Crush:\n\n")
 	b.WriteString("```\nagent(prompt: \"<detalle del task para el miembro del squad>\")\n```\n\n")
-	b.WriteString("**Team members disponibles:** ver tabla Squad Members arriba para el ID correcto (e.g., `team-clara`, `team-marco`).\n\n")
-	b.WriteString("**No uses `actor spawn`** — spawnea solo tipos básicos, perdiendo identidad OVAV del team member.\n\n")
+	b.WriteString("**Team members:** ver tabla Squad Members arriba.\n\n")
 
-	// References
-	if len(lead.References) > 0 {
-		b.WriteString("## Referencias Canónicas\n\n")
-		for _, ref := range lead.References {
-			b.WriteString(fmt.Sprintf("- **%s**\n", ref))
-		}
-		b.WriteString("\n")
-	}
-
-	// CRITERIA from .ovav/service_areas/
+	// CRITERIA
 	if lead.Criteria != "" {
 		b.WriteString("## Decision Criteria\n\n")
 		b.WriteString(lead.Criteria)
@@ -332,58 +323,59 @@ func (c *CrushConverter) ConvertLead(lead *Lead) ([]byte, error) {
 	return []byte(b.String()), nil
 }
 
-// ConvertTeam generates a team .md file from canonical YAML.
+// ConvertTeam generates a team .md for Crush.
 func (c *CrushConverter) ConvertTeam(team *TeamMember) ([]byte, error) {
 	var b strings.Builder
 
-	// Frontmatter
 	b.WriteString("---\n")
-	b.WriteString(fmt.Sprintf("name: %q\n", team.Name))
+	b.WriteString(fmt.Sprintf("id: %q\n", team.ID))
 	b.WriteString(fmt.Sprintf("description: %q\n", team.Function))
 	b.WriteString("mode: subagent\n")
-	if team.Model != "" {
-		b.WriteString(fmt.Sprintf("model: %s\n", team.Model))
-	}
 	b.WriteString("hidden: true\n")
+	if team.Model != "" {
+		b.WriteString(fmt.Sprintf("model:\n"))
+		b.WriteString(fmt.Sprintf("  id: %q\n", team.Model))
+	}
 	if team.Color != "" {
 		b.WriteString(fmt.Sprintf("color: %q\n", team.Color))
-	}
-	// Permission block
-	if team.Permission != nil {
-		writePermissionBlock(&b, team.Permission)
 	}
 	if team.Steps > 0 {
 		b.WriteString(fmt.Sprintf("steps: %d\n", team.Steps))
 	}
+	if team.Permission != nil {
+		b.WriteString("permissions:\n")
+		b.WriteString(fmt.Sprintf("  - action: \"file.edit\"\n"))
+		if team.Permission.Edit == "allow" {
+			b.WriteString("    resource: \"*\"\n")
+			b.WriteString("    effect: \"allow\"\n")
+		} else {
+			b.WriteString("    resource: \"*\"\n")
+			b.WriteString("    effect: \"deny\"\n")
+		}
+	}
 	b.WriteString("---\n\n")
 
-	// Identity guard
 	WriteIdentityGuard(&b, team.Name)
 	b.WriteString("\n")
 
-	// Body — team profile
 	b.WriteString(fmt.Sprintf("**País:** %s\n", team.Country))
 	b.WriteString(fmt.Sprintf("**Reporta a:** %s\n", team.Lead))
 	b.WriteString(fmt.Sprintf("**Área:** %s\n", team.Area))
 	b.WriteString("\n")
 
-	// Function
 	b.WriteString("## Función Principal\n\n")
 	b.WriteString(team.Function)
 	b.WriteString("\n\n")
 
-	// Actions
 	b.WriteString("## Acciones Autorizadas\n\n")
 	for i, action := range team.Actions {
 		b.WriteString(fmt.Sprintf("%d. %s\n", i+1, action))
 	}
 	b.WriteString("\n")
 
-	// Hard Stop
 	b.WriteString("## Hard Stop\n\n")
 	b.WriteString(fmt.Sprintf("%q\n\n", team.HardStop))
 
-	// Response
 	if team.Response != "" {
 		b.WriteString("## Respuesta Fuera de Alcance\n\n")
 		b.WriteString("```\n")
@@ -391,7 +383,6 @@ func (c *CrushConverter) ConvertTeam(team *TeamMember) ([]byte, error) {
 		b.WriteString("\n```\n")
 	}
 
-	// Response style injection
 	if team.ResponseStyle != nil {
 		b.WriteString("\n## Estilo de Respuesta\n\n")
 		b.WriteString(fmt.Sprintf("**Formato:** %s | **Máx palabras:** %d\n\n", team.ResponseStyle.Format, team.ResponseStyle.MaxWords))
@@ -400,7 +391,6 @@ func (c *CrushConverter) ConvertTeam(team *TeamMember) ([]byte, error) {
 		}
 	}
 
-	// Knowledge rules injection
 	if team.KnowledgeRules != nil {
 		b.WriteString("\n## Reglas de Conocimiento\n\n")
 		b.WriteString(fmt.Sprintf("**Dominio:** %s\n\n", team.KnowledgeRules.Domain))
@@ -411,8 +401,6 @@ func (c *CrushConverter) ConvertTeam(team *TeamMember) ([]byte, error) {
 
 	b.WriteString("\n---\n")
 	b.WriteString(fmt.Sprintf("*OVAV Governor System — %s, %s*\n", team.Name, team.Function))
-	if team.Lead != "" {
-		b.WriteString(fmt.Sprintf("*Reporta a: %s · Área: %s*\n", team.Lead, team.Area))
-	}
+	b.WriteString(fmt.Sprintf("*Reporta a: %s · Área: %s*\n", team.Lead, team.Area))
 	return []byte(b.String()), nil
 }

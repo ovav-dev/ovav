@@ -5,25 +5,46 @@ import (
 	"strings"
 )
 
-// CopilotConverter transforms OVAV canonical agents into GitHub Copilot Chat templates.
+// CopilotConverter transforms OVAV canonical agents into GitHub Copilot agent files.
 //
-// Copilot uses VS Code's agent chat format with instructions embedded
-// in the active instruction set.
+// Verified format: https://docs.github.com/en/copilot/building-copilot-extensions
+//
+// Agent files go to .github/agents/ (NOT runtimes/copilot/).
+// File extension: .agent.md
+// Fields: description, name, argument-hint, tools, agents, model,
+//          user-invocable, disable-model-invocation, target,
+//          mcp-servers, handoffs, hooks
+//
+// AreasOnly=true: Copilot doesn't support hierarchical agent hierarchies.
 type CopilotConverter struct{}
 
-func (c *CopilotConverter) FileExtension() string { return ".md" }
-func (c *CopilotConverter) OutputDir() string     { return "runtimes/copilot/agents" }
+func (c *CopilotConverter) FileExtension() string { return ".agent.md" }
+func (c *CopilotConverter) OutputDir() string     { return ".github/agents" }
 func (c *CopilotConverter) AreasOnly() bool        { return true }
 
 func (c *CopilotConverter) ConvertArea(area *Area, _ map[string]*Lead) ([]byte, error) {
 	var b strings.Builder
 
 	b.WriteString("---\n")
-	b.WriteString(fmt.Sprintf("title: %q\n", area.Name))
+	b.WriteString(fmt.Sprintf("name: %q\n", area.ID))
 	b.WriteString(fmt.Sprintf("description: %q\n", area.Description))
-	b.WriteString("type: agent\n")
-	if area.Color != "" {
-		b.WriteString(fmt.Sprintf("color: %q\n", area.Color))
+	b.WriteString("user-invocable: true\n")
+	b.WriteString("disable-model-invocation: false\n")
+	b.WriteString("target: vscode\n")
+	// Permission block
+	if area.Permission != nil {
+		b.WriteString("permission:\n")
+		b.WriteString(fmt.Sprintf("  edit: %q\n", area.Permission.Edit))
+		if len(area.Permission.Bash) > 0 {
+			b.WriteString("  bash:\n")
+			for k, v := range area.Permission.Bash {
+				if strings.ContainsAny(k, " *:") {
+					b.WriteString(fmt.Sprintf("    %q: %q\n", k, v))
+				} else {
+					b.WriteString(fmt.Sprintf("    %s: %q\n", k, v))
+				}
+			}
+		}
 	}
 	b.WriteString("---\n\n")
 

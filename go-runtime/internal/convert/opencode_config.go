@@ -477,6 +477,15 @@ func GenerateOpenCodeConfig(root string) error {
 		config["tool_output"] = to
 	}
 
+	// Theme — OVAV uses ovav-dark/light themes from .opencode/themes/
+	// The theme.path must match the ACTUAL files in .opencode/themes/
+	// Actual files: ovav-dark.json, ovav-light.json
+	// Use ovav-dark as the default theme
+	config["theme"] = map[string]string{
+		"name": "ovav",
+		"path": ".opencode/themes/ovav-dark.json",
+	}
+
 	// Write opencode.json (OVERWRITE — OVAV is authoritative)
 	out, err := json.MarshalIndent(config, "", "  ")
 	if err != nil {
