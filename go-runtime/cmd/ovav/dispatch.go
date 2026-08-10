@@ -108,6 +108,8 @@ func routeCommand(cmd string, args []string) int {
 		return cmdDelegate(args)
 	case "validate":
 		return cmdValidate(args)
+	case "monitor":
+		return cmdMonitor(args)
 	case "push":
 		return cmdPush(args)
 	case "memory", "mem":
@@ -146,6 +148,7 @@ func knownCommands() []string {
 		"resolve-subagent", "resolve_subagent",
 		"delegate",
 		"validate",
+		"monitor",
 		"push",
 		"memory", "mem",
 		"help", "--help", "-h",
