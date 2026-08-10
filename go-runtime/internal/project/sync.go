@@ -858,9 +858,11 @@ func syncPluginRegistry(root string) (int, error) {
 //                      Target → {root}/opencode_AGENTS.md
 // mimocode_AGENTS.md:  Source → .ovav/source/mimocode/AGENTS.md
 //                      Target → {root}/mimocode_AGENTS.md
+// crush_AGENTS.md:     Source → .ovav/source/crush/AGENTS.md
+//                      Target → {root}/crush_AGENTS.md
 //
 // These are the harness-specific instruction overlays that supersede the
-// generic AGENTS.md for OpenCode and MiMoCode users respectively.
+// generic AGENTS.md for OpenCode, MiMoCode, and Crush users respectively.
 func projectHarnessAgents(root string, verbose bool) (count int, err error) {
 	agents := []struct {
 		sourceRel string // relative to .ovav/source/
@@ -868,6 +870,7 @@ func projectHarnessAgents(root string, verbose bool) (count int, err error) {
 	}{
 		{filepath.Join("opencode", "AGENTS.md"), filepath.Join(root, "opencode_AGENTS.md")},
 		{filepath.Join("mimocode", "AGENTS.md"), filepath.Join(root, "mimocode_AGENTS.md")},
+		{filepath.Join("crush", "AGENTS.md"), filepath.Join(root, "crush_AGENTS.md")},
 	}
 
 	for _, a := range agents {
