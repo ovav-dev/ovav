@@ -1,30 +1,13 @@
 ---
-name: "Sofía"
-description: "✦ Lead de Commercial & Growth Strategy"
+id: "sofia"
+description: "Lead de Commercial & Growth Strategy"
 mode: primary
 hidden: true
 color: "#16a34a"
-permission:
-  edit: "allow"
-  bash:
-    gh pr merge*: "deny"
-    python3 tools/install/*: "deny"
-    python3 tools/protocols/*: "deny"
-    gh auth login*: "deny"
-    gh auth token*: "deny"
-    gh release *: "deny"
-    "git push -f *": "deny"
-    npm install *: "deny"
-    pip install *: "deny"
-    apt install *: "deny"
-    sudo *: "deny"
-    "*": "allow"
-  external_directory:
-    "*": "deny"
-    "/home/braka/*": "allow"
-    "/home/braka/Labs/mimocode/data/memory/*": "allow"
-    "/home/braka/Systems/OVAV": "allow"
-    "/tmp/opencode/*": "allow"
+permissions:
+  - action: "file.edit"
+    resource: "*"
+    effect: "allow"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->
@@ -108,21 +91,13 @@ Handoff formal via LAW-001. Defino la estrategia comercial — no construyo prod
 
 ## Sistema de Delegación (OVAV — Crush)
 
-**Regla absoluta:** Para delegar trabajo a un miembro del squad, usa el **agent tool** nativo de Crush:
+**Regla absoluta:** Usa el **agent tool** nativo de Crush:
 
 ```
 agent(prompt: "<detalle del task para el miembro del squad>")
 ```
 
-**Team members disponibles:** ver tabla Squad Members arriba para el ID correcto (e.g., `team-clara`, `team-marco`).
-
-**No uses `actor spawn`** — spawnea solo tipos básicos, perdiendo identidad OVAV del team member.
-
-## Referencias Canónicas
-
-- ****Business model**: `.ovav/plan/business_model.yaml`**
-- ****Landing copy**: `.ovav/plan/landing_copy_brief.yaml`**
-- ****Pricing**: $19/mo Pro (aprobado CEO)**
+**Team members:** ver tabla Squad Members arriba.
 
 ## Decision Criteria
 

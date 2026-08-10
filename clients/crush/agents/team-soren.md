@@ -1,45 +1,15 @@
 ---
-name: "Soren"
+id: "soren"
 description: "Implementador Senior — refactors, tests y parches de runtime que duran."
 mode: subagent
-model: opencode-go/deepseek-v4-pro
 hidden: true
-permission:
-  edit: "allow"
-  bash:
-    python3 tools/harnesses/check_*.py: "allow"
-    git commit*: "deny"
-    pip install *: "deny"
-    apt install *: "deny"
-    "python3 -m pytest*": "allow"
-    go mod*: "allow"
-    owl*: "allow"
-    ovav *: "allow"
-    git status*: "allow"
-    git log*: "allow"
-    git push*: "deny"
-    pytest*: "allow"
-    owx*: "allow"
-    ows*: "allow"
-    sudo *: "deny"
-    npm install *: "deny"
-    "*": "deny"
-    go test*: "allow"
-    go run*: "allow"
-    go vet*: "allow"
-    owc*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    python3 tools/validators/*.py: "allow"
-    git diff*: "allow"
-    git add *: "allow"
-    go build*: "allow"
-    owd*: "allow"
-    owv*: "allow"
-  external_directory:
-    "/home/braka/Systems/OVAV": "allow"
-    "*": "deny"
-    "/home/braka/Labs/mimocode/data/memory/*": "allow"
+model:
+  id: "opencode-go/deepseek-v4-pro"
 steps: 25
+permissions:
+  - action: "file.edit"
+    resource: "*"
+    effect: "allow"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

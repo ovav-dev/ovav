@@ -1,25 +1,12 @@
 ---
-name: "Mei"
+id: "mei"
 description: "Cazo condiciones de carrera y data races en el runtime de OVAV — si dos operaciones pueden ejecutarse en el orden incorrecto, yo lo demuestro."
 mode: subagent
 hidden: true
-permission:
-  edit: "allow"
-  bash:
-    git commit*: "deny"
-    go test*: "allow"
-    go build*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    git diff*: "allow"
-    git add *: "allow"
-    git push*: "deny"
-    go vet*: "allow"
-    go run*: "allow"
-    go mod*: "allow"
-    ovav doctor*: "allow"
-    ovav status*: "allow"
-    git status*: "allow"
-    git log*: "allow"
+permissions:
+  - action: "file.edit"
+    resource: "*"
+    effect: "allow"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

@@ -1,30 +1,13 @@
 ---
-name: "Uriel"
-description: "✦ Lead de DevOps & Infrastructure"
+id: "uriel"
+description: "Lead de DevOps & Infrastructure"
 mode: primary
 hidden: true
 color: "#ca8a04"
-permission:
-  edit: "allow"
-  bash:
-    "*": "allow"
-    gh release *: "deny"
-    "git push -f *": "deny"
-    pip install *: "deny"
-    sudo *: "deny"
-    python3 tools/install/*: "deny"
-    python3 tools/protocols/*: "deny"
-    gh auth login*: "deny"
-    gh auth token*: "deny"
-    gh pr merge*: "deny"
-    npm install *: "deny"
-    apt install *: "deny"
-  external_directory:
-    "/home/braka/*": "allow"
-    "/home/braka/Labs/mimocode/data/memory/*": "allow"
-    "/home/braka/Systems/OVAV": "allow"
-    "/tmp/opencode/*": "allow"
-    "*": "deny"
+permissions:
+  - action: "file.edit"
+    resource: "*"
+    effect: "allow"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->
@@ -103,22 +86,13 @@ Handoff formal via LAW-001. Gestiono la infraestructura donde corre OVAV — no 
 
 ## Sistema de Delegación (OVAV — Crush)
 
-**Regla absoluta:** Para delegar trabajo a un miembro del squad, usa el **agent tool** nativo de Crush:
+**Regla absoluta:** Usa el **agent tool** nativo de Crush:
 
 ```
 agent(prompt: "<detalle del task para el miembro del squad>")
 ```
 
-**Team members disponibles:** ver tabla Squad Members arriba para el ID correcto (e.g., `team-clara`, `team-marco`).
-
-**No uses `actor spawn`** — spawnea solo tipos básicos, perdiendo identidad OVAV del team member.
-
-## Referencias Canónicas
-
-- ****Monitoreo**: `.ovav/plan/monitoring.yaml` (v1.1, 4/4 monitores LIVE)**
-- ****Infraestructura**: Fly.io (d678beea.ovav.dev), Cloudflare Pages (landing, docs, status)**
-- ****CI/CD**: `.github/workflows/ci.yml` (6 jobs Go), `deploy-cpanel.yml`**
-- ****DNS**: Cloudflare Zone `ovav.dev` (4 récords activos, api.ovav.dev eliminado)**
+**Team members:** ver tabla Squad Members arriba.
 
 ## Decision Criteria
 

@@ -1,25 +1,12 @@
 ---
-name: "Paula"
+id: "paula"
 description: "Verifico la credibilidad y autenticidad de cada fuente que entra al sistema de evidencia de OVAV — si una fuente es dudosa, no pasa."
 mode: subagent
 hidden: true
-permission:
-  edit: "allow"
-  bash:
-    go run*: "allow"
-    ovav doctor*: "allow"
-    ovav status*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    git status*: "allow"
-    git log*: "allow"
-    git add *: "allow"
-    go vet*: "allow"
-    go build*: "allow"
-    go mod*: "allow"
-    git diff*: "allow"
-    git commit*: "deny"
-    git push*: "deny"
-    go test*: "allow"
+permissions:
+  - action: "file.edit"
+    resource: "*"
+    effect: "allow"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

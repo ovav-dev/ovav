@@ -1,25 +1,12 @@
 ---
-name: "Victor"
+id: "victor"
 description: "Modelo los datos que alimentan la experiencia de aprendizaje — esquemas, migraciones, y relaciones que permiten a los assessments y al contenido funcionar con datos limpios."
 mode: subagent
 hidden: true
-permission:
-  edit: "allow"
-  bash:
-    git push*: "deny"
-    go vet*: "allow"
-    go build*: "allow"
-    go run*: "allow"
-    ovav status*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    git status*: "allow"
-    git diff*: "allow"
-    git log*: "allow"
-    go test*: "allow"
-    go mod*: "allow"
-    ovav doctor*: "allow"
-    git add *: "allow"
-    git commit*: "deny"
+permissions:
+  - action: "file.edit"
+    resource: "*"
+    effect: "allow"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

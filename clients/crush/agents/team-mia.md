@@ -1,25 +1,12 @@
 ---
-name: "Mia"
+id: "mia"
 description: "Condenso handoffs, reportes, y evidencia técnica en resúmenes compactos que preservan toda la información crítica sin una palabra de más."
 mode: subagent
 hidden: true
-permission:
-  edit: "allow"
-  bash:
-    go mod*: "allow"
-    ovav doctor*: "allow"
-    ovav status*: "allow"
-    git status*: "allow"
-    git diff*: "allow"
-    go vet*: "allow"
-    go test*: "allow"
-    go run*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    git log*: "allow"
-    git add *: "allow"
-    git commit*: "deny"
-    git push*: "deny"
-    go build*: "allow"
+permissions:
+  - action: "file.edit"
+    resource: "*"
+    effect: "allow"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

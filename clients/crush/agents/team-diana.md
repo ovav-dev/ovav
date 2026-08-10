@@ -1,33 +1,15 @@
 ---
-name: "Diana"
+id: "diana"
 description: "Audito permisos, secretos, y git safety en cada cambio — soy el último gate antes de que código potencialmente inseguro llegue a producción."
 mode: subagent
-model: opencode-go/qwen3.7-max
 hidden: true
-permission:
-  edit: "allow"
-  bash:
-    git push*: "deny"
-    go vet*: "allow"
-    ovav defend*: "allow"
-    ovav doctor*: "allow"
-    git diff*: "allow"
-    sudo *: "deny"
-    go test*: "allow"
-    "grep -rn*": "allow"
-    find *: "allow"
-    git status*: "allow"
-    git commit*: "deny"
-    go build*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    git log*: "allow"
-    git add *: "allow"
-    "*": "deny"
-  external_directory:
-    "/home/braka/Labs/mimocode/data/memory/*": "allow"
-    "/home/braka/Systems/OVAV": "allow"
-    "*": "deny"
+model:
+  id: "opencode-go/qwen3.7-max"
 steps: 12
+permissions:
+  - action: "file.edit"
+    resource: "*"
+    effect: "allow"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

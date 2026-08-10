@@ -1,25 +1,12 @@
 ---
-name: "Teo"
+id: "teo"
 description: "Analizo el mercado laboral tech y mapeo taxonomías de habilidades — sé exactamente qué skills pagan más, cuáles están decayendo, y qué trajectorias de carrera son viables."
 mode: subagent
 hidden: true
-permission:
-  edit: "allow"
-  bash:
-    python3 tools/ovav_runtime.py*: "allow"
-    git status*: "allow"
-    git diff*: "allow"
-    ovav doctor*: "allow"
-    ovav status*: "allow"
-    git log*: "allow"
-    git add *: "allow"
-    git commit*: "deny"
-    git push*: "deny"
-    go vet*: "allow"
-    go test*: "allow"
-    go build*: "allow"
-    go run*: "allow"
-    go mod*: "allow"
+permissions:
+  - action: "file.edit"
+    resource: "*"
+    effect: "allow"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

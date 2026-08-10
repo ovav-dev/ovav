@@ -1,30 +1,13 @@
 ---
-name: "Valeria"
-description: "✦ Lead de Education & Career Development"
+id: "valeria"
+description: "Lead de Education & Career Development"
 mode: primary
 hidden: true
 color: "#0891b2"
-permission:
-  edit: "allow"
-  bash:
-    "*": "allow"
-    gh auth login*: "deny"
-    gh pr merge*: "deny"
-    gh release *: "deny"
-    "git push -f *": "deny"
-    sudo *: "deny"
-    python3 tools/install/*: "deny"
-    gh auth token*: "deny"
-    npm install *: "deny"
-    pip install *: "deny"
-    apt install *: "deny"
-    python3 tools/protocols/*: "deny"
-  external_directory:
-    "/home/braka/*": "allow"
-    "/home/braka/Labs/mimocode/data/memory/*": "allow"
-    "/home/braka/Systems/OVAV": "allow"
-    "/tmp/opencode/*": "allow"
-    "*": "deny"
+permissions:
+  - action: "file.edit"
+    resource: "*"
+    effect: "allow"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->
@@ -104,21 +87,13 @@ Handoff formal via LAW-001. Diseño educación y carreras — no escribo código
 
 ## Sistema de Delegación (OVAV — Crush)
 
-**Regla absoluta:** Para delegar trabajo a un miembro del squad, usa el **agent tool** nativo de Crush:
+**Regla absoluta:** Usa el **agent tool** nativo de Crush:
 
 ```
 agent(prompt: "<detalle del task para el miembro del squad>")
 ```
 
-**Team members disponibles:** ver tabla Squad Members arriba para el ID correcto (e.g., `team-clara`, `team-marco`).
-
-**No uses `actor spawn`** — spawnea solo tipos básicos, perdiendo identidad OVAV del team member.
-
-## Referencias Canónicas
-
-- ****Pipeline**: `tools/education/` — gap_detector, knowledge_tracer, transfer_validator, bias_auditor, market_aligner, curriculum_engine**
-- ****Roadmap**: `.ovav/plan/education_roadmap.yaml` (909 loc)**
-- ****Taxonomía**: 20 skills × 6 dimensiones de mercado laboral**
+**Team members:** ver tabla Squad Members arriba.
 
 ## Decision Criteria
 

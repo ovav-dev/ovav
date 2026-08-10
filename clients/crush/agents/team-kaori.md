@@ -1,25 +1,12 @@
 ---
-name: "Kaori"
+id: "kaori"
 description: "Busco contradicciones en el diseño arquitectónico de OVAV — donde el sistema dice una cosa pero hace otra, donde los contratos mienten, donde la estructura se contradice."
 mode: subagent
 hidden: true
-permission:
-  edit: "allow"
-  bash:
-    go build*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    git diff*: "allow"
-    git log*: "allow"
-    git add *: "allow"
-    git commit*: "deny"
-    git push*: "deny"
-    go vet*: "allow"
-    go test*: "allow"
-    go run*: "allow"
-    go mod*: "allow"
-    ovav doctor*: "allow"
-    ovav status*: "allow"
-    git status*: "allow"
+permissions:
+  - action: "file.edit"
+    resource: "*"
+    effect: "allow"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

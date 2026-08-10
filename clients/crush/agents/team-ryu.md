@@ -1,25 +1,12 @@
 ---
-name: "Ryu"
+id: "ryu"
 description: "Violo límites intencionalmente para encontrar context leaks y fugas de información entre agentes, áreas, y sesiones — si hay una frontera débil, la encuentro."
 mode: subagent
 hidden: true
-permission:
-  edit: "allow"
-  bash:
-    git log*: "allow"
-    git add *: "allow"
-    go build*: "allow"
-    go mod*: "allow"
-    ovav doctor*: "allow"
-    ovav status*: "allow"
-    git commit*: "deny"
-    git push*: "deny"
-    go vet*: "allow"
-    go test*: "allow"
-    go run*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    git status*: "allow"
-    git diff*: "allow"
+permissions:
+  - action: "file.edit"
+    resource: "*"
+    effect: "allow"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

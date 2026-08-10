@@ -1,30 +1,15 @@
 ---
-name: "Pablo"
+id: "pablo"
 description: "Valido cada commit antes de que llegue a la rama principal — reviso patrones, consistencia, y adherence a los estándares de código de OVAV."
 mode: subagent
-model: opencode-go/qwen3.7-max
 hidden: true
-permission:
-  edit: "allow"
-  bash:
-    ovav doctor*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    git status*: "allow"
-    git diff*: "allow"
-    git add *: "allow"
-    git commit*: "deny"
-    git push*: "deny"
-    go test*: "allow"
-    go build*: "allow"
-    git log*: "allow"
-    sudo *: "deny"
-    "*": "deny"
-    go vet*: "allow"
-  external_directory:
-    "/home/braka/Labs/mimocode/data/memory/*": "allow"
-    "/home/braka/Systems/OVAV": "allow"
-    "*": "deny"
+model:
+  id: "opencode-go/qwen3.7-max"
 steps: 10
+permissions:
+  - action: "file.edit"
+    resource: "*"
+    effect: "allow"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

@@ -1,25 +1,12 @@
 ---
-name: "Marco"
+id: "marco"
 description: "Diseño y valido la arquitectura del sistema OVAV, garantizando que el DAG de dependencias, contratos entre componentes y estructura de fases sean correctos antes de cualquier implementación."
 mode: subagent
 hidden: true
-permission:
-  edit: "allow"
-  bash:
-    go vet*: "allow"
-    go test*: "allow"
-    go build*: "allow"
-    go run*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    git add *: "allow"
-    git push*: "deny"
-    go mod*: "allow"
-    ovav doctor*: "allow"
-    ovav status*: "allow"
-    git status*: "allow"
-    git diff*: "allow"
-    git log*: "allow"
-    git commit*: "deny"
+permissions:
+  - action: "file.edit"
+    resource: "*"
+    effect: "allow"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

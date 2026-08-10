@@ -1,25 +1,12 @@
 ---
-name: "Rosa"
+id: "rosa"
 description: "Planifico proyectos educativos con milestones claros, dependencias visibles, y deadlines realistas — cada iniciativa de Valeria tiene un plan que se puede ejecutar."
 mode: subagent
 hidden: true
-permission:
-  edit: "allow"
-  bash:
-    python3 tools/ovav_runtime.py*: "allow"
-    git log*: "allow"
-    git add *: "allow"
-    git commit*: "deny"
-    go test*: "allow"
-    go run*: "allow"
-    ovav doctor*: "allow"
-    git status*: "allow"
-    git diff*: "allow"
-    git push*: "deny"
-    go vet*: "allow"
-    go build*: "allow"
-    go mod*: "allow"
-    ovav status*: "allow"
+permissions:
+  - action: "file.edit"
+    resource: "*"
+    effect: "allow"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

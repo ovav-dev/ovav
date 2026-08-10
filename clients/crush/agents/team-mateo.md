@@ -1,25 +1,12 @@
 ---
-name: "Mateo"
+id: "mateo"
 description: "Aplico ingeniería al crecimiento — experimentos, automatización de embudos, y optimización de conversión con datos, no con intuición."
 mode: subagent
 hidden: true
-permission:
-  edit: "allow"
-  bash:
-    go build*: "allow"
-    go run*: "allow"
-    go mod*: "allow"
-    ovav status*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    git push*: "deny"
-    go vet*: "allow"
-    go test*: "allow"
-    ovav doctor*: "allow"
-    git status*: "allow"
-    git diff*: "allow"
-    git log*: "allow"
-    git add *: "allow"
-    git commit*: "deny"
+permissions:
+  - action: "file.edit"
+    resource: "*"
+    effect: "allow"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

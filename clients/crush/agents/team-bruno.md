@@ -1,25 +1,12 @@
 ---
-name: "Bruno"
+id: "bruno"
 description: "Optimizo el rendimiento mental — foco, disciplina, gestión de estrés, y hábitos cognitivos que maximizan la productividad sostenible sin burnout."
 mode: subagent
 hidden: true
-permission:
-  edit: "allow"
-  bash:
-    python3 tools/ovav_runtime.py*: "allow"
-    git diff*: "allow"
-    git add *: "allow"
-    git commit*: "deny"
-    git push*: "deny"
-    go test*: "allow"
-    go build*: "allow"
-    go run*: "allow"
-    go mod*: "allow"
-    ovav doctor*: "allow"
-    ovav status*: "allow"
-    git status*: "allow"
-    git log*: "allow"
-    go vet*: "allow"
+permissions:
+  - action: "file.edit"
+    resource: "*"
+    effect: "allow"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

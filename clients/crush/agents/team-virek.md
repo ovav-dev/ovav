@@ -1,33 +1,15 @@
 ---
-name: "Virek"
+id: "virek"
 description: "Code Reviewer — validación pre-commit, detección de secretos, patrones y consistencia."
 mode: subagent
-model: opencode-go/qwen3.7-max
 hidden: true
-permission:
-  edit: "deny"
-  bash:
-    "*": "deny"
-    python3 tools/validators/*.py: "allow"
-    git status*: "allow"
-    git diff*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    python3 tools/harnesses/check_*.py: "allow"
-    git log*: "allow"
-    apt install *: "deny"
-    npm install *: "deny"
-    go vet*: "allow"
-    go test*: "allow"
-    git commit*: "deny"
-    sudo *: "deny"
-    pip install *: "deny"
-    go build*: "allow"
-    git push*: "deny"
-  external_directory:
-    "/home/braka/Systems/OVAV": "allow"
-    "*": "deny"
-    "/home/braka/Labs/mimocode/data/memory/*": "allow"
+model:
+  id: "opencode-go/qwen3.7-max"
 steps: 15
+permissions:
+  - action: "file.edit"
+    resource: "*"
+    effect: "deny"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

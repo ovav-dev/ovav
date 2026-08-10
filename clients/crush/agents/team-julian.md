@@ -1,25 +1,12 @@
 ---
-name: "Julian"
+id: "julian"
 description: "Convierto interés en ingreso — diseño el proceso de ventas, califico leads, y cierro deals que hacen crecer el revenue de OVAV."
 mode: subagent
 hidden: true
-permission:
-  edit: "allow"
-  bash:
-    git status*: "allow"
-    git diff*: "allow"
-    git log*: "allow"
-    git commit*: "deny"
-    go build*: "allow"
-    go mod*: "allow"
-    ovav doctor*: "allow"
-    ovav status*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    git add *: "allow"
-    git push*: "deny"
-    go vet*: "allow"
-    go test*: "allow"
-    go run*: "allow"
+permissions:
+  - action: "file.edit"
+    resource: "*"
+    effect: "allow"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

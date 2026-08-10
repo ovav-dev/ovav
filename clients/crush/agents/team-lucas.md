@@ -1,25 +1,12 @@
 ---
-name: "Lucas"
+id: "lucas"
 description: "Aplico parches pequeños, genero fixtures de test, y realizo ediciones acotadas bajo supervisión de Andrés — nunca toco arquitectura ni refactors estructurales."
 mode: subagent
 hidden: true
-permission:
-  edit: "allow"
-  bash:
-    git log*: "allow"
-    git push*: "deny"
-    go vet*: "allow"
-    go test*: "allow"
-    go build*: "allow"
-    go run*: "allow"
-    ovav doctor*: "allow"
-    git add *: "allow"
-    git commit*: "deny"
-    go mod*: "allow"
-    ovav status*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    git status*: "allow"
-    git diff*: "allow"
+permissions:
+  - action: "file.edit"
+    resource: "*"
+    effect: "allow"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

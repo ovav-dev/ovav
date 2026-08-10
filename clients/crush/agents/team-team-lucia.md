@@ -1,25 +1,12 @@
 ---
-name: "Lucia"
+id: "team-lucia"
 description: "Aseguro que cada despliegue, contrato, y práctica de infraestructura cumpla con regulaciones — GDPR, términos de servicio, privacy policies, y compliance de datos."
 mode: subagent
 hidden: true
-permission:
-  edit: "allow"
-  bash:
-    go run*: "allow"
-    go mod*: "allow"
-    ovav doctor*: "allow"
-    git status*: "allow"
-    git diff*: "allow"
-    git log*: "allow"
-    git add *: "allow"
-    git push*: "deny"
-    go vet*: "allow"
-    go test*: "allow"
-    go build*: "allow"
-    ovav status*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    git commit*: "deny"
+permissions:
+  - action: "file.edit"
+    resource: "*"
+    effect: "allow"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

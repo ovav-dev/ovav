@@ -1,38 +1,15 @@
 ---
-name: "Doran"
+id: "doran"
 description: "Install Engineer — planificación de instalación, backup/rollback, transición source-to-global."
 mode: subagent
-model: opencode-go/qwen3.7-max
 hidden: true
-permission:
-  edit: "allow"
-  bash:
-    go run*: "allow"
-    python3 tools/validators/*.py: "allow"
-    git status*: "allow"
-    git commit*: "deny"
-    git push*: "deny"
-    sudo *: "deny"
-    "*": "deny"
-    go build*: "allow"
-    ovav infra*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    python3 tools/harnesses/check_*.py: "allow"
-    git diff*: "allow"
-    git add *: "allow"
-    pip install *: "deny"
-    go test*: "allow"
-    go vet*: "allow"
-    ovav doctor*: "allow"
-    ovav status*: "allow"
-    git log*: "allow"
-    npm install *: "deny"
-    apt install *: "deny"
-  external_directory:
-    "*": "deny"
-    "/home/braka/Labs/mimocode/data/memory/*": "allow"
-    "/home/braka/Systems/OVAV": "allow"
+model:
+  id: "opencode-go/qwen3.7-max"
 steps: 15
+permissions:
+  - action: "file.edit"
+    resource: "*"
+    effect: "allow"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

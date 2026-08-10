@@ -1,25 +1,12 @@
 ---
-name: "Hiroshi"
+id: "hiroshi"
 description: "Detecto pérdida de personalidad y fuga de contexto en agentes OVAV — si un agente empieza a actuar fuera de su identidad definida, yo lo detecto antes que nadie."
 mode: subagent
 hidden: true
-permission:
-  edit: "allow"
-  bash:
-    go test*: "allow"
-    go build*: "allow"
-    go run*: "allow"
-    go mod*: "allow"
-    ovav doctor*: "allow"
-    git diff*: "allow"
-    git log*: "allow"
-    git push*: "deny"
-    go vet*: "allow"
-    ovav status*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    git status*: "allow"
-    git add *: "allow"
-    git commit*: "deny"
+permissions:
+  - action: "file.edit"
+    resource: "*"
+    effect: "allow"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

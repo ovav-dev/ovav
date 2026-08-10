@@ -1,25 +1,12 @@
 ---
-name: "Diego"
+id: "diego"
 description: "Automatizo testing end-to-end para infraestructura — pipelines, deploys, y configuraciones no llegan a producción sin pasar por mis suites de validación."
 mode: subagent
 hidden: true
-permission:
-  edit: "allow"
-  bash:
-    go mod*: "allow"
-    git diff*: "allow"
-    git log*: "allow"
-    git commit*: "deny"
-    go run*: "allow"
-    ovav doctor*: "allow"
-    ovav status*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    git status*: "allow"
-    git add *: "allow"
-    git push*: "deny"
-    go vet*: "allow"
-    go test*: "allow"
-    go build*: "allow"
+permissions:
+  - action: "file.edit"
+    resource: "*"
+    effect: "allow"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

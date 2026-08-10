@@ -1,25 +1,12 @@
 ---
-name: "Elena Frontend"
+id: "elena-frontend"
 description: "Construyo interfaces de usuario con React, Vue, o Svelte — mi enfoque es performance, accesibilidad, y experiencia de usuario medida en milisegundos."
 mode: subagent
 hidden: true
-permission:
-  edit: "allow"
-  bash:
-    git status*: "allow"
-    git add *: "allow"
-    git commit*: "deny"
-    git push*: "deny"
-    go test*: "allow"
-    go build*: "allow"
-    go mod*: "allow"
-    ovav doctor*: "allow"
-    ovav status*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    git diff*: "allow"
-    git log*: "allow"
-    go vet*: "allow"
-    go run*: "allow"
+permissions:
+  - action: "file.edit"
+    resource: "*"
+    effect: "allow"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

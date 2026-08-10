@@ -1,22 +1,16 @@
 ---
-name: "Platform Engineering"
-description: "◆ Go runtime, seguridad del sistema, CLI, validación, gobernanza técnica — Lead: Thavren"
+id: "platform-engineering"
+description: "Go runtime, seguridad del sistema, CLI, validación, gobernanza técnica — Lead: Thavren"
 mode: primary
 hidden: false
 color: "#2563eb"
-permission:
-  edit: "allow"
-  bash:
-    ovav_monitor: "allow"
-    ovav_status: "allow"
-    ovav_dashboard: "allow"
-    go: "allow"
-    python3: "allow"
-    ovav_health: "allow"
-  external_directory:
-    "*": "deny"
-    "/home/braka/Systems/OVAV": "allow"
-    "/tmp/opencode": "allow"
+permissions:
+  - action: "file.edit"
+    resource: "*"
+    effect: "allow"
+  - action: "bash"
+    resource: "*"
+    effect: "allow"
 instructions:
   - "crush_AGENTS.md"
   - ".ovav/service_areas/shared/visual_delivery_contract.yaml"
@@ -44,7 +38,7 @@ instructions:
 
 ## Conexión OVAV (Governor System)
 
-Este área está cableada al sistema administrador OVAV mediante los siguientes puntos de integración. **No remover** — cualquier desvío rompe el contrato global.
+Este área está cableada al sistema administrador OVAV.
 
 ### Skills cargadas
 
@@ -62,10 +56,7 @@ Este área está cableada al sistema administrador OVAV mediante los siguientes 
 
 ### Comandos CLI autorizados
 
-Estos son los únicos comandos del CLI OVAV que este área puede invocar. **Ejecutar desde la raíz del repo OVAV** (`$OVAV_ROOT` se reemplaza por la ruta real al cargar el área):
-
 ```bash
-# Atajo universal — todos los comandos asumen estar en $OVAV_ROOT
 export OVAV_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 
 (cd "$OVAV_ROOT" && go run -C go-runtime ./cmd/ovav/ status)
@@ -77,13 +68,13 @@ export OVAV_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 (cd "$OVAV_ROOT" && go run -C go-runtime ./cmd/cockpit)
 ```
 
-### Contratos OVAV que aplica
+### Contratos OVAV
 
 - `visual_delivery_contract.yaml`
 - `safe_stop_contract.yaml`
 - `context_economy_contract.yaml`
 
-### Leyes OVAV que obedece
+### Leyes OVAV
 
 - `area_boundary_enforcement.yaml:LAW-001`
 - `ovav_laws.yaml:LAW-01 (automation_useful)`
@@ -372,13 +363,9 @@ domains:
 
 ## Contratos de Gobernanza
 
-Esta área opera bajo los siguientes contratos OVAV:
-
-- **visual_delivery_contract.yaml** — Entrega visual: 50% shorter, no visible reasoning, result first, half_length_response
-- **safe_stop_contract.yaml** — Safe Stop Report: PARTIAL/SAFE_STOP/READY_FOR_COMMIT, Host Runtime vs OVAV Runtime distinction
-- **context_economy_contract.yaml** — Tiers T0-T5, escalation rules, must not load repo/internal OVAV context by default
-
----
+- **visual_delivery_contract.yaml** — 50% shorter, result first
+- **safe_stop_contract.yaml** — PARTIAL/SAFE_STOP/READY_FOR_COMMIT
+- **context_economy_contract.yaml** — Tiers T0-T5
 
 ## Funciones Autorizadas (LO QUE SÍ HACE)
 
@@ -454,12 +441,10 @@ Handoff formal via `.ovav/laws/area_boundary_enforcement.yaml` LAW-001 (Non-Inva
 agent(prompt: "<detalle del task para el agente destinatario>")
 ```
 
-**OVAV agent IDs para referencia:**
+**OVAV agent IDs:**
 - `area-<id>` — agentes de área (visibles en picker)
-- `lead-<id>` — leads OVAV (e.g., `lead-thavren`, `lead-eidren`)
-- `team-<id>` — miembros del squad (e.g., `team-clara`, `team-marco`)
-
-**No uses `actor spawn`** — spawnea solo tipos básicos, perdiendo identidad OVAV del agente.
+- `lead-<id>` — leads OVAV
+- `team-<id>` — miembros del squad
 
 ## Referencias Canónicas
 
@@ -470,7 +455,7 @@ agent(prompt: "<detalle del task para el agente destinatario>")
 
 ## Governance Wiring (DO NOT REMOVE)
 
-This area is governed by the following validators and gates. Removing these references will cause CI/CD failures:
+This area es gobernado por los siguientes validators y gates:
 
 - workspace_safety_gate — validates workspace safety before write operations
 - ovav_git_push_gate — enforces HTTPS-only push, prohibits raw git push, force push, and force delete on all surfaces

@@ -1,30 +1,13 @@
 ---
-name: "Eidren"
-description: "✦ Lead de Evidence & Decision Intelligence"
+id: "eidren"
+description: "Lead de Evidence & Decision Intelligence"
 mode: primary
 hidden: true
 color: "#7c3aed"
-permission:
-  edit: "allow"
-  bash:
-    "*": "allow"
-    gh auth token*: "deny"
-    gh release *: "deny"
-    "git push -f *": "deny"
-    pip install *: "deny"
-    apt install *: "deny"
-    sudo *: "deny"
-    python3 tools/install/*: "deny"
-    gh auth login*: "deny"
-    gh pr merge*: "deny"
-    npm install *: "deny"
-    python3 tools/protocols/*: "deny"
-  external_directory:
-    "/home/braka/*": "allow"
-    "/home/braka/Labs/mimocode/data/memory/*": "allow"
-    "/home/braka/Systems/OVAV": "allow"
-    "/tmp/opencode/*": "allow"
-    "*": "deny"
+permissions:
+  - action: "file.edit"
+    resource: "*"
+    effect: "allow"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->
@@ -107,22 +90,13 @@ Handoff formal via `.ovav/laws/area_boundary_enforcement.yaml` LAW-001. Solo ope
 
 ## Sistema de Delegación (OVAV — Crush)
 
-**Regla absoluta:** Para delegar trabajo a un miembro del squad, usa el **agent tool** nativo de Crush:
+**Regla absoluta:** Usa el **agent tool** nativo de Crush:
 
 ```
 agent(prompt: "<detalle del task para el miembro del squad>")
 ```
 
-**Team members disponibles:** ver tabla Squad Members arriba para el ID correcto (e.g., `team-clara`, `team-marco`).
-
-**No uses `actor spawn`** — spawnea solo tipos básicos, perdiendo identidad OVAV del team member.
-
-## Referencias Canónicas
-
-- ****Plan**: `.ovav/plan/caps.yaml`**
-- ****Framework**: Evidence Scoring Framework (35 reglas en `research_profile.py`)**
-- ****Repositorio**: `docs/research/`**
-- ****Network guard**: `f3_research_profile` en `permission_authority.json`**
+**Team members:** ver tabla Squad Members arriba.
 
 ## Decision Criteria
 

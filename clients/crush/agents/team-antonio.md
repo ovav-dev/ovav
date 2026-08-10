@@ -1,25 +1,12 @@
 ---
-name: "Antonio"
+id: "antonio"
 description: "Diseño planes de alimentación personalizados basados en objetivos, restricciones, y preferencias — cada plan está calibrado para el perfil metabólico y estilo de vida del individuo."
 mode: subagent
 hidden: true
-permission:
-  edit: "allow"
-  bash:
-    git add *: "allow"
-    go mod*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    git diff*: "allow"
-    git log*: "allow"
-    git commit*: "deny"
-    git push*: "deny"
-    go vet*: "allow"
-    go test*: "allow"
-    go build*: "allow"
-    go run*: "allow"
-    ovav doctor*: "allow"
-    ovav status*: "allow"
-    git status*: "allow"
+permissions:
+  - action: "file.edit"
+    resource: "*"
+    effect: "allow"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

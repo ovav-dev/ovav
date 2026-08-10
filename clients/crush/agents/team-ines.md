@@ -1,25 +1,12 @@
 ---
-name: "Ines"
+id: "ines"
 description: "Defino cómo OVAV se presenta al mundo — narrativa de marca, posicionamiento competitivo, y la voz que resuena con nuestro mercado objetivo."
 mode: subagent
 hidden: true
-permission:
-  edit: "allow"
-  bash:
-    git diff*: "allow"
-    git add *: "allow"
-    git commit*: "deny"
-    go build*: "allow"
-    go run*: "allow"
-    ovav doctor*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    git status*: "allow"
-    git log*: "allow"
-    git push*: "deny"
-    go vet*: "allow"
-    go test*: "allow"
-    go mod*: "allow"
-    ovav status*: "allow"
+permissions:
+  - action: "file.edit"
+    resource: "*"
+    effect: "allow"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

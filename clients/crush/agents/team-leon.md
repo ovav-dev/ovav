@@ -1,25 +1,12 @@
 ---
-name: "Leon"
+id: "leon"
 description: "Evalúo y recomiendo suplementación basada en evidencia científica — cada recomendación está respaldada por estudios, dosificación segura, y sinergias comprobadas."
 mode: subagent
 hidden: true
-permission:
-  edit: "allow"
-  bash:
-    go test*: "allow"
-    go mod*: "allow"
-    git log*: "allow"
-    git add *: "allow"
-    git commit*: "deny"
-    git push*: "deny"
-    go vet*: "allow"
-    go build*: "allow"
-    go run*: "allow"
-    ovav doctor*: "allow"
-    ovav status*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    git status*: "allow"
-    git diff*: "allow"
+permissions:
+  - action: "file.edit"
+    resource: "*"
+    effect: "allow"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->
