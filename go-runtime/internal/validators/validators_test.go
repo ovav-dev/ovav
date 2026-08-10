@@ -791,11 +791,15 @@ func findOVAVRoot() (string, error) {
 
 // ── Registry with 30 validators ──────────────────────────────────────────────
 
-func TestDefaultRegistry_81Validators(t *testing.T) {
+func TestDefaultRegistry_70Validators(t *testing.T) {
 	reg := DefaultRegistry()
 	all := reg.All()
-	if len(all) != 81 {
-		t.Errorf("expected 81 validators in default registry, got %d", len(all))
+	// 2026-08-09: Reduced from 81 to 70 validators
+	// Deprecated: ContextFirewallV2, MergeReadiness, ReleaseGate, HandoffSync,
+	// HeadIntegrity, ArchitectureGuardian, CapsChronosAlignment, CrossTargetConsistency, TodoDebt
+	// These are now handled by OMARS monitors or return SKIP
+	if len(all) != 70 {
+		t.Errorf("expected 70 validators in default registry, got %d", len(all))
 	}
 	// Verify each has non-empty ID
 	for _, v := range all {

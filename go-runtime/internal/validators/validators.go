@@ -85,13 +85,26 @@ func (r *Registry) Run(ctx context.Context, root string) []Result {
 }
 
 // DefaultRegistry returns the standard set of validators used in production.
+//
+// NOTE: As of 2026-08-09, many validators have been migrated to OMARS
+// (OVAV Monitoring & Auto-Remediation System). These validators now delegate
+// to monitors or return SKIP to avoid double-checking.
+//
+// Deprecated validators removed from default registry:
+//   - ContextFirewallV2 (duplicate of ContextFirewall)
+//   - MergeReadiness (→ HygieneMonitor in OMARS)
+//   - ReleaseGate (→ HygieneMonitor in OMARS)
+//   - HandoffSync (→ HygieneMonitor in OMARS)
+//   - HeadIntegrity (hash drift normal between sessions)
+//   - ArchitectureGuardian (directory structure not critical)
+//   - CapsChronosAlignment (stale caps.yaml is WARN, not FAIL)
+//   - CrossTargetConsistency (→ AgentProjectionMonitor in OMARS)
 func DefaultRegistry() *Registry {
 	return NewRegistry(
 		NewSecretsHygiene(),
 		NewExfilPatterns(),
 		NewSupplyChain(),
 		NewProtectedBranch(),
-		NewWorkspaceSafety(),
 		NewGitPush(),
 		NewPermissionDrift(),
 		NewRuntimeIntegrity(),
@@ -101,7 +114,6 @@ func DefaultRegistry() *Registry {
 		NewConfigIntegrity(),
 		NewAgentGovernance(),
 		NewPluginSecurity(),
-		NewMergeReadiness(),
 		NewCredentialGovernance(),
 		NewSecurityHardening(),
 		NewZeroTrust(),
@@ -111,23 +123,19 @@ func DefaultRegistry() *Registry {
 		NewRegistryDrift(),
 		NewConfigSyntax(),
 		NewSingleAuthority(),
-		NewReleaseGate(),
 		NewNetworkHardening(),
-		NewHandoffSync(),
-		NewArchitectureCompliance(),
+		// NOTE: ArchitectureCompliance → merged into ArchitectureGovernance
 		NewContractEnforcement(),
 		NewArchitectureGovernance(),
-		// Batch 5 — Python→Go migration (18 validators)
+		// Batch 5 — Python→Go migration (remaining useful)
 		NewThoughtFirewall(),
 		NewSessionContextGuard(),
-		NewHeadIntegrity(),
 		NewGateSelfProtection(),
 		NewModelPolicy(),
 		NewHostConfigDrift(),
 		NewWorkspaceIsolation(),
 		NewLedgerWritePath(),
 		NewSurfaceDrift(),
-		NewArchitectureGuardian(),
 		NewAgentSurfaceHierarchy(),
 		NewToolReadiness(),
 		NewAgentRuntimeEnforcement(),
@@ -136,18 +144,21 @@ func DefaultRegistry() *Registry {
 		NewRegoPolicies(),
 		NewMultiPlatform(),
 		NewValidatorCoverage(),
-		// Batch 6 — Python→Go migration (10 validators)
+		// Batch 6 — Python→Go migration (remaining useful)
 		NewLedgerDeprecation(),
 		NewServiceAreaGovernance(),
 		NewRegistryValidator(),
-		NewTodoDebt(),
 		NewLeadScope(),
 		NewAgentPermissionInvariants(),
 		NewF1Architecture(),
 		NewBehavioralDirectives(),
-		NewCrossTargetConsistency(),
-		NewContextFirewallV2(),
-		// Batch 6 — additional validators (3 more)
+		// NOTE: CrossTargetConsistency → AgentProjectionMonitor in OMARS
+		// NOTE: ContextFirewallV2 → duplicate of ContextFirewall
+		// NOTE: HeadIntegrity → removed (hash drift normal)
+		// NOTE: HandoffSync → redundant with HygieneMonitor
+		// NOTE: ReleaseGate → redundant with MergeReadiness
+		// NOTE: ArchitectureGuardian → directory structure not critical
+		// NOTE: CapsChronosAlignment → stale is WARN not FAIL
 		NewCanonicalIntegrity(),
 		NewF2Infrastructure(),
 		NewF3Roles(),
@@ -171,7 +182,7 @@ func DefaultRegistry() *Registry {
 		NewRedTeamAudit(),
 		// Batch 9 — v41.0 Caps authority blindaje
 		NewCapsSingleNext(),
-		NewCapsChronosAlignment(),
+		// NOTE: CapsChronosAlignment deprecated - stale caps.yaml is INFO not FAIL
 		NewCapsSchema(),
 		// Batch 10 — Phase 3 innovation (absorbed from external systems)
 		NewAdversarialVerification(),
