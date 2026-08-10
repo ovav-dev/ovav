@@ -384,34 +384,35 @@ issues:
       - Agent Permission Invariants: Platform Engineering and Thavren bash permissions differ
       - Agent Permission Invariants: lead-thavren.md external_directory '*' should be 'allow'
       - Cross-Target Consistency: Agent count mismatch (YAML=80, MD=81)
-      - F3 Role Governance: lead-eidren.md and lead-thavren.md have mode='subagent' instead of 'lead'
+      - F3 Role Governance: lead-eidren.md and lead-thavren.md flagged for mode='subagent'
       - Service Area Router Validator: Missing 10 service area profile files
     root_cause: |
-      Multiple drift issues from incomplete migration/updates:
-      1. Permission policy drift between YAML and agent definitions
-      2. Agent count drift between canonical (subagent_catalog.yaml) and runtime (agent MD files)
-      3. Lead mode misconfiguration in agent files
-      4. Missing service area profile files
+      MISDIAGNOSIS: The F3 validator INCORRECTLY reported that leads with mode='subagent'
+      should use 'mode:lead'. This is WRONG — OpenCode schema only accepts:
+      subagent | primary | all. There is NO 'lead mode'.
+
+      The actual correct fix:
+      - Leads in OpenCode should use mode:primary (hidden:true)
+      - The OpenCode converter (opencode.go) already does this correctly
+      - The F3 validator error message was misleading and has been fixed
+      - This issue's 'fix' recommendation of 'mode:lead' caused ConfigInvalidError
+    resolution:
+      - F3 validator fixed: error message now says "should be mode:primary" not "should be a lead mode"
+      - F3 validator now detects and reports mode:lead as INVALID
+      - agent_surface_hierarchy.go fixed: removed mode:lead from accepted values
+      - ISSUE INVALID: Close this issue — the F3 flag was a validator bug, not a real problem
     fix:
-      subsystem: multiple (permissions, agents, service_areas)
+      subsystem: F3 validator (f3_roles.go) + agent_surface_hierarchy.go
+      changes:
+        - f3_roles.go: fixed misleading error message; added detection of mode:lead as INVALID
+        - agent_surface_hierarchy.go: removed mode:lead from accepted mode values
       files_needing_review:
         - path: .ovav/registry/subagent_catalog.yaml
-          issue: agent count mismatch
-        - path: go-runtime/internal/agents/leads/lead-eidren.md
-          issue: mode='subagent' should be lead
-        - path: go-runtime/internal/agents/leads/lead-thavren.md
-          issue: mode='subagent' should be lead; external_directory '*' should be 'allow'
+          issue: agent count mismatch (separate issue)
         - path: .ovav/registry/permission_authority.json
-          issue: bash permissions drift
-        - Missing service area profiles:
-          - area-platform-engineering.md
-          - area-research-intelligence.md
-          - area-commercial-growth.md
-          - area-digital-product.md
-          - area-education-career.md
-          - area-health-performance.md
-      integration_status: PENDING
-    status: OPEN
+          issue: bash permissions drift (separate issue)
+      integration_status: RESOLVED
+    status: CLOSED
     refs:
       - .ovav/registry/subagent_catalog.yaml
       - go-runtime/internal/agents/leads/

@@ -232,9 +232,14 @@ func (v *F3Roles) validateAgentFrontmatter(path string, requiredFields []string,
 	}
 
 	// Validate mode field specifically
+	// NOTE: OpenCode schema only accepts mode: subagent | primary | all.
+	// There is NO "lead mode" — leads use mode:primary (hidden:true) or mode:primary (hidden:false for area).
 	if mode, ok := fm["mode"].(string); ok {
 		if agentType == "lead" && mode == "subagent" {
-			issues = append(issues, fmt.Sprintf("ERROR: %s — lead agent has mode='subagent' (should be a lead mode)", base))
+			issues = append(issues, fmt.Sprintf("ERROR: %s — lead agent has mode='subagent' (should be mode:primary; there is no 'lead' mode in OpenCode schema)", base))
+		}
+		if agentType == "lead" && mode == "lead" {
+			issues = append(issues, fmt.Sprintf("ERROR: %s — 'mode:lead' is INVALID. OpenCode schema only accepts: subagent, primary, all. Use mode:primary.", base))
 		}
 	}
 
