@@ -5,27 +5,27 @@ hidden: true
 permission:
   edit: "deny"
   bash:
-    pip install *: "deny"
+    "grep -rn*": "allow"
+    git push*: "deny"
     "*": "deny"
-    git status*: "allow"
+    go test*: "allow"
+    python3 tools/harnesses/check_*.py: "allow"
+    git commit*: "deny"
     sudo *: "deny"
+    apt install *: "deny"
     go vet*: "allow"
     python3 tools/ovav_runtime.py*: "allow"
-    python3 tools/harnesses/check_*.py: "allow"
     python3 tools/validators/*.py: "allow"
-    git commit*: "deny"
-    apt install *: "deny"
+    git status*: "allow"
     git diff*: "allow"
-    git push*: "deny"
     npm install *: "deny"
-    go test*: "allow"
-    "grep -rn*": "allow"
     find *: "allow"
     git log*: "allow"
+    pip install *: "deny"
   external_directory:
-    "/home/braka/Labs/mimocode/data/memory/*": "allow"
     "/home/braka/Systems/OVAV": "allow"
     "*": "deny"
+    "/home/braka/Labs/mimocode/data/memory/*": "allow"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

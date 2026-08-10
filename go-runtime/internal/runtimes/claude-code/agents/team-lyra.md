@@ -7,13 +7,13 @@ permission:
   bash:
     go test*: "allow"
     go vet*: "allow"
+    git status*: "allow"
     git diff*: "allow"
+    git log*: "allow"
+    "*": "deny"
+    git commit*: "deny"
     git push*: "deny"
     sudo *: "deny"
-    git status*: "allow"
-    git log*: "allow"
-    git commit*: "deny"
-    "*": "deny"
   external_directory:
     "/home/braka/Labs/mimocode/data/memory/*": "allow"
     "/home/braka/Systems/OVAV": "allow"

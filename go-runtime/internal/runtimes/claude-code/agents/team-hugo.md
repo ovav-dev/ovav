@@ -6,18 +6,18 @@ permission:
   edit: "allow"
   bash:
     ovav status*: "allow"
-    git diff*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    git status*: "allow"
     git log*: "allow"
     git add *: "allow"
     git commit*: "deny"
     git push*: "deny"
-    go vet*: "allow"
     go test*: "allow"
-    go build*: "allow"
     go run*: "allow"
     go mod*: "allow"
+    python3 tools/ovav_runtime.py*: "allow"
+    git status*: "allow"
+    git diff*: "allow"
+    go vet*: "allow"
+    go build*: "allow"
     ovav doctor*: "allow"
 ---
 

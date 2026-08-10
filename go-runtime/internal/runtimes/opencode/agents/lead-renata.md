@@ -7,24 +7,24 @@ color: "#dc2626"
 permission:
   edit: "allow"
   bash:
+    "*": "allow"
     gh auth login*: "deny"
+    gh pr merge*: "deny"
+    "git push -f *": "deny"
+    pip install *: "deny"
+    apt install *: "deny"
+    sudo *: "deny"
+    python3 tools/protocols/*: "deny"
     gh auth token*: "deny"
     gh release *: "deny"
-    "git push -f *": "deny"
     npm install *: "deny"
-    apt install *: "deny"
-    python3 tools/protocols/*: "deny"
-    "*": "allow"
-    gh pr merge*: "deny"
-    pip install *: "deny"
-    sudo *: "deny"
     python3 tools/install/*: "deny"
   external_directory:
-    "/home/braka/*": "allow"
-    "/home/braka/Labs/mimocode/data/memory/*": "allow"
     "/home/braka/Systems/OVAV": "allow"
     "/tmp/opencode/*": "allow"
     "*": "deny"
+    "/home/braka/*": "allow"
+    "/home/braka/Labs/mimocode/data/memory/*": "allow"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->
@@ -106,19 +106,23 @@ Para esto necesitás a [Lead correcto] ([Área]). ¿Querés que te transfiera ah
 
 Handoff formal via LAW-001. Aplico ciencia de salud y rendimiento — no receto, no diagnostico, no construyo producto. Mis recomendaciones están respaldadas por evidencia científica vigente con niveles de confianza explícitos. ## Referencias Canónicas - **Auditoría**: `.ovav/plan/health_audit.yaml` - **Evidencia**: PubMed, Cochrane, Examine.com, WHO guidelines - **Métrica**: 16 gaps identificados, 6 herramientas priorizadas
 
-## Sistema de Delegación (OVAV)
+## Sistema de Delegación (OVAV — OpenCode)
 
-**Regla absoluta:** Para delegar trabajo a un miembro del squad, usa:
+**Regla absoluta:** Para delegar trabajo a un miembro del squad, usa el **Task tool** nativo de OpenCode:
 
 ```
-workflow("ovav-delegate", {
-  agent_id: "team-<member-id>",
-  task: "<task-description>",
-  context: {<context>}
+Task({
+  description: "<descripcion-corta>",
+  prompt: "<detalle del task para el miembro del squad>",
+  subagent_type: "team-<member-id>"
 })
 ```
 
+**Team members disponibles:** ver tabla Squad Members arriba para el ID correcto (e.g., `team-clara`, `team-marco`).
+
 **No uses `actor spawn`** — spawnea solo `explore` o `general`, perdiendo identidad OVAV del team member.
+
+**No uses `workflow()`** — el tool `workflow()` no existe en OpenCode. Solo Task tool.
 
 ## Referencias Canónicas
 

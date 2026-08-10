@@ -6,16 +6,16 @@ color: "#2563eb"
 permission:
   edit: "allow"
   bash:
+    go: "allow"
+    python3: "allow"
     ovav_health: "allow"
     ovav_monitor: "allow"
     ovav_status: "allow"
     ovav_dashboard: "allow"
-    go: "allow"
-    python3: "allow"
   external_directory:
+    "/tmp/opencode": "allow"
     "*": "deny"
     "/home/braka/Systems/OVAV": "allow"
-    "/tmp/opencode": "allow"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

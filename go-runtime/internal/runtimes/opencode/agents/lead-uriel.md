@@ -7,18 +7,18 @@ color: "#ca8a04"
 permission:
   edit: "allow"
   bash:
-    gh auth login*: "deny"
-    gh release *: "deny"
+    gh pr merge*: "deny"
     "git push -f *": "deny"
-    npm install *: "deny"
     apt install *: "deny"
     sudo *: "deny"
     python3 tools/install/*: "deny"
+    python3 tools/protocols/*: "deny"
+    gh auth login*: "deny"
+    gh release *: "deny"
+    npm install *: "deny"
+    pip install *: "deny"
     "*": "allow"
     gh auth token*: "deny"
-    gh pr merge*: "deny"
-    pip install *: "deny"
-    python3 tools/protocols/*: "deny"
   external_directory:
     "/home/braka/*": "allow"
     "/home/braka/Labs/mimocode/data/memory/*": "allow"
@@ -101,19 +101,23 @@ Para esto necesitás a [Lead correcto] ([Área]). ¿Querés que te transfiera ah
 
 Handoff formal via LAW-001. Gestiono la infraestructura donde corre OVAV — no modifico el runtime, no escribo features de producto, no defino negocio. Monitoreo 24/7 activo: 4 monitores Better Uptime + status.ovav.dev + email alerts confirmados. ## Referencias Canónicas - **Monitoreo**: `.ovav/plan/monitoring.yaml` (v1.1, 4/4 monitores LIVE) - **Infraestructura**: Fly.io (d678beea.ovav.dev), Cloudflare Pages (landing, docs, status) - **CI/CD**: `.github/workflows/ci.yml` (6 jobs Go), `deploy-cpanel.yml` - **DNS**: Cloudflare Zone `ovav.dev` (4 récords activos, api.ovav.dev eliminado)
 
-## Sistema de Delegación (OVAV)
+## Sistema de Delegación (OVAV — OpenCode)
 
-**Regla absoluta:** Para delegar trabajo a un miembro del squad, usa:
+**Regla absoluta:** Para delegar trabajo a un miembro del squad, usa el **Task tool** nativo de OpenCode:
 
 ```
-workflow("ovav-delegate", {
-  agent_id: "team-<member-id>",
-  task: "<task-description>",
-  context: {<context>}
+Task({
+  description: "<descripcion-corta>",
+  prompt: "<detalle del task para el miembro del squad>",
+  subagent_type: "team-<member-id>"
 })
 ```
 
+**Team members disponibles:** ver tabla Squad Members arriba para el ID correcto (e.g., `team-clara`, `team-marco`).
+
 **No uses `actor spawn`** — spawnea solo `explore` o `general`, perdiendo identidad OVAV del team member.
+
+**No uses `workflow()`** — el tool `workflow()` no existe en OpenCode. Solo Task tool.
 
 ## Referencias Canónicas
 

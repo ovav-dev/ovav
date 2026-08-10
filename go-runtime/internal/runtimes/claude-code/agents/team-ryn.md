@@ -7,13 +7,13 @@ permission:
   bash:
     find *: "allow"
     "grep -rn*": "allow"
-    git log*: "allow"
+    git status*: "allow"
+    git diff*: "allow"
     git commit*: "deny"
     sudo *: "deny"
     "*": "deny"
     go list*: "allow"
-    git status*: "allow"
-    git diff*: "allow"
+    git log*: "allow"
     git push*: "deny"
   external_directory:
     "/home/braka/Labs/mimocode/data/memory/*": "allow"
