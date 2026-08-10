@@ -1,24 +1,6 @@
 ---
-name: "Rosa"
-type: subagent
-hidden: true
-permission:
-  edit: "allow"
-  bash:
-    git push*: "deny"
-    go vet*: "allow"
-    go test*: "allow"
-    go mod*: "allow"
-    ovav doctor*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    git status*: "allow"
-    git log*: "allow"
-    git add *: "allow"
-    go build*: "allow"
-    go run*: "allow"
-    ovav status*: "allow"
-    git diff*: "allow"
-    git commit*: "deny"
+name: "rosa"
+description: "Planifico proyectos educativos con milestones claros, dependencias visibles, y deadlines realistas — cada iniciativa de Valeria tiene un plan que se puede ejecutar."
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

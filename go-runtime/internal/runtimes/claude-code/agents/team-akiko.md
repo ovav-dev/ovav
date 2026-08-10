@@ -1,24 +1,6 @@
 ---
-name: "Akiko"
-type: subagent
-hidden: true
-permission:
-  edit: "allow"
-  bash:
-    go vet*: "allow"
-    go test*: "allow"
-    go run*: "allow"
-    go mod*: "allow"
-    ovav doctor*: "allow"
-    git diff*: "allow"
-    git log*: "allow"
-    git push*: "deny"
-    go build*: "allow"
-    ovav status*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    git status*: "allow"
-    git add *: "allow"
-    git commit*: "deny"
+name: "akiko"
+description: "Razono sobre el código como un atacante — predigo edge cases, implicaciones no obvias, y consecuencias semánticas que el diseño original no contempló."
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

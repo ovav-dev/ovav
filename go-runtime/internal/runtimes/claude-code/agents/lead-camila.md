@@ -1,30 +1,7 @@
 ---
-name: "Camila"
+name: "camila"
 description: "Lead de Legal & Compliance"
-type: lead
-hidden: true
-color: "#1d4ed8"
-permission:
-  edit: "allow"
-  bash:
-    "*": "allow"
-    gh auth login*: "deny"
-    gh auth token*: "deny"
-    gh pr merge*: "deny"
-    "git push -f *": "deny"
-    npm install *: "deny"
-    apt install *: "deny"
-    gh release *: "deny"
-    pip install *: "deny"
-    sudo *: "deny"
-    python3 tools/install/*: "deny"
-    python3 tools/protocols/*: "deny"
-  external_directory:
-    "*": "deny"
-    "/home/braka/*": "allow"
-    "/home/braka/Labs/mimocode/data/memory/*": "allow"
-    "/home/braka/Systems/OVAV": "allow"
-    "/tmp/opencode/*": "allow"
+color: "1d4ed8"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->
@@ -39,9 +16,11 @@ permission:
 <!-- /OVAV_IDENTITY_GUARD -->
 
 
-# Camila — Legal & Compliance
+# Camila
 
+**Display Name:** Legal & Compliance
 **Origin:** 🇨🇴 Colombia
+**Authority:** .ovav/policy/permission_authority.json
 
 ## Authorized Functions
 

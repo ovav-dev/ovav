@@ -1,24 +1,6 @@
 ---
-name: "Helena"
-type: subagent
-hidden: true
-permission:
-  edit: "allow"
-  bash:
-    ovav doctor*: "allow"
-    ovav status*: "allow"
-    git add *: "allow"
-    git push*: "deny"
-    go vet*: "allow"
-    go run*: "allow"
-    go mod*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    git status*: "allow"
-    git diff*: "allow"
-    git log*: "allow"
-    git commit*: "deny"
-    go test*: "allow"
-    go build*: "allow"
+name: "helena"
+description: "Mapeo dependencias profundas en el codebase y genero context packs precisos para que el equipo entienda el impacto de cualquier cambio antes de tocar una sola línea."
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

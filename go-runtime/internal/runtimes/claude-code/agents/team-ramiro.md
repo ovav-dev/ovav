@@ -1,24 +1,6 @@
 ---
-name: "Ramiro"
-type: subagent
-hidden: true
-permission:
-  edit: "allow"
-  bash:
-    go vet*: "allow"
-    go test*: "allow"
-    go build*: "allow"
-    go run*: "allow"
-    go mod*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    git status*: "allow"
-    git diff*: "allow"
-    ovav doctor*: "allow"
-    ovav status*: "allow"
-    git log*: "allow"
-    git add *: "allow"
-    git commit*: "deny"
-    git push*: "deny"
+name: "ramiro"
+description: "Diseño estudios de investigación con metodología rigurosa — defino hipótesis, selecciono métodos, y establezco criterios de validez antes de recolectar un solo dato."
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

@@ -1,8 +1,7 @@
 ---
-name: "Health Performance"
+name: "health-performance"
 description: "Nutrición, fitness, salud, rendimiento humano — Lead: Renata"
-type: area
-color: "#dc2626"
+color: "red"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->
@@ -20,6 +19,7 @@ color: "#dc2626"
 # Health Performance
 
 **Lead:** renata
+**Surface:** Nutrición, fitness, salud, bienestar, rendimiento humano, ciencia del deporte
 
 ## Functions
 

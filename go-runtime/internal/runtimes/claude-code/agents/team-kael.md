@@ -1,38 +1,7 @@
 ---
-name: "Kael"
-type: subagent
-hidden: true
-permission:
-  edit: "allow"
-  bash:
-    go run*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    python3 tools/harnesses/check_*.py: "allow"
-    git push*: "deny"
-    pip install *: "deny"
-    "*": "deny"
-    go vet*: "allow"
-    go mod*: "allow"
-    owc*: "allow"
-    git add *: "allow"
-    apt install *: "deny"
-    go build*: "allow"
-    owd*: "allow"
-    owv*: "allow"
-    owl*: "allow"
-    ovav *: "allow"
-    sudo *: "deny"
-    npm install *: "deny"
-    go test*: "allow"
-    python3 tools/validators/*.py: "allow"
-    git status*: "allow"
-    git diff*: "allow"
-    git log*: "allow"
-    git commit*: "deny"
-  external_directory:
-    "/home/braka/Labs/mimocode/data/memory/*": "allow"
-    "/home/braka/Systems/OVAV": "allow"
-    "*": "deny"
+name: "kael"
+description: "Implementador Junior — parches pequeños, fixtures y ediciones determinísticas."
+model: opencode-go/qwen3.7-max
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

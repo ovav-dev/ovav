@@ -1,8 +1,7 @@
 ---
-name: "Adversarial Intelligence"
+name: "adversarial-intelligence"
 description: "Red Team, testing adversarial, seguridad ofensiva, pentesting — Lead: Kenji Tanaka"
-type: area
-color: "#a21caf"
+color: "a21caf"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->
@@ -20,6 +19,7 @@ color: "#a21caf"
 # Adversarial Intelligence
 
 **Lead:** kenji
+**Surface:** Testing adversarial, red team, boundary testing, race conditions, drift detection
 
 ## Functions
 

@@ -1,8 +1,7 @@
 ---
-name: "Ux Design"
+name: "ux-design"
 description: "Diseño UI/UX, interfaz de usuario, experiencia de producto — Lead: Elena"
-type: area
-color: "#db2777"
+color: "pink"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->
@@ -20,6 +19,7 @@ color: "#db2777"
 # Ux Design
 
 **Lead:** elena
+**Surface:** Diseño de experiencia de usuario, investigación de usuarios, prototipado, accesibilidad
 
 ## Functions
 

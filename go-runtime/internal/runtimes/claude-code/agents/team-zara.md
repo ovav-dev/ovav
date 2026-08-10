@@ -1,31 +1,7 @@
 ---
-name: "Zara"
-type: subagent
-hidden: true
-permission:
-  edit: "deny"
-  bash:
-    "grep -rn*": "allow"
-    git push*: "deny"
-    "*": "deny"
-    go test*: "allow"
-    python3 tools/harnesses/check_*.py: "allow"
-    git commit*: "deny"
-    sudo *: "deny"
-    apt install *: "deny"
-    go vet*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    python3 tools/validators/*.py: "allow"
-    git status*: "allow"
-    git diff*: "allow"
-    npm install *: "deny"
-    find *: "allow"
-    git log*: "allow"
-    pip install *: "deny"
-  external_directory:
-    "/home/braka/Systems/OVAV": "allow"
-    "*": "deny"
-    "/home/braka/Labs/mimocode/data/memory/*": "allow"
+name: "zara"
+description: "Security Auditor — permisos, secretos, git safety y scope risk. Última línea de defensa."
+model: opencode-go/qwen3.7-max
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

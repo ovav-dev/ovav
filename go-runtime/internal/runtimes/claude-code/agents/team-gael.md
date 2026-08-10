@@ -1,24 +1,6 @@
 ---
-name: "Gael"
-type: subagent
-hidden: true
-permission:
-  edit: "allow"
-  bash:
-    git commit*: "deny"
-    go build*: "allow"
-    ovav doctor*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    git diff*: "allow"
-    git add *: "allow"
-    git push*: "deny"
-    go vet*: "allow"
-    go test*: "allow"
-    go run*: "allow"
-    go mod*: "allow"
-    ovav status*: "allow"
-    git status*: "allow"
-    git log*: "allow"
+name: "gael"
+description: "Creo materiales de aprendizaje y ejercicios que transforman conceptos de diseño en práctica accionable — cada recurso está diseñado para ser entendido y aplicado."
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

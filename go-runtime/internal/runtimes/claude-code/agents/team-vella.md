@@ -1,33 +1,7 @@
 ---
-name: "Vella"
-type: subagent
-hidden: true
-permission:
-  edit: "allow"
-  bash:
-    go build*: "allow"
-    "python3 -B tools/validators/*.py": "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    sudo *: "deny"
-    go vet*: "allow"
-    pytest*: "allow"
-    python3 tools/harnesses/check_*.py: "allow"
-    git push*: "deny"
-    go run*: "allow"
-    ovav status*: "allow"
-    git status*: "allow"
-    git diff*: "allow"
-    git add *: "allow"
-    git commit*: "deny"
-    "*": "deny"
-    go test*: "allow"
-    "python3 -m pytest*": "allow"
-    ovav doctor*: "allow"
-    git log*: "allow"
-  external_directory:
-    "/home/braka/Systems/OVAV": "allow"
-    "*": "deny"
-    "/home/braka/Labs/mimocode/data/memory/*": "allow"
+name: "vella"
+description: "Testing & QA Engineer — ejecuta tests, detecta regresiones, cubre edge cases."
+model: opencode-go/qwen3.7-max
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

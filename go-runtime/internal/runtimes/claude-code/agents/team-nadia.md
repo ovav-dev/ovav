@@ -1,24 +1,6 @@
 ---
-name: "Nadia"
-type: subagent
-hidden: true
-permission:
-  edit: "allow"
-  bash:
-    ovav status*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    git status*: "allow"
-    git add *: "allow"
-    go vet*: "allow"
-    go mod*: "allow"
-    git diff*: "allow"
-    git log*: "allow"
-    git commit*: "deny"
-    git push*: "deny"
-    go test*: "allow"
-    go build*: "allow"
-    go run*: "allow"
-    ovav doctor*: "allow"
+name: "nadia"
+description: "Mantengo la documentación técnica viva y precisa — changelogs, API references, y guías de arquitectura que reflejan el estado real del código, no lo que deseamos que sea."
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

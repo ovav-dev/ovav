@@ -1,24 +1,7 @@
 ---
-name: "Ryn"
-type: subagent
-hidden: true
-permission:
-  edit: "deny"
-  bash:
-    find *: "allow"
-    "grep -rn*": "allow"
-    git status*: "allow"
-    git diff*: "allow"
-    git commit*: "deny"
-    sudo *: "deny"
-    "*": "deny"
-    go list*: "allow"
-    git log*: "allow"
-    git push*: "deny"
-  external_directory:
-    "/home/braka/Labs/mimocode/data/memory/*": "allow"
-    "/home/braka/Systems/OVAV": "allow"
-    "*": "deny"
+name: "ryn"
+description: "Explorer rápido — búsqueda de codebase, archivos por patrón, escaneo rápido."
+model: opencode-go/qwen3.7-plus
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

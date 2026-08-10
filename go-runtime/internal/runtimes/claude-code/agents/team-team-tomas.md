@@ -1,23 +1,6 @@
 ---
-name: "Tomas"
-type: subagent
-hidden: true
-permission:
-  edit: "allow"
-  bash:
-    go mod*: "allow"
-    ovav doctor*: "allow"
-    git status*: "allow"
-    git diff*: "allow"
-    git log*: "allow"
-    git push*: "deny"
-    go vet*: "allow"
-    go test*: "allow"
-    go run*: "allow"
-    ovav status*: "allow"
-    git add *: "allow"
-    git commit*: "deny"
-    go build*: "allow"
+name: "team-tomas"
+description: "Redacto y reviso contratos de servicio, licencias, acuerdos entre áreas, y términos de uso. Aseguro que toda relación contractual en OVAV esté documentada y cumpla con las regulaciones aplicables."
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

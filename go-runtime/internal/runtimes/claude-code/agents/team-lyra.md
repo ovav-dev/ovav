@@ -1,23 +1,7 @@
 ---
-name: "Lyra"
-type: subagent
-hidden: true
-permission:
-  edit: "deny"
-  bash:
-    go test*: "allow"
-    go vet*: "allow"
-    git status*: "allow"
-    git diff*: "allow"
-    git log*: "allow"
-    "*": "deny"
-    git commit*: "deny"
-    git push*: "deny"
-    sudo *: "deny"
-  external_directory:
-    "/home/braka/Labs/mimocode/data/memory/*": "allow"
-    "/home/braka/Systems/OVAV": "allow"
-    "*": "deny"
+name: "lyra"
+description: "Summarizer — condensación de handoffs, reportes y evidencia."
+model: opencode-go/qwen3.7-plus
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

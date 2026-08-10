@@ -1,8 +1,7 @@
 ---
-name: "Legal Compliance"
+name: "legal-compliance"
 description: "Legal, compliance, contratos, GDPR, regulaciones — Lead: Camila"
-type: area
-color: "#1d4ed8"
+color: "1d4ed8"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->
@@ -20,6 +19,7 @@ color: "#1d4ed8"
 # Legal Compliance
 
 **Lead:** camila
+**Surface:** Legal, compliance, contratos, GDPR, regulaciones, propiedad intelectual
 
 ## Functions
 

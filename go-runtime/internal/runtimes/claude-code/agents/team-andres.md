@@ -1,24 +1,6 @@
 ---
-name: "Andres"
-type: subagent
-hidden: true
-permission:
-  edit: "allow"
-  bash:
-    ovav doctor*: "allow"
-    ovav status*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    git add *: "allow"
-    git push*: "deny"
-    go test*: "allow"
-    go build*: "allow"
-    go run*: "allow"
-    go mod*: "allow"
-    git status*: "allow"
-    git diff*: "allow"
-    git log*: "allow"
-    git commit*: "deny"
-    go vet*: "allow"
+name: "andres"
+description: "Ejecuto refactors de alto impacto y escribo código de producción duradero — Go runtime, validadores, y herramientas core que forman la columna vertebral de OVAV."
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

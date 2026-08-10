@@ -1,24 +1,6 @@
 ---
-name: "Hugo"
-type: subagent
-hidden: true
-permission:
-  edit: "allow"
-  bash:
-    ovav status*: "allow"
-    git log*: "allow"
-    git add *: "allow"
-    git commit*: "deny"
-    git push*: "deny"
-    go test*: "allow"
-    go run*: "allow"
-    go mod*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    git status*: "allow"
-    git diff*: "allow"
-    go vet*: "allow"
-    go build*: "allow"
-    ovav doctor*: "allow"
+name: "hugo"
+description: "Diseño la arquitectura financiera de OVAV — pricing, revenue models, proyecciones, y estructura de costos que hacen el negocio sostenible."
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

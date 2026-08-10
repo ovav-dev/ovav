@@ -1,27 +1,7 @@
 ---
-name: "Clara"
-type: subagent
-hidden: true
-permission:
-  edit: "allow"
-  bash:
-    go test*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    git status*: "allow"
-    git push*: "deny"
-    "*": "deny"
-    go vet*: "allow"
-    go run*: "allow"
-    ovav doctor*: "allow"
-    git diff*: "allow"
-    git log*: "allow"
-    git add *: "allow"
-    git commit*: "deny"
-    sudo *: "deny"
-  external_directory:
-    "/home/braka/Labs/mimocode/data/memory/*": "allow"
-    "/home/braka/Systems/OVAV": "allow"
-    "*": "deny"
+name: "clara"
+description: "Diseño y ejecuto tests que rompen cosas antes que los usuarios — mi trabajo es encontrar regresiones, edge cases, y comportamientos inesperados que nadie más vio."
+model: opencode-go/qwen3.7-plus
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

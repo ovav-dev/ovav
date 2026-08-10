@@ -1,24 +1,6 @@
 ---
-name: "Gabriela"
-type: subagent
-hidden: true
-permission:
-  edit: "allow"
-  bash:
-    git push*: "deny"
-    go run*: "allow"
-    ovav status*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    git status*: "allow"
-    git diff*: "allow"
-    git log*: "allow"
-    git add *: "allow"
-    go vet*: "allow"
-    go test*: "allow"
-    go build*: "allow"
-    go mod*: "allow"
-    ovav doctor*: "allow"
-    git commit*: "deny"
+name: "gabriela"
+description: "Analizo el mercado para identificar oportunidades, amenazas, y movimientos competitivos — cada decisión comercial de OVAV se apoya en mi inteligencia de mercado."
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

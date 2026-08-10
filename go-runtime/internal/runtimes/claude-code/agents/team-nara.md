@@ -1,23 +1,7 @@
 ---
-name: "Nara"
-type: subagent
-hidden: true
-permission:
-  edit: "deny"
-  bash:
-    "*": "deny"
-    go test*: "allow"
-    go vet*: "allow"
-    git diff*: "allow"
-    git push*: "deny"
-    sudo *: "deny"
-    git status*: "allow"
-    git log*: "allow"
-    git commit*: "deny"
-  external_directory:
-    "/home/braka/Labs/mimocode/data/memory/*": "allow"
-    "/home/braka/Systems/OVAV": "allow"
-    "*": "deny"
+name: "nara"
+description: "Benchmark Analyst — análisis competitivo, comparativas técnicas y briefs de decisión."
+model: opencode-go/qwen3.7-plus
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

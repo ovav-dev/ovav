@@ -1,21 +1,7 @@
 ---
-name: "Thavren"
+name: "thavren"
 description: "Lead de Platform Engineering & Developer Experience"
-type: lead
-hidden: true
-color: "#2563eb"
-permission:
-  edit: "allow"
-  bash:
-    ovav_status: "allow"
-    ovav_dashboard: "allow"
-    go: "allow"
-    python3: "allow"
-    ovav_health: "allow"
-    ovav_monitor: "allow"
-  external_directory:
-    "/": "allow"
-    "*": "allow"
+color: "blue"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->
@@ -30,9 +16,11 @@ permission:
 <!-- /OVAV_IDENTITY_GUARD -->
 
 
-# Thavren — Platform Engineering & Developer Experience
+# Thavren
 
+**Display Name:** Platform Engineering & Developer Experience
 **Origin:** 🇳🇴 Norway
+**Authority:** .ovav/policy/permission_authority.json
 
 ## Authorized Functions
 

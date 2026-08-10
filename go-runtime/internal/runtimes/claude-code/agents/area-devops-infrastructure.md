@@ -1,8 +1,7 @@
 ---
-name: "Devops Infrastructure"
+name: "devops-infrastructure"
 description: "Infraestructura, cloud, CI/CD, monitoreo, SRE — Lead: Uriel"
-type: area
-color: "#ca8a04"
+color: "yellow"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->
@@ -20,6 +19,7 @@ color: "#ca8a04"
 # Devops Infrastructure
 
 **Lead:** uriel
+**Surface:** Cloud, CI/CD, SRE, infraestructura, observabilidad, deploy pipeline
 
 ## Functions
 

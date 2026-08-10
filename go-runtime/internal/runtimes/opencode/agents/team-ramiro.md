@@ -6,20 +6,20 @@ hidden: true
 permission:
   edit: "allow"
   bash:
-    git add *: "allow"
-    git commit*: "deny"
-    go test*: "allow"
-    go build*: "allow"
-    go run*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    git status*: "allow"
-    git diff*: "allow"
-    git push*: "deny"
     go vet*: "allow"
     go mod*: "allow"
     ovav doctor*: "allow"
-    ovav status*: "allow"
+    git status*: "allow"
     git log*: "allow"
+    git commit*: "deny"
+    git push*: "deny"
+    go test*: "allow"
+    go build*: "allow"
+    go run*: "allow"
+    ovav status*: "allow"
+    python3 tools/ovav_runtime.py*: "allow"
+    git diff*: "allow"
+    git add *: "allow"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->
