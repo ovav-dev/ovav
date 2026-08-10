@@ -213,7 +213,13 @@ func (c *CrushConverter) ConvertArea(area *Area, leadForArea map[string]*Lead) (
 	if len(area.References) > 0 {
 		b.WriteString("## Referencias Canónicas\n\n")
 		for _, ref := range area.References {
-			b.WriteString(fmt.Sprintf("- **%s**\n", ref))
+			// Format: "Label: path" → "- **Label**: path"
+			parts := strings.SplitN(ref, ":", 2)
+			if len(parts) == 2 {
+				b.WriteString(fmt.Sprintf("- **%s**:%s\n", strings.TrimSpace(parts[0]), parts[1]))
+			} else {
+				b.WriteString(fmt.Sprintf("- **%s**\n", ref))
+			}
 		}
 		b.WriteString("\n")
 	}

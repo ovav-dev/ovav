@@ -1,11 +1,11 @@
 {
   "schema_version": "ovav.sbom.v2",
-  "generated_at": "2026-08-10T20:47:23Z",
+  "generated_at": "2026-08-10T21:15:11Z",
   "project": "OVAV",
   "hash_algorithm": "sha256",
   "metadata": {
     "root_path": "/home/braka/Systems/OVAV",
-    "git_commit": "ca65623e46949f865d695fd8ff1228a3b43acd5d"
+    "git_commit": "79a00108df48e3cec2fc7358edda982148ccf15d"
   },
   "dependencies": {
     "go": [
@@ -1028,10 +1028,10 @@
     "go-runtime/internal/agents/areas/area-commercial-growth.yaml": "2ca7c91972cbb53dc573cd517cb9cd4c9a1c92146ae0f510e276046c447bd371",
     "go-runtime/internal/agents/areas/area-devops-infrastructure.yaml": "68b7cf12584ce8abb2625b92784fac6bdb8c5adc9c799a360cd7e7f9640de79a",
     "go-runtime/internal/agents/areas/area-digital-product.yaml": "7ce6df457b0cb7b65239c9e4581bcb9257146f347454065a723adfb2d9f98c2c",
-    "go-runtime/internal/agents/areas/area-education-career.yaml": "3b76b3ff607dda5935720320926b8b01fb5807f637008a3b62125e6ab431259e",
+    "go-runtime/internal/agents/areas/area-education-career.yaml": "c0fedd970bae28921262c632e02f4ce8d122913e72c7212eb4763615fce4a789",
     "go-runtime/internal/agents/areas/area-health-performance.yaml": "9a8f983271d59342245822697e26c0089d63875c0d9bc75179eaaae391d55854",
-    "go-runtime/internal/agents/areas/area-legal-compliance.yaml": "5640f32757baefb0b246af5f7402d9b8165a4ade365404e9498185954b22d0a3",
-    "go-runtime/internal/agents/areas/area-platform-engineering.yaml": "95f17d7418e2413b6f559ccd2d014977eab21ba44afc12a2a093f8147ea2d54f",
+    "go-runtime/internal/agents/areas/area-legal-compliance.yaml": "8421374bf2ae49470e695790a3d174787bfc21c5d6f400881d00e1fe0d1e1c4d",
+    "go-runtime/internal/agents/areas/area-platform-engineering.yaml": "9d67155777675ef973a7132c7aca22ec51bb89b5de4152c04da0ecd87802871d",
     "go-runtime/internal/agents/areas/area-research-intelligence.yaml": "d4c60a777f00d254e03ae3eadcb9a48115cfa3f79680d654c5921de267bdf242",
     "go-runtime/internal/agents/areas/area-ux-design.yaml": "967eb57997a8bf2a9e8f22f19b18bb713f34bc190539ccc824fef13c49ef97d5",
     "go-runtime/internal/agents/leads/lead-camila.yaml": "f19584b8ced9655bb62ff0b0c96afc2d4c1aa945490498509475b04062ea8166",
@@ -1156,7 +1156,7 @@
     "go-runtime/internal/convert/convert.go": "3520b1aed1745a84e2baa82c5215ceec5e0dd8481ffda9f1a678522de820aeac",
     "go-runtime/internal/convert/convert_test.go": "2b79ebb30376183d518d7488d94a7861e2de033a838252a3ceef022d986367a5",
     "go-runtime/internal/convert/copilot.go": "03d17193685a1b6c2f7ee799f11887ab46bda74a420e5e3499fced59e87d465e",
-    "go-runtime/internal/convert/crush.go": "de4f063b4b140c5a4bdf8d4900c62535df5379ade7144e66b686223a12ee9cbf",
+    "go-runtime/internal/convert/crush.go": "dbed7d92af43bf6647772249ce06240dab6ce4d52215c1e6f9c85104cb82cc44",
     "go-runtime/internal/convert/cursor.go": "18dd0703edcbec59482c49e7db09f55048bc91301a5894917aeaa2e6263f649c",
     "go-runtime/internal/convert/goose.go": "60a1d1a74034b1072ebd3567a564d39bece15921cf9aed32ca160ec4f39609de",
     "go-runtime/internal/convert/mimocode.go": "73cc94ee4dc368a57ed74c5f100dd2faae6b12659b833b32651fce22d928c773",
