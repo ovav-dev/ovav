@@ -352,3 +352,11 @@ _archive/
 .ovav/runtime/trusted_head_hash.json
 .ovav/vault/tokens/
 bin/ovav-mcp-memory
+
+# ── OVAV MiMo/OpenCode runtime dirs (environment-specific, never commit) ──
+.mimocode/
+go-runtime/cmd/ovav/.mimocode/
+
+# OVAV memory governor runtime state files
+.ovav/memory/
+.ovav/tasks/
