@@ -7,23 +7,23 @@ hidden: true
 permission:
   edit: "allow"
   bash:
-    "git status*": "allow"
-    "git add *": "allow"
-    "git commit*": "deny"
-    "go vet*": "allow"
-    "go build*": "allow"
-    "python3 tools/ovav_runtime.py*": "allow"
-    "git diff*": "allow"
-    "git log*": "allow"
-    "git push*": "deny"
-    "sudo *": "deny"
-    "*": "deny"
-    "go test*": "allow"
-    "ovav doctor*": "allow"
+    ovav doctor*: "allow"
+    git status*: "allow"
+    git add *: "allow"
+    git commit*: "deny"
+    go vet*: "allow"
+    python3 tools/ovav_runtime.py*: "allow"
+    git diff*: "allow"
+    git log*: "allow"
+    git push*: "deny"
+    sudo *: "deny"
+    *: "deny"
+    go test*: "allow"
+    go build*: "allow"
   external_directory:
-    "/home/braka/Labs/mimocode/data/memory/*": "allow"
     "/home/braka/Systems/OVAV": "allow"
     "*": "deny"
+    "/home/braka/Labs/mimocode/data/memory/*": "allow"
 steps: 10
 ---
 

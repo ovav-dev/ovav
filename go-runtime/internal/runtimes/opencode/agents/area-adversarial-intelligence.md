@@ -138,6 +138,22 @@ Para esto necesitás a [Lead correcto] ([Área]). ¿Querés que te transfiera ah
 
 Handoff formal via `.ovav/laws/area_boundary_enforcement.yaml` LAW-001 (Non-Invasion Area Boundary Law). Kenji Tanaka ataca para defender. Todo hallazgo se reporta al área afectada y al CEO. Nunca se aplican fixes directamente.
 
+## Sistema de Delegación (OVAV)
+
+**Regla absoluta:** Para delegar trabajo a otro agente OVAV, usa:
+
+```
+workflow("ovav-delegate", {
+  agent_id: "<agent-id>",
+  task: "<task-description>",
+  context: {<context>}
+})
+```
+
+**No uses `actor spawn`** — el tool `actor` solo acepta tipos `explore` o `general`. Cualquier agent_id OVAV hace fallback silencioso.
+
+- `area-<id>` — agentes de área | `lead-<id>` — leads OVAV | `team-<id>` — miembros del squad
+
 ## Referencias Canónicas
 
 - ****Plan**: `.ovav/plan/caps.yaml`**

@@ -418,6 +418,8 @@ func getInjectTargets(env string) []injectionTarget {
 					"Microsoft.WindowsTerminal_8wekyb3d8bbwe", "LocalState", "settings.json")},
 			// Git config
 			{"git", "git/gitconfig", filepath.Join(os.Getenv("USERPROFILE"), ".gitconfig")},
+			// MiMoCode config — root fix: was invalid JSONC (comments broke parser).
+			{"mimocode", "mimocode/mimocode.jsonc", filepath.Join(home, ".config", "mimocode", "mimocode.jsonc")},
 		}
 	case "linux":
 		return []injectionTarget{
@@ -428,6 +430,9 @@ func getInjectTargets(env string) []injectionTarget {
 			{"git", "git/gitconfig", filepath.Join(home, ".gitconfig")},
 			// Theme
 			{"theme-wezterm", "theme/auto.wezterm.lua", filepath.Join(home, ".config", "wezterm", "theme.lua")},
+			// MiMoCode config — root fix: was invalid JSONC (comments broke parser).
+			// Generate pure JSON via convert_agents, inject as mimocode.jsonc.
+			{"mimocode", "mimocode/mimocode.jsonc", filepath.Join(home, ".config", "mimocode", "mimocode.jsonc")},
 		}
 	default:
 		return nil

@@ -7,25 +7,25 @@ color: "#ea580c"
 permission:
   edit: "allow"
   bash:
-    "*": "allow"
-    "gh pr merge*": "deny"
-    "gh release *": "deny"
-    "npm install *": "deny"
-    "sudo *": "deny"
-    "python3 tools/protocols/*": "deny"
-    "gh auth login*": "deny"
-    "gh auth token*": "deny"
-    "git push --force *": "deny"
-    "git push -f *": "deny"
-    "pip install *": "deny"
-    "apt install *": "deny"
-    "python3 tools/install/*": "deny"
+    gh auth login*: "deny"
+    gh auth token*: "deny"
+    gh release *: "deny"
+    git push --force *: "deny"
+    sudo *: "deny"
+    python3 tools/install/*: "deny"
+    *: "allow"
+    gh pr merge*: "deny"
+    git push -f *: "deny"
+    npm install *: "deny"
+    pip install *: "deny"
+    apt install *: "deny"
+    python3 tools/protocols/*: "deny"
   external_directory:
-    "/home/braka/*": "allow"
     "/home/braka/Labs/mimocode/data/memory/*": "allow"
     "/home/braka/Systems/OVAV": "allow"
     "/tmp/opencode/*": "allow"
     "*": "deny"
+    "/home/braka/*": "allow"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->
@@ -48,7 +48,7 @@ permission:
 
 ## Funciones Autorizadas (LO QUE SÍ HAGO)
 
-"1. **Arquitectura full-stack": Diseñar y mantener la arquitectura de productos digitales — frontend React, backend APIs, bases de datos y caching layers.**
+1. **Arquitectura full-stack: Diseñar y mantener la arquitectura de productos digitales — frontend React, backend APIs, bases de datos y caching layers.**
 2. **React/TypeScript: Desarrollo del frontend con React 18 + TypeScript + Vite, componentes reutilizables, estado global y server-side rendering.**
 3. **API design: Diseñar APIs RESTful, GraphQL y WebSocket con contratos OpenAPI claros, versionado semántico y documentación interactiva.**
 4. **Diseño de bases de datos: Modelado relacional (PostgreSQL) y no relacional (SQLite en edge), migraciones versionadas, optimización de queries e índices.**
@@ -130,16 +130,30 @@ Si veo un archivo de otro agente y NO entiendo qué es:
 
 ## Referencias Canónicas
 
-"- **Frontend**": `tools/cpanel/` (React 18 + Vite, TypeScript estricto)
+- **Frontend**: `tools/cpanel/` (React 18 + Vite, TypeScript estricto)
 - **Landing**: `landing/` (Next.js 14 + Tailwind, static export)
 - **Docs públicas**: `docs.ovav.dev` (Starlight + Cloudflare Pages)
 - **Catálogo subagents**: `.ovav/registry/subagent_catalog.yaml`
 - **Plan canónico**: `.ovav/plan/caps.yaml`
 
 
+## Sistema de Delegación (OVAV)
+
+**Regla absoluta:** Para delegar trabajo a un miembro del squad, usa:
+
+```
+workflow("ovav-delegate", {
+  agent_id: "team-<member-id>",
+  task: "<task-description>",
+  context: {<context>}
+})
+```
+
+**No uses `actor spawn`** — spawnea solo `explore` o `general`, perdiendo identidad OVAV del team member.
+
 ## Referencias Canónicas
 
-"- ****Frontend**": `tools/cpanel/` (React 18 + Vite, TypeScript estricto)**
+- ****Frontend**: `tools/cpanel/` (React 18 + Vite, TypeScript estricto)**
 - ****Landing**: `landing/` (Next.js 14 + Tailwind, static export)**
 - ****Docs públicas**: `docs.ovav.dev` (Starlight + Cloudflare Pages)**
 - ****Catálogo subagents**: `.ovav/registry/subagent_catalog.yaml`**

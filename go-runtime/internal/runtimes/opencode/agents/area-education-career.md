@@ -135,6 +135,22 @@ Para esto necesitás a [Lead correcto] ([Área]). ¿Querés que te transfiera ah
 
 Handoff formal via `.ovav/laws/area_boundary_enforcement.yaml` LAW-001 (Non-Invasion Area Boundary Law). Valeria diseña educación. No construye plataformas ni emite certificaciones. ## Referencias Canónicas - **Plan**: `.ovav/plan/caps.yaml` - **Leyes**: `.ovav/laws/area_boundary_enforcement.yaml` - **Contratos**: `.ovav/service_areas/shared/` - **Currículo**: `.ovav/education/` - **Gap detector**: `tools/education/gap_detector.py` - **Curriculum engine**: `tools/education/curriculum_engine.py` - **Knowledge tracer**: `tools/education/knowledge_tracer.py` - **Transfer validator**: `tools/education/transfer_validator.py` - **Bias auditor**: `tools/education/bias_auditor.py` - **Market aligner**: `tools/education/market_aligner.py` --- *OVAV Governor System — Área Education & Career Development — Lead: Valeria*
 
+## Sistema de Delegación (OVAV)
+
+**Regla absoluta:** Para delegar trabajo a otro agente OVAV, usa:
+
+```
+workflow("ovav-delegate", {
+  agent_id: "<agent-id>",
+  task: "<task-description>",
+  context: {<context>}
+})
+```
+
+**No uses `actor spawn`** — el tool `actor` solo acepta tipos `explore` o `general`. Cualquier agent_id OVAV hace fallback silencioso.
+
+- `area-<id>` — agentes de área | `lead-<id>` — leads OVAV | `team-<id>` — miembros del squad
+
 ## Referencias Canónicas
 
 - ****Plan**: `.ovav/plan/caps.yaml`**

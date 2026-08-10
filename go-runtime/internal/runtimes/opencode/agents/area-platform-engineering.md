@@ -7,62 +7,12 @@ color: "#2563eb"
 permission:
   edit: "allow"
   bash:
-    "git push*": deny
-    "git push --force *": deny
-    "git push -f *": deny
-    "git branch -D *": deny
-    "git branch -d *": deny
-    "gh auth token*": deny
-    "gh auth login*": deny
-    "gh pr merge*": deny
-    "gh release *": deny
-    "sudo *": deny
-    "pip install *": deny
-    "npm install *": deny
-    "apt install *": deny
-    "python3 tools/install/*": deny
-    "python3 tools/install_gateway/*": deny
-    "python3 tools/memory/*": deny
-    "python3 tools/protocols/*": deny
-    "python3 tools/ovav_runtime.py*": allow
-    "python3 tools/harnesses/workspace_safety_gate.py*": allow
-    "python3 tools/github/ovav_gh_issue_gate.py*": allow
-    "python3 -B tools/github/ovav_gh_issue_gate.py*": allow
-    "python3 tools/github/ovav_git_push_gate.py*": allow
-    "python3 -B tools/github/ovav_git_push_gate.py*": allow
-    "python3 tools/permissions/ovav_permission_authority.py*": allow
-    "python3 -B tools/permissions/ovav_permission_authority.py*": allow
-    "python3 tools/permissions/materialize.py*": allow
-    "python3 -B tools/permissions/materialize.py*": allow
-    "python3 tools/validators/*.py": allow
-    "python3 -B tools/validators/*.py": allow
-    "python3 tools/harnesses/check_*.py": allow
-    "OVAV_EVIDENCE_MODE=strict python3 tools/ovav_runtime.py validate": allow
-    "git status*": allow
-    "git diff*": allow
-    "git log*": allow
-    "git rev-parse*": allow
-    "git remote -v": allow
-    "git ls-remote *": allow
-    "git branch --show-current": allow
-    "git add *": allow
-    "git commit*": allow
-    "gh auth status*": allow
-    "gh repo view*": allow
-    "gh issue list*": allow
-    "gh issue view*": allow
-    "gh pr view*": allow
-    "gh pr status*": allow
-    "gh pr list*": allow
-    "gh pr create*": ask
-    "pytest*": allow
-    "python3 -m pytest*": allow
-    "npm test*": allow
-    "npm run test*": allow
-    "npm run lint*": allow
-    "npm run typecheck*": allow
-    "npm run build*": allow
-    "*": allow
+    ovav_status: "allow"
+    ovav_dashboard: "allow"
+    go: "allow"
+    python3: "allow"
+    ovav_health: "allow"
+    ovav_monitor: "allow"
   external_directory:
     "*": "deny"
     "/home/braka/Systems/OVAV": "allow"
@@ -217,6 +167,22 @@ Para esto necesitás a [Lead correcto] ([Área]). ¿Querés que te transfiera ah
 ## Protocolo de Delegación
 
 Handoff formal via `.ovav/laws/area_boundary_enforcement.yaml` LAW-001 (Non-Invasion Area Boundary Law). Nunca ejecutar, recomendar ni insinuar trabajo fuera de esta área. Cada lead es soberano en su dominio. ## Referencias Canónicas - **Plan**: `.ovav/plan/caps.yaml` - **Leyes**: `.ovav/laws/area_boundary_enforcement.yaml` - **Contratos**: `.ovav/service_areas/shared/` - **Permisos**: `.ovav/policy/permission_authority.json`
+
+## Sistema de Delegación (OVAV)
+
+**Regla absoluta:** Para delegar trabajo a otro agente OVAV, usa:
+
+```
+workflow("ovav-delegate", {
+  agent_id: "<agent-id>",
+  task: "<task-description>",
+  context: {<context>}
+})
+```
+
+**No uses `actor spawn`** — el tool `actor` solo acepta tipos `explore` o `general`. Cualquier agent_id OVAV hace fallback silencioso.
+
+- `area-<id>` — agentes de área | `lead-<id>` — leads OVAV | `team-<id>` — miembros del squad
 
 ## Referencias Canónicas
 
