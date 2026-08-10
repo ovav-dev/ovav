@@ -1,11 +1,11 @@
 {
   "schema_version": "ovav.sbom.v2",
-  "generated_at": "2026-08-10T03:41:53Z",
+  "generated_at": "2026-08-10T03:46:53Z",
   "project": "OVAV",
   "hash_algorithm": "sha256",
   "metadata": {
     "root_path": "/home/braka/Systems/OVAV",
-    "git_commit": "9a7c46bb1e73285731ca184cd593b20f1b665c99"
+    "git_commit": "efffcf7aad4e022951b5281dd0da66eef01b135a"
   },
   "dependencies": {
     "go": [
@@ -1526,7 +1526,7 @@
     "go-runtime/internal/validators/tool_readiness.go": "1ec343ed9cca59f284cd5f74be91d3df364c925958c908ba4fdc119518f0bfa6",
     "go-runtime/internal/validators/validator_coverage.go": "8945ab26f487017ae0f91115abfcaf81c8776fd8ea82799615f7d9a89a212d09",
     "go-runtime/internal/validators/validators.go": "ecf66760a9591da2a36887b872c53f024d93bd653d6f2786a18435d14fbffa4d",
-    "go-runtime/internal/validators/validators_test.go": "4d45495008ad4d6ef44babae7fb84732cf3145b62f8fa7cc43a78a56a3a833df",
+    "go-runtime/internal/validators/validators_test.go": "3e283e4471cf5b80d81d9cc17817cb008623455fad00f84bd2d89d80783a3faf",
     "go-runtime/internal/validators/wezterm_path_integrity.go": "22650e5fa49087c28d9b4cb355008b63aed2c97ff29e9d68e7842b13a2d18859",
     "go-runtime/internal/validators/workspace_isolation.go": "c37e39b44bd4bbd18980e6c3d9b3f3c2909867c9a032c6e3092bc0d84f93a66e",
     "go-runtime/internal/validators/workspace_safety.go": "3936b7a654e675fe1fb47ef9a72f083667d9b14ce0102620e2d008c56a494904",
