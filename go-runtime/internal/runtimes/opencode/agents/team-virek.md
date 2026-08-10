@@ -7,26 +7,26 @@ hidden: true
 permission:
   edit: "deny"
   bash:
-    git log*: "allow"
     git push*: "deny"
-    go test*: "allow"
+    sudo *: "deny"
+    go build*: "allow"
+    python3 tools/validators/*.py: "allow"
+    git diff*: "allow"
+    git log*: "allow"
     apt install *: "deny"
+    "*": "deny"
+    go test*: "allow"
+    git status*: "allow"
     npm install *: "deny"
     python3 tools/ovav_runtime.py*: "allow"
-    python3 tools/validators/*.py: "allow"
-    git status*: "allow"
-    git commit*: "deny"
-    go vet*: "allow"
-    git diff*: "allow"
-    sudo *: "deny"
-    "*": "deny"
-    pip install *: "deny"
-    go build*: "allow"
     python3 tools/harnesses/check_*.py: "allow"
+    git commit*: "deny"
+    pip install *: "deny"
+    go vet*: "allow"
   external_directory:
+    "*": "deny"
     "/home/braka/Labs/mimocode/data/memory/*": "allow"
     "/home/braka/Systems/OVAV": "allow"
-    "*": "deny"
 steps: 15
 ---
 

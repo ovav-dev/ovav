@@ -34,3 +34,4 @@ return {
     return false
   end,
 }
+return config

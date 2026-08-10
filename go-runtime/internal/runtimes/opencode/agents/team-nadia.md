@@ -6,19 +6,19 @@ hidden: true
 permission:
   edit: "allow"
   bash:
-    go build*: "allow"
+    go test*: "allow"
     go run*: "allow"
-    ovav status*: "allow"
-    git diff*: "allow"
+    python3 tools/ovav_runtime.py*: "allow"
+    git status*: "allow"
     git add *: "allow"
     git commit*: "deny"
     git push*: "deny"
     go vet*: "allow"
-    go test*: "allow"
+    go build*: "allow"
     go mod*: "allow"
     ovav doctor*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    git status*: "allow"
+    ovav status*: "allow"
+    git diff*: "allow"
     git log*: "allow"
 ---
 
