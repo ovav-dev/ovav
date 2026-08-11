@@ -205,3 +205,18 @@ function __ovav_auto_logout --on-event fish_exit
         set -ge OVAV_VAULT_KEY
     end
 end
+
+# ═══════════════════════════════════════════════════════════════════════
+# OVAV — Crush Keybinding Fix
+# Force Crush to use standard emacs keybindings, not vim/custom
+# ═══════════════════════════════════════════════════════════════════════
+
+# Set environment variables that tell TUI libraries to use emacs mode
+set -gx EDITOR emacs
+set -gx VISUAL emacs
+
+# Disable readline vim mode if Crush uses it
+set -gx INPUTRC /dev/null
+
+# Force terminal to report proper keys
+set -gx TERM xterm-256color
