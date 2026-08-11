@@ -775,14 +775,19 @@ func TestGenerateOpenCodePlugin_WithWatchers(t *testing.T) {
 
 func runGit(t *testing.T, dir string, args ...string) {
 	t.Helper()
+	// Build git command with -C flag
+	gitCmd := func(subargs ...string) *exec.Cmd {
+		fullArgs := []string{"-C", dir}
+		fullArgs = append(fullArgs, subargs...)
+		return exec.Command("git", fullArgs...)
+	}
 	// Set git identity for test environment (required for commits in temp repos)
-	cmd := exec.Command("git", "-C", dir, "config", "user.email", "test@ovav.dev")
+	cmd := gitCmd("config", "user.email", "test@ovav.dev")
 	cmd.Run() // ignore error if already set
-	cmd = exec.Command("git", "-C", dir, "config", "user.name", "OVAV Test")
+	cmd = gitCmd("config", "user.name", "OVAV Test")
 	cmd.Run()
 	// Now run the actual git command
-	cmd = exec.Command("git", args...)
-	cmd.Dir = dir
+	cmd = gitCmd(args...)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Fatalf("git %v: %v\n%s", args, err, out)
