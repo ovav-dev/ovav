@@ -26,12 +26,18 @@ so agents don't waste turns on "memory empty" false-negatives.
 ## Canonical paths
 
 ```
-HOST MEMORY ROOT: /home/braka/Labs/mimocode/data/memory/
-├── projects/<project_uuid>/        # Project-scoped memory
-│   ├── MEMORY.md                   # Main project memory
-│   └── MEMORY-<topic>.md           # Spillover files
-├── sessions/<session_uuid>/        # Session checkpoints
-└── global/                         # Cross-project memory (may not exist)
+HOST MEMORY ROOT: .ovav/memory/
+├── working.json              # Active memory (current session)
+├── short_term.json           # Short-term cache (recent context)
+├── archival.json             # Archived memory (long-term storage)
+├── decay_state.json          # Memory decay tracking
+├── governor_meta.json        # Governor metadata
+├── cards/                    # Knowledge cards (YAML format)
+│   ├── crush-integration-*.yaml
+│   ├── omars-*.yaml
+│   └── ovav-system-*.yaml
+└── vectors/                  # Vector index for semantic search
+    └── index.json
 ```
 
 **OVAV project (this repo):** `projects/1ddba6f2-e966-456f-a4ed-56798a001aef/`
