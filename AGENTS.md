@@ -16,12 +16,46 @@ You are an OVAV-powered professional agent. You help with software engineering t
 OVAV is a commercial AI workstation governor that provides intelligent agents,
 skills, and governance for your development workflow.
 
+## Architecture Overview
+
+OVAV is a **multi-language, multi-harness AI workstation governor** with three main components:
+
+### 1. Go Runtime (`go-runtime/`)
+- **Core engine**: CLI tooling, worktree system, governance gates, memory bridge
+- **Main binary**: `ovav` (built from `cmd/ovav/main.go`)
+- **Cockpit TUI**: Bubble Tea-based terminal UI (`cmd/cockpit/`)
+- **Key packages**:
+  - `internal/validators/` — 50+ validation gates (security, architecture, compliance)
+  - `internal/governor/` — decision engine, delegation protocol, trust gate
+  - `internal/memory/` — agent memory, vector store, live learning
+  - `internal/gitflow/` — worktree management (owc/owd workflow)
+  - `internal/vault/` — secrets management, encryption, rotation
+  - `internal/connect/` — provider abstraction (Anthropic, OpenAI, MiniMax)
+
+### 2. Python Tools (`tools/`)
+- **Control Panel**: React/TypeScript web app (`tools/cpanel/`)
+- **Service areas**: Education, health, research, security modules
+- **Infrastructure**: Cloudflare access, DNS tunnel fixes, workspace safety
+- **Validators**: Automated audit scripts (`tools/validators/`)
+
+### 3. Governance Layer (`.ovav/`)
+- **Canonical plan**: `.ovav/plan/caps.yaml` — source of truth for capabilities
+- **Service areas**: 10 specialized domains (platform, research, UX, devops, etc.)
+- **Registry**: Operational state, audit logs, SBOM
+- **Vault**: Encrypted secrets, tokens, credentials
+- **Skills**: Agent skill definitions (`.opencode/skills/`, `.mimocode/skills/`)
+
 ## Agent System
 
 OVAV provides role-based agents specialized for your project stack:
 - Each agent has deep expertise in their domain
 - Agents adapt to YOUR project and preferences over time
 - No pre-loaded context — agents learn from you
+
+### Agent Hierarchy
+- **Area Agents** (`area-*`): Domain specialists (e.g., `area-platform-engineering`)
+- **Lead Agents** (`lead-*`): Area leaders (e.g., `lead-thavren` for platform, `lead-eidren` for research)
+- **Team Agents** (`team-*`): Squad members (e.g., `team-clara` for frontend, `team-marco` for backend)
 
 ## Core Rules
 
@@ -31,15 +65,17 @@ OVAV provides role-based agents specialized for your project stack:
 - Result first, explanation after
 
 ### Git Discipline
-- No `git add .` — stage exact files
-- No raw `git push` — use workflow commands
-- No `--force`, `--skip-gates`
-- Protected branches: main, master, develop, staging, prod, production
+- **NEVER** use `git add .` — stage exact files by path
+- **NEVER** use raw `git push` or `git merge` — use worktree commands
+- **NEVER** use `--force`, `--skip-gates` on ANY branch
+- Protected branches: `main`, `master`, `develop`, `staging`, `prod`, `production`
+- CEO Waiver required for writes on protected branches
 
 ### Security
-- No `sudo` commands
-- No `pip install` or `npm install` without approval
-- No auth token exposure in output
+- **NEVER** use `sudo` commands
+- **NEVER** run `pip install` or `npm install` without explicit approval
+- **NEVER** expose auth tokens in output
+- Always check `.ovav/security/protected_files.yaml` before modifying sensitive files
 
 ### Context Economy
 - Load only what is needed for the current task
@@ -48,6 +84,271 @@ OVAV provides role-based agents specialized for your project stack:
 - T3: small implementation
 - T4: multi-file implementation
 - T5: closure/safety
+
+## Essential Commands
+
+### Build & Test
+
+#### Go Runtime
+```bash
+cd go-runtime
+make build              # Build all platforms (linux/darwin/windows)
+make build-current      # Build for current platform only
+make build-cockpit      # Build Cockpit TUI
+make test               # Run tests: go test ./... -v -count=1 -timeout 30s
+make test-cover         # Run tests with coverage
+make vet                # Run go vet
+make fmt                # Format with gofmt
+make lint               # Run golangci-lint
+make install            # Install to ~/.local/bin/
+```
+
+**Go conventions:**
+- Format with `gofumpt` (stricter than `gofmt`) — **NOT** gofmt
+- Tests: table-driven with `t.Run()`, run with `-v -count=1 -race`
+- **NEVER** use `panic()` in library code — return `error` always
+- Zero-value initialization preferred over explicit constructors
+- Interface names: single method = `-er` suffix (Reader, Writer, Validator)
+- Package names: lowercase, single word, no underscores
+- Errors: use `fmt.Errorf("context: %w", err)` for wrapping
+
+#### Python Tools
+```bash
+# From repo root
+python -m pytest tools/ -v                    # Run all Python tests
+python -m pytest tools/education/ -v          # Run specific module tests
+ruff check tools/                             # Lint Python code
+ruff format tools/                            # Format Python code
+```
+
+#### TypeScript/React (Control Panel)
+```bash
+cd tools/cpanel
+npm run dev           # Start dev server
+npm run build         # Build for production
+npm run test          # Run Vitest tests
+npm run lint          # Type check: tsc --noEmit
+```
+
+**TypeScript conventions:**
+- **Strict mode** — `noImplicitAny`, `strictNullChecks`, `noUncheckedIndexedAccess`
+- **Single quotes** for strings, **no semicolons** (Prettier default)
+- **Relative imports** for within packages, **absolute** from `src/` root
+- Components: **functional only**, named exports, PascalCase filenames
+- Hooks: `use<Name>` prefix, always start with `use`
+- Types: prefer `interface` for objects, `type` for unions/intersections
+- Avoid `enum` — use `as const` objects instead
+- **Never** use `any` — use `unknown` + narrowing
+- **Never** use `require()` — use ESM `import`
+
+### Worktree Workflow
+
+OVAV uses git worktrees for feature isolation:
+
+```bash
+owc <feature-name>        # Create new worktree branch (alias: ovav-owc)
+                          # Example: owc feat-add-login
+
+# ... work on feature ...
+
+owd                       # Merge worktree back to develop + cleanup (alias: ovav-owd)
+owl                       # List active worktrees
+owclean                   # Remove stale worktrees
+```
+
+**Worktree rules:**
+- Always create worktrees from `develop` branch
+- Never commit directly to `develop` — use worktrees
+- Run `owd` when done — it handles merge, cleanup, and validation
+- Commit messages: `<type>(<scope>): <message>`
+  - Types: `feat`, `fix`, `align`, `refactor`, `docs`, `chore`
+  - Scopes: `caps`, `go-runtime`, `skills`, `browser-mcp`, `worktree`, `cpanel`, `frontend`
+
+### OVAV CLI Commands
+
+```bash
+ovav                      # Launch Cockpit TUI (default)
+ovav --cli                # Force flat CLI mode
+ovav login                # Authenticate session
+ovav status               # Check system status
+ovav memory <query>       # Query agent memory
+ovav delegate <agent>     # Delegate task to subagent
+ovav validate             # Run validation gates
+ovav worktree create      # Create worktree (same as owc)
+ovav worktree done        # Complete worktree (same as owd)
+```
+
+### Session Greeting
+
+At session start, run:
+```bash
+go run -C go-runtime ./cmd/session_greeting --json
+```
+
+This loads current governance state, active capabilities, and session context.
+
+## YAML Conventions
+
+All `.ovav/` configs follow caps.yaml schema:
+- 2-space indentation (NOT tabs)
+- Namespace keys with service area prefix: `platform_`, `research_`, `ux_`, etc.
+- Timestamps in ISO 8601 with timezone: `2026-07-19T21:03:53-0500`
+- Canonical source: `.ovav/plan/caps.yaml`
+
+## Directory Map
+
+```
+go-runtime/              → Go source (cmd/, internal/, pkg/)
+  cmd/                   → CLI binaries (ovav, cockpit, session_greeting, etc.)
+  internal/              → Private packages (validators, governor, memory, vault)
+  Makefile               → Build system
+
+tools/                   → Python tools and services
+  cpanel/                → React/TS control panel (Vite + Vitest)
+  education/             → Curriculum engine, bias auditor, knowledge tracer
+  health/                → Patient intake, wellness tracking
+  research/              → Benchmark engine, evidence scorer
+  security/              → Bootstrap verifier, vault backup
+  validators/            → Automated audit scripts
+
+.ovav/                   → Governance configs (canonical source of truth)
+  plan/caps.yaml         → Canonical capability plan
+  registry/              → Operational state, audit logs, SBOM
+  policy/                → Permission rules, protection policies
+  security/              → Protected files, URL allowlist, session guards
+  service_areas/         → 10 specialized domains with leads and squads
+  vault/                 → Encrypted secrets, tokens, credentials
+  source/skills/         → Agent skill definitions
+
+.opencode/skills/        → OpenCode harness skills
+.mimocode/skills/        → MiMoCode harness skills
+
+bin/                     → Shell tools and aliases
+  owc, owd, owl, ...     → Worktree management shortcuts
+  ovav-owlib.sh          → Worktree library (core logic)
+
+docs-site/               → Documentation website
+web/                     → Docker deployment configs
+```
+
+## Important Gotchas
+
+### 1. Binary Locations
+- Main `ovav` binary: `go-runtime/build/ovav` (after build)
+- Installed location: `~/.local/bin/ovav` (after `make install`)
+- Cockpit TUI: `go-runtime/build/cockpit` or `~/.local/bin/ovav-cockpit`
+
+### 2. Authentication
+- Session TTL: Auth state expires after inactivity
+- CEO bypass: Valid HMAC-signed CEO session overrides TTL
+- Re-authenticate: `ovav login` if session expired
+
+### 3. Protected Branches
+Before writing to `main`, `master`, `develop`, `staging`, `prod`, or `production`:
+- Check protection: `--check-protected` flag
+- CEO Waiver required for writes
+- Use worktrees for all feature work
+
+### 4. Output Guard
+Sign responses containing sensitive data:
+```bash
+echo "<RESPONSE>" | go run -C go-runtime ./cmd/output_guard --sign
+```
+
+### 5. Never Claim Production Ready
+OVAV launch verification is still in progress. Never claim "production ready" or "global ready" in documentation or commits.
+
+### 6. File Integrity
+- `.ovav/plan/caps.yaml` is canonical plan data
+- Git HEAD is canonical temporal data
+- Do not modify files in `.ovav/gate_self_hash` without understanding integrity chain
+
+### 7. Skill Loading
+If a task matches a skill description in `<available_skills>`, you MUST load the skill via View tool before acting:
+```
+crush://skills/<skill-name>/SKILL.md
+```
+
+Builtin skills use virtual `crush://` URIs — pass them verbatim to View.
+
+### 8. Delegation in Crush
+Use the `agent` tool for subagent delegation:
+```
+agent(prompt: "<task details>")
+```
+
+Do NOT use `workflow()` or `actor spawn` — they don't exist in Crush or lose OVAV identity.
+
+## Testing Strategy
+
+### Go Tests
+```bash
+cd go-runtime
+go test ./... -v -count=1 -race    # All tests with race detection
+go test ./internal/validators -v   # Specific package
+```
+
+**Test patterns:**
+- Table-driven tests with `t.Run()`
+- Coverage boost tests: `*_coverage_boost_test.go`
+- Fuzz tests: `*_fuzz_test.go`
+- Extra coverage: `*_extra_test.go`
+
+### Python Tests
+```bash
+python -m pytest tools/education/test_*.py -v
+```
+
+**Test patterns:**
+- Standard pytest fixtures
+- Module-specific test files: `test_<module>.py`
+
+### TypeScript Tests
+```bash
+cd tools/cpanel
+npm run test    # Vitest
+```
+
+**Test patterns:**
+- React Testing Library
+- Component tests in `__tests__/` directories
+
+## Common Workflows
+
+### Adding a New Feature
+1. Create worktree: `owc feat-my-feature`
+2. Implement changes in isolated branch
+3. Run tests: `cd go-runtime && make test`
+4. Validate: `ovav validate`
+5. Complete: `owd`
+
+### Fixing a Bug
+1. Create worktree: `owc fix-bug-description`
+2. Reproduce issue
+3. Apply fix with tests
+4. Run validators: `ovav validate`
+5. Complete: `owd`
+
+### Updating Capabilities
+1. Edit `.ovav/plan/caps.yaml`
+2. Update related service area configs
+3. Run validation: `ovav validate`
+4. Commit with scope `caps`: `git commit -m "align(caps): update capability X"`
+
+### Adding a New Skill
+1. Create skill directory: `.opencode/skills/my-skill/`
+2. Write `SKILL.md` with trigger description
+3. Add references/scripts in same directory
+4. Test with agent delegation
+
+## Key Files to Know
+
+- `go-runtime/cmd/ovav/main.go` — Main CLI entry point
+- `go-runtime/internal/validators/` — Validation gate implementations
+- `.ovav/plan/caps.yaml` — Canonical capability definitions
+- `.ovav/service_areas/` — Domain-specific configurations
+- `tools/cpanel/src/App.tsx` — Control panel main component
+- `bin/ovav-owlib.sh` — Worktree management library
 
 ---
 
