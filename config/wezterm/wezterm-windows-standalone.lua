@@ -423,10 +423,6 @@ config.keys = {
   { key = 'r', mods = 'CTRL|SHIFT', action = act.ReloadConfiguration },
 }
 
-return config
-
--- ═══════════════════════════════════════════════════════════════════════════════
--- FIX: Windows WSL2 key modifier handling
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 -- FIX: Windows WSL2 key modifier handling
