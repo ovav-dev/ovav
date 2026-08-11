@@ -18,9 +18,10 @@ if status is-interactive
     if command -q atuin
         atuin init fish | source
     end
-    bind \ee edit_command_buffer
-    bind \e\[1\;3D backward-word
-    bind \e\[1\;3C forward-word
+    
+    # OVAV Keybindings — safe bindings that don't conflict with terminal defaults
+    # Only bind \ee (edit command buffer) if not already bound
+    bind --query \ee >/dev/null 2>&1; or bind \ee edit_command_buffer
 end
 
 if command -q eza
