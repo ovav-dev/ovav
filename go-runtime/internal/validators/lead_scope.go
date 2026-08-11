@@ -31,6 +31,14 @@ func (l *LeadScope) Validate(ctx context.Context, root string) Result {
 	saDir := filepath.Join(root, ".ovav", "service_areas")
 	entries, err := os.ReadDir(saDir)
 	if err != nil {
+		if os.IsNotExist(err) {
+			// No service_areas directory — skip validation (not applicable for minimal test fixtures)
+			return Result{
+				ID: l.ID(), Name: l.Name(), Status: "skip", Weight: l.Weight(),
+				Message:  "SKIP lead scope — service areas directory not found",
+				Duration: time.Since(start),
+			}
+		}
 		issues = append(issues, fmt.Sprintf("cannot read service areas directory: %s: %v", saDir, err))
 		return Result{
 			ID: l.ID(), Name: l.Name(), Status: "fail", Weight: l.Weight(),

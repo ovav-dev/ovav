@@ -53,10 +53,13 @@ func TestNewConverters_AreasOnly(t *testing.T) {
 func TestNewConverters_OutputDirs(t *testing.T) {
 	expected := map[Target]string{
 		TargetWindsurf:  "runtimes/windsurf/agents",
-		TargetCopilot:   "runtimes/copilot/agents",
-		TargetContinue:  "runtimes/continue/agents",
+		TargetCopilot:   ".github/agents",
+		TargetContinue:  ".continue/agents",
 		TargetAider:     "runtimes/aider/agents",
-		TargetGoose:     "runtimes/goose/agents",
+		TargetGoose:     "runtimes/goose",
+		TargetClaude:    "go-runtime/internal/runtimes/claude-code/agents",
+		TargetCursor:    "runtimes/cursor",
+		TargetOpenCode:  "go-runtime/internal/runtimes/opencode/agents",
 	}
 	
 	for target, expectedDir := range expected {

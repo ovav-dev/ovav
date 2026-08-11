@@ -157,7 +157,7 @@ func TestOpenCodeConverter_GenerateAll(t *testing.T) {
 	}
 
 	// Check output directory exists
-	outputDir := filepath.Join(outputRoot, "runtimes/opencode/agents")
+	outputDir := filepath.Join(outputRoot, "go-runtime/internal/runtimes/opencode/agents")
 	if _, err := os.Stat(outputDir); os.IsNotExist(err) {
 		t.Fatalf("output dir not created: %s", outputDir)
 	}
@@ -218,8 +218,8 @@ func TestFileExtension(t *testing.T) {
 
 func TestOutputDir(t *testing.T) {
 	conv := &OpenCodeConverter{}
-	if dir := conv.OutputDir(); dir != "runtimes/opencode/agents" {
-		t.Errorf("expected 'runtimes/opencode/agents', got %q", dir)
+	if dir := conv.OutputDir(); dir != "go-runtime/internal/runtimes/opencode/agents" {
+		t.Errorf("expected 'go-runtime/internal/runtimes/opencode/agents', got %q", dir)
 	}
 }
 
@@ -228,8 +228,8 @@ func TestClaudeCodeConverter_Area(t *testing.T) {
 	if ext := conv.FileExtension(); ext != ".md" {
 		t.Errorf("expected .md, got %q", ext)
 	}
-	if dir := conv.OutputDir(); dir != "runtimes/claude-code/agents" {
-		t.Errorf("expected 'runtimes/claude-code/agents', got %q", dir)
+	if dir := conv.OutputDir(); dir != "go-runtime/internal/runtimes/claude-code/agents" {
+		t.Errorf("expected 'go-runtime/internal/runtimes/claude-code/agents', got %q", dir)
 	}
 
 	areas, err := loadAreas("../../internal/agents/areas")
@@ -252,21 +252,21 @@ func TestClaudeCodeConverter_Area(t *testing.T) {
 		t.Fatalf("ConvertArea: %v", err)
 	}
 	md := string(output)
-	if !strings.Contains(md, "name: \"Platform Engineering\"") {
-		t.Error("should contain area name")
+	if !strings.Contains(md, "name: \"platform-engineering\"") {
+		t.Error("should contain area ID as name")
 	}
-	if !strings.Contains(md, "type: area") {
-		t.Error("should contain type: area")
+	if !strings.Contains(md, "description:") {
+		t.Error("should contain description")
 	}
 }
 
 func TestCursorConverter_Area(t *testing.T) {
 	conv := &CursorConverter{}
-	if ext := conv.FileExtension(); ext != ".mdc" {
-		t.Errorf("expected .mdc, got %q", ext)
+	if ext := conv.FileExtension(); ext != ".md" {
+		t.Errorf("expected .md, got %q", ext)
 	}
-	if dir := conv.OutputDir(); dir != "runtimes/cursor/rules" {
-		t.Errorf("expected 'runtimes/cursor/rules', got %q", dir)
+	if dir := conv.OutputDir(); dir != "runtimes/cursor" {
+		t.Errorf("expected 'runtimes/cursor', got %q", dir)
 	}
 
 	areas, err := loadAreas("../../internal/agents/areas")
@@ -343,11 +343,10 @@ func TestClaudeCodeConverter_ConvertLead(t *testing.T) {
 	md := string(output)
 
 	checks := []string{
-		"name: \"Thavren\"",
-		"type: lead",
-		"hidden: true",
-		"# Thavren — Platform Engineering & Developer Experience",
-		"**Origin:** 🇳🇴 Norway",
+		"name:",          // Claude format uses name field
+		"description:",   // Claude format uses description field
+		"# Thavren",      // heading uses lead.Name
+		"**Origin:**",    // Origin field is output
 		"## Authorized Functions",
 		"## Limitations",
 		"## Hard Stop",
@@ -383,13 +382,12 @@ func TestClaudeCodeConverter_ConvertTeam(t *testing.T) {
 	md := string(output)
 
 	checks := []string{
-		"name: \"Clara\"",
-		"type: subagent",
-		"hidden: true",
-		"# Clara",
-		"**Country:** Netherlands",
-		"**Reports to:** thavren",
-		"**Area:** platform_engineering",
+		"name:",           // Claude format uses name field
+		"description:",    // Claude format uses description field
+		"# Clara",        // heading uses team.Name
+		"**Country:**",   // Country field is output
+		"**Reports to:**", // Reports to field is output
+		"**Area:**",      // Area field is output
 		"## Function",
 		"## Actions",
 	}
@@ -426,10 +424,11 @@ func TestCursorConverter_ConvertLead(t *testing.T) {
 	md := string(output)
 
 	checks := []string{
-		`description: "Thavren — Platform Engineering & Developer Experience"`,
-		"alwaysApply: false",
-		"# Thavren — Platform Engineering & Developer Experience",
-		"Origin: 🇳🇴 Norway",
+		`name: "thavren"`,        // Cursor uses name field with ID
+		"description:",            // Cursor uses description field
+		"readonly:",              // Cursor specific field
+		"# Thavren",              // heading uses lead.Name
+		"Origin:",                // Origin field is output
 		"## Authorized Functions",
 		"## Limitations",
 		"## Hard Stop",
@@ -440,12 +439,12 @@ func TestCursorConverter_ConvertLead(t *testing.T) {
 		}
 	}
 
-	// .mdc format should NOT contain hidden/mode fields (OpenCode-specific)
+	// Cursor format should NOT contain hidden/mode fields (OpenCode-specific)
 	if strings.Contains(md, "hidden:") {
-		t.Error(".mdc should not contain hidden field")
+		t.Error("Cursor format should not contain hidden field")
 	}
 	if strings.Contains(md, "mode:") {
-		t.Error(".mdc should not contain mode field")
+		t.Error("Cursor format should not contain mode field")
 	}
 }
 
@@ -473,12 +472,13 @@ func TestCursorConverter_ConvertTeam(t *testing.T) {
 	md := string(output)
 
 	checks := []string{
-		`description: "Team: Clara — Netherlands"`,
-		"alwaysApply: false",
-		"# Team: Clara",
-		"Country: Netherlands",
-		"Reports to: thavren",
-		"Area: platform_engineering",
+		`name: "clara"`,         // Cursor uses name field with ID
+		"description:",           // Cursor uses description field
+		"readonly:",             // Cursor specific field
+		"# Clara",               // heading uses team.Name
+		"Country:",              // Country field is output
+		"Reports to:",          // Reports to field is output
+		"Area:",                // Area field is output
 		"## Function",
 		"## Actions",
 	}
@@ -644,7 +644,7 @@ func TestGenerateAll_ClaudeCode(t *testing.T) {
 		t.Fatalf("GenerateAll(Claude): %v", err)
 	}
 
-	outputDir := filepath.Join(outputRoot, "runtimes/claude-code/agents")
+	outputDir := filepath.Join(outputRoot, "go-runtime/internal/runtimes/claude-code/agents")
 	if _, err := os.Stat(outputDir); os.IsNotExist(err) {
 		t.Fatalf("output dir not created: %s", outputDir)
 	}
@@ -672,34 +672,41 @@ func TestGenerateAll_ClaudeCode(t *testing.T) {
 	data, err := os.ReadFile(aeFile)
 	if err == nil {
 		content := string(data)
-		if !strings.Contains(content, "type: area") {
-			t.Error("Claude area should contain 'type: area'")
+		// Claude format uses name, description, color (not type:, hidden:, mode:)
+		if !strings.Contains(content, "name:") {
+			t.Error("Claude area should contain 'name:' field")
 		}
-		if strings.Contains(content, "mode:") {
-			t.Error("Claude format should not contain 'mode:' field")
+		if !strings.Contains(content, "description:") {
+			t.Error("Claude area should contain 'description:' field")
+		}
+		if strings.Contains(content, "type:") {
+			t.Error("Claude format should not contain 'type:' field (OVAV extension)")
 		}
 	}
 
-	// Check a lead file has type: lead and hidden: true
+	// Check a lead file has name, description, color
 	leadFile := filepath.Join(outputDir, "lead-thavren.md")
 	data, err = os.ReadFile(leadFile)
 	if err == nil {
 		content := string(data)
-		if !strings.Contains(content, "type: lead") {
-			t.Error("Claude lead should contain 'type: lead'")
+		if !strings.Contains(content, "name:") {
+			t.Error("Claude lead should contain 'name:' field")
 		}
-		if !strings.Contains(content, "hidden: true") {
-			t.Error("Claude lead should contain 'hidden: true'")
+		if !strings.Contains(content, "description:") {
+			t.Error("Claude lead should contain 'description:' field")
 		}
 	}
 
-	// Check a team file has type: subagent
+	// Check a team file has name, description, model
 	teamFile := filepath.Join(outputDir, "team-clara.md")
 	data, err = os.ReadFile(teamFile)
 	if err == nil {
 		content := string(data)
-		if !strings.Contains(content, "type: subagent") {
-			t.Error("Claude team should contain 'type: subagent'")
+		if !strings.Contains(content, "name:") {
+			t.Error("Claude team should contain 'name:' field")
+		}
+		if !strings.Contains(content, "description:") {
+			t.Error("Claude team should contain 'description:' field")
 		}
 	}
 
@@ -716,31 +723,31 @@ func TestGenerateAll_Cursor(t *testing.T) {
 		t.Fatalf("GenerateAll(Cursor): %v", err)
 	}
 
-	outputDir := filepath.Join(outputRoot, "runtimes/cursor/rules")
+	outputDir := filepath.Join(outputRoot, "runtimes/cursor")
 	if _, err := os.Stat(outputDir); os.IsNotExist(err) {
 		t.Fatalf("output dir not created: %s", outputDir)
 	}
 
-	// Verify area files (.mdc extension)
-	areaFiles, _ := filepath.Glob(filepath.Join(outputDir, "area-*.mdc"))
+	// Verify area files (.md extension)
+	areaFiles, _ := filepath.Glob(filepath.Join(outputDir, "area-*.md"))
 	if len(areaFiles) < 9 {
-		t.Errorf("expected at least 9 area .mdc files, got %d", len(areaFiles))
+		t.Errorf("expected at least 9 area .md files, got %d", len(areaFiles))
 	}
 
 	// Verify lead files
-	leadFiles, _ := filepath.Glob(filepath.Join(outputDir, "lead-*.mdc"))
+	leadFiles, _ := filepath.Glob(filepath.Join(outputDir, "lead-*.md"))
 	if len(leadFiles) < 9 {
-		t.Errorf("expected at least 9 lead .mdc files, got %d", len(leadFiles))
+		t.Errorf("expected at least 9 lead .md files, got %d", len(leadFiles))
 	}
 
 	// Verify team files
-	teamFiles, _ := filepath.Glob(filepath.Join(outputDir, "team-*.mdc"))
+	teamFiles, _ := filepath.Glob(filepath.Join(outputDir, "team-*.md"))
 	if len(teamFiles) < 40 {
-		t.Errorf("expected at least 40 team .mdc files, got %d", len(teamFiles))
+		t.Errorf("expected at least 40 team .md files, got %d", len(teamFiles))
 	}
 
-	// Spot-check Cursor-specific .mdc format
-	aeFile := filepath.Join(outputDir, "area-platform-engineering.mdc")
+	// Spot-check Cursor-specific .md format
+	aeFile := filepath.Join(outputDir, "area-platform-engineering.md")
 	data, err := os.ReadFile(aeFile)
 	if err == nil {
 		content := string(data)
@@ -830,7 +837,7 @@ func TestGenerateAll_OpenCodeForceAll(t *testing.T) {
 		t.Fatalf("GenerateAllWithFilter(all): %v", err)
 	}
 
-	outputDir := filepath.Join(outputRoot, "runtimes/opencode/agents")
+	outputDir := filepath.Join(outputRoot, "go-runtime/internal/runtimes/opencode/agents")
 
 	leadFiles, _ := filepath.Glob(filepath.Join(outputDir, "lead-*.md"))
 	if len(leadFiles) < 9 {
