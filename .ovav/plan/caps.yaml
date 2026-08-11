@@ -4,10 +4,10 @@
 # Authority: Thavren (Platform Engineering Lead)
 # =============================================================================
 #
-# VERSIÓN ACTUAL: v102.3
-# FECHA: 2026-08-06
-# CAPA: 9
-# GITHASH: bc7cff50
+# VERSIÓN ACTUAL: v102.5
+# FECHA: 2026-08-11
+# CAPA: 11
+# GITHASH: 2f9c1987
 # RAMA: develop
 #
 # CUMPLIMIENTO: Este documento es requerido por el runtime.
@@ -18,9 +18,9 @@ canonical: true
 version: "102.5"
 plan_version: "102.5"
 capa: 11
-updated_at: "2026-08-08T19:00:00-05:00"
+updated_at: "2026-08-11T15:00:00-05:00"
 updated_by: "thavren"
-build_date: "2026-08-08"
+build_date: "2026-08-11"
 git_head: "develop"
 git_branch: "develop"
 status: "active"
