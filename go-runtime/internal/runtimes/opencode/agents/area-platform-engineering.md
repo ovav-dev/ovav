@@ -7,16 +7,16 @@ color: "#2563eb"
 permission:
   edit: "allow"
   bash:
+    python3: "allow"
     ovav_health: "allow"
     ovav_monitor: "allow"
     ovav_status: "allow"
     ovav_dashboard: "allow"
     go: "allow"
-    python3: "allow"
   external_directory:
+    "/tmp/opencode": "allow"
     "*": "deny"
     "/home/braka/Systems/OVAV": "allow"
-    "/tmp/opencode": "allow"
 instructions:
   - "opencode_AGENTS.md"
   - ".ovav/service_areas/shared/visual_delivery_contract.yaml"
