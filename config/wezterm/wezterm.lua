@@ -229,7 +229,7 @@ local function switch_workspace(window, pane, ws_name)
   -- No existing tab for this workspace - spawn new one
   window:perform_action(act.SpawnCommandInNewTab({
     domain = { DomainName = USER.wsl_domain_label },
-    args = { 'fish', '-c', 'cd ' .. ws.cwd .. ' && fish -l' },
+    args = { 'fish', '-c', 'cd ' .. wezterm.shell_escape(ws.cwd) .. ' && fish -l' },
   }), pane)
 end
 
