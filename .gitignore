@@ -363,3 +363,8 @@ go-runtime/cmd/ovav/.mimocode/
 # OVAV memory governor runtime state files
 .ovav/memory/
 .ovav/tasks/
+
+# Crush config - secrets (API keys in plaintext)
+clients/crush/config/minimax_direct_env.sh
+clients/crush/config/provider_setup.sh
+clients/crush/config/setup_minimax_direct.sh
