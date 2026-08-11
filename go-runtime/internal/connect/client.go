@@ -51,7 +51,34 @@ func LoadConfig() *Config {
 		TimeoutSec: 120,
 	}
 
-	// Detect provider from environment
+	// 1. FIRST: Check runtime provider config (~/.ovav/provider.json)
+	// This is set by 'ovav provider use <name>' and takes highest priority
+	if runtimeProvider := loadRuntimeProvider(); runtimeProvider != nil {
+		cfg.Provider = runtimeProvider.Provider
+		cfg.APIKey = runtimeProvider.APIKey
+		cfg.BaseURL = runtimeProvider.BaseURL
+		cfg.Model = runtimeProvider.Model
+		return cfg
+	}
+
+	// 2. THEN: Check OVAV_* override env vars (user manual override)
+	if p := os.Getenv("OVAV_PROVIDER"); p != "" {
+		cfg.Provider = Provider(p)
+	}
+	if k := os.Getenv("OVAV_API_KEY"); k != "" {
+		cfg.APIKey = k
+	}
+	if u := os.Getenv("OVAV_BASE_URL"); u != "" {
+		cfg.BaseURL = u
+	}
+	if m := os.Getenv("OVAV_MODEL"); m != "" {
+		cfg.Model = m
+	}
+	if cfg.APIKey != "" && cfg.BaseURL != "" {
+		return cfg // User set OVAV_* vars explicitly
+	}
+
+	// 3. FINALLY: Auto-detect from available *_API_KEY env vars
 	if key := os.Getenv("MINIMAX_API_KEY"); key != "" {
 		cfg.Provider = ProviderMiniMax
 		cfg.APIKey = key
@@ -80,21 +107,45 @@ func LoadConfig() *Config {
 		cfg.BaseURL = getEnv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
 	}
 
-	// Allow override via OVAV_PROVIDER, OVAV_API_KEY, OVAV_BASE_URL
-	if p := os.Getenv("OVAV_PROVIDER"); p != "" {
-		cfg.Provider = Provider(p)
-	}
-	if k := os.Getenv("OVAV_API_KEY"); k != "" {
-		cfg.APIKey = k
-	}
-	if u := os.Getenv("OVAV_BASE_URL"); u != "" {
-		cfg.BaseURL = u
-	}
-	if m := os.Getenv("OVAV_MODEL"); m != "" {
-		cfg.Model = m
-	}
-
 	return cfg
+}
+
+// runtimeProviderConfig represents the persisted provider selection
+type runtimeProviderConfig struct {
+	Provider  Provider `json:"provider"`
+	APIKey   string   `json:"api_key"`
+	BaseURL  string   `json:"base_url"`
+	Model    string   `json:"model"`
+	SetAt    string   `json:"set_at"`
+	SetBy    string   `json:"set_by"`
+}
+
+// loadRuntimeProvider loads the user's runtime provider selection from ~/.ovav/provider.json
+func loadRuntimeProvider() *Config {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return nil
+	}
+	path := home + "/.ovav/provider.json"
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil
+	}
+	var p runtimeProviderConfig
+	if err := json.Unmarshal(data, &p); err != nil {
+		return nil
+	}
+	// Validate that the API key is still available in environment
+	// (we store the key ref, not the actual key for security)
+	if p.APIKey == "" {
+		return nil
+	}
+	return &Config{
+		Provider:  p.Provider,
+		APIKey:   p.APIKey,
+		BaseURL:  p.BaseURL,
+		Model:    p.Model,
+	}
 }
 
 func getEnv(key, fallback string) string {

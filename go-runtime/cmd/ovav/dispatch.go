@@ -114,6 +114,8 @@ func routeCommand(cmd string, args []string) int {
 		return cmdPush(args)
 	case "memory", "mem":
 		return cmdMemory(args)
+	case "provider", "providers":
+		return cmdProvider(args)
 	case "help", "--help", "-h":
 		printUsage()
 		return 0
