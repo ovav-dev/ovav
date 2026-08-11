@@ -94,7 +94,7 @@ func LoadConfig() *Config {
 		if strings.HasPrefix(key, "sk-cp-") {
 			cfg.Provider = ProviderMiniMax
 			cfg.APIKey = key
-			cfg.BaseURL = getEnv("ANTHROPIC_API_ENDPOINT", "https://api.minimax.io/anthropic/v1")
+			cfg.BaseURL = getEnv("ANTHROPIC_API_ENDPOINT", "https://api.minimax.io/anthropic")
 			cfg.Model = getEnv("ANTHROPIC_MODEL", "minimax/MiniMax-M2.7")
 		} else {
 			cfg.Provider = ProviderAnthropic
@@ -232,7 +232,7 @@ func (c *Client) Invoke(agentID string, task string) (*Response, error) {
 
 	// Make request based on provider
 	switch c.Config.Provider {
-	case ProviderAnthropic:
+	case ProviderAnthropic, ProviderMiniMax:
 		return c.invokeAnthropic(systemPrompt, task)
 	default:
 		return c.invokeOpenAI(messages)
@@ -314,9 +314,10 @@ func (c *Client) invokeOpenAI(messages []Message) (*Response, error) {
 	}
 
 	url := c.Config.BaseURL
-	if !strings.HasSuffix(url, "/v1/chat/completions") {
-		url = strings.TrimSuffix(url, "/") + "/v1/chat/completions"
-	}
+	// Normalize: remove trailing /v1 if present, then append /v1/chat/completions
+	url = strings.TrimSuffix(url, "/v1")
+	url = strings.TrimSuffix(url, "/")
+	url = url + "/v1/chat/completions"
 
 	req, err := http.NewRequest("POST", url, bytes.NewReader(jsonBody))
 	if err != nil {
@@ -387,9 +388,10 @@ func (c *Client) invokeAnthropic(system, task string) (*Response, error) {
 	}
 
 	url := c.Config.BaseURL
-	if !strings.HasSuffix(url, "/v1/messages") {
-		url = strings.TrimSuffix(url, "/") + "/v1/messages"
-	}
+	// Normalize: remove trailing /v1 if present, then append /v1/messages
+	url = strings.TrimSuffix(url, "/v1")
+	url = strings.TrimSuffix(url, "/")
+	url = url + "/v1/messages"
 
 	req, err := http.NewRequest("POST", url, bytes.NewReader(jsonBody))
 	if err != nil {
