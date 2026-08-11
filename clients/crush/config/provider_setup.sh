@@ -11,7 +11,8 @@ export OVAV_ROOT="/home/braka/Systems/OVAV"
 # PROVIDER: minimax_direct (YOUR subscription — RECOMMENDED)
 # =============================================================================
 # Your MiniMax monthly subscription — direct API access
-export ANTHROPIC_API_KEY="sk-cp-I9CVx22_-wxYz2tr7P2YFHZ-MeENpjGlTvAgm9MpUsPdZxZWqVLjnEKbx8yl-3Tw7vtLvA_oQLH7igXJQqhR2QsUvHm653c6U_aby9NCc__vU7bnQu1QTF8"
+# Key loaded from OVAV vault: ANTHROPIC_API_KEY
+export ANTHROPIC_API_KEY="${ANTHROPIC_API_KEY:-$(cat ~/.ovav/vault/tokens/ANTHROPIC_API_KEY 2>/dev/null || echo 'NOT_SET')}"
 export ANTHROPIC_API_ENDPOINT="https://api.minimax.io/anthropic/v1"
 
 # =============================================================================
