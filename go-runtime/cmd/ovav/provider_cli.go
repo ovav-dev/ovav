@@ -446,7 +446,7 @@ func providerUnset(args []string) int {
 
 // providerHelp prints help for the provider command
 func providerHelp() {
-	fmt.Println(`OVAV Provider Switching — Select your AI provider at runtime
+	fmt.Print(`OVAV Provider Switching — Select your AI provider at runtime
 
 Usage:
   ovav provider list              List all available providers

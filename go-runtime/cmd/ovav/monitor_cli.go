@@ -37,7 +37,7 @@ func cmdMonitor(args []string) int {
 }
 
 func printMonitorHelp() int {
-	fmt.Println(`ovav monitor — OMARS (OVAV Monitoring & Auto-Remediation System)
+	fmt.Print(`ovav monitor — OMARS (OVAV Monitoring & Auto-Remediation System)
 
 Usage:
   ovav monitor run        Run all monitors once
