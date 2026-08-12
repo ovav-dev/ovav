@@ -17,7 +17,6 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
-	"syscall"
 	"time"
 
 	"github.com/ovav/ovav/internal/auth"
@@ -257,17 +256,13 @@ func launchCockpitDefault() int {
 		repoRoot, _ = os.Getwd()
 	}
 
-	// Launch cockpit with a new session — this allocates a controlling TTY
-	// in WSL, SSH, and other environments where stdin might not be a terminal.
-	cmd := exec.Command(cockpitPath)
+	// Use 'script -q -c' to launch cockpit — this allocates a proper PTY
+	// and works reliably in WSL, SSH, and other non-native terminal environments.
+	cmd := exec.Command("/usr/bin/script", "-q", "-e", "-c", cockpitPath, "/dev/null")
 	cmd.Dir = repoRoot
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	cmd.SysProcAttr = &syscall.SysProcAttr{
-		Setsid:  true,  // Create new session — becomes session leader
-		Setctty: true,  // Set controlling TTY from stdin
-	}
 
 	if err := cmd.Run(); err != nil {
 		// Cockpit exited with error — fall back to CLI
