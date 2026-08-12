@@ -152,6 +152,11 @@ func (m *Model) navigateToMenuItem(id string) {
 
 // ── Root Render — Modern ───────────────────────────────────────────
 
+const (
+	rootMenuOffset = 7
+	devListOffset  = 6
+)
+
 func (m Model) renderRoot() string {
 	w := m.width
 	if w < 60 {
@@ -162,8 +167,12 @@ func (m Model) renderRoot() string {
 	sb.WriteString(renderTitleBar(fmt.Sprintf("🚀  %s", "OVAV Cockpit")))
 	sb.WriteString("\n")
 
-	// ── Breadcrumb / Status ──
 	sb.WriteString(styles.MutedFg.Render(fmt.Sprintf("  %s", m.ovavRoot)))
+
+	if crumb := m.nav.Breadcrumb(); crumb != "" {
+		sb.WriteString("  ")
+		sb.WriteString(styles.Breadcrumb.Render(crumb))
+	}
 	sb.WriteString("\n\n")
 
 	// ── Menu ──

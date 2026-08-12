@@ -17,6 +17,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.ready = true
 
 	case tea.KeyMsg:
+		m.ResetInactivity()
 		// Global keys
 		switch msg.String() {
 		case "ctrl+c":
@@ -50,6 +51,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m.handleViewKey(msg, view)
 
 	case tea.MouseMsg:
+		m.ResetInactivity()
 		return m.handleMouse(msg, view)
 
 	case goBackMsg:
@@ -93,20 +95,25 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 
 	case syncItemsMsg:
-		// GOV-009: Sync engine status loaded (non-blocking)
 		if len(msg.items) > 0 {
 			m.updatesModel.items = append(msg.items, gatherPhase2Items()...)
 		}
 		return m, nil
 
 	case updateCheckMsg:
-		// GOV-007: cPanel version check result
 		if msg.err != nil {
 			m.updateInfo.Error = msg.err.Error()
 		} else {
 			m.updateInfo = msg.info
 		}
 		return m, nil
+
+	case dataLoadedMsg:
+		m.handleDataLoaded(msg)
+		return m, nil
+
+	case inactivityTickMsg:
+		return m.handleInactivityTick()
 	}
 
 	m.viewport, cmd = m.viewport.Update(msg)
@@ -187,8 +194,7 @@ func (m Model) handleMouse(msg tea.MouseMsg, view string) (tea.Model, tea.Cmd) {
 
 	switch view {
 	case ViewRoot:
-		// Menu starts at row 7 (title bar + blank line + breadcrumb + blank line)
-		row := msg.Y - 7
+		row := msg.Y - rootMenuOffset
 		if row >= 0 && row < len(menuItems) {
 			m.menuCursor = row
 			item := menuItems[row]
@@ -258,32 +264,28 @@ func (m Model) handleMouse(msg tea.MouseMsg, view string) (tea.Model, tea.Cmd) {
 		return m, nil
 
 	case ViewTesting:
-		// Click on coverage list → set cursor
-		row := msg.Y - 6
+		row := msg.Y - devListOffset
 		if row >= 0 && row < len(m.testingModel.coverage) {
 			m.testingModel.cursor = row
 		}
 		return m, nil
 
 	case ViewDelegation:
-		// Click on session list → set cursor
-		row := msg.Y - 6
+		row := msg.Y - devListOffset
 		if row >= 0 && row < len(m.delegationModel.sessions) {
 			m.delegationModel.cursor = row
 		}
 		return m, nil
 
 	case ViewResearch:
-		// Click on benchmark list → set cursor
-		row := msg.Y - 6
+		row := msg.Y - devListOffset
 		if row >= 0 && row < len(m.researchModel.benchmarks) {
 			m.researchModel.cursor = row
 		}
 		return m, nil
 
 	case ViewAdversarial:
-		// Click on gates list → set cursor
-		row := msg.Y - 6
+		row := msg.Y - devListOffset
 		if row >= 0 && row < len(m.adversarialModel.gates) {
 			m.adversarialModel.cursor = row
 		}

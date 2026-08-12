@@ -187,6 +187,12 @@ func main() {
 		os.Exit(0)
 	}
 
+	// "ovav cockpit" — run cockpit directly as subcommand (no exec, no TTY issues)
+	if os.Args[1] == "cockpit" {
+		code := runCockpitInternal()
+		os.Exit(code)
+	}
+
 	cmd := os.Args[1]
 	args := os.Args[2:]
 
@@ -256,16 +262,39 @@ func launchCockpitDefault() int {
 		repoRoot, _ = os.Getwd()
 	}
 
-	// Use 'script -q -c' to launch cockpit — this allocates a proper PTY
-	// and works reliably in WSL, SSH, and other non-native terminal environments.
-	cmd := exec.Command("/usr/bin/script", "-q", "-e", "-c", cockpitPath, "/dev/null")
-	cmd.Dir = repoRoot
+	// Launch cockpit via bash -c with exec — bash handles PTY allocation
+	// and the cockpit replaces the bash process. This works reliably in WSL.
+	cmd := exec.Command("bash", "-c", fmt.Sprintf("cd %q && exec %q", repoRoot, cockpitPath))
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
 	if err := cmd.Run(); err != nil {
 		// Cockpit exited with error — fall back to CLI
+		return 1
+	}
+	return 0
+}
+
+// runCockpitInternal runs the cockpit as an internal subcommand.
+// This is used for "ovav cockpit" to bypass the TTY launch complexity.
+func runCockpitInternal() int {
+	cockpitPath := resolveCockpitBinary()
+	if cockpitPath == "" {
+		fmt.Fprintf(os.Stderr, "ovav: cockpit binary not found.\n")
+		return 1
+	}
+	repoRoot, err := cli.FindRepoRoot()
+	if err != nil {
+		repoRoot, _ = os.Getwd()
+	}
+	cmd := exec.Command(cockpitPath)
+	cmd.Dir = repoRoot
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	if err := cmd.Run(); err != nil {
+		fmt.Fprintf(os.Stderr, "ovav: cockpit error: %v\n", err)
 		return 1
 	}
 	return 0
