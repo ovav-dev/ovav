@@ -1,1 +1,7 @@
-{"updated_at":"2026-08-10T00:00:00Z","status":"healthy","score":100.0,"passed":70,"failed":0,"errors":0,"label":"Integrity: 100%","icon":"✅"}
+{
+  "status": "healthy",
+  "label": "Integrity: 100%",
+  "icon": "✅",
+  "score": 100,
+  "passed": 70
+}
