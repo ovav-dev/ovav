@@ -93,7 +93,7 @@ export const OVAVMonitor = async ({ client, $, project, directory }) => {
             budgetPercent: state.budgetPercent,
             budgetRemaining: state.budgetRemaining,
             memoryActive: state.ovavMemoryActive,
-            sessionElapsed: `${minutes}m ${seconds}s`,
+            sessionElapsed: `$'{'minutes}m $'{'seconds}s`,
             sessionActive: state.sessionActive,
           }, null, 2);
         },

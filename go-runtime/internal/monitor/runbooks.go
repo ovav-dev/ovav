@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
@@ -12,6 +13,7 @@ import (
 	"time"
 
 	"github.com/ovav/ovav/internal/monitor/alerts"
+	"github.com/ovav/ovav/internal/sbom"
 )
 
 // RunbookFixGeneratedDrift auto-fixes generated file drift by re-running project sync
@@ -116,19 +118,27 @@ func RunbookFixAgentProjection(ctx context.Context, a *alerts.Alert) error {
 func RunbookFixSBOMBaseline(ctx context.Context, a *alerts.Alert) error {
 	root := filepath.Dir(filepath.Dir(filepath.Join(".ovav", "runtime", "alerts")))
 
-	// Run: go run ./cmd/sbom_regen/
-	cmd := exec.Command("go", "run", "-C", filepath.Join(root, "go-runtime"), "./cmd/sbom_regen/")
-	cmd.Dir = root
-	out, err := cmd.CombinedOutput()
+	// Generate SBOM using the sbom package directly (autonomous, no binary needed)
+	s, err := sbom.Generate(root)
 	if err != nil {
-		return fmt.Errorf("sbom_regen failed: %w, output: %s", err, string(out))
+		return fmt.Errorf("sbom.Generate failed: %w", err)
+	}
+
+	// Write SBOM to .ovav/registry/sbom.yaml
+	sbomDir := filepath.Join(root, ".ovav", "registry")
+	os.MkdirAll(sbomDir, 0755)
+	sbomPath := filepath.Join(sbomDir, "sbom.yaml")
+	data, _ := json.MarshalIndent(s, "", "  ")
+	if err := os.WriteFile(sbomPath, data, 0644); err != nil {
+		return fmt.Errorf("write sbom: %w", err)
 	}
 
 	// Create/update integrity baseline
-	baselineDir := filepath.Join(root, ".ovav", "integrity_backups")
+	baselineDir := filepath.Join(root, ".ovav", "integrity")
 	os.MkdirAll(baselineDir, 0755)
 	baselinePath := filepath.Join(baselineDir, "baseline.json")
-	baseline := fmt.Sprintf(`{"version":"1.0","created":"%s","operator":"OVAV-AGENTS"}`, time.Now().Format(time.RFC3339))
+	baseline := fmt.Sprintf(`{"version":"1.0","created":"%s","operator":"OVAV-AGENTS","sbom_hash":"%x"}`,
+		time.Now().Format(time.RFC3339), sha256.Sum256(data))
 	if err := os.WriteFile(baselinePath, []byte(baseline), 0644); err != nil {
 		return fmt.Errorf("write baseline: %w", err)
 	}
