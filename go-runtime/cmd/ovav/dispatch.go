@@ -56,8 +56,6 @@ func routeCommand(cmd string, args []string) int {
 		return cmdDeploy(args)
 	case "sbom":
 		return cmdSBOM(args)
-	case "cockpit", "shell", "tui":
-		return cmdCockpit(args)
 	case "project":
 		return cmdProject(args)
 	case "worktree", "wt":
@@ -106,6 +104,14 @@ func routeCommand(cmd string, args []string) int {
 		return cmdResolveSubagent(args)
 	case "delegate":
 		return cmdDelegate(args)
+	case "adversarial":
+		return cmdAdversarial(args)
+	case "fde":
+		return cmdFDE(args)
+	case "benchmark":
+		return cmdBenchmark(args)
+	case "coverage":
+		return cmdCoverage(args)
 	case "validate":
 		return cmdValidate(args)
 	case "monitor":
@@ -134,7 +140,7 @@ func knownCommands() []string {
 		"version", "--version", "-v",
 		"install", "uninstall", "plan", "backup", "apply", "verify",
 		"restore", "rollback", "deploy", "sbom",
-		"cockpit", "shell", "tui",
+		// "ovav" (no args) launches Cockpit TUI via launchCockpitDefault()
 		"project", "git", "worktree", "wt",
 		"chronos", "hook", "infra",
 		"login", "signin", "auth",
@@ -149,6 +155,10 @@ func knownCommands() []string {
 		"sync",
 		"resolve-subagent", "resolve_subagent",
 		"delegate",
+		"adversarial",
+		"fde",
+		"benchmark",
+		"coverage",
 		"validate",
 		"monitor",
 		"push",
