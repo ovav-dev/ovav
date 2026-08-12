@@ -17,6 +17,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/ovav/ovav/internal/auth"
@@ -177,14 +178,13 @@ func main() {
 
 	if len(os.Args) < 2 {
 		// Default (no args): launch Cockpit TUI if available
-		// Fallback to flat help if cockpit not built or not in repo
+		// Falls back to CLI help if cockpit unavailable or not a terminal
 		code := launchCockpitDefault()
 		if code == 0 {
 			os.Exit(0)
 		}
-		// Cockpit unavailable — show help with build hint
+		// Cockpit unavailable — show CLI help
 		printUsage()
-		fmt.Fprintf(os.Stderr, "\n💡 Run 'make build-cockpit' in go-runtime/ to build the TUI.\n")
 		os.Exit(0)
 	}
 
@@ -241,31 +241,35 @@ func launchCockpitDefault() int {
 	// Resolve cockpit binary path
 	cockpitPath := resolveCockpitBinary()
 	if cockpitPath == "" {
+		fmt.Fprintf(os.Stderr, "ovav: cockpit binary not found.\n")
+		fmt.Fprintf(os.Stderr, "  Run 'make build-cockpit' in go-runtime/ to build the TUI.\n")
 		return 1
 	}
 
 	// Verify binary exists and is executable
 	if _, err := os.Stat(cockpitPath); err != nil {
+		fmt.Fprintf(os.Stderr, "ovav: cockpit binary not accessible: %v\n", err)
 		return 1
 	}
 
 	repoRoot, err := cli.FindRepoRoot()
 	if err != nil {
-		// Not in a repo — still try to launch cockpit without repo context
 		repoRoot, _ = os.Getwd()
 	}
 
-	cmd := exec.Command(cockpitPath)
-	cmd.Stdin = os.Stdin
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	cmd.Dir = repoRoot
-
-	if err := cmd.Run(); err != nil {
-		fmt.Fprintf(os.Stderr, "Cockpit error: %v\n", err)
+	// Change to repo root so cockpit can find OVAV root via upward search
+	if err := os.Chdir(repoRoot); err != nil {
+		fmt.Fprintf(os.Stderr, "ovav: cannot chdir to %s: %v\n", repoRoot, err)
 		return 1
 	}
-	return 0
+
+	// Use syscall.Exec — cockpit replaces this process with proper TTY inheritance.
+	// This is the correct way to launch a TUI in Unix.
+	env := os.Environ()
+	err = syscall.Exec(cockpitPath, []string{cockpitPath}, env)
+	// If Exec returns, it failed
+	fmt.Fprintf(os.Stderr, "ovav: exec failed: %v\n", err)
+	return 1
 }
 
 // resolveCockpitBinary finds the cockpit binary using multiple search paths.

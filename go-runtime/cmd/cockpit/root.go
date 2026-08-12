@@ -29,6 +29,11 @@ var menuItems = []menuItem{
 	{id: "install", label: "Install Pipeline", icon: "📦", category: "SYSTEM", desc: "Guided setup & deployment", hotkey: "i"},
 	{id: "tailor", label: "Tailor Composer", icon: "🧩", category: "SYSTEM", desc: "Profile & workspace customization", hotkey: "t"},
 	{id: "cli", label: "CLI Runtimes", icon: "⚡", category: "RUNTIMES", desc: "MiMo Code · OpenCode · Claude Code · Cursor", hotkey: "r"},
+	{id: "testing", label: "Testing & Coverage", icon: "🧪", category: "DEVELOPER", desc: "Coverage sprint · test suites · loop detect", hotkey: "e"},
+	{id: "delegation", label: "Delegation", icon: "🎯", category: "DEVELOPER", desc: "Active agents · delegation chains", hotkey: "g"},
+	{id: "research", label: "Research", icon: "🔬", category: "DEVELOPER", desc: "Benchmarks · evidence scores", hotkey: "n"},
+	{id: "adversarial", label: "Adversarial", icon: "🛡️", category: "DEVELOPER", desc: "Security gates · threat model", hotkey: "a"},
+	{id: "performance", label: "Performance", icon: "📈", category: "DEVELOPER", desc: "Runtime metrics · profiling", hotkey: "p"},
 }
 
 // ── Root Update ────────────────────────────────────────────────────
@@ -77,6 +82,26 @@ func (m Model) rootUpdate(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		m.menuCursor = 8
 		return m, nil
 
+	case "e":
+		m.menuCursor = 9
+		return m, nil
+
+	case "g":
+		m.menuCursor = 10
+		return m, nil
+
+	case "n":
+		m.menuCursor = 11
+		return m, nil
+
+	case "a":
+		m.menuCursor = 12
+		return m, nil
+
+	case "p":
+		m.menuCursor = 13
+		return m, nil
+
 	case "up", "k":
 		m.menuCursor = max(0, m.menuCursor-1)
 		return m, nil
@@ -112,6 +137,16 @@ func (m *Model) navigateToMenuItem(id string) {
 		m.nav.Push(ViewTailor)
 	case "cli":
 		m.nav.Push(ViewCLI)
+	case "testing":
+		m.nav.Push(ViewTesting)
+	case "delegation":
+		m.nav.Push(ViewDelegation)
+	case "research":
+		m.nav.Push(ViewResearch)
+	case "adversarial":
+		m.nav.Push(ViewAdversarial)
+	case "performance":
+		m.nav.Push(ViewPerformance)
 	}
 }
 
@@ -165,7 +200,7 @@ func (m Model) renderRoot() string {
 	// ── Help / Tips ──
 	helpBox := styles.PrimaryHelpBorder.
 		Width(w - 4).
-		Render(fmt.Sprintf(" %s  ↑↓ Move  Enter Select  Hotkeys (u,d,h,s,c,i,t,r)  ? Help  q Quit  Esc Back ",
+		Render(fmt.Sprintf(" %s  ↑↓ Move  Enter Select  Hotkeys (u,d,h,v,s,c,i,t,r,e,g,n,a,p)  ? Help  q Quit  Esc Back ",
 			styles.PrimaryDimFg.Render(fmt.Sprintf("%d/%d", m.menuCursor+1, len(menuItems)))))
 
 	sb.WriteString(styles.MutedFg.Render(helpBox))
