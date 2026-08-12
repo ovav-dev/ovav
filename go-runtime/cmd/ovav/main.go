@@ -257,19 +257,23 @@ func launchCockpitDefault() int {
 		repoRoot, _ = os.Getwd()
 	}
 
-	// Change to repo root so cockpit can find OVAV root via upward search
-	if err := os.Chdir(repoRoot); err != nil {
-		fmt.Fprintf(os.Stderr, "ovav: cannot chdir to %s: %v\n", repoRoot, err)
-		return 1
+	// Launch cockpit with a new session — this allocates a controlling TTY
+	// in WSL, SSH, and other environments where stdin might not be a terminal.
+	cmd := exec.Command(cockpitPath)
+	cmd.Dir = repoRoot
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	cmd.SysProcAttr = &syscall.SysProcAttr{
+		Setsid:  true,  // Create new session — becomes session leader
+		Setctty: true,  // Set controlling TTY from stdin
 	}
 
-	// Use syscall.Exec — cockpit replaces this process with proper TTY inheritance.
-	// This is the correct way to launch a TUI in Unix.
-	env := os.Environ()
-	err = syscall.Exec(cockpitPath, []string{cockpitPath}, env)
-	// If Exec returns, it failed
-	fmt.Fprintf(os.Stderr, "ovav: exec failed: %v\n", err)
-	return 1
+	if err := cmd.Run(); err != nil {
+		// Cockpit exited with error — fall back to CLI
+		return 1
+	}
+	return 0
 }
 
 // resolveCockpitBinary finds the cockpit binary using multiple search paths.
