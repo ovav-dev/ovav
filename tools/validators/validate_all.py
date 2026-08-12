@@ -1,1 +1,0 @@
-../validators/DEPRECATED/validate_all.py
