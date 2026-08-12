@@ -7,15 +7,15 @@ hidden: true
 permission:
   edit: "deny"
   bash:
-    sudo *: "deny"
-    "*": "deny"
-    go vet*: "allow"
-    git diff*: "allow"
     go test*: "allow"
-    git status*: "allow"
-    git log*: "allow"
+    go vet*: "allow"
     git commit*: "deny"
+    sudo *: "deny"
+    git status*: "allow"
+    git diff*: "allow"
+    git log*: "allow"
     git push*: "deny"
+    "*": "deny"
   external_directory:
     "/home/braka/Labs/mimocode/data/memory/*": "allow"
     "/home/braka/Systems/OVAV": "allow"

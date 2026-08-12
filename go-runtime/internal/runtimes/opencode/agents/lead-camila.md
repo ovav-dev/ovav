@@ -8,23 +8,23 @@ permission:
   edit: "allow"
   bash:
     npm install *: "deny"
-    python3 tools/install/*: "deny"
-    "*": "allow"
-    gh release *: "deny"
     pip install *: "deny"
-    apt install *: "deny"
-    sudo *: "deny"
     python3 tools/protocols/*: "deny"
-    gh auth login*: "deny"
+    "*": "allow"
     gh auth token*: "deny"
     gh pr merge*: "deny"
+    apt install *: "deny"
+    sudo *: "deny"
+    python3 tools/install/*: "deny"
+    gh auth login*: "deny"
+    gh release *: "deny"
     "git push -f *": "deny"
   external_directory:
+    "/home/braka/*": "allow"
     "/home/braka/Labs/mimocode/data/memory/*": "allow"
     "/home/braka/Systems/OVAV": "allow"
     "/tmp/opencode/*": "allow"
     "*": "deny"
-    "/home/braka/*": "allow"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->
