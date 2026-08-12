@@ -178,6 +178,7 @@ func DefaultRegistry() *Registry {
 		NewInvalidFixtures(),
 		NewSSHProfile(),
 		NewWeztermPathIntegrity(),
+		NewWeztermWorkspaceIsolation(),
 		// Batch 8 — T15 Red Team automation
 		NewRedTeamAudit(),
 		// Batch 9 — v41.0 Caps authority blindaje
