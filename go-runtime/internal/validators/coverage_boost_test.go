@@ -1048,15 +1048,16 @@ func TestServiceAreaRouter_MissingAgents(t *testing.T) {
 
 func TestServiceAreaRouter_OneAgentPresent(t *testing.T) {
 	dir := t.TempDir()
-	agentsDir := filepath.Join(dir, "clients", "opencode", "agents")
-	os.MkdirAll(agentsDir, 0755)
-	// Create one agent with all required hard stops
-	hardStops := areaProfiles[0].hardStops
-	content := "# Platform Engineering\n"
-	for _, hs := range hardStops {
-		content += hs + "\n"
-	}
-	os.WriteFile(filepath.Join(agentsDir, areaProfiles[0].file), []byte(content), 0644)
+	// Create .ovav/service_areas/platform_engineering/area_boundaries.yaml
+	saDir := filepath.Join(dir, ".ovav", "service_areas", "platform_engineering")
+	os.MkdirAll(saDir, 0755)
+	content := `area: platform_engineering
+does_not_cover:
+  - external_research:
+      description: "Deep research reports"
+      route_to: "Eidren — Research Intelligence"
+`
+	os.WriteFile(filepath.Join(saDir, "area_boundaries.yaml"), []byte(content), 0644)
 
 	v := NewServiceAreaRouter()
 	result := v.Validate(context.Background(), dir)

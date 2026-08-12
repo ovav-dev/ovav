@@ -130,10 +130,11 @@ func (a *AgentSurfaceHierarchy) Validate(ctx context.Context, root string) Resul
 		}
 
 		if isHidden {
+			// NOTE: OpenCode schema only accepts subagent, primary, all — NOT "lead"
 			if cfg.mode == "subagent" || cfg.mode == "primary" {
 				squadAgents = append(squadAgents, name)
 			} else {
-				issues = append(issues, fmt.Sprintf("[%s] %s: hidden:true with mode:%s — must be mode:primary or mode:subagent", cfg.file, name, cfg.mode))
+				issues = append(issues, fmt.Sprintf("[%s] %s: hidden:true with mode:%s — must be mode:primary or mode:subagent (mode:lead is INVALID)", cfg.file, name, cfg.mode))
 			}
 			continue
 		}
@@ -145,7 +146,7 @@ func (a *AgentSurfaceHierarchy) Validate(ctx context.Context, root string) Resul
 		case "subagent":
 			atAgents = append(atAgents, name)
 		default:
-			issues = append(issues, fmt.Sprintf("[%s] %s: hidden:false with mode:%s — must be mode:primary, mode:all or mode:subagent", cfg.file, name, cfg.mode))
+			issues = append(issues, fmt.Sprintf("[%s] %s: hidden:false with mode:%s — must be mode:primary, mode:all or mode:subagent (mode:lead is INVALID)", cfg.file, name, cfg.mode))
 		}
 	}
 

@@ -2,42 +2,7 @@
     "$help": "https://aka.ms/terminal-documentation",
     "$schema": "https://aka.ms/terminal-profiles-schema",
     "actions": [
-        {
-            "command": "unbound",
-            "keys": "ctrl+b"
-        },
-        {
-            "command": "unbound",
-            "keys": "ctrl+o"
-        },
-        {
-            "command": "unbound",
-            "keys": "ctrl+x"
-        },
-        {
-            "command": "unbound",
-            "keys": "ctrl+k"
-        },
-        {
-            "command": "unbound",
-            "keys": "ctrl+u"
-        },
-        {
-            "command": "unbound",
-            "keys": "ctrl+d"
-        },
-        {
-            "command": "unbound",
-            "keys": "ctrl+a"
-        },
-        {
-            "command": "unbound",
-            "keys": "ctrl+e"
-        },
-        {
-            "command": "unbound",
-            "keys": "ctrl+w"
-        },
+
         {
             "command": "paste",
             "keys": "ctrl+v"

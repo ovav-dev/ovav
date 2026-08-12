@@ -14,6 +14,8 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"github.com/creack/pty"
+	"syscall"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -177,15 +179,20 @@ func main() {
 
 	if len(os.Args) < 2 {
 		// Default (no args): launch Cockpit TUI if available
-		// Fallback to flat help if cockpit not built or not in repo
+		// Falls back to CLI help if cockpit unavailable
 		code := launchCockpitDefault()
 		if code == 0 {
 			os.Exit(0)
 		}
-		// Cockpit unavailable — show help with build hint
+		// Cockpit unavailable — show CLI help
 		printUsage()
-		fmt.Fprintf(os.Stderr, "\n💡 Run 'make build-cockpit' in go-runtime/ to build the TUI.\n")
 		os.Exit(0)
+	}
+
+	// "ovav cockpit" — run cockpit directly as subcommand
+	if os.Args[1] == "cockpit" {
+		code := runCockpitInternal()
+		os.Exit(code)
 	}
 
 	cmd := os.Args[1]
@@ -235,34 +242,99 @@ func printUsage() {
 
 // launchCockpitDefault attempts to launch the Cockpit TUI.
 // Returns 0 on success, non-zero if cockpit is unavailable.
-// Searches: 1) go-runtime/build/cockpit  2) ~/.local/bin/ovav-cockpit
-//  3. same directory as the ovav binary (ovav-cockpit)
 func launchCockpitDefault() int {
-	// Resolve cockpit binary path
 	cockpitPath := resolveCockpitBinary()
 	if cockpitPath == "" {
+		fmt.Fprintf(os.Stderr, "ovav: cockpit binary not found.\n")
+		fmt.Fprintf(os.Stderr, "  Run 'make build-cockpit' in go-runtime/ to build the TUI.\n")
 		return 1
 	}
-
-	// Verify binary exists and is executable
 	if _, err := os.Stat(cockpitPath); err != nil {
+		fmt.Fprintf(os.Stderr, "ovav: cockpit binary not accessible: %v\n", err)
 		return 1
 	}
-
 	repoRoot, err := cli.FindRepoRoot()
 	if err != nil {
-		// Not in a repo — still try to launch cockpit without repo context
 		repoRoot, _ = os.Getwd()
 	}
 
+	// Allocate a PTY so Bubble Tea gets a real controlling TTY.
+	// Without PTY, Bubble Tea fails with "could not open a new TTY" in
+	// non-interactive environments (AI shell, scripts, pipes).
 	cmd := exec.Command(cockpitPath)
+	cmd.Dir = repoRoot
+
+	ptyShell, tty, err := pty.Open()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "ovav: PTY allocation failed: %v\n", err)
+		return 1
+	}
+	defer ptyShell.Close()
+	defer tty.Close()
+
+	// Start the cockpit process with the PTY as its controlling terminal.
+	cmd.SysProcAttr = &syscall.SysProcAttr{Setsid: true}
+	cmd.Stdin = tty
+	cmd.Stdout = tty
+	cmd.Stderr = tty
+
+	if err := cmd.Start(); err != nil {
+		fmt.Fprintf(os.Stderr, "ovav: failed to start cockpit: %v\n", err)
+		return 1
+	}
+
+	// Relay stdin → PTY and PTY → stdout
+	done := make(chan struct{})
+	go func() {
+		buf := make([]byte, 4096)
+		for {
+			n, err := os.Stdin.Read(buf)
+			if n > 0 {
+				ptyShell.Write(buf[:n])
+			}
+			if err != nil {
+				close(done)
+				return
+			}
+		}
+	}()
+	go func() {
+		buf := make([]byte, 4096)
+		for {
+			n, err := ptyShell.Read(buf)
+			if n > 0 {
+				os.Stdout.Write(buf[:n])
+			}
+			if err != nil {
+				close(done)
+				return
+			}
+		}
+	}()
+
+	cmd.Wait()
+	return 0
+}
+
+// runCockpitInternal runs the cockpit as an internal subcommand.
+// This is used for "ovav cockpit" to bypass the TTY launch complexity.
+func runCockpitInternal() int {
+	cockpitPath := resolveCockpitBinary()
+	if cockpitPath == "" {
+		fmt.Fprintf(os.Stderr, "ovav: cockpit binary not found.\n")
+		return 1
+	}
+	repoRoot, err := cli.FindRepoRoot()
+	if err != nil {
+		repoRoot, _ = os.Getwd()
+	}
+	cmd := exec.Command(cockpitPath)
+	cmd.Dir = repoRoot
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	cmd.Dir = repoRoot
-
 	if err := cmd.Run(); err != nil {
-		fmt.Fprintf(os.Stderr, "Cockpit error: %v\n", err)
+		fmt.Fprintf(os.Stderr, "ovav: cockpit error: %v\n", err)
 		return 1
 	}
 	return 0
@@ -284,8 +356,7 @@ func resolveCockpitBinary() string {
 	}
 
 	// 3) ~/.local/bin/ovav-cockpit (installed alongside ovav)
-	homeDir, _ := os.UserHomeDir()
-	if homeDir != "" {
+	if homeDir, _ := os.UserHomeDir(); homeDir != "" {
 		localCockpit := filepath.Join(homeDir, ".local", "bin", "ovav-cockpit")
 		if _, err := os.Stat(localCockpit); err == nil {
 			return localCockpit
@@ -644,7 +715,7 @@ func cmdProfile(args []string) int {
 	rest := args[1:]
 
 	switch sub {
-	case "list":
+	case "list", "show":
 		return profile.CmdList(rest)
 	case "apply":
 		return profile.CmdApply(rest)
@@ -3154,7 +3225,7 @@ func cliRuntimeOS() string {
 // ── infra command ──────────────────────────────────────────────────────────
 
 func cmdInfra(args []string) int {
-	if len(args) == 0 {
+	if len(args) == 0 || args[0] == "--help" || args[0] == "-h" {
 		fmt.Println("OVAV Infrastructure Manager")
 		fmt.Println()
 		fmt.Println("Commands:")

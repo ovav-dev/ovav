@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"time"
@@ -73,6 +74,21 @@ func (g *GitPush) Validate(ctx context.Context, root string) Result {
 		}
 	}
 
+	// Rule 5: Protected branch must have waiver (migrated from Python)
+	if safe, msg := g.checkBranchSafety(root); !safe {
+		issues = append(issues, msg)
+	}
+
+	// Rule 6: No uncommitted changes (migrated from Python)
+	if safe, msg := g.checkUncommitted(root); !safe {
+		issues = append(issues, msg)
+	}
+
+	// Rule 7: No stale locks (migrated from Python)
+	if safe, msg := g.checkLocks(root); !safe {
+		issues = append(issues, msg)
+	}
+
 	if len(issues) > 0 {
 		return Result{
 			ID: g.ID(), Name: g.Name(), Status: "fail", Weight: g.Weight(),
@@ -82,9 +98,70 @@ func (g *GitPush) Validate(ctx context.Context, root string) Result {
 	}
 	return Result{
 		ID: g.ID(), Name: g.Name(), Status: "pass", Weight: g.Weight(),
-		Message:  "PASS git push gate — HTTPS transport verified, no force push allowed",
+		Message:  "PASS git push gate — HTTPS transport, branch safety, hygiene verified",
 		Duration: time.Since(start),
 	}
+}
+
+// checkBranchSafety checks if current branch is protected and has a waiver.
+func (g *GitPush) checkBranchSafety(root string) (bool, string) {
+	branch := getCurrentBranch(root)
+	if branch == "" {
+		return false, "Cannot determine current branch"
+	}
+	if !protectedBranches[branch] {
+		return true, ""
+	}
+	// Protected branch — check for waiver
+	waiverPath := filepath.Join(root, ".ovav", "governance", "waivers", branch+".yaml")
+	if _, err := os.Stat(waiverPath); os.IsNotExist(err) {
+		return false, fmt.Sprintf("Protected branch '%s' has no active waiver", branch)
+	}
+	return true, ""
+}
+
+// checkUncommitted checks for uncommitted changes.
+func (g *GitPush) checkUncommitted(root string) (bool, string) {
+	cmd := exec.Command("git", "status", "--porcelain")
+	cmd.Dir = root
+	out, err := cmd.Output()
+	if err != nil {
+		return false, fmt.Sprintf("Git status check failed: %v", err)
+	}
+	if len(strings.TrimSpace(string(out))) > 0 {
+		return false, "Uncommitted changes exist"
+	}
+	return true, ""
+}
+
+// checkLocks checks for stale lock files (older than 1 hour).
+func (g *GitPush) checkLocks(root string) (bool, string) {
+	locksDir := filepath.Join(root, ".ovav", "locks")
+	info, err := os.Stat(locksDir)
+	if err != nil || !info.IsDir() {
+		return true, ""
+	}
+	entries, err := os.ReadDir(locksDir)
+	if err != nil {
+		return true, ""
+	}
+	cutoff := time.Now().Add(-1 * time.Hour).Unix()
+	var stale []string
+	for _, entry := range entries {
+		if !strings.HasSuffix(entry.Name(), ".lock") {
+			continue
+		}
+		path := filepath.Join(locksDir, entry.Name())
+		if stat, err := os.Stat(path); err == nil {
+			if stat.ModTime().Unix() < cutoff {
+				stale = append(stale, entry.Name())
+			}
+		}
+	}
+	if len(stale) > 0 {
+		return false, fmt.Sprintf("Stale locks: %s", strings.Join(stale[:3], ", "))
+	}
+	return true, ""
 }
 
 // resolveGitPath resolves a path inside the .git directory, handling worktrees

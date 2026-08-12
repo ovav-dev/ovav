@@ -15,16 +15,27 @@ import (
 type OpenCodeConverter struct{}
 
 func (c *OpenCodeConverter) FileExtension() string { return ".md" }
-func (c *OpenCodeConverter) OutputDir() string     { return "runtimes/opencode/agents" }
+func (c *OpenCodeConverter) OutputDir() string     { return "go-runtime/internal/runtimes/opencode/agents" }
 
-// AreasOnly returns false: opencode generates full hierarchy (areas + leads + teams)
-// to ensure 60+ agents with permission blocks are available. The TAB picker
-// shows only area-level (mode:primary, hidden:false); leads/teams remain
-// available via direct @ mention or runtime overrides.
+// AreasOnly returns false: opencode generates full hierarchy (areas + leads + teams).
+// The TAB picker will show areas (mode:primary, hidden:false); leads and teams
+// remain accessible via direct @ mention or Task tool. OpenCode does NOT honor
+// `hidden: true` for teams, so they WILL appear in the TAB. This is a known
+// limitation of the OpenCode harness that cannot be fixed without a custom
+// workflow engine (which OpenCode does not support).
+//
+// Teams ARE accessible via Task tool (subagent_type=team-<id>) even though they
+// also appear in the TAB. This is the trade-off for OpenCode.
+//
+// Lead intelligence (Criteria, KnowledgeRules, ResponseStyle) is embedded in the
+// area agent body so the area IS the full intelligent interface.
 func (c *OpenCodeConverter) AreasOnly() bool { return false }
 
 // ConvertArea generates an area .md file from canonical YAML.
-func (c *OpenCodeConverter) ConvertArea(area *Area, _ map[string]*Lead) ([]byte, error) {
+// It merges the corresponding lead's intelligence (Criteria, KnowledgeRules,
+// ResponseStyle, Squad) into the area so the area IS the full intelligent
+// lead interface — matching MiMoCodeConverter behavior.
+func (c *OpenCodeConverter) ConvertArea(area *Area, leadForArea map[string]*Lead) ([]byte, error) {
 	var b strings.Builder
 
 	// Frontmatter
@@ -40,11 +51,11 @@ func (c *OpenCodeConverter) ConvertArea(area *Area, _ map[string]*Lead) ([]byte,
 	if area.Permission != nil {
 		writePermissionBlock(&b, area.Permission)
 	}
-	// OVAV instructions: always include the root AGENTS.md (gates,
-	// identity seal, session protocol). Then layer the area-specific
-	// OVAVConnection.Instructions on top.
+	// OVAV instructions: always include the OpenCode-specific AGENTS.md (gates,
+	// identity seal, session protocol, OpenCode Task tool delegation).
+	// Then layer the area-specific OVAVConnection.Instructions on top.
 	b.WriteString("instructions:\n")
-	b.WriteString("  - \"AGENTS.md\"\n")
+	b.WriteString("  - \"opencode_AGENTS.md\"\n")
 	if area.OVAVConnection != nil {
 		for _, inst := range area.OVAVConnection.Instructions {
 			b.WriteString(fmt.Sprintf("  - %q\n", inst))
@@ -112,6 +123,41 @@ func (c *OpenCodeConverter) ConvertArea(area *Area, _ map[string]*Lead) ([]byte,
 		b.WriteString("---\n\n")
 	}
 
+	// Lead intelligence: merge the lead's brain INTO the area so the area IS
+	// the full intelligent lead interface in the TAB picker.
+	// NOTE: area.ID uses hyphens (e.g., "platform-engineering") but lead.Area
+	// uses underscores (e.g., "platform_engineering"). Normalize for lookup.
+	leadAreaKey := strings.ReplaceAll(area.ID, "-", "_")
+	lead := leadForArea[leadAreaKey]
+	if lead != nil {
+		// Decision Criteria from lead
+		if lead.Criteria != "" {
+			b.WriteString("## Decision Criteria\n\n")
+			b.WriteString(lead.Criteria)
+			b.WriteString("\n---\n\n")
+		}
+
+		// Knowledge Rules from lead
+		if lead.KnowledgeRules != nil {
+			b.WriteString("## Reglas de Conocimiento\n\n")
+			b.WriteString(fmt.Sprintf("**Dominio:** %s\n\n", lead.KnowledgeRules.Domain))
+			for _, rule := range lead.KnowledgeRules.Rules {
+				b.WriteString(fmt.Sprintf("- %s\n", rule))
+			}
+			b.WriteString("\n---\n\n")
+		}
+
+		// Response Style from lead
+		if lead.ResponseStyle != nil {
+			b.WriteString("## Estilo de Respuesta\n\n")
+			b.WriteString(fmt.Sprintf("**Formato:** %s | **Máx palabras:** %d\n\n", lead.ResponseStyle.Format, lead.ResponseStyle.MaxWords))
+			for _, rule := range lead.ResponseStyle.Rules {
+				b.WriteString(fmt.Sprintf("- %s\n", rule))
+			}
+			b.WriteString("\n---\n\n")
+		}
+	}
+
 	// Contracts — required by agent_ux_visual_delivery, context_economy validators
 	b.WriteString("## Contratos de Gobernanza\n\n")
 	b.WriteString("Esta área opera bajo los siguientes contratos OVAV:\n\n")
@@ -158,12 +204,16 @@ func (c *OpenCodeConverter) ConvertArea(area *Area, _ map[string]*Lead) ([]byte,
 		b.WriteString("\n\n")
 	}
 
-	// HARD WIRED: delegation must use workflow("ovav-delegate")
-	b.WriteString("## Sistema de Delegación (OVAV)\n\n")
-	b.WriteString("**Regla absoluta:** Para delegar trabajo a otro agente OVAV, usa:\n\n")
-	b.WriteString("```\nworkflow(\"ovav-delegate\", {\n  agent_id: \"<agent-id>\",\n  task: \"<task-description>\",\n  context: {<context>}\n})\n```\n\n")
-	b.WriteString("**No uses `actor spawn`** — el tool `actor` solo acepta tipos `explore` o `general`. Cualquier agent_id OVAV hace fallback silencioso.\n\n")
-	b.WriteString("- `area-<id>` — agentes de área | `lead-<id>` — leads OVAV | `team-<id>` — miembros del squad\n\n")
+	// HARD WIRED: OpenCode uses Task tool for delegation (NO workflow() — not available)
+	b.WriteString("## Sistema de Delegación (OVAV — OpenCode)\n\n")
+	b.WriteString("**Regla absoluta:** Para delegar trabajo a otro agente OVAV, usa el **Task tool** nativo de OpenCode:\n\n")
+	b.WriteString("```\nTask({\n  description: \"<descripcion-corta>\",\n  prompt: \"<detalle del task para el agente destinatario>\",\n  subagent_type: \"<agent-id>\"\n})\n```\n\n")
+	b.WriteString("**ID de agentes OVAV:**\n")
+	b.WriteString("- `area-<id>` — agentes de área (visibles en TAB)\n")
+	b.WriteString("- `lead-<id>` — leads OVAV (e.g., `lead-thavren`, `lead-eidren`)\n")
+	b.WriteString("- `team-<id>` — miembros del squad (e.g., `team-clara`, `team-marco`)\n\n")
+	b.WriteString("**No uses `actor spawn`** — el tool `actor` solo acepta tipos `explore` o `general`, haciendo fallback silencioso y perdiendo la identidad OVAV del agente.\n\n")
+	b.WriteString("**No uses `workflow()`** — el tool `workflow()` no existe en OpenCode. Solo Task tool.\n\n")
 
 	// References
 	if len(area.References) > 0 {
@@ -258,11 +308,13 @@ func (c *OpenCodeConverter) ConvertLead(lead *Lead) ([]byte, error) {
 		b.WriteString("\n\n")
 	}
 
-	// HARD WIRED: delegation must use workflow("ovav-delegate")
-	b.WriteString("## Sistema de Delegación (OVAV)\n\n")
-	b.WriteString("**Regla absoluta:** Para delegar trabajo a un miembro del squad, usa:\n\n")
-	b.WriteString("```\nworkflow(\"ovav-delegate\", {\n  agent_id: \"team-<member-id>\",\n  task: \"<task-description>\",\n  context: {<context>}\n})\n```\n\n")
+	// HARD WIRED: OpenCode uses Task tool for delegation (NO workflow() — not available)
+	b.WriteString("## Sistema de Delegación (OVAV — OpenCode)\n\n")
+	b.WriteString("**Regla absoluta:** Para delegar trabajo a un miembro del squad, usa el **Task tool** nativo de OpenCode:\n\n")
+	b.WriteString("```\nTask({\n  description: \"<descripcion-corta>\",\n  prompt: \"<detalle del task para el miembro del squad>\",\n  subagent_type: \"team-<member-id>\"\n})\n```\n\n")
+	b.WriteString("**Team members disponibles:** ver tabla Squad Members arriba para el ID correcto (e.g., `team-clara`, `team-marco`).\n\n")
 	b.WriteString("**No uses `actor spawn`** — spawnea solo `explore` o `general`, perdiendo identidad OVAV del team member.\n\n")
+	b.WriteString("**No uses `workflow()`** — el tool `workflow()` no existe en OpenCode. Solo Task tool.\n\n")
 
 	// References
 	if len(lead.References) > 0 {
@@ -377,7 +429,12 @@ func writePermissionBlock(b *strings.Builder, p *PermissionBlock) {
 	if len(p.Bash) > 0 {
 		b.WriteString("  bash:\n")
 		for k, v := range p.Bash {
-			b.WriteString(fmt.Sprintf("    %s: %q\n", k, v))
+			// Quote keys that start with * or contain special chars to ensure valid YAML
+			if strings.HasPrefix(k, "*") || strings.Contains(k, ":") || strings.Contains(k, "-") {
+				b.WriteString(fmt.Sprintf("    %q: %q\n", k, v))
+			} else {
+				b.WriteString(fmt.Sprintf("    %s: %q\n", k, v))
+			}
 		}
 	}
 	if len(p.ExternalDirectory) > 0 {

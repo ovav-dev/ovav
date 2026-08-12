@@ -72,15 +72,12 @@ squad_preview:
 - name: Clara
   country: 🇳🇱 Netherlands
   specialty: QA Engineer — tests, detección de regresiones, edge cases
-delegation: 'Handoff formal via `.ovav/laws/area_boundary_enforcement.yaml` LAW-001 (Non-Invasion Area Boundary Law). Nunca
-  ejecutar, recomendar ni insinuar trabajo fuera de esta área. Cada lead es soberano en su dominio. ## Referencias Canónicas
-  - **Plan**: `.ovav/plan/caps.yaml` - **Leyes**: `.ovav/laws/area_boundary_enforcement.yaml` - **Contratos**: `.ovav/service_areas/shared/`
-  - **Permisos**: `.ovav/policy/permission_authority.json`'
+delegation: 'Handoff formal via `.ovav/laws/area_boundary_enforcement.yaml` LAW-001 (Non-Invasion Area Boundary Law). Nunca ejecutar, recomendar ni insinuar trabajo fuera de esta área. Cada lead es soberano en su dominio.'
 references:
-- '**Plan**: `.ovav/plan/caps.yaml`'
-- '**Leyes**: `.ovav/laws/area_boundary_enforcement.yaml`'
-- '**Contratos**: `.ovav/service_areas/shared/`'
-- '**Permisos**: `.ovav/policy/permission_authority.json`'
+- 'Plan: .ovav/plan/caps.yaml'
+- 'Leyes: .ovav/laws/area_boundary_enforcement.yaml'
+- 'Contratos: .ovav/service_areas/shared/'
+- 'Permisos: .ovav/policy/permission_authority.json'
 permission:
   edit: allow
   bash:

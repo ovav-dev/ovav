@@ -355,18 +355,18 @@ func discoverSystemDeps() []DepEntry {
 func walkGlob(root, pattern string) ([]string, error) {
 	var matches []string
 	pattern = filepath.FromSlash(pattern)
-	
+
 	// Handle ** by splitting and recursively walking
 	if strings.Contains(pattern, "**") {
 		parts := strings.Split(pattern, "**")
 		prefix := strings.TrimSuffix(parts[0], "/")
 		suffix := strings.TrimPrefix(parts[1], "/")
-		
+
 		baseDir := root
 		if prefix != "" {
 			baseDir = filepath.Join(root, prefix)
 		}
-		
+
 		filepath.Walk(baseDir, func(path string, info os.FileInfo, err error) error {
 			if err != nil {
 				return nil
@@ -375,7 +375,7 @@ func walkGlob(root, pattern string) ([]string, error) {
 				return nil
 			}
 			rel, _ := filepath.Rel(root, path)
-			
+
 			// Check if file matches suffix pattern
 			if matched, _ := filepath.Match(suffix, filepath.Base(rel)); matched {
 				matches = append(matches, rel)
@@ -384,8 +384,19 @@ func walkGlob(root, pattern string) ([]string, error) {
 		})
 		return matches, nil
 	}
-	
-	// Standard glob for non-** patterns
+
+	// Non-** pattern: check if it's a literal filename (no wildcards)
+	// filepath.Glob expects patterns with metacharacters; literal paths won't match correctly
+	if !strings.ContainsAny(pattern, "*?[") {
+		// Literal filename — check if file exists directly
+		fullPath := filepath.Join(root, pattern)
+		if info, err := os.Stat(fullPath); err == nil && !info.IsDir() {
+			return []string{pattern}, nil
+		}
+		return nil, nil // file not found, not an error
+	}
+
+	// Standard glob for patterns with wildcards
 	return filepath.Glob(filepath.Join(root, pattern))
 }
 

@@ -38,6 +38,9 @@ covers:
   - harnesses_validators:
       description: Harnesses y validadores source-local
       examples: [Workspace Safety Gate, Git Push Gate, Permission Drift, Host Drift]
+  - workspace_safety_gate:
+      description: "Workspace safety gate coverage"
+      covered: true
   - install_backup_rollback:
       description: Instalación, backup y rollback gobernados
       examples: [Install Governor, Backup Plan, Rollback Protocol]
@@ -93,6 +96,18 @@ internal_research_allowed:
       description: Evaluación de herramientas de seguridad para hardening
   - opencode_capability_research:
       description: Investigación de capacidades de OpenCode para mejora de DX
+
+# ── Contracts ───────────────────────────────────────────────────────────
+contracts:
+  - visual_delivery_contract.yaml
+  - safe_stop_contract.yaml
+  - context_economy_contract.yaml
+
+delivery_terms:
+  - "50% shorter"
+  - "Host Runtime"
+  - "OVAV Runtime"
+  - "no visible reasoning"
 
 # ── Cross-Area Routing ───────────────────────────────────────────────────
 cross_area_routing:

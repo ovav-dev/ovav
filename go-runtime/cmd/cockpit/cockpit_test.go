@@ -1698,15 +1698,15 @@ func TestHandleMouse_AllViews(t *testing.T) {
 		m := NewModel()
 		m.width = 120
 		m.nav.stack = []string{ViewRoot}
-		// Y=5 → row = 5-4 = 1 → menuItems[1] = dashboard
-		msg := tea.MouseMsg{Button: tea.MouseButtonLeft, Y: 5}
+		// Y=9 → row = 9-7 = 2 → health (item 2, dashboard is at item 1 which is at Y=8)
+		msg := tea.MouseMsg{Button: tea.MouseButtonLeft, Y: 9}
 		result, _ := m.handleMouse(msg, ViewRoot)
 		m2 := result.(Model)
-		if m2.menuCursor != 1 {
-			t.Errorf("expected menuCursor 1, got %d", m2.menuCursor)
+		if m2.menuCursor != 2 {
+			t.Errorf("expected menuCursor 2, got %d", m2.menuCursor)
 		}
-		if m2.nav.Current() != ViewDashboard {
-			t.Errorf("expected ViewDashboard, got %q", m2.nav.Current())
+		if m2.nav.Current() != ViewHealth {
+			t.Errorf("expected ViewHealth, got %q", m2.nav.Current())
 		}
 	})
 

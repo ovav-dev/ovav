@@ -6,7 +6,7 @@ min_version: "20260805"
 
 # Canonical source: .ovav/source/configs/wezterm/
 
-# User-customizable variables (top of config.lua)
+# User-customizable variables (top of wezterm.lua)
 user_variables:
   - wsl_username
   - wsl_distro
@@ -17,17 +17,14 @@ user_variables:
 
 # Deploy target (ovav convert)
 deploy:
-  - path: config/wezterm/config.lua
+  - path: config/wezterm/wezterm.lua
     description: WezTerm Lua config (OVAV managed)
 
 # Home injection (ovav convert --inject)
 inject:
-  - path: config/wezterm/config.lua
+  - path: config/wezterm/wezterm.lua
     target: ~/.wezterm.lua
     description: User WezTerm config
-  - path: config/wezterm/wezterm-template.lua
-    target: ~/.wezterm.lua.template
-    description: Standalone template (user copies to ~/.wezterm.lua)
 
 # Dependencies
 dependencies:

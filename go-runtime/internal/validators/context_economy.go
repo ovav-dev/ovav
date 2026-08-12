@@ -24,8 +24,8 @@ func (c *ContextEconomy) Description() string {
 func (c *ContextEconomy) Weight() int { return 8 }
 
 var economyActiveSurfaces = []string{
-	"go-runtime/internal/runtimes/opencode/agents/area-platform-engineering.md",
-	"go-runtime/internal/runtimes/opencode/agents/area-research-intelligence.md",
+	".ovav/service_areas/platform_engineering/area_boundaries.yaml",
+	".ovav/service_areas/research_intelligence/area_boundaries.yaml",
 	".ovav/source/skills/ovav-response-contract/SKILL.md",
 	".ovav/source/skills/ovav-platform-session/SKILL.md",
 	".ovav/source/skills/ovav-research-session/SKILL.md",
@@ -129,7 +129,7 @@ func (c *ContextEconomy) Validate(ctx context.Context, root string) Result {
 
 	// 3. Check area agents reference contracts
 	areaContracts := []string{"visual_delivery_contract.yaml", "safe_stop_contract.yaml", "context_economy_contract.yaml"}
-	for _, rel := range []string{"go-runtime/internal/runtimes/opencode/agents/area-platform-engineering.md", "go-runtime/internal/runtimes/opencode/agents/area-research-intelligence.md"} {
+	for _, rel := range []string{".ovav/service_areas/platform_engineering/area_boundaries.yaml", ".ovav/service_areas/research_intelligence/area_boundaries.yaml"} {
 		text := readFile(rel)
 		if text == "" {
 			issues = append(issues, fmt.Sprintf("missing: %s", rel))

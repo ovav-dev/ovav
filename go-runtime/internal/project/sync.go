@@ -78,7 +78,18 @@ func Sync(root string, verbose bool) error {
 		fmt.Printf("  ✓ mimocode: %d artifacts projected\n", mimocodeCount)
 	}
 
-	// 5. OpenCode config generation — canonical YAML → opencode.json (OVERWRITE)
+	// 5. Harness AGENTS projection — opencode_AGENTS.md + mimocode_AGENTS.md
+	agentsCount, err := projectHarnessAgents(root, verbose)
+	if err != nil {
+		if verbose {
+			fmt.Fprintf(os.Stderr, "  ✗ harness_agents: FAILED — %v\n", err)
+		}
+		totalFailed++
+	} else if verbose {
+		fmt.Printf("  ✓ harness_agents: %d harness AGENTS files projected\n", agentsCount)
+	}
+
+	// 6. OpenCode config generation — canonical YAML → opencode.json (OVERWRITE)
 	//    OVAV es la fuente autoritativa. Genera el config completo desde cero.
 	if err := convert.GenerateOpenCodeConfig(root); err != nil {
 		if verbose {
@@ -89,7 +100,7 @@ func Sync(root string, verbose bool) error {
 		fmt.Println("  ✓ config: generated from .ovav/source/opencode/config.yaml")
 	}
 
-	// 5. Validate generated config
+	// 7. Validate generated config
 	configIssues, configErr := convert.ValidateOpenCodeConfig(root)
 	if configErr != nil {
 		if verbose {
@@ -121,12 +132,12 @@ func Sync(root string, verbose bool) error {
 // projectAgentsSimple generates CLI agent files from canonical OVAV YAML
 // using the convert engine — pure Go, no raw file copies.
 //
-//	Canonical source: ovav/agents/{areas,leads,teams}/*.yaml
-//	CLI targets:      runtimes/{opencode,claude-code,cursor}/agents|rules/*.md|.mdc
+//	Canonical source: go-runtime/internal/agents/{areas,leads,teams}/*.yaml
+//	CLI targets:      go-runtime/internal/runtimes/{opencode,claude-code,cursor}/agents/*.md
 //
 // Replaces: tools/agents/project_opencode.py (removed python3 dependency)
 func projectAgentsSimple(root string, verbose bool) (cleaned int, created int, err error) {
-	canonicalRoot := filepath.Join(root, "ovav", "agents")
+	canonicalRoot := filepath.Join(root, "go-runtime", "internal", "agents")
 	targets := convert.AvailableTargets()
 
 	// Clean old generated files across all target output directories
@@ -838,6 +849,55 @@ func syncPluginRegistry(root string) (int, error) {
 	return len(existing), nil
 }
 
+// ── Projector 4b: Harness AGENTS Projection ──────────────────────────────
+
+// projectHarnessAgents projects harness-specific AGENTS.md files from OVAV
+// canonical sources to the repository root.
+//
+// opencode_AGENTS.md:  Source → .ovav/source/opencode/AGENTS.md
+//                      Target → {root}/opencode_AGENTS.md
+// mimocode_AGENTS.md:  Source → .ovav/source/mimocode/AGENTS.md
+//                      Target → {root}/mimocode_AGENTS.md
+// crush_AGENTS.md:     Source → .ovav/source/crush/AGENTS.md
+//                      Target → {root}/crush_AGENTS.md
+//
+// These are the harness-specific instruction overlays that supersede the
+// generic AGENTS.md for OpenCode, MiMoCode, and Crush users respectively.
+func projectHarnessAgents(root string, verbose bool) (count int, err error) {
+	agents := []struct {
+		sourceRel string // relative to .ovav/source/
+		target    string // absolute target path
+	}{
+		{filepath.Join("opencode", "AGENTS.md"), filepath.Join(root, "opencode_AGENTS.md")},
+		{filepath.Join("mimocode", "AGENTS.md"), filepath.Join(root, "mimocode_AGENTS.md")},
+		{filepath.Join("crush", "AGENTS.md"), filepath.Join(root, "crush_AGENTS.md")},
+	}
+
+	for _, a := range agents {
+		src := filepath.Join(root, ".ovav", "source", a.sourceRel)
+		if _, statErr := os.Stat(src); os.IsNotExist(statErr) {
+			if verbose {
+				fmt.Printf("    · %s: source not found, skipping\n", filepath.Base(a.target))
+			}
+			continue
+		}
+		if filesEqual(src, a.target) {
+			if verbose {
+				fmt.Printf("    · %s: up to date\n", filepath.Base(a.target))
+			}
+			continue
+		}
+		if copyErr := copyFile(src, a.target); copyErr != nil {
+			return count, fmt.Errorf("copy %s: %w", a.target, copyErr)
+		}
+		count++
+		if verbose {
+			fmt.Printf("    ✅ %s: projected\n", filepath.Base(a.target))
+		}
+	}
+	return count, nil
+}
+
 // ── Projector 4: MiMo Code Projection ────────────────────────────────────
 
 // projectToMimocode projects skills, plugins, and workflows from OVAV canonical
@@ -1038,4 +1098,9 @@ func SyncVisual(root string, verbose bool) (count int, err error) {
 // SyncMiMoCode runs the MiMo Code projection step.
 func SyncMiMoCode(root string, verbose bool) (count int, err error) {
 	return projectToMimocode(root, verbose)
+}
+
+// SyncHarnessAgents runs the harness AGENTS projection step.
+func SyncHarnessAgents(root string, verbose bool) (count int, err error) {
+	return projectHarnessAgents(root, verbose)
 }

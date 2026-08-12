@@ -17,6 +17,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.ready = true
 
 	case tea.KeyMsg:
+		m.ResetInactivity()
 		// Global keys
 		switch msg.String() {
 		case "ctrl+c":
@@ -50,6 +51,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m.handleViewKey(msg, view)
 
 	case tea.MouseMsg:
+		m.ResetInactivity()
 		return m.handleMouse(msg, view)
 
 	case goBackMsg:
@@ -93,20 +95,25 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 
 	case syncItemsMsg:
-		// GOV-009: Sync engine status loaded (non-blocking)
 		if len(msg.items) > 0 {
 			m.updatesModel.items = append(msg.items, gatherPhase2Items()...)
 		}
 		return m, nil
 
 	case updateCheckMsg:
-		// GOV-007: cPanel version check result
 		if msg.err != nil {
 			m.updateInfo.Error = msg.err.Error()
 		} else {
 			m.updateInfo = msg.info
 		}
 		return m, nil
+
+	case dataLoadedMsg:
+		m.handleDataLoaded(msg)
+		return m, nil
+
+	case inactivityTickMsg:
+		return m.handleInactivityTick()
 	}
 
 	m.viewport, cmd = m.viewport.Update(msg)
@@ -148,6 +155,26 @@ func (m Model) handleViewKey(msg tea.KeyMsg, view string) (tea.Model, tea.Cmd) {
 		return m.updatesUpdate(msg)
 	case ViewHelp:
 		return m.helpUpdate(msg)
+	case ViewTesting:
+		tm, cmd := m.testingModel.Update(msg)
+		m.testingModel = tm
+		return m, cmd
+	case ViewDelegation:
+		dm, cmd := m.delegationModel.Update(msg)
+		m.delegationModel = dm
+		return m, cmd
+	case ViewResearch:
+		rm, cmd := m.researchModel.Update(msg)
+		m.researchModel = rm
+		return m, cmd
+	case ViewAdversarial:
+		am, cmd := m.adversarialModel.Update(msg)
+		m.adversarialModel = am
+		return m, cmd
+	case ViewPerformance:
+		pm, cmd := m.performanceModel.Update(msg)
+		m.performanceModel = pm
+		return m, cmd
 	case ViewQuit:
 		if msg.String() == "enter" {
 			m.quitting = true
@@ -167,28 +194,39 @@ func (m Model) handleMouse(msg tea.MouseMsg, view string) (tea.Model, tea.Cmd) {
 
 	switch view {
 	case ViewRoot:
-		// Safe click on menu items with bounds checking
-		row := msg.Y - 4
+		row := msg.Y - rootMenuOffset
 		if row >= 0 && row < len(menuItems) {
 			m.menuCursor = row
 			item := menuItems[row]
 			switch item.id {
+			case "updates":
+				m.nav.Push(ViewUpdates)
 			case "dashboard":
 				m.nav.Push(ViewDashboard)
 			case "health":
 				m.nav.Push(ViewHealth)
 			case "vault":
 				m.nav.Push(ViewVault)
-			case "install":
-				m.nav.Push(ViewInstall)
 			case "sync":
 				m.nav.Push(ViewSync)
 			case "config":
 				m.nav.Push(ViewConfig)
+			case "install":
+				m.nav.Push(ViewInstall)
 			case "tailor":
 				m.nav.Push(ViewTailor)
 			case "cli":
 				m.nav.Push(ViewCLI)
+			case "testing":
+				m.nav.Push(ViewTesting)
+			case "delegation":
+				m.nav.Push(ViewDelegation)
+			case "research":
+				m.nav.Push(ViewResearch)
+			case "adversarial":
+				m.nav.Push(ViewAdversarial)
+			case "performance":
+				m.nav.Push(ViewPerformance)
 			}
 			return m, nil
 		}
@@ -223,6 +261,39 @@ func (m Model) handleMouse(msg tea.MouseMsg, view string) (tea.Model, tea.Cmd) {
 
 	case ViewWelcome:
 		m.nav.Replace(ViewRoot)
+		return m, nil
+
+	case ViewTesting:
+		row := msg.Y - devListOffset
+		if row >= 0 && row < len(m.testingModel.coverage) {
+			m.testingModel.cursor = row
+		}
+		return m, nil
+
+	case ViewDelegation:
+		row := msg.Y - devListOffset
+		if row >= 0 && row < len(m.delegationModel.sessions) {
+			m.delegationModel.cursor = row
+		}
+		return m, nil
+
+	case ViewResearch:
+		row := msg.Y - devListOffset
+		if row >= 0 && row < len(m.researchModel.benchmarks) {
+			m.researchModel.cursor = row
+		}
+		return m, nil
+
+	case ViewAdversarial:
+		row := msg.Y - devListOffset
+		if row >= 0 && row < len(m.adversarialModel.gates) {
+			m.adversarialModel.cursor = row
+		}
+		return m, nil
+
+	case ViewPerformance:
+		// Click on metrics → refresh
+		m.performanceModel = NewPerformanceModel()
 		return m, nil
 
 	case ViewQuit:

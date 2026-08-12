@@ -665,8 +665,8 @@ func TestProjectVisual_InvalidMonitoringYAML(t *testing.T) {
 	if err == nil {
 		t.Error("expected error for invalid monitoring YAML")
 	}
-	if count != 1 {
-		t.Errorf("expected count=1 before error, got %d", count)
+	if count != 2 {
+		t.Errorf("expected count=2 before error (theme dark+light), got %d", count)
 	}
 }
 
@@ -775,8 +775,19 @@ func TestGenerateOpenCodePlugin_WithWatchers(t *testing.T) {
 
 func runGit(t *testing.T, dir string, args ...string) {
 	t.Helper()
-	cmd := exec.Command("git", args...)
-	cmd.Dir = dir
+	// Build git command with -C flag
+	gitCmd := func(subargs ...string) *exec.Cmd {
+		fullArgs := []string{"-C", dir}
+		fullArgs = append(fullArgs, subargs...)
+		return exec.Command("git", fullArgs...)
+	}
+	// Set git identity for test environment (required for commits in temp repos)
+	cmd := gitCmd("config", "user.email", "test@ovav.dev")
+	cmd.Run() // ignore error if already set
+	cmd = gitCmd("config", "user.name", "OVAV Test")
+	cmd.Run()
+	// Now run the actual git command
+	cmd = gitCmd(args...)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Fatalf("git %v: %v\n%s", args, err, out)

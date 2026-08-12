@@ -5,7 +5,7 @@ runtime:
   small_model: opencode-go/deepseek-v4-flash
   default_agent: Platform Engineering
   instructions:
-  - AGENTS.md
+  - opencode_AGENTS.md
   agent: {}
 mcp:
   ovav-budget:

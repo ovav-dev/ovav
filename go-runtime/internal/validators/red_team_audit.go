@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"gopkg.in/yaml.v3"
 )
 
 // RedTeamAudit validates cross-area boundary compliance at Red Team depth.
@@ -42,7 +44,7 @@ var allAreas = []struct {
 	{
 		id:          "platform_engineering",
 		name:        "Platform Engineering & Developer Experience",
-		profileFile: "area-platform-engineering.md",
+		profileFile: "platform_engineering/area_boundaries.yaml",
 		leadFile:    "lead-thavren.md",
 		keywords:    []string{"HARD STOP", "Fuera de mi área", "runtime Go", "seguridad del sistema", "validación sistémica"},
 		forbidden:   []string{"NO diseño UI/UX", "NO frontend React", "NO DevOps"},
@@ -50,7 +52,7 @@ var allAreas = []struct {
 	{
 		id:          "research_intelligence",
 		name:        "Evidence & Decision Intelligence",
-		profileFile: "area-research-intelligence.md",
+		profileFile: "research_intelligence/area_boundaries.yaml",
 		leadFile:    "lead-eidren.md",
 		keywords:    []string{"HARD STOP", "Fuera de mi área", "evidencia", "benchmark"},
 		forbidden:   []string{"NO desarrollo de producto"},
@@ -58,7 +60,7 @@ var allAreas = []struct {
 	{
 		id:          "commercial_growth",
 		name:        "Commercial & Growth Strategy",
-		profileFile: "area-commercial-growth.md",
+		profileFile: "commercial_growth/area_boundaries.yaml",
 		leadFile:    "lead-sofia.md",
 		keywords:    []string{"HARD STOP", "Fuera de mi área", "estrategia", "GTM"},
 		forbidden:   []string{"NO runtime Go", "NO desarrollo"},
@@ -66,7 +68,7 @@ var allAreas = []struct {
 	{
 		id:          "digital_product",
 		name:        "Digital Product Engineering",
-		profileFile: "area-digital-product.md",
+		profileFile: "digital_product/area_boundaries.yaml",
 		leadFile:    "lead-dante.md",
 		keywords:    []string{"HARD STOP", "Fuera de mi área", "frontend", "React", "TypeScript"},
 		forbidden:   []string{"NO runtime Go", "NO estrategia comercial"},
@@ -74,7 +76,7 @@ var allAreas = []struct {
 	{
 		id:          "devops_infrastructure",
 		name:        "DevOps & Infrastructure",
-		profileFile: "area-devops-infrastructure.md",
+		profileFile: "devops_infrastructure/area_boundaries.yaml",
 		leadFile:    "lead-uriel.md",
 		keywords:    []string{"HARD STOP", "Fuera de mi área", "infraestructura", "deploy", "CI/CD"},
 		forbidden:   []string{"NO desarrollo Go", "NO frontend"},
@@ -82,7 +84,7 @@ var allAreas = []struct {
 	{
 		id:          "ux_design",
 		name:        "UX/UI Design",
-		profileFile: "area-ux-design.md",
+		profileFile: "ux_design/area_boundaries.yaml",
 		leadFile:    "lead-elena.md",
 		keywords:    []string{"HARD STOP", "Fuera de mi área", "diseño", "UX", "UI"},
 		forbidden:   []string{"NO runtime Go", "NO DevOps"},
@@ -90,7 +92,7 @@ var allAreas = []struct {
 	{
 		id:          "legal_compliance",
 		name:        "Legal & Compliance",
-		profileFile: "area-legal-compliance.md",
+		profileFile: "legal_compliance/area_boundaries.yaml",
 		leadFile:    "lead-camila.md",
 		keywords:    []string{"HARD STOP", "Fuera de mi área", "legal", "compliance", "contratos"},
 		forbidden:   []string{"NO desarrollo", "NO runtime Go"},
@@ -98,7 +100,7 @@ var allAreas = []struct {
 	{
 		id:          "education_career",
 		name:        "Education & Career Development",
-		profileFile: "area-education-career.md",
+		profileFile: "education_career/area_boundaries.yaml",
 		leadFile:    "lead-valeria.md",
 		keywords:    []string{"HARD STOP", "Fuera de mi área", "educación", "currículo"},
 		forbidden:   []string{"NO DevOps", "NO runtime Go"},
@@ -106,7 +108,7 @@ var allAreas = []struct {
 	{
 		id:          "adversarial_intelligence",
 		name:        "Adversarial Intelligence",
-		profileFile: "area-adversarial-intelligence.md",
+		profileFile: "adversarial_intelligence/area_boundaries.yaml",
 		leadFile:    "lead-kenji.md",
 		keywords:    []string{"HARD STOP", "Fuera de mi área", "Red Team", "adversarial", "pentesting"},
 		forbidden:   []string{"NO desarrollo de features", "NO modificar código de otras áreas"},
@@ -121,6 +123,7 @@ func (r *RedTeamAudit) Validate(ctx context.Context, root string) Result {
 
 	harness := DetectHarness(root)
 	agentsDir := harness.agentsDir(root)
+	saDir := filepath.Join(root, ".ovav", "service_areas")
 	lawPath := filepath.Join(root, ".ovav", "laws", "area_boundary_enforcement.yaml")
 	sharedDir := filepath.Join(root, ".ovav", "service_areas", "shared")
 
@@ -137,57 +140,78 @@ func (r *RedTeamAudit) Validate(ctx context.Context, root string) Result {
 		}
 	}
 
-	// 2. Verify all 9 area agent profiles exist with hard stops
+	// 2. Verify all 9 area agent profiles exist with scope definitions (canonical YAML)
 	for _, area := range allAreas {
 		total++
-		profilePath := filepath.Join(agentsDir, area.profileFile)
+		profilePath := filepath.Join(saDir, area.profileFile)
 		data, err := os.ReadFile(profilePath)
 		if err != nil {
 			issues = append(issues, fmt.Sprintf("MISSING_AREA_PROFILE: %s (%s) — %v", area.name, area.profileFile, err))
 			continue
 		}
-		content := string(data)
+		var doc map[string]interface{}
+		if err := yaml.Unmarshal(data, &doc); err != nil {
+			issues = append(issues, fmt.Sprintf("AREA_YAML_ERROR: %s — invalid YAML: %v", area.name, err))
+			continue
+		}
 
-		// Check required keywords (case-insensitive)
-		allKeywordsFound := true
-		contentLower := strings.ToLower(content)
-		for _, kw := range area.keywords {
-			if !strings.Contains(contentLower, strings.ToLower(kw)) {
-				issues = append(issues, fmt.Sprintf("AREA_KEYWORD_MISSING: %s — '%s' not found in profile", area.name, kw))
-				allKeywordsFound = false
+		hasScope := false
+		if dnc, ok := doc["does_not_cover"].([]interface{}); ok && len(dnc) > 0 {
+			hasScope = true
+		}
+		if ab, ok := doc["area_boundaries"].(map[string]interface{}); ok {
+			if scope, ok := ab["scope"].(map[string]interface{}); ok {
+				if _, hasIncludes := scope["includes"]; hasIncludes {
+					hasScope = true
+				}
+				if _, hasExcludes := scope["excludes"]; hasExcludes {
+					hasScope = true
+				}
 			}
 		}
-		// Check forbidden terms (these must appear as negations)
-		for _, fb := range area.forbidden {
-			if !strings.Contains(contentLower, strings.ToLower(fb)) {
-				issues = append(issues, fmt.Sprintf("AREA_HARD_STOP_MISSING: %s — '%s' hard stop not found", area.name, fb))
-				allKeywordsFound = false
-			}
+
+		if !hasScope {
+			issues = append(issues, fmt.Sprintf("AREA_SCOPE_MISSING: %s — no scope definition found (does_not_cover or scope.includes/excludes)", area.name))
+			continue
 		}
-		if allKeywordsFound {
-			passed++
-		}
+		passed++
 	}
 
-	// 3. Verify all 9 lead agent files exist with permission blocks
-	// MiMoCode harness (areas-only): lead files don't exist — skip this check
+	// 3. Verify all 9 lead agent files exist with scope definitions (canonical YAML)
 	if harness.isFullHierarchy() {
 		for _, area := range allAreas {
 			total++
-			leadPath := filepath.Join(agentsDir, area.leadFile)
+			leadPath := filepath.Join(saDir, area.id, "lead_contract.yaml")
 			data, err := os.ReadFile(leadPath)
 			if err != nil {
-				issues = append(issues, fmt.Sprintf("MISSING_LEAD_FILE: %s (%s) — %v", area.name, area.leadFile, err))
+				issues = append(issues, fmt.Sprintf("MISSING_LEAD_FILE: %s (lead_contract.yaml) — %v", area.name, err))
 				continue
 			}
-			content := string(data)
-			contentLower := strings.ToLower(content)
-			if !strings.Contains(contentLower, "permission") && !strings.Contains(contentLower, "autoridad") {
-				issues = append(issues, fmt.Sprintf("LEAD_NO_PERMISSION: %s — %s missing permission block", area.name, area.leadFile))
+			var doc map[string]interface{}
+			if err := yaml.Unmarshal(data, &doc); err != nil {
+				issues = append(issues, fmt.Sprintf("LEAD_YAML_ERROR: %s — invalid YAML: %v", area.name, err))
 				continue
 			}
-			if !strings.Contains(contentLower, "funciones autorizadas") && !strings.Contains(contentLower, "authorized") {
-				issues = append(issues, fmt.Sprintf("LEAD_NO_SCOPE: %s — %s missing authorized functions declaration", area.name, area.leadFile))
+			lc, ok := doc["lead_contract"].(map[string]interface{})
+			if !ok {
+				issues = append(issues, fmt.Sprintf("LEAD_NO_SCOPE: %s — lead_contract.yaml missing lead_contract section", area.name))
+				continue
+			}
+			hasScope := false
+			if _, hasCovers := lc["covers"]; hasCovers {
+				hasScope = true
+			}
+			if _, hasDNC := lc["does_not_cover"]; hasDNC {
+				hasScope = true
+			}
+			if _, hasResp := lc["responsibilities"]; hasResp {
+				hasScope = true
+			}
+			if _, hasAuth := lc["authority"]; hasAuth {
+				hasScope = true
+			}
+			if !hasScope {
+				issues = append(issues, fmt.Sprintf("LEAD_NO_SCOPE: %s — lead_contract.yaml missing scope (covers/does_not_cover/responsibilities/authority)", area.name))
 				continue
 			}
 			passed++

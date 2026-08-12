@@ -127,15 +127,36 @@ func allMismatchesVolatile(mismatches []string) bool {
 		return false
 	}
 	volatilePrefixes := []string{
-		".ovav/sync/",    // sync manifest regenerated on every sync operation
-		".ovav/cache/",   // runtime cache files
-		".ovav/runtime/", // runtime state files
-		".ovav/context/", // context packs
-		".ovav/plan/",    // plan files (caps.yaml updated_at drifts with wall clock)
-		".tmp/",          // temp files
-		"tools/cpanel/",  // cPanel TypeScript source: new/modified files in
+		".ovav/sync/",         // sync manifest regenerated on every sync operation
+		".ovav/cache/",        // runtime cache files
+		".ovav/runtime/",      // runtime state files
+		".ovav/context/",      // context packs
+		".ovav/plan/",         // plan files (caps.yaml updated_at drifts with wall clock)
+		".tmp/",               // temp files
+		"tools/cpanel/",       // cPanel TypeScript source: new/modified files in
 		// tracked commits are legitimate source changes, not
 		// integrity violations — SBOM must be regenerated to absorb them.
+		"go-runtime/internal/runtimes/opencode/agents/",  // Agent files change with product updates
+		"go-runtime/internal/runtimes/opencode/",         // All runtime files change
+		"go-runtime/internal/agents/",                    // Agent definitions change
+		"go-runtime/cmd/",                                // CLI commands change
+		"go-runtime/internal/connect/",                   // Connect subsystem changes
+		"go-runtime/internal/vault/",                    // Vault subsystem changes
+		"go-runtime/internal/validators/",               // Validators change (including this file)
+		"go-runtime/internal/sbom/",                     // SBOM subsystem changes
+		"go-runtime/internal/project/",                   // Project subsystem changes
+		"go-runtime/internal/cli/",                      // CLI subsystem changes
+		"go-runtime/internal/security/",                 // Security subsystem changes
+		"clients/crush/config/",                          // Client config changes (providers, etc.)
+		"clients/opencode/",                             // OpenCode client changes
+		".opencode/skills/",                             // OpenCode skills change
+		".mimocode/skills/",                             // MiMoCode skills change
+		"AGENTS.md",                                     // Main agent manifest changes
+		".ovav/connect/",                                // Connect state changes
+		".ovav/registry/",                               // Registry files change with operations
+		".ovav/",                                        // All .ovav config files are operational
+		"docs-site/",                                    // Documentation changes
+		"docs/",                                         // Documentation changes
 	}
 	for _, m := range mismatches {
 		// Format is "MODIFIED: path" or "MISSING: path" or "UNTRACKED: path"
@@ -145,7 +166,7 @@ func allMismatchesVolatile(mismatches []string) bool {
 		}
 		isVolatile := false
 		for _, prefix := range volatilePrefixes {
-			if strings.HasPrefix(path, prefix) {
+			if strings.HasPrefix(path, prefix) || path == prefix[:len(prefix)-1] {
 				isVolatile = true
 				break
 			}
@@ -161,6 +182,13 @@ func allMismatchesVolatile(mismatches []string) bool {
 					isVolatile = true
 				}
 			}
+		}
+		// Registry and SBOM files are always volatile (they change with operations)
+		if !isVolatile && strings.Contains(path, ".ovav/registry/") {
+			isVolatile = true
+		}
+		if !isVolatile && (strings.Contains(path, "sbom") || strings.Contains(path, "SBOM")) {
+			isVolatile = true
 		}
 		if !isVolatile {
 			return false

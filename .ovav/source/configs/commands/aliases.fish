@@ -6,7 +6,19 @@
 # Navigation shortcuts
 alias home "cd ~"
 alias sys "cd ~/.config"
-alias ovav "cd ~/Systems/OVAV"
+
+# ovav — smart dispatch: no args = cd, with args = forward to binary
+# FIX: alias ovav "cd ~/Systems/OVAV" broke "ovav login" → fish expanded to
+# "cd ~/Systems/OVAV login" → "Too many args for cd command".
+# Root fix: function instead of alias — detects argument presence and routes
+# to the correct handler (cd or binary) automatically.
+function ovav
+    if test (count $argv) -eq 0
+        cd ~/Systems/OVAV
+    else
+        command ovav $argv
+    end
+end
 
 # Workspace shortcuts
 alias wh "cd ~/"

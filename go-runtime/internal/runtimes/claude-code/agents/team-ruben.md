@@ -1,24 +1,6 @@
 ---
-name: "Ruben"
-type: subagent
-hidden: true
-permission:
-  edit: "allow"
-  bash:
-    git add *: "allow"
-    git commit*: "deny"
-    git push*: "deny"
-    go vet*: "allow"
-    go test*: "allow"
-    go build*: "allow"
-    go mod*: "allow"
-    ovav status*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    git status*: "allow"
-    git diff*: "allow"
-    go run*: "allow"
-    ovav doctor*: "allow"
-    git log*: "allow"
+name: "ruben"
+description: "Optimizo la nutrición para rendimiento deportivo — periodización nutricional, carga de carbohidratos, y estrategias de hidratación para atletas y high performers."
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

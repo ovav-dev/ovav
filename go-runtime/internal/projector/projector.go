@@ -24,6 +24,9 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
+
+	"gopkg.in/yaml.v3"
 )
 
 // Projector defines the interface for all projectors.
@@ -105,6 +108,12 @@ func (p *ConfigsProjector) Project(root string, verbose bool) (int, error) {
 				continue
 			}
 			src := filepath.Join(sourcePath, sub.Name())
+			if !p.validateFile(src) {
+				if verbose {
+					fmt.Printf("    ⚠️  %s: %s skipped (validation failed)\n", toolName, sub.Name())
+				}
+				continue
+			}
 			dst := filepath.Join(deployPath, sub.Name())
 			if err := copyFile(src, dst); err != nil {
 				return count, fmt.Errorf("copy %s: %w", sub.Name(), err)
@@ -340,4 +349,121 @@ func copyFile(src, dst string) error {
 		return err
 	}
 	return os.WriteFile(dst, data, 0644)
+}
+
+// validateFile checks file content validity before projection.
+// Returns true if the file is valid or doesn't need validation.
+func (p *ConfigsProjector) validateFile(path string) bool {
+	ext := strings.ToLower(filepath.Ext(path))
+	switch ext {
+	case ".yaml", ".yml":
+		return validateYAML(path)
+	case ".lua":
+		return validateLua(path)
+	}
+	return true // No validation needed for unknown extensions
+}
+
+// validateYAML checks if a YAML file parses correctly.
+func validateYAML(path string) bool {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return false
+	}
+	var v any
+	return yaml.Unmarshal(data, &v) == nil
+}
+
+// validateLua performs basic Lua syntax validation by checking bracket balance.
+func validateLua(path string) bool {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return false
+	}
+	content := string(data)
+
+	// Check for balanced curly braces { }
+	if !balancedBrackets(content, "{", "}") {
+		return false
+	}
+	// Check for balanced parentheses ( )
+	if !balancedBrackets(content, "(", ")") {
+		return false
+	}
+	// Check for balanced long-string brackets [[ ]]
+	if !balancedLuaLongString(content) {
+		return false
+	}
+	return true
+}
+
+// balancedLuaLongString checks [[ and ]] bracket balance in Lua long strings.
+func balancedLuaLongString(content string) bool {
+	depth := 0
+	for i := 0; i < len(content); i++ {
+		if i+1 < len(content) {
+			if content[i] == '[' && content[i+1] == '[' {
+				depth++
+				i++ // skip next char
+				continue
+			}
+			if content[i] == ']' && content[i+1] == ']' {
+				depth--
+				if depth < 0 {
+					return false
+				}
+				i++ // skip next char
+				continue
+			}
+		}
+	}
+	return depth == 0
+}
+
+// balancedBrackets checks if single-char brackets are balanced,
+// ignoring brackets inside string literals.
+func balancedBrackets(content, open, close string) bool {
+	depth := 0
+	inString := false
+	stringChar := rune(0)
+
+	for i := 0; i < len(content); i++ {
+		c := rune(content[i])
+
+		// Handle string literals (single and double quotes)
+		if !inString && (c == '"' || c == '\'') {
+			inString = true
+			stringChar = c
+			continue
+		}
+		if inString && c == stringChar {
+			// Check for escaped quote
+			if i > 0 && content[i-1] == '\\' {
+				// Count backslashes to determine if escaped
+				bs := 0
+				for j := i - 2; j >= 0 && content[j] == '\\'; j-- {
+					bs++
+				}
+				if bs%2 == 0 {
+					inString = false
+				}
+			} else {
+				inString = false
+			}
+			continue
+		}
+		if inString {
+			continue
+		}
+
+		if c == rune(open[0]) {
+			depth++
+		} else if c == rune(close[0]) {
+			depth--
+			if depth < 0 {
+				return false
+			}
+		}
+	}
+	return depth == 0
 }

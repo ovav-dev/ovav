@@ -1,26 +1,7 @@
 ---
-name: "Orin"
-type: subagent
-hidden: true
-permission:
-  edit: "deny"
-  bash:
-    git push*: "deny"
-    sudo *: "deny"
-    go vet*: "allow"
-    find *: "allow"
-    git commit*: "deny"
-    *: "deny"
-    go mod*: "allow"
-    go list*: "allow"
-    grep -rn*: "allow"
-    git status*: "allow"
-    git diff*: "allow"
-    git log*: "allow"
-  external_directory:
-    "/home/braka/Labs/mimocode/data/memory/*": "allow"
-    "/home/braka/Systems/OVAV": "allow"
-    "*": "deny"
+name: "orin"
+description: "Deep Explorer — exploración profunda de repositorio, mapeo de dependencias, context packs."
+model: opencode-go/qwen3.7-max
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

@@ -1,24 +1,6 @@
 ---
-name: "Karina"
-type: subagent
-hidden: true
-permission:
-  edit: "allow"
-  bash:
-    git diff*: "allow"
-    git add *: "allow"
-    git commit*: "deny"
-    go vet*: "allow"
-    go test*: "allow"
-    go mod*: "allow"
-    git status*: "allow"
-    git log*: "allow"
-    git push*: "deny"
-    go build*: "allow"
-    go run*: "allow"
-    ovav doctor*: "allow"
-    ovav status*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
+name: "karina"
+description: "Mantengo las operaciones comerciales funcionando sin fricción — procesos, herramientas, y flujos que permiten al equipo de crecimiento ejecutar sin trabas."
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

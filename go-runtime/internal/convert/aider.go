@@ -5,9 +5,18 @@ import (
 	"strings"
 )
 
-// AiderConverter transforms OVAV canonical agents into Aider session prompts.
+// AiderConverter transforms OVAV canonical areas into Aider system prompts.
 //
-// Aider is CLI-focused and uses system prompts for agent behavior.
+// Verified format: https://aider.chat/docs
+//
+// Aider does NOT have named agent files. It uses system prompts via
+// the --system-prompts-from CLI flag. These are PLAIN MARKDOWN files
+// with NO YAML frontmatter.
+//
+// Output: runtimes/aider/agents/ as .md files (system prompt templates).
+// AreasOnly=true: Aider has no hierarchical agent system.
+//
+// Usage: aider --system-prompts-from runtimes/aider/agents/
 type AiderConverter struct{}
 
 func (c *AiderConverter) FileExtension() string { return ".md" }
@@ -17,8 +26,12 @@ func (c *AiderConverter) AreasOnly() bool        { return true }
 func (c *AiderConverter) ConvertArea(area *Area, _ map[string]*Lead) ([]byte, error) {
 	var b strings.Builder
 
-	b.WriteString("# " + area.Name + "\n\n")
+	// NO YAML frontmatter for Aider — plain markdown system prompt
+	b.WriteString(fmt.Sprintf("# %s\n\n", area.Name))
 	b.WriteString(fmt.Sprintf("**Lead:** %s\n\n", area.Lead))
+	if area.Surface != "" {
+		b.WriteString(fmt.Sprintf("**Surface:** %s\n\n", area.Surface))
+	}
 	b.WriteString("## Functions\n\n")
 	for _, fn := range area.Functions {
 		b.WriteString(fmt.Sprintf("- %s\n", fn))

@@ -25,7 +25,11 @@
 package main
 
 import (
+	"fmt"
 	"log"
+	"os"
+	"path/filepath"
+	"time"
 
 	"github.com/ovav/ovav/internal/cli"
 	"github.com/ovav/ovav/internal/memory"
@@ -40,6 +44,16 @@ func main() {
 	am, err := memory.NewAgentMemory(repoRoot, true)
 	if err != nil {
 		log.Fatalf("memory-mcp: init agent memory: %v", err)
+	}
+
+	runtimeDir := filepath.Join(repoRoot, ".ovav", "runtime")
+	if err := os.MkdirAll(runtimeDir, 0755); err != nil {
+		log.Fatalf("memory-mcp: mkdir runtime dir: %v", err)
+	}
+
+	markerPath := filepath.Join(runtimeDir, "memory_active")
+	if err := os.WriteFile(markerPath, []byte(fmt.Sprintf("pid=%d started=%s", os.Getpid(), time.Now().Format(time.RFC3339))), 0644); err != nil {
+		log.Fatalf("memory-mcp: write memory_active marker: %v", err)
 	}
 
 	server := memory.NewMCPServer(am, repoRoot)

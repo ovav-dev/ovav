@@ -42,6 +42,8 @@ func main() {
 		history(tk, os.Args[2:])
 	case "report":
 		report(tk)
+	case "optimize":
+		optimize(tk)
 	default:
 		printUsage()
 		os.Exit(1)
@@ -236,8 +238,82 @@ func report(tk *tracker.Tracker) {
 	}
 }
 
+func optimize(tk *tracker.Tracker) {
+	fmt.Println("🧠 Running AI-Powered Optimization Analysis...")
+	fmt.Println()
+
+	optimizer := tracker.NewAutoOptimizer(tk)
+	
+	recommendations, err := optimizer.GenerateRecommendations()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error generating recommendations: %v\n", err)
+		os.Exit(1)
+	}
+
+	if len(recommendations) == 0 {
+		fmt.Println("✅ No optimization opportunities found. Your setup looks good!")
+		return
+	}
+
+	fmt.Printf("💡 Found %d optimization opportunities:\n\n", len(recommendations))
+	
+	for i, rec := range recommendations {
+		priorityIcon := "🟡"
+		if rec.Priority > 0.8 {
+			priorityIcon = "🔴"
+		} else if rec.Priority > 0.5 {
+			priorityIcon = "🟠"
+		}
+		
+		fmt.Printf("%d. %s [%s] %.0f%% priority\n", i+1, priorityIcon, rec.Type, rec.Priority*100)
+		fmt.Printf("   Provider: %s\n", rec.ProviderID)
+		if rec.Model != "" {
+			fmt.Printf("   Model: %s\n", rec.Model)
+		}
+		fmt.Printf("   Potential Savings: $%.2f\n", rec.Savings)
+		fmt.Printf("   Reason: %s\n", rec.Reason)
+		fmt.Printf("   Action: %s\n", rec.Action)
+		fmt.Println()
+	}
+
+	// Show provider analysis
+	providers := tk.ListProviders()
+	fmt.Println("📈 Provider Performance Analysis:")
+	fmt.Println()
+	
+	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
+	fmt.Fprintf(w, "Provider\tEfficiency\tTrend\tAvg Cost/1K\tBest Model\n")
+	fmt.Fprintf(w, "--------\t----------\t-----\t-----------\t----------\n")
+	
+	for _, p := range providers {
+		if !p.Enabled {
+			continue
+		}
+		
+		analysis, err := optimizer.AnalyzeProvider(p.ID)
+		if err != nil {
+			continue
+		}
+		
+		trendIcon := "➡️"
+		if analysis.TrendDirection == "increasing" {
+			trendIcon = "📈"
+		} else if analysis.TrendDirection == "decreasing" {
+			trendIcon = "📉"
+		}
+		
+		fmt.Fprintf(w, "%s\t%.0f%%\t%s\t$%.4f\t%s\n", 
+			p.ID, 
+			analysis.EfficiencyScore*100, 
+			trendIcon,
+			analysis.AverageCostPerK,
+			analysis.BestModel)
+	}
+	w.Flush()
+}
+
 func printUsage() {
-	fmt.Println(`OVAV Connect - Token Usage Tracking
+	fmt.Print(`OVAV Connect - Token Usage Tracking
 
 Usage:
   ovav connect <command>
@@ -249,6 +325,7 @@ Commands:
   remove      Remove a provider
   history     Show usage history
   report      Generate usage report
+  optimize    AI-powered optimization recommendations
 
 Examples:
   ovav connect status              # Check status
@@ -256,5 +333,6 @@ Examples:
   ovav connect add anthropic sk-.. # Add Anthropic
   ovav connect history --days 30    # Last 30 days
   ovav connect report              # Monthly report
-`)
+  ovav connect optimize            # Get AI optimization tips
+` + "\n")
 }

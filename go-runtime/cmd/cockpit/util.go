@@ -82,6 +82,11 @@ const (
 	ViewUpdates   = "updates"
 	ViewQuit      = "quit"
 	ViewHelp      = "help"
+	ViewTesting   = "testing"
+	ViewDelegation = "delegation"
+	ViewResearch  = "research"
+	ViewAdversarial = "adversarial"
+	ViewPerformance = "performance"
 )
 
 // ── OVAV Root Detection ─────────────────────────────────────────────

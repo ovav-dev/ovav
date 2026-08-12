@@ -1,8 +1,7 @@
 ---
-name: "Education Career"
+name: "education-career"
 description: "Educación, currículo, career development, herramientas de aprendizaje — Lead: Valeria"
-type: area
-color: "#0891b2"
+color: "cyan"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->
@@ -20,6 +19,7 @@ color: "#0891b2"
 # Education Career
 
 **Lead:** valeria
+**Surface:** Aprendizaje, capacitación, currículo, desarrollo profesional, educación
 
 ## Functions
 

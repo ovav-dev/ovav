@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/ovav/ovav/internal/convert"
 	"github.com/ovav/ovav/internal/project"
 )
 
@@ -88,6 +89,41 @@ func cmdSync(args []string) int {
 			totalFailed++
 		} else {
 			fmt.Printf("  ✓ mimocode: %d artifacts\n", mc)
+		}
+	}
+
+	if step == "" || step == "agents" {
+		if ha, err := project.SyncHarnessAgents(root, verbose); err != nil {
+			fmt.Fprintf(os.Stderr, "  ✗ harness_agents: %v\n", err)
+			totalFailed++
+		} else {
+			fmt.Printf("  ✓ harness_agents: %d harness AGENTS projected\n", ha)
+		}
+	}
+
+	if step == "" || step == "config" {
+		// OpenCode config generation
+		if err := convert.GenerateOpenCodeConfig(root); err != nil {
+			fmt.Fprintf(os.Stderr, "  ✗ config: %v\n", err)
+			totalFailed++
+		} else {
+			fmt.Println("  ✓ config: generated from .ovav/source/opencode/config.yaml")
+		}
+		// Validate generated config
+		issues, configErr := convert.ValidateOpenCodeConfig(root)
+		if configErr != nil {
+			fmt.Fprintf(os.Stderr, "  ⚠ config validation: %v\n", configErr)
+		} else {
+			criticals := 0
+			for _, issue := range issues {
+				if issue.Severity == "critical" {
+					criticals++
+					fmt.Fprintf(os.Stderr, "  ✗ config: %s — %s\n", issue.Field, issue.Message)
+				}
+			}
+			if criticals == 0 {
+				fmt.Println("  ✓ config: valid")
+			}
 		}
 	}
 

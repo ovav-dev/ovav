@@ -423,4 +423,13 @@ config.keys = {
   { key = 'r', mods = 'CTRL|SHIFT', action = act.ReloadConfiguration },
 }
 
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+-- FIX: Windows WSL2 key modifier handling
+-- ═══════════════════════════════════════════════════════════════════════════════
+config.send_composed_key_when_left_alt_pressed = false
+config.send_composed_key_when_right_alt_pressed = false
+config.use_ime = false
+config.dead_key_timeout_ms = 0
+
 return config

@@ -173,6 +173,11 @@ func (e *Engine) Status() *autonomous.ResearchStatus {
 	return status
 }
 
+// GetIntelligenceLayer returns the AI intelligence layer for advanced analysis.
+func (e *Engine) GetIntelligenceLayer() *IntelligenceLayer {
+	return NewIntelligenceLayer(e)
+}
+
 // ListFindings returns all saved findings.
 func (e *Engine) ListFindings() ([]autonomous.Finding, error) {
 	var allFindings []autonomous.Finding
