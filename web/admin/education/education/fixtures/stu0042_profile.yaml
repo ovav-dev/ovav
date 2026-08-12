@@ -1,0 +1,8 @@
+profile:
+  student_id: "stu-0042"
+  career_goal: "Data Scientist"
+  available_hours_per_week: 15
+  learning_style: "visual"
+  preferred_language: "es"
+  time_constraint_days: 180
+  prior_modules_completed: []
