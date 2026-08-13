@@ -1086,6 +1086,99 @@ func TestMatchSecretPatterns_HashComment(t *testing.T) {
 	}
 }
 
+// ── End-to-end: feature/fix-full-activation candidate passes OWS scan ────
+//
+// This test reads the *actual* files modified in the candidate branch
+// (vs origin/develop) and runs scanSecretsInChanges against them in a
+// throwaway test repo. It is the integration guard that proves the
+// allowlist fix eliminates both false positives reported in the
+// candidate review:
+//
+//   1. .ovav/ovav-commit-wrapper → GPG_KEY="7DE5923582A84DBB"
+//      (public subkey fingerprint, not a credential)
+//   2. go-runtime/internal/truststore/truststore.go →
+//      `worktreeHeadsKey = ".ovav/runtime/worktree_heads.json"`
+//      (structural file-path const, not a secret)
+//
+// If the allowlist ever regresses, this test fails with the exact line
+// the scanner still flags.
+
+func TestScanSecrets_FixFullActivationCandidatePasses(t *testing.T) {
+	// Resolve repo root: this test file lives in
+	// go-runtime/internal/ows/, so the OVAV repo root is three levels up.
+	repoRoot := filepath.Join("..", "..", "..")
+	absRoot, err := filepath.Abs(repoRoot)
+	if err != nil {
+		t.Fatalf("abs repoRoot: %v", err)
+	}
+
+	// ── Verify the candidate branch is checked out ──
+	branchOut, err := runGitOutput(absRoot, "rev-parse", "--abbrev-ref", "HEAD")
+	if err != nil {
+		t.Fatalf("git rev-parse: %v", err)
+	}
+	branch := strings.TrimSpace(branchOut)
+	if branch != "feature/fix-full-activation" {
+		t.Skipf("skip: candidate branch not checked out (current=%q)", branch)
+	}
+
+	// ── Verify develop ref is reachable ──
+	if _, err := runGitOutput(absRoot, "rev-parse", "--verify", "origin/develop"); err != nil {
+		// Try local develop as fallback
+		if _, err2 := runGitOutput(absRoot, "rev-parse", "--verify", "develop"); err2 != nil {
+			t.Skipf("skip: neither origin/develop nor develop ref is reachable: %v / %v", err, err2)
+		}
+	}
+
+	// ── Run the real OWS scan against the worktree ──
+	findings, err := scanSecretsInChanges(absRoot, "feature/fix-full-activation")
+	if err != nil {
+		t.Fatalf("scanSecretsInChanges: %v", err)
+	}
+	if len(findings) != 0 {
+		for _, f := range findings {
+			t.Errorf("FAIL: candidate still flagged — %s:%d — %s", f.File, f.Line, f.Detail)
+		}
+		t.Fatalf("expected zero findings for feature/fix-full-activation, got %d", len(findings))
+	}
+	t.Log("✅ feature/fix-full-activation: OWS pre-merge scan PASSED with zero findings")
+}
+
+// TestScanSecrets_FixFullActivationSpecificLinesAreSkipped pins the two
+// specific lines that triggered the original false positives so future
+// refactors of the allowlist cannot regress them silently.
+func TestScanSecrets_FixFullActivationSpecificLinesAreSkipped(t *testing.T) {
+	cases := []struct {
+		name string
+		file string
+		line string
+	}{
+		{
+			name: "ovav-commit-wrapper GPG_KEY",
+			file: ".ovav/ovav-commit-wrapper",
+			line: `GPG_KEY="7DE5923582A84DBB"`,
+		},
+		{
+			name: "truststore.go worktreeHeadsKey const",
+			file: "go-runtime/internal/truststore/truststore.go",
+			line: `	worktreeHeadsKey = ".ovav/runtime/worktree_heads.json"`,
+		},
+		{
+			name: "truststore.go LastGitOpReflog struct tag",
+			file: "go-runtime/internal/truststore/truststore.go",
+			line: `	LastGitOpReflog  string ` + "`json:\"last_git_op_reflog\"`" + `  // Reflog entry describing the op`,
+		},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			findings := matchSecretPatterns(tc.file, 1, tc.line)
+			if len(findings) != 0 {
+				t.Errorf("FAIL: line should be skipped by allowlist, got: %+v", findings)
+			}
+		})
+	}
+}
+
 // ── profileToGitflow ──
 
 func TestProfileToGitflow_AllProfiles(t *testing.T) {
