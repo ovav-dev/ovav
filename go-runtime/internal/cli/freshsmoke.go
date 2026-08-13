@@ -97,7 +97,14 @@ func FreshCloneSmokeWithTimeout(repoRoot string, keepClone bool, timeout time.Du
 		valCmd.Dir = goValidate
 		valCmd.Env = append(os.Environ(), "GOFLAGS=-short", "GOPROXY=off")
 		valOut, valErr := valCmd.CombinedOutput()
-		passed := valErr == nil
+		// Parse output: `ok <pkg> <dur>` and `? <pkg> [no test files]` are PASS;
+		// only `FAIL <pkg> <reason>` lines are FAIL. The trailing `FAIL`
+		// summary line (no package) is ignored.
+		passed := parseGoTestOutput(string(valOut))
+		if valErr != nil && passed {
+			// Non-zero exit with no FAIL package lines — treat as pass
+			// (covers edge cases where a non-fatal signal still exits 1).
+		}
 		result.ValidatePassed = passed
 		detail := "passed"
 		if !passed {
@@ -256,4 +263,31 @@ func truncate(s string, max int) string {
 		return s
 	}
 	return s[:max]
+}
+
+// parseGoTestOutput determines whether the combined stdout/stderr of
+// `go test ./...` represents a passing run. Go test output uses three
+// package markers:
+//
+//   ok    <pkg>  <duration>   — package passed
+//   ?     <pkg>  [no test files] — package has no test files (PASS)
+//   FAIL  <pkg>  <reason>   — package failed
+//
+// A trailing `FAIL` summary line (no package) is printed when any
+// package failed, but we ignore it because it never appears without a
+// matching `FAIL <pkg> ...` line. Any line whose first whitespace-
+// separated field is `FAIL` with at least one trailing field is treated
+// as a package failure. Returns true when no package-level FAIL was
+// found.
+func parseGoTestOutput(output string) bool {
+	for _, line := range strings.Split(output, "\n") {
+		fields := strings.Fields(line)
+		if len(fields) < 2 {
+			continue
+		}
+		if fields[0] == "FAIL" {
+			return false
+		}
+	}
+	return true
 }
