@@ -240,7 +240,7 @@ func appendGateRefreshAudit(root, authReason, prev, next string) error {
 
 func printIntegrityHelp() {
 	data, _ := json.Marshal(map[string]string{
-		"baseline":    "ovav integrity baseline [--plan|--write]",
+		"baseline":     "ovav integrity baseline [--plan|--write]",
 		"gate_refresh": "ovav integrity gate refresh [--ceowaiver]",
 		"gate_help":    "ovav integrity gate refresh needs .ovav/runtime/.session_marker OR --ceowaiver",
 	})

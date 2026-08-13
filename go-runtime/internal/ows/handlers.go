@@ -750,16 +750,16 @@ func scanSecretsInChanges(repoRoot, branch string) ([]SecretFinding, error) {
 // secretFileAllowlist: basenames of files that may contain known-benign
 // "secret-shaped" lines. Files fully exempt from scanning.
 var secretFileAllowlist = map[string]bool{
-	"ovav-commit-wrapper":          true, // GPG signing key fingerprint (public)
-	"permission_authority.json":    true, // mirror of validators.skipFiles
-	"secrets_hygiene.go":           true, // pattern definitions (test fixtures)
-	"secrets_hygiene_test.go":      true, // mirrors validators.skipFiles
-	"validators_test.go":           true, // mirrors validators.skipFiles
-	"check_ovav_ssh_profile.py":    true, // mirrors validators.skipFiles
-	"ovav_public_export_gate.py":   true, // mirrors validators.skipFiles
-	"minimax_direct_env.sh":        true, // placeholder API key template
-	"provider_setup.sh":            true, // placeholder API key template
-	"setup_minimax_direct.sh":      true, // placeholder API key template
+	"ovav-commit-wrapper":        true, // GPG signing key fingerprint (public)
+	"permission_authority.json":  true, // mirror of validators.skipFiles
+	"secrets_hygiene.go":         true, // pattern definitions (test fixtures)
+	"secrets_hygiene_test.go":    true, // mirrors validators.skipFiles
+	"validators_test.go":         true, // mirrors validators.skipFiles
+	"check_ovav_ssh_profile.py":  true, // mirrors validators.skipFiles
+	"ovav_public_export_gate.py": true, // mirrors validators.skipFiles
+	"minimax_direct_env.sh":      true, // placeholder API key template
+	"provider_setup.sh":          true, // placeholder API key template
+	"setup_minimax_direct.sh":    true, // placeholder API key template
 }
 
 // secretNameAllowlist: identifiers whose values are NOT secrets — public

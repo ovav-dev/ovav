@@ -10,8 +10,8 @@ import (
 
 func TestModelPolicyRejectsUnauthorizedProjectedOpenCodeAgent(t *testing.T) {
 	root := tempRepoWithFiles(t, map[string]string{
-		".ovav/policy/permission_authority.json":                         `{"model_groups":{"standard":{"models":["openai/gpt-5.6-sol","minimax-coding-plan/MiniMax-M3"]}}}`,
-		"opencode.json":                                                  `{"model":"openai/gpt-5.6-sol"}`,
+		".ovav/policy/permission_authority.json": `{"model_groups":{"standard":{"models":["openai/gpt-5.6-sol","minimax-coding-plan/MiniMax-M3"]}}}`,
+		"opencode.json":                          `{"model":"openai/gpt-5.6-sol"}`,
 		"go-runtime/internal/runtimes/opencode/agents/team-retired.md": "---\nmodel: opencode-go/qwen3.7-max\n---\n",
 	})
 

@@ -38,9 +38,9 @@ const (
 // GateState tracks the gate file hash and the last git operation timestamp.
 // Stored at .ovav/runtime/gate_state.json.
 type GateState struct {
-	GateSHA256       string `json:"gate_sha256"`
-	LastGitOpTime    int64  `json:"last_git_op_time"`    // Unix timestamp
-	LastGitOpReflog  string `json:"last_git_op_reflog"`  // Reflog entry describing the op
+	GateSHA256      string `json:"gate_sha256"`
+	LastGitOpTime   int64  `json:"last_git_op_time"`   // Unix timestamp
+	LastGitOpReflog string `json:"last_git_op_reflog"` // Reflog entry describing the op
 }
 
 // GateFileSHA256 computes the SHA-256 hash of the given file path.

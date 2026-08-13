@@ -18,8 +18,9 @@ import (
 )
 
 // setupGateRepo creates a minimal repo skeleton in a temp dir:
-//   <tmp>/<gateRelPath>             — real file with deterministic content
-//   <tmp>/.ovav/runtime/            — gate state parent directory
+//
+//	<tmp>/<gateRelPath>             — real file with deterministic content
+//	<tmp>/.ovav/runtime/            — gate state parent directory
 //
 // The temp directory is owned by the test user, so identity.validateSecureDirectoryFD
 // accepts it (matches euid and has world-writable bits stripped).

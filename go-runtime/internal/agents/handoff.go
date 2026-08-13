@@ -16,10 +16,10 @@ type Handoff struct {
 
 // HandoffResult is the outcome of a handoff decision.
 type HandoffResult struct {
-	Status       string
-	Handoff      *Handoff
-	DeniedCtx    map[string]any
-	DecidedAt    time.Time
+	Status    string
+	Handoff   *Handoff
+	DeniedCtx map[string]any
+	DecidedAt time.Time
 }
 
 // ErrHandoffDenied is returned when a handoff is rejected.

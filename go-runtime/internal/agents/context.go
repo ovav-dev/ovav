@@ -6,9 +6,9 @@ type ContextType string
 
 // ContextRequest captures a request for agent context.
 type ContextRequest struct {
-	AgentID      string
-	ContextType  ContextType
-	RequestedAt  int64
+	AgentID     string
+	ContextType ContextType
+	RequestedAt int64
 }
 
 // DecisionOutcome represents the result of a context decision.
