@@ -8,6 +8,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -17,6 +18,12 @@ import (
 	"strings"
 	"time"
 )
+
+var runProductSyncCommand = func(ctx context.Context, dir string, args ...string) ([]byte, error) {
+	cmd := exec.CommandContext(ctx, "go", args...)
+	cmd.Dir = dir
+	return cmd.CombinedOutput()
+}
 
 // ProductVersionResponse is the API response for version queries.
 type ProductVersionResponse struct {
@@ -121,16 +128,14 @@ func runProductSync() error {
 	goRuntime := filepath.Join(root, "go-runtime")
 
 	// Step 1: Sync agents to runtimes/mimocode/agents/
-	syncCmd := exec.Command("go", "run", "./cmd/ovav", "sync", "--agents")
-	syncCmd.Dir = goRuntime
-	if out, err := syncCmd.CombinedOutput(); err != nil {
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+	defer cancel()
+	if out, err := runProductSyncCommand(ctx, goRuntime, "run", "./cmd/ovav", "sync", "--agents"); err != nil {
 		return fmt.Errorf("sync agents: %v — %s", err, string(out))
 	}
 
 	// Step 2: Reinstall OVAV Product from runtimes/mimocode/agents/
-	installCmd := exec.Command("go", "run", "./cmd/ovav", "product", "install")
-	installCmd.Dir = goRuntime
-	if out, err := installCmd.CombinedOutput(); err != nil {
+	if out, err := runProductSyncCommand(ctx, goRuntime, "run", "./cmd/ovav", "product", "install"); err != nil {
 		return fmt.Errorf("product install: %v — %s", err, string(out))
 	}
 
