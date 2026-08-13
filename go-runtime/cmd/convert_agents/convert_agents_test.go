@@ -414,7 +414,7 @@ func TestGenerateTarget_CleanOldOutputError(t *testing.T) {
 	root := t.TempDir()
 	createCanonicalDir(t, root)
 
-	outputDir := filepath.Join(root, "runtimes", "opencode", "agents")
+	outputDir := filepath.Join(root, "go-runtime", "internal", "runtimes", "opencode", "agents")
 	os.MkdirAll(outputDir, 0755)
 	os.WriteFile(filepath.Join(outputDir, "stale-area.md"), []byte("old"), 0644)
 	if err := os.Chmod(outputDir, 0555); err != nil {

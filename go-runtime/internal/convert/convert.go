@@ -390,8 +390,9 @@ func atomicWrite(path string, data []byte, perm os.FileMode) error {
 // via the returned warning string).
 func GenerateGovernor(canonicalRoot, outputRoot string, target Target) (string, error) {
 	// Source: <repoRoot>/.ovav/source/agents/ovav.md
-	// canonicalRoot is typically <repoRoot>/ovav/agents, so we need to go up TWO levels.
-	repoRoot := filepath.Dir(filepath.Dir(canonicalRoot))
+	// canonicalRoot is <repoRoot>/go-runtime/internal/agents; resolve the
+	// repository root rather than assuming a fixed number of parent levels.
+	repoRoot := findRepoRootFrom(canonicalRoot)
 	sourcePath := filepath.Join(repoRoot, ".ovav", "source", "agents", "ovav.md")
 
 	if _, err := os.Stat(sourcePath); os.IsNotExist(err) {

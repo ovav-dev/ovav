@@ -821,8 +821,8 @@ func TestCheckTargetStatus(t *testing.T) {
 
 	t.Run("generated", func(t *testing.T) {
 		dir := t.TempDir()
-		os.MkdirAll(filepath.Join(dir, "runtimes", "opencode", "agents"), 0755)
-		os.WriteFile(filepath.Join(dir, "runtimes", "opencode", "agents", "test.md"), []byte("test"), 0644)
+		os.MkdirAll(filepath.Join(dir, "go-runtime", "internal", "runtimes", "opencode", "agents"), 0755)
+		os.WriteFile(filepath.Join(dir, "go-runtime", "internal", "runtimes", "opencode", "agents", "test.md"), []byte("test"), 0644)
 		status := checkTargetStatus(dir, "opencode")
 		if status != "generated" {
 			t.Errorf("expected 'generated', got %q", status)
@@ -831,7 +831,7 @@ func TestCheckTargetStatus(t *testing.T) {
 
 	t.Run("empty_dir_not_generated", func(t *testing.T) {
 		dir := t.TempDir()
-		os.MkdirAll(filepath.Join(dir, "runtimes", "opencode", "agents"), 0755)
+		os.MkdirAll(filepath.Join(dir, "go-runtime", "internal", "runtimes", "opencode", "agents"), 0755)
 		status := checkTargetStatus(dir, "opencode")
 		if status != "not_generated" {
 			t.Errorf("expected 'not_generated' for empty dir, got %q", status)
@@ -850,8 +850,8 @@ func TestCheckTargetStatus(t *testing.T) {
 func TestRenderCLI(t *testing.T) {
 	dir := t.TempDir()
 	// Create generated opencode runtime so status shows ✅
-	os.MkdirAll(filepath.Join(dir, "runtimes", "opencode", "agents"), 0755)
-	os.WriteFile(filepath.Join(dir, "runtimes", "opencode", "agents", "area-platform-engineering.md"), []byte("test"), 0644)
+	os.MkdirAll(filepath.Join(dir, "go-runtime", "internal", "runtimes", "opencode", "agents"), 0755)
+	os.WriteFile(filepath.Join(dir, "go-runtime", "internal", "runtimes", "opencode", "agents", "area-platform-engineering.md"), []byte("test"), 0644)
 
 	m := NewModel()
 	m.ovavRoot = dir
@@ -875,8 +875,8 @@ func TestRenderCLI(t *testing.T) {
 
 func TestRenderCLI_WithMessage(t *testing.T) {
 	dir := t.TempDir()
-	os.MkdirAll(filepath.Join(dir, "runtimes", "opencode", "agents"), 0755)
-	os.WriteFile(filepath.Join(dir, "runtimes", "opencode", "agents", "area-platform-engineering.md"), []byte("test"), 0644)
+	os.MkdirAll(filepath.Join(dir, "go-runtime", "internal", "runtimes", "opencode", "agents"), 0755)
+	os.WriteFile(filepath.Join(dir, "go-runtime", "internal", "runtimes", "opencode", "agents", "area-platform-engineering.md"), []byte("test"), 0644)
 
 	m := NewModel()
 	m.ovavRoot = dir
@@ -892,8 +892,8 @@ func TestRenderCLI_WithMessage(t *testing.T) {
 
 func TestRenderCLI_WithPreview(t *testing.T) {
 	dir := t.TempDir()
-	os.MkdirAll(filepath.Join(dir, "runtimes", "opencode", "agents"), 0755)
-	os.WriteFile(filepath.Join(dir, "runtimes", "opencode", "agents", "area-platform-engineering.md"), []byte("test"), 0644)
+	os.MkdirAll(filepath.Join(dir, "go-runtime", "internal", "runtimes", "opencode", "agents"), 0755)
+	os.WriteFile(filepath.Join(dir, "go-runtime", "internal", "runtimes", "opencode", "agents", "area-platform-engineering.md"), []byte("test"), 0644)
 
 	m := NewModel()
 	m.ovavRoot = dir
