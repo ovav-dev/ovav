@@ -2,6 +2,7 @@ package validators
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -28,7 +29,6 @@ func (h *HostConfigDrift) Weight() int { return 25 }
 // opencode.json is MiMoCode's own config — only flagged if it contains OVAV content.
 var hostIntrusionFiles = []string{
 	"AGENTS.md",
-	"opencode.jsonc",
 }
 
 // OVAV-specific content markers that indicate leakage into host config.
@@ -68,14 +68,15 @@ func (h *HostConfigDrift) checkHostIntrusion(root string) []string {
 		}
 	}
 
-	// opencode.json is MiMoCode's own config — it is EXPECTED to contain OVAV
-	// governance content when used as an OVAV harness. This is intentional integration,
-	// not an intrusion. Skip the OVAV content check for opencode.json.
-	// See: OVAV — MiMoCode integration (MEMORY-OVAV-discovered-foundation.md)
-	opencodePath := filepath.Join(hostConfig, "opencode.json")
-	if info, err := os.Stat(opencodePath); err == nil && !info.IsDir() {
-		// opencode.json intentionally contains OVAV markers when used with OVAV harness
-		// — this is expected, not an intrusion. Skip warning.
+	// Global OpenCode configs may contain bootstrap/schema metadata. Provider,
+	// permission and agent intelligence must stay repo-local.
+	for _, configName := range []string{"opencode.json", "opencode.jsonc"} {
+		opencodePath := filepath.Join(hostConfig, configName)
+		if info, err := os.Stat(opencodePath); err == nil && !info.IsDir() {
+			if !h.isBenignBootstrap(opencodePath) && h.containsGlobalIntelligence(opencodePath) {
+				issues = append(issues, fmt.Sprintf("HOST INTRUSION: %s contains global agents/permissions/providers — quarantine required", configName))
+			}
+		}
 	}
 
 	// Check for intrusion agent files
@@ -87,6 +88,29 @@ func (h *HostConfigDrift) checkHostIntrusion(root string) []string {
 	}
 
 	return issues
+}
+
+func (h *HostConfigDrift) containsGlobalIntelligence(path string) bool {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return false
+	}
+	var config map[string]json.RawMessage
+	if err := json.Unmarshal(data, &config); err != nil {
+		content := string(data)
+		for _, key := range []string{"agent", "agents", "permission", "permissions", "provider", "providers"} {
+			if strings.Contains(content, `"`+key+`"`) {
+				return true
+			}
+		}
+		return false
+	}
+	for _, key := range []string{"agent", "agents", "permission", "permissions", "provider", "providers"} {
+		if _, exists := config[key]; exists {
+			return true
+		}
+	}
+	return false
 }
 
 func (h *HostConfigDrift) isBenignBootstrap(path string) bool {
