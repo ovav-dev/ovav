@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/ovav/ovav/internal/security"
 )
 
 // BootstrapChain validates the integrity seal chain from AGENTS.md.
@@ -64,6 +66,9 @@ func (b *BootstrapChain) Validate(ctx context.Context, root string) Result {
 		}
 	}
 	content := string(data)
+	if !security.BootstrapTrustAnchorsConfigured() {
+		issues = append(issues, "INTENTIONALLY_GATED/PARTIAL: immutable bootstrap trust anchors are not configured in build metadata")
+	}
 
 	// Check integrity seal block
 	const sealStart = "OVAV_INTEGRITY_SEAL"
@@ -93,6 +98,14 @@ func (b *BootstrapChain) Validate(ctx context.Context, root string) Result {
 	}
 
 	if len(issues) > 0 {
+		if len(issues) == 1 && strings.HasPrefix(issues[0], "INTENTIONALLY_GATED/PARTIAL:") {
+			return Result{
+				ID: b.ID(), Name: b.Name(), Status: "warn", Weight: b.Weight(),
+				Message:  "INTENTIONALLY_GATED/PARTIAL — bootstrap files are intact but immutable build trust anchors are not configured",
+				Issues:   issues,
+				Duration: time.Since(start),
+			}
+		}
 		return Result{
 			ID: b.ID(), Name: b.Name(), Status: "fail", Weight: b.Weight(),
 			Message:  fmt.Sprintf("FAIL — bootstrap chain broken: %d issue(s) in %d links checked", len(issues), len(chainLinks)),
