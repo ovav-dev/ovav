@@ -404,20 +404,14 @@ func getInjectTargets(env string) []injectionTarget {
 			{"fish-conf-99", "fish/99-ovav-systems-lock.fish", filepath.Join(home, ".config", "fish", "conf.d", "99-ovav-systems-lock.fish")},
 			// Git config
 			{"git", "git/gitconfig", filepath.Join(home, ".gitconfig")},
-			// Theme
-			{"theme-wezterm", "theme/auto.wezterm.lua", filepath.Join(home, ".config", "wezterm", "theme.lua")},
-			// Windows Terminal
-			{"windows-terminal", "windows-terminal/settings.json",
-				"/mnt/c/Users/Alexa/AppData/Local/Packages/Microsoft.WindowsTerminal_8wekyb3d8bbwe/LocalState/settings.json"},
+			// WezTerm projection stays gated until the runtime is installed.
+			// Windows Terminal is merge-only and remains projection-gated.
 		}
 	case "windows":
 		return []injectionTarget{
 			// WezTerm config
 			{"wezterm", "wezterm/wezterm.lua", filepath.Join(os.Getenv("USERPROFILE"), ".wezterm.lua")},
-			// Windows Terminal settings
-			{"windows-terminal", "windows-terminal/settings.json",
-				filepath.Join(os.Getenv("LOCALAPPDATA"), "Packages",
-					"Microsoft.WindowsTerminal_8wekyb3d8bbwe", "LocalState", "settings.json")},
+			// Windows Terminal is merge-only and remains projection-gated.
 			// Git config
 			{"git", "git/gitconfig", filepath.Join(os.Getenv("USERPROFILE"), ".gitconfig")},
 			// MiMoCode config — root fix: was invalid JSONC (comments broke parser).
@@ -430,8 +424,7 @@ func getInjectTargets(env string) []injectionTarget {
 			{"fish-aliases", "commands/aliases.fish", filepath.Join(home, ".config", "fish", "aliases.fish")},
 			// Git config
 			{"git", "git/gitconfig", filepath.Join(home, ".gitconfig")},
-			// Theme
-			{"theme-wezterm", "theme/auto.wezterm.lua", filepath.Join(home, ".config", "wezterm", "theme.lua")},
+			// WezTerm projection stays gated until the runtime is installed.
 			// MiMoCode config — root fix: was invalid JSONC (comments broke parser).
 			// Generate pure JSON via convert_agents, inject as mimocode.jsonc.
 			{"mimocode", "mimocode/mimocode.jsonc", filepath.Join(home, ".config", "mimocode", "mimocode.jsonc")},
