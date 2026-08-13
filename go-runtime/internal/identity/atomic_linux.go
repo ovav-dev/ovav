@@ -108,6 +108,14 @@ func secureAtomicCreate(path string, data []byte, syncFn func(string) error) (bo
 	return secureAtomicReplace(path, data, nil, nil, true, syncFn)
 }
 
+// SecureAtomicReplace publishes data to path using the secure atomic replacement
+// protocol. Caller is responsible for verifying the parent directory is the
+// intended target (e.g. not a symlink) before invoking this function.
+func SecureAtomicReplace(path string, data []byte) error {
+	_, err := secureAtomicReplace(path, data, nil, nil, true, nil)
+	return err
+}
+
 func validateSecureDirectoryFD(fd int) error {
 	var stat unix.Stat_t
 	if err := unix.Fstat(fd, &stat); err != nil {

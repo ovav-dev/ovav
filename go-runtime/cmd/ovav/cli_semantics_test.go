@@ -55,15 +55,17 @@ func TestRunPushPreflightBlocksFailure(t *testing.T) {
 }
 
 func TestParseIntegrityArgsDefaultsToPlanAndRequiresExplicitWrite(t *testing.T) {
-	options, err := parseIntegrityArgs([]string{"baseline"})
+	// parseIntegrityArgs now operates on flags only — the `baseline`/`gate`
+	// subcommand prefix is stripped by cmdIntegrity's dispatcher.
+	options, err := parseIntegrityArgs([]string{})
 	if err != nil || options.write {
 		t.Fatalf("default integrity options=%+v err=%v", options, err)
 	}
-	options, err = parseIntegrityArgs([]string{"baseline", "--write"})
+	options, err = parseIntegrityArgs([]string{"--write"})
 	if err != nil || !options.write {
 		t.Fatalf("write integrity options=%+v err=%v", options, err)
 	}
-	if _, err := parseIntegrityArgs([]string{"baseline", "--apply"}); err == nil {
+	if _, err := parseIntegrityArgs([]string{"--apply"}); err == nil {
 		t.Fatal("unknown integrity write option accepted")
 	}
 }
