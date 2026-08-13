@@ -1,6 +1,6 @@
 {
   "name": "ovav",
-  "version": "2.3.2",
+  "version": "2.3.3",
   "description": "OVAV - Zero-Memory Agent Workstation Governor",
   "private": true,
   "packageManager": "pnpm@9.0.0",
