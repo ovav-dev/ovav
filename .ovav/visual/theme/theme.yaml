@@ -11,7 +11,7 @@
 schema: ovav.visual.theme.v1
 name: "OVAV Default"
 version: "2.0.0"
-description: "Tema visual canónico del sistema gobernador OVAV — modo oscuro eye-friendly, bajo contraste, largas sesiones"
+description: "Sistema visual adaptativo OVAV Day/Night — premium minimal, WCAG AA y baja fatiga"
 
 # ══════════════════════════════════════════════════════════════════════════════
 # PALETA DE MARCA — Colores de identidad OVAV (suavizados)
@@ -44,32 +44,58 @@ semantic:
 # ══════════════════════════════════════════════════════════════════════════════
 surfaces:
   dark:
-    bg_root:          "#242424"   # Fondo principal — gris oscuro cálido
-    bg_panel:         "#2d2d2d"   # Paneles — gris medio
-    bg_element:       "#383838"   # Elementos interactivos
-    bg_hover:         "#454545"   # Hover/activo
-    bg_selected:      "#505050"   # Seleccionado
-    border:           "#383838"   # Bordes estándar
-    border_active:    "#6d9b8e"   # Borde activo — color Thavren
-    border_focus:     "#9aaa4a"   # Borde foco — color Eidren
-    text_primary:     "#d4d4d4"   # Texto principal — gris claro
-    text_secondary:   "#a0a0a0"   # Texto secundario — gris medio
-    text_muted:       "#707070"   # Texto atenuado
-    text_inverse:     "#242424"   # Texto sobre fondo claro
+    bg_root:          "#202124"   # Fondo principal — grafito neutro
+    bg_panel:         "#25272b"   # Paneles — separación sutil
+    bg_element:       "#2d3035"   # Elementos interactivos
+    bg_hover:         "#373b41"   # Hover/activo
+    bg_selected:      "#42474f"   # Seleccionado
+    border:           "#4b5058"   # Bordes estándar
+    border_active:    "#72b8aa"   # Borde activo — teal OVAV
+    border_focus:     "#aebd68"   # Borde foco — oliva OVAV
+    text_primary:     "#d9dadd"   # Texto principal — AA
+    text_secondary:   "#b5b8be"   # Texto secundario — AA
+    text_muted:       "#979ba3"   # Texto atenuado — AA
+    text_inverse:     "#202124"   # Texto sobre fondo claro
+    primary:          "#72b8aa"
+    secondary:        "#aebd68"
+    accent:           "#df8997"
+    error:            "#e17f74"
+    warning:          "#e0b86b"
+    success:          "#86c78a"
+    info:             "#79aee0"
+    diff_added:       "#9bd39e"
+    diff_removed:     "#ef9a91"
+    diff_context:     "#b5b8be"
+    diff_hunk:        "#91bce4"
+    diff_added_bg:    "#24352a"
+    diff_removed_bg:  "#3b292a"
 
   light:
-    bg_root:          "#f5f0e8"   # Fondo principal — crema papel
-    bg_panel:         "#ede4d6"   # Paneles
-    bg_element:       "#e5dac8"   # Elementos
-    bg_hover:         "#d9ccb6"   # Hover
-    bg_selected:      "#cbbfa6"   # Seleccionado
-    border:           "#d9ccb6"   # Bordes
-    border_active:    "#5a7d8a"   # Borde activo
-    border_focus:     "#9aaa4a"   # Borde foco
-    text_primary:     "#3a3a3a"   # Texto principal
-    text_secondary:   "#5c5c5c"   # Texto secundario
-    text_muted:       "#808080"   # Texto atenuado
-    text_inverse:     "#f5f0e8"   # Texto sobre fondo oscuro
+    bg_root:          "#f7f4ee"   # Fondo principal — marfil de baja fatiga
+    bg_panel:         "#ece7dd"   # Paneles
+    bg_element:       "#e4ded4"   # Elementos
+    bg_hover:         "#d8d1c6"   # Hover
+    bg_selected:      "#cbc3b7"   # Seleccionado
+    border:           "#aaa49b"   # Bordes
+    border_active:    "#2f685c"   # Borde activo
+    border_focus:     "#596814"   # Borde foco
+    text_primary:     "#202124"   # Texto principal — AA
+    text_secondary:   "#4f545c"   # Texto secundario — AA
+    text_muted:       "#555b63"   # Texto atenuado — AA
+    text_inverse:     "#f7f4ee"   # Texto sobre fondo oscuro
+    primary:          "#2f685c"
+    secondary:        "#596814"
+    accent:           "#8b4050"
+    error:            "#97392f"
+    warning:          "#785500"
+    success:          "#356b39"
+    info:             "#285d82"
+    diff_added:       "#356b39"
+    diff_removed:     "#97392f"
+    diff_context:     "#555b63"
+    diff_hunk:        "#285d82"
+    diff_added_bg:    "#dce8df"
+    diff_removed_bg:  "#e9dedd"
 
 # ══════════════════════════════════════════════════════════════════════════════
 # SINTAXIS — Colores para código y diff (suavizado)

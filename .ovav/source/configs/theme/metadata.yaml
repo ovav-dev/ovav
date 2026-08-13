@@ -9,7 +9,6 @@ files:
   - dark.yaml                    # Dark palette (canonical)
   - light.yaml                   # Light palette (canonical)
   - auto.wezterm.lua            # WezTerm auto-detection module
-  - auto.windows-terminal.json   # Windows Terminal auto-detection
 
 # Color schemes
 schemes:
@@ -31,16 +30,13 @@ auto_detection:
     module: "auto.wezterm.lua"
     env_var: "OVAV_COLOR_SCHEME"
     default: "dark"
-
-  windows_terminal:
-    file: "auto.windows-terminal.json"
-    env_var: "OVAV_COLOR_SCHEME"
-    default: "dark"
+    projection_gate: "command -v wezterm"
 
 # Features
 features:
   - System theme detection
   - Dark/Light manual override via OVAV_COLOR_SCHEME
+  - WezTerm GUI appearance detection via wezterm.gui.get_appearance()
   - Workspace-aware coloring
 
 # Deploy targets
