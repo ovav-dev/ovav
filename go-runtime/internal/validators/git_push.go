@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/ovav/ovav/internal/ceo"
 )
 
 // GitPush validates OVAV git push gate rules:
@@ -121,6 +123,13 @@ func (g *GitPush) Validate(ctx context.Context, root string) Result {
 }
 
 // checkBranchSafety checks if current branch is protected and has a waiver.
+//
+// Resolution order (matches protected_branch.go):
+//  1. Non-protected branch → always safe.
+//  2. Active CEO session → bypass all waiver requirements.
+//  3. Centralized runtime waiver (.ovav/runtime/protected_branch_waiver.yaml)
+//     that covers the branch → safe.
+//  4. Otherwise → fail with "no active waiver".
 func (g *GitPush) checkBranchSafety(root string) (bool, string) {
 	branch := getCurrentBranch(root)
 	if branch == "" {
@@ -129,8 +138,12 @@ func (g *GitPush) checkBranchSafety(root string) (bool, string) {
 	if !protectedBranches[branch] {
 		return true, ""
 	}
-	// Protected branch — check for waiver
-	waiverPath := filepath.Join(root, ".ovav", "governance", "waivers", branch+".yaml")
+	// Protected branch — CEO session auto-bypasses.
+	if ceo.IsActive(root) {
+		return true, ""
+	}
+	// Protected branch — require the centralized runtime waiver file.
+	waiverPath := filepath.Join(root, ".ovav", "runtime", "protected_branch_waiver.yaml")
 	if _, err := os.Stat(waiverPath); os.IsNotExist(err) {
 		return false, fmt.Sprintf("Protected branch '%s' has no active waiver", branch)
 	}

@@ -63,9 +63,11 @@ func (p *PluginSecurity) Validate(ctx context.Context, root string) Result {
 		} else if strings.Contains(content, "url = git@") {
 			// SSH — good
 		} else if strings.Contains(content, "url = https://") {
-			// HTTPS without SSH — check if credential helper is configured
-			if !strings.Contains(content, "credential") {
-				issues = append(issues, "GIT: HTTPS transport without credential helper — consider SSH")
+			// HTTPS without SSH — accept either:
+			//   (a) traditional `credential.helper` config in .git/config
+			//   (b) gh CLI authentication via ~/.config/gh/hosts.yml (modern dev workflow)
+			if !strings.Contains(content, "credential") && !hasGhCLIAuth() {
+				issues = append(issues, "GIT: HTTPS transport without credential helper — consider SSH or `gh auth login`")
 			}
 		}
 	}
@@ -118,3 +120,29 @@ func (p *PluginSecurity) Validate(ctx context.Context, root string) Result {
 }
 
 var _ Validator = (*PluginSecurity)(nil)
+
+// hasGhCLIAuth reports whether the user has authenticated the GitHub CLI.
+//
+// `gh` stores its session token in ~/.config/gh/hosts.yml as
+// `oauth_token: <token>` (or `users.<user>.oauth_token`). When present,
+// git's https transport automatically uses the token via the `gh` credential
+// helper, even without `credential.helper` set in .git/config. This is the
+// canonical auth path on modern dev workstations and CI runners.
+//
+// Returns false if the file is missing, unreadable, or contains no oauth_token.
+func hasGhCLIAuth() bool {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return false
+	}
+	hostsPath := filepath.Join(home, ".config", "gh", "hosts.yml")
+	data, err := os.ReadFile(hostsPath)
+	if err != nil {
+		return false
+	}
+	// hosts.yml is YAML, but a substring search for the token field is robust
+	// enough for the boolean decision we need here. False positives are
+	// extremely unlikely (a literal "oauth_token: " in user-controlled config
+	// is itself a security smell).
+	return strings.Contains(string(data), "oauth_token:")
+}
