@@ -681,8 +681,14 @@ type SecretFinding struct {
 
 // scanSecretsInChanges scans files changed in branch vs develop for secrets.
 func scanSecretsInChanges(repoRoot, branch string) ([]SecretFinding, error) {
-	// Get list of files changed in this branch vs develop (two-dot: direct comparison)
-	diffCmd := exec.Command("git", "diff", "--name-only", "develop.."+branch)
+	// Get list of files changed in this branch vs develop (two-dot: direct comparison).
+	// Prefer local "develop" first; fall back to "origin/develop" when running in a
+	// freshly cloned worktree where the local ref does not exist yet.
+	diffBase := "develop"
+	if _, err := runGitOutput(repoRoot, "rev-parse", "--verify", "--quiet", diffBase); err != nil {
+		diffBase = "origin/develop"
+	}
+	diffCmd := exec.Command("git", "diff", "--name-only", diffBase+".."+branch)
 	diffCmd.Dir = repoRoot
 	diffOut, err := diffCmd.Output()
 	if err != nil {
