@@ -670,7 +670,12 @@ func TestMain_Subprocess_NoRepoRoot(t *testing.T) {
 	}
 	bin := buildBinary(t)
 
-	tmp := t.TempDir()
+	// The workspace contains a nested .ovav/ directory; placing the subprocess
+	// outside it proves root discovery fails without touching real projections.
+	tmp := filepath.Join(t.TempDir(), "outside-workspace")
+	if err := os.MkdirAll(tmp, 0o755); err != nil {
+		t.Fatal(err)
+	}
 	cmd := exec.Command(bin)
 	cmd.Dir = tmp
 	out, err := cmd.CombinedOutput()
