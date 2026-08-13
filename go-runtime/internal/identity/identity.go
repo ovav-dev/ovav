@@ -20,6 +20,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"gopkg.in/yaml.v3"
 )
@@ -64,7 +65,7 @@ type Registry struct {
 
 // ── Registry loading ─────────────────────────────────────────────────────────
 
-const registryRelPath = ".ovav/registry/identities.yaml"
+const registryRelPath = RegistryRelativePath
 
 // LoadRegistry reads and parses the identity registry from the repo root.
 // It does NOT verify the signature — call VerifySignature separately with the CEO key.
@@ -169,14 +170,32 @@ func VerifySignature(repoRoot string, ceoKey []byte) (bool, error) {
 	if err := yaml.Unmarshal(data, &reg); err != nil {
 		return false, fmt.Errorf("identity: invalid YAML: %w", err)
 	}
+	if _, err := time.Parse(time.RFC3339Nano, reg.Signature.SignedAt); err != nil {
+		return false, fmt.Errorf("identity: signature signed_at is invalid: %w", err)
+	}
 
 	if reg.Signature.Value == "" || reg.Signature.Value == "PLACEHOLDER" {
 		return false, fmt.Errorf("identity: signature is placeholder — registry not yet signed")
 	}
 
-	// Compute HMAC-SHA256(ceoKey, signedContent)
+	var payload []byte
+	switch reg.Signature.Algorithm {
+	case "HMAC-SHA256":
+		if reg.Signature.SignedBy != "ceo" {
+			return false, fmt.Errorf("identity: legacy signature signed_by must be ceo")
+		}
+		payload = []byte(signedContent)
+	case "HMAC-SHA256-V2":
+		if reg.Signature.SignedBy != CanonicalCEOID {
+			return false, fmt.Errorf("identity: v2 signature signed_by must be %s", CanonicalCEOID)
+		}
+		payload = signaturePayloadV2([]byte(signedContent), reg.Signature.Algorithm, reg.Signature.SignedBy, reg.Signature.SignedAt)
+	default:
+		return false, fmt.Errorf("identity: unsupported signature algorithm")
+	}
+
 	mac := hmac.New(sha256.New, ceoKey)
-	mac.Write([]byte(signedContent))
+	mac.Write(payload)
 	expectedSig := hex.EncodeToString(mac.Sum(nil))
 
 	// Constant-time comparison
@@ -191,6 +210,19 @@ func VerifySignature(repoRoot string, ceoKey []byte) (bool, error) {
 	}
 
 	return hmac.Equal(storedSig, computedSig), nil
+}
+
+func signaturePayloadV2(signedContent []byte, algorithm, signedBy, signedAt string) []byte {
+	payload := make([]byte, 0, len(signedContent)+len(algorithm)+len(signedBy)+len(signedAt)+64)
+	payload = append(payload, []byte("OVAV-IDENTITY-SIGNATURE-V2\n")...)
+	payload = append(payload, signedContent...)
+	payload = append(payload, []byte("\nalgorithm:")...)
+	payload = append(payload, algorithm...)
+	payload = append(payload, []byte("\nsigned_by:")...)
+	payload = append(payload, signedBy...)
+	payload = append(payload, []byte("\nsigned_at:")...)
+	payload = append(payload, signedAt...)
+	return payload
 }
 
 // SignRegistry computes the HMAC-SHA256 signature for registry content.
@@ -212,8 +244,27 @@ func SignRegistry(repoRoot string, ceoKey []byte) (string, error) {
 
 	signedContent := content[:idx]
 
+	var reg Registry
+	if err := yaml.Unmarshal(data, &reg); err != nil {
+		return "", fmt.Errorf("identity: invalid YAML: %w", err)
+	}
+	var payload []byte
+	switch reg.Signature.Algorithm {
+	case "HMAC-SHA256":
+		if reg.Signature.SignedBy != "ceo" {
+			return "", fmt.Errorf("identity: legacy signature signed_by must be ceo")
+		}
+		payload = []byte(signedContent)
+	case "HMAC-SHA256-V2":
+		if reg.Signature.SignedBy != CanonicalCEOID {
+			return "", fmt.Errorf("identity: v2 signature signed_by must be %s", CanonicalCEOID)
+		}
+		payload = signaturePayloadV2([]byte(signedContent), reg.Signature.Algorithm, reg.Signature.SignedBy, reg.Signature.SignedAt)
+	default:
+		return "", fmt.Errorf("identity: unsupported signature algorithm")
+	}
 	mac := hmac.New(sha256.New, ceoKey)
-	mac.Write([]byte(signedContent))
+	mac.Write(payload)
 	return hex.EncodeToString(mac.Sum(nil)), nil
 }
 

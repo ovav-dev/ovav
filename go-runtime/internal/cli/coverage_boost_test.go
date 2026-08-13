@@ -2,9 +2,11 @@ package cli
 
 import (
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 )
 
 // ── envdetect.go: IsOVAVProject (0% → tested) ─────────────────────────────
@@ -76,7 +78,7 @@ func TestFreshCloneSmoke(t *testing.T) {
 	os.WriteFile(filepath.Join(tmp, "HEAD"), []byte("ref: refs/heads/main"), 0644)
 
 	result := FreshCloneSmoke(tmp, false)
-	if result.SchemaVersion != "ovav.fresh_clone_smoke.v1" {
+	if result.SchemaVersion != "ovav.candidate_smoke.v2" {
 		t.Errorf("schema = %v", result.SchemaVersion)
 	}
 	if len(result.Checks) == 0 {
@@ -115,8 +117,83 @@ func TestFreshCloneSmoke_KeepClone(t *testing.T) {
 
 	result := FreshCloneSmoke(tmp, true)
 	// Just verify it doesn't panic and produces valid result
-	if result.SchemaVersion != "ovav.fresh_clone_smoke.v1" {
+	if result.SchemaVersion != "ovav.candidate_smoke.v2" {
 		t.Errorf("schema = %v", result.SchemaVersion)
+	}
+}
+
+func TestApplyCandidateChanges_IncludesTrackedAndUntrackedFiles(t *testing.T) {
+	repo := initCandidateTestRepo(t)
+	clone := filepath.Join(t.TempDir(), "clone")
+	runGitTestCommand(t, "", "clone", "--no-hardlinks", repo, clone)
+
+	mustWriteTestFile(t, repo, "tracked.txt", "candidate\n")
+	mustWriteTestFile(t, repo, "untracked.txt", "included\n")
+	if err := applyCandidateChanges(repo, clone); err != nil {
+		t.Fatalf("applyCandidateChanges() error = %v", err)
+	}
+
+	for path, want := range map[string]string{"tracked.txt": "candidate\n", "untracked.txt": "included\n"} {
+		got, err := os.ReadFile(filepath.Join(clone, path))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if string(got) != want {
+			t.Errorf("%s = %q, want %q", path, got, want)
+		}
+	}
+}
+
+func TestApplyCandidateChanges_FailsWhenPatchCannotApply(t *testing.T) {
+	repo := initCandidateTestRepo(t)
+	clone := filepath.Join(t.TempDir(), "clone")
+	runGitTestCommand(t, "", "clone", "--no-hardlinks", repo, clone)
+
+	mustWriteTestFile(t, repo, "tracked.txt", "candidate\n")
+	mustWriteTestFile(t, clone, "tracked.txt", "conflict\n")
+	if err := applyCandidateChanges(repo, clone); err == nil {
+		t.Fatal("applyCandidateChanges() succeeded with a conflicting clone")
+	}
+}
+
+func TestFreshCloneSmokeWithTimeout_DefaultTestsCandidate(t *testing.T) {
+	repo := t.TempDir()
+	runGitTestCommand(t, repo, "init")
+	runGitTestCommand(t, repo, "config", "user.email", "test@example.invalid")
+	runGitTestCommand(t, repo, "config", "user.name", "Test")
+	mustWriteTestFile(t, repo, "go-runtime/go.mod", "module example.invalid/candidate\n\ngo 1.22\n")
+	mustWriteTestFile(t, repo, "go-runtime/cmd/ovav/main.go", "package main\nfunc main() {}\n")
+	runGitTestCommand(t, repo, "add", "go-runtime/go.mod", "go-runtime/cmd/ovav/main.go")
+	runGitTestCommand(t, repo, "commit", "-m", "fixture")
+	mustWriteTestFile(t, repo, "go-runtime/cmd/ovav/main.go", "package main\nfunc main( {\n")
+
+	result := FreshCloneSmokeWithTimeout(repo, false, 30*time.Second)
+	if result.ValidatePassed {
+		t.Fatal("candidate with invalid Go syntax was not tested")
+	}
+	if len(result.Checks) < 2 || result.Checks[1]["name"] != "apply_candidate" || result.Checks[1]["passed"] != true {
+		t.Fatalf("candidate apply evidence missing: %#v", result.Checks)
+	}
+}
+
+func initCandidateTestRepo(t *testing.T) string {
+	t.Helper()
+	repo := t.TempDir()
+	runGitTestCommand(t, repo, "init")
+	runGitTestCommand(t, repo, "config", "user.email", "test@example.invalid")
+	runGitTestCommand(t, repo, "config", "user.name", "Test")
+	mustWriteTestFile(t, repo, "tracked.txt", "head\n")
+	runGitTestCommand(t, repo, "add", "tracked.txt")
+	runGitTestCommand(t, repo, "commit", "-m", "fixture")
+	return repo
+}
+
+func runGitTestCommand(t *testing.T, dir string, args ...string) {
+	t.Helper()
+	cmd := exec.Command("git", args...)
+	cmd.Dir = dir
+	if out, err := cmd.CombinedOutput(); err != nil {
+		t.Fatalf("git %v: %v: %s", args, err, out)
 	}
 }
 
@@ -136,7 +213,7 @@ func TestScanForSecrets_NoSecrets(t *testing.T) {
 func TestScanForSecrets_WithSecret(t *testing.T) {
 	tmp := t.TempDir()
 	os.MkdirAll(filepath.Join(tmp, "tools"), 0755)
-	os.WriteFile(filepath.Join(tmp, "tools", "bad.py"), []byte("api_key = 'sk-abc123'"), 0644)
+	os.WriteFile(filepath.Join(tmp, "tools", "bad.py"), []byte("api_key = 'sk-"+strings.Repeat("a", 48)+"'"), 0644)
 
 	findings := scanForSecrets(tmp)
 	if len(findings) == 0 {
@@ -182,7 +259,7 @@ func TestScanForSecrets_AllDirs(t *testing.T) {
 func TestScanForSecrets_MultiplePatterns(t *testing.T) {
 	tmp := t.TempDir()
 	os.MkdirAll(filepath.Join(tmp, "tools"), 0755)
-	content := "key = 'ghp_abcdef1234567890'\nsecret = 'AIzaSyDfake'"
+	content := "key = 'ghp_" + strings.Repeat("a", 36) + "'\nsecret = 'AIza" + strings.Repeat("B", 35) + "'"
 	os.WriteFile(filepath.Join(tmp, "tools", "config.py"), []byte(content), 0644)
 
 	findings := scanForSecrets(tmp)
@@ -264,49 +341,32 @@ func TestCheckUncommitted_IncompleteRepo(t *testing.T) {
 
 func TestCheckVersionConsistency_Found(t *testing.T) {
 	tmp := t.TempDir()
-	content := "# AGENTS.md\nVersion 1.2.3\nSome other line\n"
-	os.WriteFile(filepath.Join(tmp, "AGENTS.md"), []byte(content), 0644)
+	os.WriteFile(filepath.Join(tmp, "VERSION"), []byte("1.2.3\n"), 0644)
 
 	result := checkVersionConsistency(tmp)
-	if _, ok := result["AGENTS.md"]; !ok {
-		t.Error("expected version info from AGENTS.md")
+	if result.Sources["VERSION"] != "1.2.3" {
+		t.Errorf("VERSION source = %q", result.Sources["VERSION"])
 	}
 }
 
 func TestCheckVersionConsistency_NoVersion(t *testing.T) {
 	tmp := t.TempDir()
-	content := "# AGENTS.md\nNo version info here\n"
-	os.WriteFile(filepath.Join(tmp, "AGENTS.md"), []byte(content), 0644)
+	os.WriteFile(filepath.Join(tmp, "VERSION"), []byte("\n"), 0644)
 
 	result := checkVersionConsistency(tmp)
-	// Should not find version
-	for _, v := range result {
-		if strings.Contains(v, "Version") {
-			t.Errorf("should not find version in: %v", v)
-		}
+	if result.Passed() {
+		t.Fatal("empty VERSION should fail consistency")
+	}
+	if !strings.Contains(strings.Join(result.Issues, "\n"), "empty") {
+		t.Errorf("issues = %v, want empty VERSION issue", result.Issues)
 	}
 }
 
 func TestCheckVersionConsistency_MissingFiles(t *testing.T) {
 	tmp := t.TempDir()
 	result := checkVersionConsistency(tmp)
-	// No files exist, should return empty map
-	if len(result) != 0 {
+	if len(result.Sources) != 0 {
 		t.Errorf("expected empty result, got %v", result)
-	}
-}
-
-func TestCheckVersionConsistency_LongLine(t *testing.T) {
-	tmp := t.TempDir()
-	longLine := "Version " + strings.Repeat("x", 100)
-	content := longLine + "\n"
-	os.WriteFile(filepath.Join(tmp, "AGENTS.md"), []byte(content), 0644)
-
-	result := checkVersionConsistency(tmp)
-	if v, ok := result["AGENTS.md"]; ok {
-		if len(v) > 80 {
-			t.Errorf("line should be truncated to 80 chars, got %d", len(v))
-		}
 	}
 }
 
@@ -433,7 +493,7 @@ func TestCheckReadme_Present(t *testing.T) {
 func TestExportGateCheck_WithSecret(t *testing.T) {
 	tmp := t.TempDir()
 	os.MkdirAll(filepath.Join(tmp, "tools"), 0755)
-	os.WriteFile(filepath.Join(tmp, "tools", "bad.py"), []byte("api_key='sk-test123'"), 0644)
+	os.WriteFile(filepath.Join(tmp, "tools", "bad.py"), []byte("api_key='sk-"+strings.Repeat("a", 48)+"'"), 0644)
 	os.WriteFile(filepath.Join(tmp, "README.md"), []byte("# Test"), 0644)
 
 	result := ExportGateCheck(tmp)

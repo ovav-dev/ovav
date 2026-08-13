@@ -4,7 +4,9 @@
 # =============================================================================
 # Author  = Agent identity (lead)  → shows as "Thavren (Platform Engineering)"
 # Committer = Verified human (Alexander Salvador) → GitHub "Verified" badge
-# Signing = GPG key 3DAC13769287AC80 (alexander_mya@outlook.com)
+# Signing = GPG primary 1D70BE0236928C49921A781F5F384C5B35CDD0F8
+#           signing subkey 7DE5923582A84DBB
+#           (rotated 2026-08-13 after laptop reformat lost RSA-4096 3DAC13769287AC80)
 # =============================================================================
 
 set -e
@@ -21,7 +23,7 @@ fi
 # Verified human identity (committer — GitHub "Verified" badge)
 HUMAN_NAME="Alexander Salvador"
 HUMAN_EMAIL="alexander_mya@outlook.com"
-GPG_KEY="3DAC13769287AC80"
+GPG_KEY="7DE5923582A84DBB"
 
 # Load agent identity for a lead using jq
 load_agent_identity() {

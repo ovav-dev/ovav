@@ -12,9 +12,7 @@ import (
 	"github.com/ovav/ovav/internal/truststore"
 )
 
-// GateSelfProtection validates host defense gate integrity.
-// Uses git reflog grace period: gate hash changes within 5 minutes of a git
-// operation are treated as legitimate (developer workflow), not compromise.
+// GateSelfProtection validates host defense gate integrity without changing trust state.
 type GateSelfProtection struct{}
 
 func NewGateSelfProtection() *GateSelfProtection { return &GateSelfProtection{} }
@@ -90,27 +88,18 @@ func (g *GateSelfProtection) Validate(ctx context.Context, root string) Result {
 	state := truststore.ReadGateState(root)
 	storedHash := state.GateSHA256
 
-	// 4. Authorized session — bypass hash check
-	if g.isAuthorizedSession(root) {
-		if currentHash != storedHash && storedHash != "" {
-			state.GateSHA256 = currentHash
-			truststore.WriteGateState(root, state)
-		}
-		return Result{
-			ID: g.ID(), Name: g.Name(), Status: "pass", Weight: g.Weight(),
-			Message:  fmt.Sprintf("PASS gate self-protection — authorized session, hash updated (%s...)", currentHash[:8]),
-			Duration: time.Since(start),
-		}
+	status, tracked := gitPathStatus(root, gateFile)
+	if !tracked {
+		issues = append(issues, "UNTRACKED PROTECTED GATE: "+gateFile)
+		return Result{ID: g.ID(), Name: g.Name(), Status: "fail", Weight: g.Weight(), Message: "FAIL gate self-protection — protected gate is outside HEAD", Issues: issues, Duration: time.Since(start)}
 	}
 
-	// 5. First run — initialize
+	// 4. A baseline is created only by an explicit trust operation.
 	if storedHash == "" {
-		state.GateSHA256 = currentHash
-		truststore.WriteGateState(root, state)
 		return Result{
-			ID: g.ID(), Name: g.Name(), Status: "pass", Weight: g.Weight(),
-			Message:  "PASS gate self-protection — gate hash initialized",
-			Duration: time.Since(start),
+			ID: g.ID(), Name: g.Name(), Status: "warn", Weight: g.Weight(),
+			Message: "WARN gate self-protection — gate hash baseline missing; validation made no writes",
+			Issues:  []string{"gate hash baseline missing; explicit baseline operation required"}, Duration: time.Since(start),
 		}
 	}
 
@@ -123,38 +112,16 @@ func (g *GateSelfProtection) Validate(ctx context.Context, root string) Result {
 		}
 	}
 
-	// 7. Hash mismatch — check grace period
-	if state.LastGitOpTime > 0 {
-		ok, _ := truststore.GracePeriodOk(root)
-		if ok {
-			elapsed := time.Since(time.Unix(state.LastGitOpTime, 0))
-			state.GateSHA256 = currentHash
-			truststore.WriteGateState(root, state)
-			return Result{
-				ID: g.ID(), Name: g.Name(), Status: "pass", Weight: g.Weight(),
-				Message: fmt.Sprintf(
-					"PASS gate self-protection — hash updated post-git-op (%.0f min grace, reflog: %s)",
-					elapsed.Minutes(), state.LastGitOpReflog,
-				),
-				Duration: time.Since(start),
-			}
+	// 6. A tracked working-tree modification is expected feature work. A hash
+	// mismatch with a clean worktree means the baseline disagrees with HEAD.
+	if status != "" {
+		return Result{
+			ID: g.ID(), Name: g.Name(), Status: "warn", Weight: g.Weight(),
+			Message: "WARN gate self-protection — tracked protected gate modified in feature worktree",
+			Issues:  []string{fmt.Sprintf("EXPECTED FEATURE MODIFICATION: %s (%s); trust baseline unchanged", gateFile, status)}, Duration: time.Since(start),
 		}
-		// Outside grace period
-		elapsed := time.Since(time.Unix(state.LastGitOpTime, 0))
-		issues = append(issues, fmt.Sprintf(
-			"GATE HASH MISMATCH: current %s... != stored %s... — possible compromise",
-			currentHash[:16], storedHash[:16],
-		))
-		issues = append(issues, fmt.Sprintf(
-			"Last git op: %s (%.0f min ago) — outside 5-min grace period",
-			state.LastGitOpReflog, elapsed.Minutes(),
-		))
-	} else {
-		issues = append(issues, fmt.Sprintf(
-			"GATE HASH MISMATCH: current %s... != stored %s... — possible compromise (no git-op record)",
-			currentHash[:16], storedHash[:16],
-		))
 	}
+	issues = append(issues, fmt.Sprintf("GATE HASH MISMATCH: clean HEAD file %s... != stored %s... — stale baseline or compromise", currentHash[:16], storedHash[:16]))
 
 	return Result{
 		ID: g.ID(), Name: g.Name(), Status: "fail", Weight: g.Weight(),

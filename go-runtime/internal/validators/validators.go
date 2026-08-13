@@ -99,15 +99,19 @@ func (r *Registry) Run(ctx context.Context, root string) []Result {
 //   - ArchitectureGuardian (directory structure not critical)
 //   - CapsChronosAlignment (stale caps.yaml is WARN, not FAIL)
 //   - CrossTargetConsistency (→ AgentProjectionMonitor in OMARS)
-func DefaultRegistry() *Registry {
+func DefaultRegistry(modes ...ValidationMode) *Registry {
+	mode := ValidationDeveloper
+	if len(modes) > 0 {
+		mode = modes[0]
+	}
 	return NewRegistry(
 		NewSecretsHygiene(),
 		NewExfilPatterns(),
-		NewSupplyChain(),
+		NewSupplyChain(mode),
 		NewProtectedBranch(),
 		NewGitPush(),
 		NewPermissionDrift(),
-		NewRuntimeIntegrity(),
+		NewRuntimeIntegrity(mode),
 		NewContractFreshness(),
 		NewInstallVerification(),
 		NewSecurityPolicy(),

@@ -8,18 +8,25 @@ import (
 	"github.com/ovav/ovav/internal/project"
 )
 
-// cmdSync handles `ovav sync` — projection sync from canonical source to CLI surfaces.
-func cmdSync(args []string) int {
-	verbose := false
-	dryRun := false
-	step := ""
+type syncOptions struct {
+	verbose  bool
+	dryRun   bool
+	planJSON bool
+	help     bool
+	step     string
+}
 
+func parseSyncArgs(args []string) (syncOptions, error) {
+	var opts syncOptions
 	for _, arg := range args {
+		var step string
 		switch arg {
 		case "-v", "--verbose":
-			verbose = true
+			opts.verbose = true
 		case "--dry-run":
-			dryRun = true
+			opts.dryRun = true
+		case "--plan-json":
+			opts.planJSON = true
 		case "--agents":
 			step = "agents"
 		case "--skills":
@@ -29,9 +36,48 @@ func cmdSync(args []string) int {
 		case "--mimocode":
 			step = "mimocode"
 		case "--help", "-h":
-			printSyncHelp()
-			return 0
+			opts.help = true
+		default:
+			return syncOptions{}, fmt.Errorf("unknown sync argument %q", arg)
 		}
+		if step != "" {
+			if opts.step != "" && opts.step != step {
+				return syncOptions{}, fmt.Errorf("sync steps %q and %q conflict", opts.step, step)
+			}
+			opts.step = step
+		}
+	}
+	return opts, nil
+}
+
+func buildSyncPlan(root, step string) map[string]interface{} {
+	steps := []string{"agents", "skills", "visual", "mimocode", "harness_agents", "config"}
+	switch step {
+	case "agents":
+		steps = []string{"agents", "harness_agents"}
+	case "skills", "visual", "mimocode":
+		steps = []string{step}
+	}
+	return map[string]interface{}{
+		"schema_version":   "ovav.sync_plan.v1",
+		"command":          "sync",
+		"mode":             "plan",
+		"root":             root,
+		"steps":            steps,
+		"writes_performed": false,
+	}
+}
+
+// cmdSync handles `ovav sync` — projection sync from canonical source to CLI surfaces.
+func cmdSync(args []string) int {
+	opts, err := parseSyncArgs(args)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+		return 2
+	}
+	if opts.help {
+		printSyncHelp()
+		return 0
 	}
 
 	root, err := findOvavRoot()
@@ -40,12 +86,16 @@ func cmdSync(args []string) int {
 		return 1
 	}
 
-	if dryRun {
+	if opts.planJSON {
+		return jsonOutput(buildSyncPlan(root, opts.step))
+	}
+
+	if opts.dryRun {
 		fmt.Println("╔══════════════════════════════════════════════════════╗")
 		fmt.Println("║  OVAV Sync — Dry Run                                ║")
 		fmt.Println("╠══════════════════════════════════════════════════════╣")
 		fmt.Printf("║  Root: %s\n", root)
-		fmt.Printf("║  Step: %s\n", step)
+		fmt.Printf("║  Step: %s\n", opts.step)
 		fmt.Println("╚══════════════════════════════════════════════════════╝")
 		return 0
 	}
@@ -56,8 +106,8 @@ func cmdSync(args []string) int {
 	totalFailed := 0
 
 	// Run specific step or all
-	if step == "" || step == "agents" {
-		if cleaned, created, err := project.SyncAgents(root, verbose); err != nil {
+	if opts.step == "" || opts.step == "agents" {
+		if cleaned, created, err := project.SyncAgents(root, opts.verbose); err != nil {
 			fmt.Fprintf(os.Stderr, "  ✗ agents: %v\n", err)
 			totalFailed++
 		} else {
@@ -65,8 +115,8 @@ func cmdSync(args []string) int {
 		}
 	}
 
-	if step == "" || step == "skills" {
-		if s, a, err := project.SyncConnectorBus(root, verbose); err != nil {
+	if opts.step == "" || opts.step == "skills" {
+		if s, a, err := project.SyncConnectorBus(root, opts.verbose); err != nil {
 			fmt.Fprintf(os.Stderr, "  ✗ skills: %v\n", err)
 			totalFailed++
 		} else {
@@ -74,8 +124,8 @@ func cmdSync(args []string) int {
 		}
 	}
 
-	if step == "" || step == "visual" {
-		if v, err := project.SyncVisual(root, verbose); err != nil {
+	if opts.step == "" || opts.step == "visual" {
+		if v, err := project.SyncVisual(root, opts.verbose); err != nil {
 			fmt.Fprintf(os.Stderr, "  ✗ visual: %v\n", err)
 			totalFailed++
 		} else {
@@ -83,8 +133,8 @@ func cmdSync(args []string) int {
 		}
 	}
 
-	if step == "" || step == "mimocode" {
-		if mc, err := project.SyncMiMoCode(root, verbose); err != nil {
+	if opts.step == "" || opts.step == "mimocode" {
+		if mc, err := project.SyncMiMoCode(root, opts.verbose); err != nil {
 			fmt.Fprintf(os.Stderr, "  ✗ mimocode: %v\n", err)
 			totalFailed++
 		} else {
@@ -92,8 +142,8 @@ func cmdSync(args []string) int {
 		}
 	}
 
-	if step == "" || step == "agents" {
-		if ha, err := project.SyncHarnessAgents(root, verbose); err != nil {
+	if opts.step == "" || opts.step == "agents" {
+		if ha, err := project.SyncHarnessAgents(root, opts.verbose); err != nil {
 			fmt.Fprintf(os.Stderr, "  ✗ harness_agents: %v\n", err)
 			totalFailed++
 		} else {
@@ -101,7 +151,7 @@ func cmdSync(args []string) int {
 		}
 	}
 
-	if step == "" || step == "config" {
+	if opts.step == "" {
 		// OpenCode config generation
 		if err := convert.GenerateOpenCodeConfig(root); err != nil {
 			fmt.Fprintf(os.Stderr, "  ✗ config: %v\n", err)
@@ -146,6 +196,7 @@ func printSyncHelp() {
 	fmt.Println("  ovav sync --visual     Sync themes + plugins only")
 	fmt.Println("  ovav sync --mimocode   Sync MiMo Code artifacts only")
 	fmt.Println("  ovav sync --dry-run    Preview without writing")
+	fmt.Println("  ovav sync --plan-json  Emit a machine-readable no-write plan")
 	fmt.Println("  ovav sync -v           Verbose output")
 	fmt.Println()
 	fmt.Println("Also available in cockpit: ovav → Sync Projection")

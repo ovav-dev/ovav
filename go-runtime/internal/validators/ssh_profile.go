@@ -35,12 +35,14 @@ var sshRequiredFiles = []struct {
 	{"config/fish/ovav-thavren-ssh-agent.fish.example", "fish_template"},
 	{"config/workstation/ovav-thavren-ssh-profile.yaml", "policy"},
 	{"config/workstation/ovav-thavren-ssh-install-plan.yaml", "install_plan"},
-	{"tools/workstation/ovav_workstation_access.py", "workstation_tool"},
+	{"go-runtime/internal/install/install.go", "install_gateway"},
+	{"go-runtime/internal/tailor/apply.go", "workstation_composer"},
 }
 
 func (s *SSHProfile) Validate(ctx context.Context, root string) Result {
 	start := time.Now()
 	var issues []string
+	var warnings []string
 
 	readFile := func(rel string) string {
 		data, err := os.ReadFile(filepath.Join(root, rel))
@@ -68,7 +70,8 @@ func (s *SSHProfile) Validate(ctx context.Context, root string) Result {
 	fishText := readFile("config/fish/ovav-thavren-ssh-agent.fish.example")
 	policyText := readFile("config/workstation/ovav-thavren-ssh-profile.yaml")
 	installPlanText := readFile("config/workstation/ovav-thavren-ssh-install-plan.yaml")
-	workstationText := readFile("tools/workstation/ovav_workstation_access.py")
+	installGatewayText := readFile("go-runtime/internal/install/install.go")
+	workstationText := readFile("go-runtime/internal/tailor/apply.go")
 	docText := readFile("docs/workstation/OVAV_THAVREN_SSH_PROFILE.md")
 	accessDocText := readFile("docs/workstation/OVAV_WORKSTATION_ACCESS_PROFILE.md")
 	installDocText := readFile("docs/workstation/OVAV_THAVREN_SSH_INSTALL_PLAN.md")
@@ -135,16 +138,24 @@ func (s *SSHProfile) Validate(ctx context.Context, root string) Result {
 		}
 	}
 
-	// 7. Check workstation tool tokens
+	// 7. Check current Go-native workstation/install boundary. The removed
+	// Python helper is obsolete under caps migration truth and is not required.
 	workstationTokens := []string{
-		"def build_plan()", "def diagnose()", "def verify_source()",
-		"def blocked_apply()", "writes_performed", "Real workstation apply is blocked",
+		"ApplySelection", "InstallConfirmationRows", "preview", "backup", "verify",
 	}
 	for _, token := range workstationTokens {
 		if !strings.Contains(workstationText, token) {
 			issues = append(issues, fmt.Sprintf("workstation_tool missing: %s", token))
 		}
 	}
+	for _, token := range []string{"plan", "manifest", "safety", "boundaries", "backup", "apply", "verify", "PermanentlyBlockedSurfaces", "user_home_config"} {
+		if !strings.Contains(installGatewayText, token) {
+			issues = append(issues, fmt.Sprintf("install_gateway missing: %s", token))
+		}
+	}
+	// The generic Go install boundary is current, but there is no SSH-specific
+	// Go apply helper. Keep host writes explicitly gated rather than claiming pass.
+	warnings = append(warnings, "INTENTIONALLY_GATED: no current Go SSH apply helper; user-home SSH writes remain blocked")
 
 	// 8. Check doc boundaries
 	if !strings.Contains(docText, "~/.ssh/config") || !strings.Contains(docText, "no autoriza") {
@@ -171,6 +182,9 @@ func (s *SSHProfile) Validate(ctx context.Context, root string) Result {
 	if len(issues) > 0 {
 		return Result{ID: s.ID(), Name: s.Name(), Status: "fail", Weight: s.Weight(),
 			Message: fmt.Sprintf("FAIL — %d issue(s)", len(issues)), Issues: issues, Duration: time.Since(start)}
+	}
+	if len(warnings) > 0 {
+		return Result{ID: s.ID(), Name: s.Name(), Status: "warn", Weight: s.Weight(), Message: "WARN — SSH source projection valid; host apply intentionally gated", Issues: warnings, Duration: time.Since(start)}
 	}
 	return Result{ID: s.ID(), Name: s.Name(), Status: "pass", Weight: s.Weight(),
 		Message: "PASS — SSH profile artifacts valid", Duration: time.Since(start)}

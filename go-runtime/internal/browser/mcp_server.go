@@ -14,6 +14,8 @@ import (
 	"strings"
 )
 
+const browserEvaluateEnv = "OVAV_BROWSER_EVALUATE"
+
 // MCPRequest represents a JSON-RPC 2.0 request.
 type MCPRequest struct {
 	JSONRPC string      `json:"jsonrpc"`
@@ -38,17 +40,32 @@ type MCPError struct {
 
 // MCPServer wraps a Controller and exposes MCP tools.
 type MCPServer struct {
-	ctrl *Controller
+	ctrl        *Controller
+	urlFirewall *URLFirewall
 }
 
 // NewMCPServer creates a new MCP server.
 func NewMCPServer(ctrl *Controller) *MCPServer {
-	return &MCPServer{ctrl: ctrl}
+	root, _ := os.Getwd()
+	return &MCPServer{ctrl: ctrl, urlFirewall: NewURLFirewall(root)}
 }
 
 // ToolCount returns the number of registered tools.
 func (s *MCPServer) ToolCount() int {
-	return len(tools)
+	return len(availableTools())
+}
+
+func availableTools() []map[string]interface{} {
+	if os.Getenv(browserEvaluateEnv) == "1" {
+		return tools
+	}
+	filtered := make([]map[string]interface{}, 0, len(tools)-1)
+	for _, tool := range tools {
+		if tool["name"] != "browser_evaluate" {
+			filtered = append(filtered, tool)
+		}
+	}
+	return filtered
 }
 
 // tools lists all available MCP tools.
@@ -359,7 +376,7 @@ func (s *MCPServer) HandleRequest(req MCPRequest) *MCPResponse {
 			JSONRPC: "2.0",
 			ID:      req.ID,
 			Result: map[string]interface{}{
-				"tools": tools,
+				"tools": availableTools(),
 			},
 		}
 
@@ -393,14 +410,34 @@ func (s *MCPServer) handleToolCall(req MCPRequest) *MCPResponse {
 	switch name {
 	case "browser_connect":
 		endpoint, _ := args["endpoint"].(string)
+		if endpoint == "" {
+			endpoint = "http://127.0.0.1:9222"
+		}
+		if err = s.urlFirewall.Validate(endpoint); err != nil {
+			break
+		}
 		err = s.ctrl.ConnectRemote(endpoint)
 
 	case "browser_start":
 		err = s.ctrl.Start()
 
 	case "browser_navigate":
-		url, _ := args["url"].(string)
-		result, err = s.ctrl.Navigate(url)
+		target, _ := args["url"].(string)
+		if err = s.urlFirewall.Validate(target); err != nil {
+			break
+		}
+		result, err = s.ctrl.Navigate(target)
+		if err == nil {
+			var finalURL string
+			finalURL, err = s.ctrl.GetURL()
+			if err == nil {
+				err = s.urlFirewall.Validate(finalURL)
+			}
+			if err != nil {
+				_ = s.ctrl.Stop()
+				err = fmt.Errorf("browser redirect target denied: %w", err)
+			}
+		}
 
 	case "browser_screenshot":
 		selector, _ := args["selector"].(string)
@@ -420,6 +457,10 @@ func (s *MCPServer) handleToolCall(req MCPRequest) *MCPResponse {
 		result, err = s.ctrl.GetHTML(selector)
 
 	case "browser_evaluate":
+		if os.Getenv(browserEvaluateEnv) != "1" {
+			err = fmt.Errorf("browser_evaluate disabled; set %s=1 for an explicit capability grant", browserEvaluateEnv)
+			break
+		}
 		js, _ := args["js"].(string)
 		result, err = s.ctrl.Evaluate(js)
 

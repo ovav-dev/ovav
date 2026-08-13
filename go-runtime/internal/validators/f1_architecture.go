@@ -2,17 +2,21 @@ package validators
 
 import (
 	"context"
-	"encoding/json"
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/ovav/ovav/internal/permissions"
+	"github.com/ovav/ovav/internal/security"
 )
 
-// F1Architecture validates F1 Architecture Integrity — permission authority,
-// Rego policies, F1 tools, and guidance documents.
-// Replaces: tools/validators/check_f1_architecture.py
+// F1Architecture validates F1 Architecture Integrity through the production
+// permission and bootstrap APIs, plus canonical Rego policy behavior.
 type F1Architecture struct{}
 
 func NewF1Architecture() *F1Architecture { return &F1Architecture{} }
@@ -20,135 +24,175 @@ func NewF1Architecture() *F1Architecture { return &F1Architecture{} }
 func (v *F1Architecture) ID() string   { return "f1_architecture" }
 func (v *F1Architecture) Name() string { return "F1 Architecture Integrity" }
 func (v *F1Architecture) Description() string {
-	return "Validates F1 architecture: permission authority, Rego policies, F1 tools, and guidance"
+	return "Validates F1 architecture behavior: permission authority, simulation, Rego, and bootstrap"
 }
 func (v *F1Architecture) Weight() int { return 7 }
 
 func (v *F1Architecture) Validate(ctx context.Context, root string) Result {
 	start := time.Now()
 	var issues []string
+	partialBootstrap := !security.BootstrapTrustAnchorsConfigured()
 
-	// 1. Validate permission_authority.json exists and has v2 schema
-	paPath := filepath.Join(root, ".ovav", "policy", "permission_authority.json")
-	paData, err := os.ReadFile(paPath)
-	if err != nil {
-		issues = append(issues, "CRITICAL: .ovav/policy/permission_authority.json not found")
-	} else {
-		var pa map[string]interface{}
-		if err := json.Unmarshal(paData, &pa); err != nil {
-			issues = append(issues, fmt.Sprintf("CRITICAL: permission_authority.json invalid JSON: %v", err))
-		} else {
-			schemaVer, _ := pa["schema_version"].(string)
-			if schemaVer != "ovav.permission_authority.v2" && schemaVer != "ovav.permission_authority.v3" {
-				issues = append(issues, fmt.Sprintf("ERROR: permission_authority.json schema_version is '%s' (expected 'v2' or 'v3')", schemaVer))
+	if err := ctx.Err(); err != nil {
+		issues = append(issues, "ERROR: validation context unavailable")
+	}
+
+	permissionAuthorityPath := filepath.Join(root, ".ovav", "policy", "permission_authority.json")
+	if !permissions.VerifyPermissionAuthorityV3(permissionAuthorityPath) {
+		issues = append(issues, "CRITICAL: permission_authority.json schema_version v3 integrity verification failed")
+	}
+
+	if err := permissions.Simulate(); err != nil {
+		issues = append(issues, fmt.Sprintf("ERROR: canonical permission simulation failed: %v", err))
+	}
+
+	regoDir, regoCount := canonicalRegoDirectory(root)
+	if regoCount < 3 {
+		issues = append(issues, fmt.Sprintf("ERROR: Only %d Rego policy files found (expected >= 3)", regoCount))
+	} else if err := verifyRegoBehavior(regoDir); err != nil {
+		issues = append(issues, "ERROR: Rego behavioral verification failed: "+err.Error())
+	}
+
+	if partialBootstrap {
+		issues = append(issues, "INTENTIONALLY_GATED/PARTIAL: startup enforcement requires immutable permission-authority and runtime hashes injected at build time")
+	} else if err := verifyBootstrapBehavior(root, permissionAuthorityPath); err != nil {
+		issues = append(issues, "ERROR: Go F0 bootstrap behavioral verification failed: "+err.Error())
+	}
+
+	if _, err := os.Stat(filepath.Join(root, "docs", "research", "F1_EAL7_GUIDANCE.md")); err != nil {
+		issues = append(issues, "WARNING: docs/research/F1_EAL7_GUIDANCE.md not found")
+	}
+
+	if len(issues) > 0 {
+		hasCritical := false
+		for _, issue := range issues {
+			if strings.HasPrefix(issue, "CRITICAL:") {
+				hasCritical = true
+				break
 			}
-			// v2 fields
-			if schemaVer == "ovav.permission_authority.v2" {
-				if _, ok := pa["architecture"]; !ok {
-					issues = append(issues, "ERROR: permission_authority.json missing 'architecture' section")
-				}
-				if _, ok := pa["resource_policies"]; !ok {
-					issues = append(issues, "ERROR: permission_authority.json missing 'resource_policies' section")
-				}
-				if _, ok := pa["hardening_baseline"]; !ok {
-					issues = append(issues, "ERROR: permission_authority.json missing 'hardening_baseline' section")
-				}
-			}
-			// v3 fields
-			if schemaVer == "ovav.permission_authority.v3" {
-				if _, ok := pa["authority"]; !ok {
-					issues = append(issues, "ERROR: permission_authority.json v3 missing 'authority' section")
-				}
-				if _, ok := pa["governor"]; !ok {
-					issues = append(issues, "ERROR: permission_authority.json v3 missing 'governor' section")
-				}
-			}
+		}
+		message := fmt.Sprintf("FAIL F1 architecture integrity — %d issue(s)", len(issues))
+		if hasCritical {
+			message += " including critical"
+		}
+		status := "fail"
+		if partialBootstrap && len(issues) == 1 {
+			status = "warn"
+			message = "INTENTIONALLY_GATED/PARTIAL F1 architecture integrity — immutable startup trust anchors are not configured"
+		}
+		return Result{
+			ID: v.ID(), Name: v.Name(), Status: status, Weight: v.Weight(),
+			Message: message, Issues: issues, Duration: time.Since(start),
 		}
 	}
 
-	// 2. Check Rego policies exist (at least 3 .rego files)
-	// Check both .ovav/policy/rego/ and .ovav/registry/rego_policies/
-	regoDirs := []string{
-		filepath.Join(root, ".ovav", "policy", "rego"),
-		filepath.Join(root, ".ovav", "registry", "rego_policies"),
+	return Result{
+		ID: v.ID(), Name: v.Name(), Status: "pass", Weight: v.Weight(),
+		Message:  fmt.Sprintf("PASS F1 architecture integrity — canonical APIs and %d Rego policies verified behaviorally", regoCount),
+		Duration: time.Since(start),
 	}
-	regoFound := 0
-	var regoLocations []string
-	for _, dir := range regoDirs {
+}
+
+func canonicalRegoDirectory(root string) (string, int) {
+	bestDir := ""
+	bestCount := 0
+	for _, rel := range []string{filepath.Join(".ovav", "policy", "rego"), filepath.Join(".ovav", "registry", "rego_policies")} {
+		dir := filepath.Join(root, rel)
 		entries, err := os.ReadDir(dir)
 		if err != nil {
 			continue
 		}
-		for _, e := range entries {
-			if strings.HasSuffix(e.Name(), ".rego") {
-				regoFound++
-				regoLocations = append(regoLocations, filepath.Join(dir, e.Name()))
+		count := 0
+		for _, entry := range entries {
+			if !entry.IsDir() && strings.HasSuffix(entry.Name(), ".rego") {
+				count++
 			}
 		}
-	}
-	if regoFound == 0 {
-		issues = append(issues, "ERROR: No Rego policy files found in .ovav/policy/rego/ or .ovav/registry/rego_policies/")
-	} else if regoFound < 3 {
-		issues = append(issues, fmt.Sprintf("ERROR: Only %d Rego policy files found (expected >= 3)", regoFound))
-	}
-
-	// 3. Check F1 tools exist
-	f1Tools := []string{
-		"tools/permissions/rego_engine.py",
-		"tools/permissions/simulate.py",
-		"tools/permissions/verify.py",
-	}
-	for _, tool := range f1Tools {
-		toolPath := filepath.Join(root, tool)
-		if _, err := os.Stat(toolPath); os.IsNotExist(err) {
-			issues = append(issues, fmt.Sprintf("ERROR: Missing F1 tool: %s", tool))
+		if count > bestCount {
+			bestDir, bestCount = dir, count
 		}
 	}
+	return bestDir, bestCount
+}
 
-	// 4. Check bootstrap_verifier (F0.5 → F1 dependency)
-	bootstrapPath := filepath.Join(root, "tools", "security", "bootstrap_verifier.py")
-	if _, err := os.Stat(bootstrapPath); os.IsNotExist(err) {
-		issues = append(issues, "WARNING: tools/security/bootstrap_verifier.py not found — F1 requires F0 bootstrap")
+func verifyRegoBehavior(regoDir string) error {
+	engine := permissions.NewRegoEngine(regoDir)
+	if err := engine.LoadPolicies(); err != nil {
+		return fmt.Errorf("load policies: %w", err)
+	}
+	allowed := engine.Evaluate("read", map[string]interface{}{
+		"action":          "read",
+		"operator":        "andres",
+		"scope":           "repo_local",
+		"bootstrap_valid": true,
+		"explicit_grant":  true,
+	})
+	if !allowed.Allowed {
+		return fmt.Errorf("explicit read grant was denied: %s", allowed.Reason)
+	}
+	denied := engine.Evaluate("bash", map[string]interface{}{
+		"action":          "bash",
+		"command":         "sudo id",
+		"operator":        "andres",
+		"scope":           "repo_local",
+		"bootstrap_valid": true,
+		"explicit_grant":  true,
+	})
+	if denied.Allowed {
+		return fmt.Errorf("dangerous bash command was allowed")
+	}
+	return nil
+}
+
+func verifyBootstrapBehavior(root, authorityPath string) error {
+	executable, err := os.Executable()
+	if err != nil {
+		return fmt.Errorf("resolve validator executable: %w", err)
+	}
+	executable, err = filepath.EvalSymlinks(executable)
+	if err != nil {
+		return fmt.Errorf("resolve validator executable links: %w", err)
+	}
+	checksum, err := fileSHA256(executable)
+	if err != nil {
+		return err
+	}
+	tempDir, err := os.MkdirTemp("", "ovav-f1-bootstrap-")
+	if err != nil {
+		return fmt.Errorf("create bootstrap verification workspace: %w", err)
+	}
+	defer os.RemoveAll(tempDir)
+	checksumPath := filepath.Join(tempDir, "runtime.sha256")
+	if err := os.WriteFile(checksumPath, []byte(checksum+"\n"), 0o600); err != nil {
+		return fmt.Errorf("write bootstrap checksum fixture: %w", err)
 	}
 
-	// 5. Check F1 EAL7 guidance exists
-	eal7Path := filepath.Join(root, "docs", "research", "F1_EAL7_GUIDANCE.md")
-	if _, err := os.Stat(eal7Path); os.IsNotExist(err) {
-		issues = append(issues, "WARNING: docs/research/F1_EAL7_GUIDANCE.md not found")
-	}
+	notRequired := false
+	return security.VerifyBootstrapWithConfig(security.BootstrapConfig{
+		Root:                      root,
+		LicensePath:               filepath.Join(tempDir, "absent-license.json"),
+		VaultKeyPath:              filepath.Join(tempDir, "absent-vault-key"),
+		PermissionAuthorityPath:   authorityPath,
+		RuntimePath:               executable,
+		RuntimeChecksumPath:       checksumPath,
+		PermissionAuthoritySHA256: security.BuildPermissionAuthoritySHA256,
+		RuntimeSHA256:             security.BuildRuntimeSHA256,
+		RequireLicense:            &notRequired,
+		RequireVaultKey:           &notRequired,
+	})
+}
 
-	// Determine result
-	hasCritical := false
-	for _, issue := range issues {
-		if strings.HasPrefix(issue, "CRITICAL:") {
-			hasCritical = true
-			break
-		}
+func fileSHA256(path string) (string, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return "", fmt.Errorf("open validator executable: %w", err)
 	}
-	if hasCritical || len(issues) > 0 {
-		status := "fail"
-		msg := fmt.Sprintf("FAIL F1 architecture integrity — %d issue(s)", len(issues))
-		if hasCritical {
-			msg = fmt.Sprintf("FAIL F1 architecture integrity — %d issue(s) including critical", len(issues))
-		}
-		return Result{
-			ID:       v.ID(),
-			Name:     v.Name(),
-			Status:   status,
-			Weight:   v.Weight(),
-			Message:  msg,
-			Issues:   issues,
-			Duration: time.Since(start),
-		}
+	defer file.Close()
+	hash := sha256.New()
+	if _, err := io.Copy(hash, file); err != nil {
+		return "", fmt.Errorf("hash validator executable: %w", err)
 	}
-	return Result{
-		ID:       v.ID(),
-		Name:     v.Name(),
-		Status:   "pass",
-		Weight:   v.Weight(),
-		Message:  fmt.Sprintf("PASS F1 architecture integrity — permission authority v2, %d Rego policies, F1 tools verified", regoFound),
-		Duration: time.Since(start),
-	}
+	return hex.EncodeToString(hash.Sum(nil)), nil
 }
 
 var _ Validator = (*F1Architecture)(nil)

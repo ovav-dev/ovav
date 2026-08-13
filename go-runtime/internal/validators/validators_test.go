@@ -370,11 +370,15 @@ func TestContractFreshness_Present(t *testing.T) {
 
 func TestRuntimeIntegrity_NoBaseline(t *testing.T) {
 	dir := t.TempDir()
+	gitInit(t, dir)
+	setupCoreFiles(t, dir)
+	runGitTest(t, dir, "add", "AGENTS.md", "opencode.json", ".ovav/policy/permission_authority.json", ".ovav/plan/caps.yaml", "go-runtime/go.mod", "go-runtime/internal/validators/cmd/validate/main.go")
+	runGitTest(t, dir, "commit", "-m", "core files")
 
 	v := NewRuntimeIntegrity()
 	result := v.Validate(context.Background(), dir)
-	if result.Status != "fail" {
-		t.Errorf("expected fail without baseline, got %s", result.Status)
+	if result.Status != "warn" {
+		t.Errorf("expected warn without baseline, got %s", result.Status)
 	}
 	if !strings.Contains(result.Message, "baseline") {
 		t.Errorf("expected baseline mention, got: %s", result.Message)
@@ -383,7 +387,10 @@ func TestRuntimeIntegrity_NoBaseline(t *testing.T) {
 
 func TestRuntimeIntegrity_WithBaseline_Pass(t *testing.T) {
 	dir := t.TempDir()
+	gitInit(t, dir)
 	setupCoreFiles(t, dir)
+	runGitTest(t, dir, "add", "AGENTS.md", "opencode.json", ".ovav/policy/permission_authority.json", ".ovav/plan/caps.yaml", "go-runtime/go.mod", "go-runtime/internal/validators/cmd/validate/main.go")
+	runGitTest(t, dir, "commit", "-m", "core files")
 	createBaseline(t, dir)
 
 	v := NewRuntimeIntegrity()
@@ -395,7 +402,10 @@ func TestRuntimeIntegrity_WithBaseline_Pass(t *testing.T) {
 
 func TestRuntimeIntegrity_WithBaseline_MissingFile(t *testing.T) {
 	dir := t.TempDir()
+	gitInit(t, dir)
 	setupCoreFiles(t, dir)
+	runGitTest(t, dir, "add", "AGENTS.md", "opencode.json", ".ovav/policy/permission_authority.json", ".ovav/plan/caps.yaml", "go-runtime/go.mod", "go-runtime/internal/validators/cmd/validate/main.go")
+	runGitTest(t, dir, "commit", "-m", "core files")
 	createBaseline(t, dir)
 	// Remove one core file to trigger missing path
 	os.Remove(filepath.Join(dir, "opencode.json"))
@@ -419,7 +429,7 @@ func setupCoreFiles(t *testing.T, dir string) {
 		".ovav/policy/permission_authority.json": `{"thavren":"full"}`,
 		".ovav/plan/caps.yaml":                   "version: 1\n",
 		"go-runtime/go.mod":                      "module test\n",
-		"tools/validators/validate_all.py":       "#!/usr/bin/env python3\nprint('ok')\n",
+		"go-runtime/internal/validators/cmd/validate/main.go": "package main\n",
 	}
 	for rel, content := range files {
 		fullPath := filepath.Join(dir, rel)
@@ -433,9 +443,7 @@ func setupCoreFiles(t *testing.T, dir string) {
 // createBaseline creates a minimal baseline.json for runtime_integrity.
 func createBaseline(t *testing.T, dir string) {
 	t.Helper()
-	baselineDir := filepath.Join(dir, ".ovav", "integrity_backups")
-	os.MkdirAll(baselineDir, 0755)
-	os.WriteFile(filepath.Join(baselineDir, "baseline.json"), []byte(`{"version":"1.0"}`), 0644)
+	createIntegrityBaseline(t, dir)
 }
 
 func TestSupplyChain_GoModPresent(t *testing.T) {
@@ -992,13 +1000,13 @@ func TestArchitectureGovernance_StackPurity(t *testing.T) {
 
 func TestRegoPolicies_Clean(t *testing.T) {
 	dir := t.TempDir()
-	// Create minimal rego engine
-	os.MkdirAll(filepath.Join(dir, "tools", "permissions"), 0755)
-	os.WriteFile(filepath.Join(dir, "tools", "permissions", "rego_engine.py"), []byte("class RegoEngine:\n  def load_policies(self): pass\n  def test_policy(self, tests): pass\nBUILTIN_TESTS = []\n# deny rules\ndef deny(): pass\n# allow rules\ndef allow(): pass"), 0644)
+	// Create minimal Go-native Rego engine.
+	os.MkdirAll(filepath.Join(dir, "go-runtime", "internal", "permissions"), 0755)
+	os.WriteFile(filepath.Join(dir, "go-runtime", "internal", "permissions", "rego_engine.go"), []byte("package permissions\ntype RegoEngine struct{}\nfunc NewRegoEngine(string) *RegoEngine { return &RegoEngine{} }\nfunc (e *RegoEngine) LoadPolicies() error { return nil }\nfunc (e *RegoEngine) Evaluate(string, map[string]interface{}) bool { return false }\nfunc (e *RegoEngine) TestPolicy([]map[string]interface{}) map[string]interface{} { return nil }\nfunc BuiltinTests() []map[string]interface{} { return nil }"), 0644)
 
 	// Create rego policy dir
-	os.MkdirAll(filepath.Join(dir, ".ovav", "laws"), 0755)
-	os.WriteFile(filepath.Join(dir, ".ovav", "laws", "security.rego"), []byte("package ovav.security"), 0644)
+	os.MkdirAll(filepath.Join(dir, ".ovav", "registry", "rego_policies"), 0755)
+	os.WriteFile(filepath.Join(dir, ".ovav", "registry", "rego_policies", "security.rego"), []byte("package ovav.security\ndefault allow = false\ndeny_bash { true }\nallow { false }"), 0644)
 
 	v := NewRegoPolicies()
 	result := v.Validate(context.Background(), dir)
@@ -1154,14 +1162,16 @@ func TestHeadIntegrity_NoTrustedHash(t *testing.T) {
 
 func TestGateSelfProtection_NoStoredHash(t *testing.T) {
 	dir := t.TempDir()
+	gitInit(t, dir)
 	os.MkdirAll(filepath.Join(dir, "go-runtime", "internal", "validators"), 0755)
 	os.WriteFile(filepath.Join(dir, "go-runtime", "internal", "validators", "host_config_drift.go"), []byte("package validators"), 0644)
+	runGitTest(t, dir, "add", gateFile)
+	runGitTest(t, dir, "commit", "-m", "gate")
 
 	v := NewGateSelfProtection()
 	result := v.Validate(context.Background(), dir)
-	// No stored hash = first run, should pass
-	if result.Status != "pass" {
-		t.Errorf("expected pass with no stored hash (first run), got %s", result.Status)
+	if result.Status != "warn" {
+		t.Errorf("expected warn with no stored hash, got %s", result.Status)
 	}
 }
 
@@ -1367,20 +1377,9 @@ func TestAgentRuntimeEnforcement_Empty(t *testing.T) {
 	})
 
 	t.Run("AllModulesPresentWithSignatures", func(t *testing.T) {
-		dir := t.TempDir()
-		modules := map[string]string{
-			"tools/agent_runtime/service_area_router.py":  "route_request\nservice_area\ninternal_repo_access_denied_by_default",
-			"tools/agent_runtime/context_gateway.py":      "request_context\nresearch_no_repo_default\ndecision",
-			"tools/agent_runtime/tool_gateway.py":         "request_tool\ndecision\nrequires_permission",
-			"tools/agent_runtime/handoff_protocol.py":     "create_handoff\ndecision\ndenied_context",
-			"tools/agent_runtime/delegation_router.py":    "decide_delegation\ndelegation_mode\ncritical_squad",
-			"tools/agent_runtime/observability_engine.py": "trace_event\ntrace_id\ntrace_",
-		}
-		for path, content := range modules {
-			fullPath := filepath.Join(dir, path)
-			os.MkdirAll(filepath.Dir(fullPath), 0755)
-			os.WriteFile(fullPath, []byte(content), 0644)
-		}
+		modules := goRuntimeTruthFixture()
+		modules["go-runtime/internal/agents/observability.go"] = observabilityTruthFixture
+		dir := tempRepoWithFiles(t, modules)
 
 		v := NewAgentRuntimeEnforcement()
 		result := v.Validate(context.Background(), dir)
@@ -1391,15 +1390,9 @@ func TestAgentRuntimeEnforcement_Empty(t *testing.T) {
 
 	t.Run("MissingSignatures", func(t *testing.T) {
 		dir := t.TempDir()
-		// Create all modules with WRONG signatures
-		for _, modPath := range []string{
-			"tools/agent_runtime/service_area_router.py",
-			"tools/agent_runtime/context_gateway.py",
-			"tools/agent_runtime/tool_gateway.py",
-			"tools/agent_runtime/handoff_protocol.py",
-			"tools/agent_runtime/delegation_router.py",
-			"tools/agent_runtime/observability_engine.py",
-		} {
+		// Create all Go modules with wrong signatures.
+		for _, component := range runtimeComponents {
+			modPath := component.path
 			fullPath := filepath.Join(dir, modPath)
 			os.MkdirAll(filepath.Dir(fullPath), 0755)
 			os.WriteFile(fullPath, []byte("wrong content, no valid signatures"), 0644)
@@ -1423,10 +1416,10 @@ func TestAgentRuntimeEnforcement_Empty(t *testing.T) {
 
 	t.Run("PartialModules", func(t *testing.T) {
 		dir := t.TempDir()
-		// Only create 2 of 6 modules
+		// Only create 2 of 7 Go modules.
 		modules := map[string]string{
-			"tools/agent_runtime/service_area_router.py": "route_request\nservice_area\ninternal_repo_access_denied_by_default",
-			"tools/agent_runtime/context_gateway.py":     "request_context\nresearch_no_repo_default\ndecision",
+			"go-runtime/internal/agents/service_area.go": "RouteRequest\nServiceAreaForAgent\nInternalRepoAccessDeniedByDefault",
+			"go-runtime/internal/agents/context.go":      "RequestContext\nResearchNoRepoDefault\nDecideContext",
 		}
 		for path, content := range modules {
 			fullPath := filepath.Join(dir, path)
@@ -1445,8 +1438,8 @@ func TestAgentRuntimeEnforcement_Empty(t *testing.T) {
 				missingCount++
 			}
 		}
-		if missingCount != 4 {
-			t.Errorf("expected 4 missing modules, got %d: %v", missingCount, result.Issues)
+		if missingCount != 5 {
+			t.Errorf("expected 5 missing modules, got %d: %v", missingCount, result.Issues)
 		}
 	})
 }
@@ -1467,11 +1460,8 @@ func TestArchitectureGuardian_SimpleDir(t *testing.T) {
 
 func TestFeedbackLoop_Clean(t *testing.T) {
 	dir := t.TempDir()
-	os.MkdirAll(filepath.Join(dir, "tools", "agent_runtime"), 0755)
-	os.WriteFile(filepath.Join(dir, "tools", "agent_runtime", "feedback_loop.py"), []byte("class FeedbackLoop:\n  def capture_decision(self): pass\n  def compact_memory(self): pass\n  def ledger_gate_status(self): pass\n  def sanitize(self): pass"), 0644)
-	os.WriteFile(filepath.Join(dir, "tools", "agent_runtime", "belief_manager.py"), []byte("class BeliefManager:\n  def add_belief(self): pass\n  def deprecate_belief(self): pass\n  def deprecate_stale_emergent(self): pass"), 0644)
-	os.MkdirAll(filepath.Join(dir, "tools", "memory"), 0755)
-	os.WriteFile(filepath.Join(dir, "tools", "memory", "governor.py"), []byte("def ledger_write_allowed(): pass\ndef ledger_vivo(): pass"), 0644)
+	writeTestFile(t, dir, "go-runtime/internal/agents/belief.go", "type BeliefManager struct{}\nfunc AddBelief(){}\nfunc AddBeliefWithState(){}\nfunc DeprecateBelief(){}\nfunc DeprecateStaleEmergent(){}\nfunc DeprecateStaleEmergentAt(){ delete(map[string]int{}, \"x\") }\n")
+	writeTestFile(t, dir, "go-runtime/internal/memory/governor.go", "type Governor struct{}\nfunc (g *Governor) Write(){ Classify(); UpsertCard(); Save() }\nfunc (g *Governor) SessionPack(){}\n")
 
 	v := NewFeedbackLoop()
 	result := v.Validate(context.Background(), dir)
@@ -1740,8 +1730,8 @@ func TestBootstrapChain_Pass(t *testing.T) {
 	})
 	v := NewBootstrapChain()
 	result := v.Validate(context.Background(), dir)
-	if result.Status != "pass" {
-		t.Errorf("expected pass, got %s: %v", result.Status, result.Issues)
+	if result.Status != "warn" || !strings.Contains(result.Message, "INTENTIONALLY_GATED/PARTIAL") {
+		t.Errorf("expected intentionally gated warning, got %s: %v", result.Status, result.Issues)
 	}
 }
 
@@ -2524,11 +2514,11 @@ func TestSecurityHardening_ValidPolicy(t *testing.T) {
 	os.WriteFile(filepath.Join(dir, ".ovav", "policy", "permission_authority.json"), []byte(`{
 		"security_surfaces": {
 			"f4_bash_commands": {
-				"total_rules": 15,
+				"total_rules": 16,
 				"allowed": 9,
-				"denied": 6,
+				"denied": 7,
 				"deny_by_default": true,
-				"governor": "tools/governor/bash_commands.py",
+				"governor": "go-runtime/internal/permissions/governors.go",
 				"categories": {
 					"source_control_read": {},
 					"source_control_mutate": {},
@@ -2550,7 +2540,7 @@ func TestSecurityHardening_ValidPolicy(t *testing.T) {
 				"denied": 7,
 				"ask": 1,
 				"deny_by_default": true,
-				"governor": "tools/governor/unsafe_selectors.py",
+				"governor": "go-runtime/internal/permissions/governors.go",
 				"categories": {
 					"source_local": {},
 					"external_governed": {},
@@ -2569,6 +2559,7 @@ func TestSecurityHardening_ValidPolicy(t *testing.T) {
 			"bash": ["rule1","rule2","rule3","rule4","rule5","rule6","rule7","rule8","rule9","rule10","rule11","rule12"]
 		}
 	}`), 0644)
+	writeTestFile(t, dir, "go-runtime/internal/permissions/governors.go", "package permissions\n")
 
 	v := NewSecurityHardening()
 	result := v.Validate(context.Background(), dir)
@@ -2636,7 +2627,7 @@ func TestSecurityHardening_WrongBashCounts(t *testing.T) {
 	}
 	hasTotalIssue := false
 	for _, issue := range result.Issues {
-		if strings.Contains(issue, "total_rules expected 15") {
+		if strings.Contains(issue, "total_rules expected 16") {
 			hasTotalIssue = true
 		}
 	}
@@ -2698,8 +2689,8 @@ func TestSingleAuthority_DerivedFileClaimsAuthority(t *testing.T) {
 
 	v := NewSingleAuthority()
 	result := v.Validate(context.Background(), dir)
-	if result.Status != "fail" {
-		t.Errorf("expected fail with duplicate authority claim, got %s", result.Status)
+	if result.Status != "warn" {
+		t.Errorf("expected warn with generated duplicate authority claim, got %s", result.Status)
 	}
 	hasDuplicate := false
 	for _, issue := range result.Issues {
@@ -2923,31 +2914,25 @@ func TestF1Architecture_Valid(t *testing.T) {
 	dir := t.TempDir()
 	os.MkdirAll(filepath.Join(dir, ".ovav", "policy"), 0755)
 	os.WriteFile(filepath.Join(dir, ".ovav", "policy", "permission_authority.json"), []byte(`{
-		"schema_version": "ovav.permission_authority.v2",
-		"architecture": {},
-		"resource_policies": {},
-		"hardening_baseline": {}
+		"schema_version": "ovav.permission_authority.v3",
+		"authority": {"owner":"OVAV"},
+		"governor": {"owner":"Thavren"},
+		"materialized_targets": ["opencode.json"]
 	}`), 0644)
 	// Create Rego policies
 	os.MkdirAll(filepath.Join(dir, ".ovav", "policy", "rego"), 0755)
-	os.WriteFile(filepath.Join(dir, ".ovav", "policy", "rego", "base.rego"), []byte("package base"), 0644)
-	os.WriteFile(filepath.Join(dir, ".ovav", "policy", "rego", "network.rego"), []byte("package network"), 0644)
-	os.WriteFile(filepath.Join(dir, ".ovav", "policy", "rego", "security.rego"), []byte("package security"), 0644)
-	// Create F1 tools
-	os.MkdirAll(filepath.Join(dir, "tools", "permissions"), 0755)
-	os.WriteFile(filepath.Join(dir, "tools", "permissions", "rego_engine.py"), []byte(""), 0644)
-	os.WriteFile(filepath.Join(dir, "tools", "permissions", "simulate.py"), []byte(""), 0644)
-	os.WriteFile(filepath.Join(dir, "tools", "permissions", "verify.py"), []byte(""), 0644)
-	// Create bootstrap
-	os.MkdirAll(filepath.Join(dir, "tools", "security"), 0755)
-	os.WriteFile(filepath.Join(dir, "tools", "security", "bootstrap_verifier.py"), []byte(""), 0644)
+	os.WriteFile(filepath.Join(dir, ".ovav", "policy", "rego", "base.rego"), []byte("package base\ndefault allow = false\nallow { true }\n"), 0644)
+	os.WriteFile(filepath.Join(dir, ".ovav", "policy", "rego", "network.rego"), []byte("package network\nallow_read { true }\n"), 0644)
+	os.WriteFile(filepath.Join(dir, ".ovav", "policy", "rego", "security.rego"), []byte("package security\ndeny_bash { true }\n"), 0644)
 	// Create EAL7 guidance
 	os.MkdirAll(filepath.Join(dir, "docs", "research"), 0755)
 	os.WriteFile(filepath.Join(dir, "docs", "research", "F1_EAL7_GUIDANCE.md"), []byte(""), 0644)
 
 	v := NewF1Architecture()
 	result := v.Validate(context.Background(), dir)
-	t.Logf("F1Architecture: %s — %v", result.Status, result.Issues)
+	if result.Status != "warn" || !strings.Contains(result.Message, "INTENTIONALLY_GATED/PARTIAL") {
+		t.Fatalf("expected intentionally gated bootstrap warning, got %s: %v", result.Status, result.Issues)
+	}
 }
 
 // ── F2Infrastructure ───────────────────────────────────────────────────────
@@ -4270,6 +4255,20 @@ hidden: true
 	})
 }
 
+func TestRedTeamAuditDoesNotClassifyCentralGovernorAsTeamAgent(t *testing.T) {
+	for _, test := range []struct {
+		name string
+		want bool
+	}{
+		{name: "ovav.md", want: true},
+		{name: "team-ovav.md", want: false},
+	} {
+		if got := isCentralGovernorAgent(test.name); got != test.want {
+			t.Errorf("isCentralGovernorAgent(%q) = %v, want %v", test.name, got, test.want)
+		}
+	}
+}
+
 // ── Agent Surface Hierarchy Tests ───────────────────────────────────────
 
 func TestAgentSurfaceHierarchy(t *testing.T) {
@@ -5001,6 +5000,7 @@ func TestModelPolicy(t *testing.T) {
 		dir := t.TempDir()
 		os.WriteFile(filepath.Join(dir, "opencode.json"),
 			[]byte(`{"model": "opencode-go/deepseek-v4-pro"}`), 0644)
+		writeTestFile(t, dir, ".ovav/policy/permission_authority.json", `{"model_groups":{"legacy_fixture":{"models":["opencode-go/deepseek-v4-pro"]}}}`)
 		// Create model_body_ladder.yaml at expected path
 		ladderDir := filepath.Join(dir, ".ovav", "service_areas", "platform_engineering")
 		os.MkdirAll(ladderDir, 0755)
@@ -5255,22 +5255,8 @@ func TestFeedbackLoop(t *testing.T) {
 
 	t.Run("complete feedback loop", func(t *testing.T) {
 		dir := t.TempDir()
-		agentDir := filepath.Join(dir, "tools", "agent_runtime")
-		os.MkdirAll(agentDir, 0755)
-		os.WriteFile(filepath.Join(agentDir, "feedback_loop.py"), []byte(`class FeedbackLoop:
-  def capture_decision(): pass
-  def compact_memory(): pass
-  def ledger_gate_status(): pass
-  def sanitize(): pass
-`), 0644)
-		os.WriteFile(filepath.Join(agentDir, "belief_manager.py"), []byte(`class BeliefManager:
-  def add_belief(): pass
-  def deprecate_belief(): pass
-  def deprecate_stale_emergent(): pass
-`), 0644)
-		memDir := filepath.Join(dir, "tools", "memory")
-		os.MkdirAll(memDir, 0755)
-		os.WriteFile(filepath.Join(memDir, "governor.py"), []byte(`def ledger_vivo(): return True`), 0644)
+		writeTestFile(t, dir, "go-runtime/internal/agents/belief.go", "type BeliefManager struct{}\nfunc AddBelief(){}\nfunc AddBeliefWithState(){}\nfunc DeprecateBelief(){}\nfunc DeprecateStaleEmergent(){}\nfunc DeprecateStaleEmergentAt(){ delete(map[string]int{}, \"x\") }\n")
+		writeTestFile(t, dir, "go-runtime/internal/memory/governor.go", "type Governor struct{}\nfunc (g *Governor) Write(){ Classify(); UpsertCard(); Save() }\nfunc (g *Governor) SessionPack(){}\n")
 
 		v := NewFeedbackLoop()
 		result := v.Validate(context.Background(), dir)

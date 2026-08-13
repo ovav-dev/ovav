@@ -5,34 +5,44 @@ platform: windows
 
 # Canonical source: .ovav/source/configs/windows-terminal/
 
-# Deploy target (ovav convert)
+# Deploy target (ovav convert --configs). This is a merge fragment, never a
+# replacement for installed settings.json.
 deploy:
-  - path: config/wezterm/settings.json
-    description: Windows Terminal settings
+  - path: config/windows-terminal/ovav.fragment.json
+    description: Windows Terminal merge-ready Day/Night fragment
 
-# Home injection (ovav convert --inject)
+# Global projection is gated pending explicit apply approval.
 inject:
-  - path: config/wezterm/settings.json
-    target: ~/AppData/Local/Packages/Microsoft.WindowsTerminal_8wekyb3d8bbwe/local/state/settings.json
-    description: Windows Terminal user settings
+  enabled: false
+  strategy: merge_backup_validate
+  backup_pattern: settings.json.ovav-backup-YYYYMMDDTHHMMSSZ
+  planner: go-runtime/internal/terminalconfig
+  steps:
+    - parse installed settings and fragment
+    - merge named schemes, themes and profiles without replacing actions
+    - plan UTC timestamped backup
+    - validate installed, fragment and merged JSON with the built-in Windows Terminal 1.24 structural subset
+    - require explicit apply approval
+validation:
+  scope: windows_terminal_1_24_structural_subset
+  full_vendor_schema_bundled: false
+  vendor_authority: installed Windows Terminal
 
 # Profiles
 profiles:
   wsl_ubuntu:
     name: "WSL — Ubuntu (OVAV)"
-    command: "C:\\Windows\\System32\\wsl.exe -d Ubuntu-24.04 --cd ~"
-    startingDirectory: "//wsl.localhost/Ubuntu-24.04/home/braka"
+    command: "C:\\Windows\\System32\\wsl.exe -d Ubuntu-26.04 --cd ~"
+    startingDirectory: "//wsl.localhost/Ubuntu-26.04/home/braka"
   wsl_ovav:
     name: "WSL — OVAV Systems"
-    command: "C:\\Windows\\System32\\wsl.exe -d Ubuntu-24.04 --cd /home/braka/Systems/OVAV"
-    startingDirectory: "//wsl.localhost/Ubuntu-24.04/home/braka/Systems/OVAV"
+    command: "C:\\Windows\\System32\\wsl.exe -d Ubuntu-26.04 --cd /home/braka/Systems/ovav"
+    startingDirectory: "//wsl.localhost/Ubuntu-26.04/home/braka/Systems/ovav"
 
 # Color schemes
 schemes:
+  - OVAV Day
   - OVAV Night
-  - OVAV Dark
-  - OVAV Home
-  - OVAV System
 
 # Features
 features:
@@ -44,4 +54,5 @@ features:
 # Dependencies
 dependencies:
   - Windows Terminal (latest)
-  - WSL2 Ubuntu-24.04
+  - Windows Terminal 1.24-compatible settings surface
+  - WSL2 Ubuntu-26.04

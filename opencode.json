@@ -23,62 +23,43 @@
       "type": "local"
     },
     "ovav-budget": {
-      "command": [
-        "python3",
-        "tools/mcp/ovav_mcp_server.py",
-        "budget"
-      ],
-      "enabled": true,
-      "type": "local"
+      "enabled": false
     },
     "ovav-design-system": {
-      "command": [
-        "/home/braka/Systems/OVAV/tools/mcp/consumer/bin/ovav-mcp-design-system"
-      ],
-      "enabled": true,
-      "type": "local"
+      "enabled": false
     },
     "ovav-figma": {
-      "command": [
-        "/home/braka/Systems/OVAV/tools/mcp/consumer/bin/ovav-mcp-figma"
-      ],
-      "enabled": true,
-      "type": "local"
+      "enabled": false
     },
     "ovav-git": {
-      "command": [
-        "/home/braka/Systems/OVAV/tools/mcp/consumer/bin/ovav-mcp-git"
-      ],
-      "enabled": true,
-      "type": "local"
+      "enabled": false
     },
     "ovav-memory": {
-      "command": [
-        "/home/braka/Systems/OVAV/bin/ovav-mcp-memory"
-      ],
-      "enabled": true,
-      "type": "local"
+      "enabled": false
     },
     "ovav-sqlite": {
-      "command": [
-        "/home/braka/Systems/OVAV/tools/mcp/consumer/bin/ovav-mcp-sqlite"
-      ],
-      "enabled": false,
-      "type": "local"
+      "enabled": false
     }
   },
-  "model": "opencode-go/deepseek-v4-pro",
+  "model": "openai/gpt-5.6-sol",
   "permission": {
     "bash": {
       "*": "allow",
-      "OVAV_EVIDENCE_MODE=strict python3 tools/ovav_runtime.py validate": "allow",
+      "\u003e:w !sudo tee": "deny",
       "apt install *": "deny",
+      "apt-get install *": "deny",
+      "cat /etc/passwd": "deny",
+      "chmod -R 777": "deny",
+      "chmod 777": "deny",
+      "curl | sh": "deny",
+      "dd if=/dev/zero of=/dev/sda": "deny",
+      "eval $(curl": "deny",
       "gh auth login*": "deny",
       "gh auth status*": "allow",
       "gh auth token*": "deny",
       "gh issue list*": "allow",
       "gh issue view*": "allow",
-      "gh pr create*": "ask",
+      "gh pr create*": "allow",
       "gh pr list*": "allow",
       "gh pr merge*": "deny",
       "gh pr status*": "allow",
@@ -88,20 +69,24 @@
       "git add *": "allow",
       "git branch --show-current": "allow",
       "git branch -D *": "deny",
-      "git branch -d *": "allow",
+      "git branch -d *": "deny",
       "git commit*": "allow",
       "git diff*": "allow",
       "git log*": "allow",
       "git ls-remote *": "allow",
       "git push --force *": "deny",
+      "git push --force-with-lease *": "deny",
       "git push -f *": "deny",
       "git push*": "deny",
       "git remote -v": "allow",
       "git rev-parse*": "allow",
       "git status*": "allow",
-      "go run ./go-runtime/cmd/ovav/ sbom*": "allow",
-      "go run ./go-runtime/cmd/ovav/ validate*": "allow",
-      "go run ./go-runtime/internal/validators/cmd/validate/*": "allow",
+      "go install *": "deny",
+      "go run -C go-runtime ./cmd/ovav validate*": "allow",
+      "go run -C go-runtime ./internal/validators/cmd/validate*": "allow",
+      "mkfs": "deny",
+      "nc -l -p 443 -e": "deny",
+      "nmap -O": "deny",
       "npm install *": "deny",
       "npm run build*": "allow",
       "npm run lint*": "allow",
@@ -109,36 +94,28 @@
       "npm run typecheck*": "allow",
       "npm test*": "allow",
       "pip install *": "deny",
+      "pip3 install *": "deny",
+      "pnpm add *": "deny",
       "pytest*": "allow",
-      "python3 -B tools/github/ovav_gh_issue_gate.py*": "allow",
-      "python3 -B tools/github/ovav_git_push_gate.py*": "allow",
-      "python3 -B tools/permissions/materialize.py*": "allow",
-      "python3 -B tools/permissions/ovav_permission_authority.py*": "allow",
-      "python3 -B tools/validators/*.py": "allow",
+      "python3 -c \"import pty": "deny",
       "python3 -m pytest*": "allow",
-      "python3 tools/github/ovav_gh_issue_gate.py*": "allow",
-      "python3 tools/github/ovav_git_push_gate.py*": "allow",
-      "python3 tools/harnesses/check_*.py": "allow",
-      "python3 tools/harnesses/workspace_safety_gate.py*": "allow",
-      "python3 tools/install/*": "deny",
-      "python3 tools/install_gateway/*": "deny",
-      "python3 tools/memory/*": "deny",
-      "python3 tools/ovav_runtime.py*": "allow",
-      "python3 tools/permissions/materialize.py*": "allow",
-      "python3 tools/permissions/ovav_permission_authority.py*": "allow",
-      "python3 tools/protocols/*": "deny",
-      "python3 tools/validators/*.py": "allow",
-      "sudo *": "deny"
+      "rm -rf /": "deny",
+      "rm -rf /bin": "deny",
+      "rm -rf /usr": "deny",
+      "sudo *": "deny",
+      "sudo su": "deny",
+      "wget | sh": "deny",
+      "yarn add *": "deny"
     },
     "edit": "allow",
     "external_directory": {
-      "/home/braka/*": "allow",
-      "/home/braka/..ovav/source/configs/wezterm/*": "allow",
+      "*": "deny",
       "/home/braka/.config/ovav/*": "allow",
       "/home/braka/.local/share/ovav/*": "allow",
       "/home/braka/.local/state/ovav-opencode/*": "allow",
-      "/home/braka/Labs/mimocode/data/memory/*": "allow",
-      "/mnt/c/Users/Alexa/*": "allow",
+      "/home/braka/Systems/ovav/*": "allow",
+      "/home/braka/Systems/ovav/config/wezterm/*": "allow",
+      "/mnt/c/Users/Alexa/AppData/Roaming/wezterm/*": "allow",
       "/tmp/opencode/*": "allow"
     }
   },
@@ -146,12 +123,12 @@
     ".opencode/plugins/ovav-monitor.js"
   ],
   "provider": {
-    "openai": {
+    "minimax-coding-plan": {
       "options": {
         "timeout": 300000
       }
     },
-    "opencode": {
+    "openai": {
       "options": {
         "timeout": 300000
       }
@@ -173,11 +150,7 @@
       "path": "docs"
     }
   },
-  "small_model": "opencode-go/deepseek-v4-flash",
-  "theme": {
-    "name": "ovav",
-    "path": ".opencode/themes/ovav-dark.json"
-  },
+  "small_model": "minimax-coding-plan/MiniMax-M3",
   "tool_output": {
     "max_bytes": 4096,
     "max_lines": 80

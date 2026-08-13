@@ -911,10 +911,13 @@ func TestGateSelfProtection_HashMismatch(t *testing.T) {
 
 func TestGateSelfProtection_HashMatch(t *testing.T) {
 	dir := t.TempDir()
+	gitInit(t, dir)
 	gateDir := filepath.Join(dir, "go-runtime", "internal", "validators")
 	os.MkdirAll(gateDir, 0755)
 	gateContent := "package validators"
 	os.WriteFile(filepath.Join(gateDir, "host_config_drift.go"), []byte(gateContent), 0644)
+	runGitTest(t, dir, "add", gateFile)
+	runGitTest(t, dir, "commit", "-m", "gate")
 
 	// Compute actual hash
 	g := NewGateSelfProtection()

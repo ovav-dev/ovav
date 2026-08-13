@@ -29,10 +29,14 @@ var requiredSquadFiles = []string{
 	".ovav/registry/delegation_rules.yaml",
 	".ovav/service_areas/shared/delegation_policy.yaml",
 	".ovav/service_areas/shared/squad_roles.yaml",
-	"tools/agent_runtime/delegation_router.py",
-	"tools/agent_runtime/context_gateway.py",
-	"tools/agent_runtime/tool_gateway.py",
-	"tools/agent_runtime/observability_engine.py",
+	".ovav/service_areas/shared/observability_policy.yaml",
+	"go-runtime/internal/agents/service_area.go",
+	"go-runtime/internal/agents/context.go",
+	"go-runtime/internal/agents/tool_gateway.go",
+	"go-runtime/internal/agents/delegation.go",
+	"go-runtime/internal/agents/handoff.go",
+	"go-runtime/internal/agents/observability.go",
+	"go-runtime/internal/validators/context_firewall_v2.go",
 }
 
 var requiredDelegationModes = []string{
@@ -79,7 +83,16 @@ func (s *SquadNormalization) Validate(ctx context.Context, root string) Result {
 	rules := readFile(".ovav/registry/delegation_rules.yaml")
 	sharedRoles := readFile(".ovav/service_areas/shared/squad_roles.yaml")
 	delegationPolicy := readFile(".ovav/service_areas/shared/delegation_policy.yaml")
-	router := readFile("tools/agent_runtime/delegation_router.py")
+	router := readFile("go-runtime/internal/agents/delegation.go")
+	runtimeSurface := strings.Join([]string{
+		readFile("go-runtime/internal/agents/service_area.go"),
+		readFile("go-runtime/internal/agents/context.go"),
+		readFile("go-runtime/internal/agents/tool_gateway.go"),
+		readFile("go-runtime/internal/agents/handoff.go"),
+		readFile("go-runtime/internal/agents/observability.go"),
+		readFile("go-runtime/internal/validators/context_firewall_v2.go"),
+		readFile(".ovav/service_areas/shared/observability_policy.yaml"),
+	}, "\n")
 
 	// 3. Check delegation modes
 	combinedDelegation := strings.Join([]string{squads, rules, delegationPolicy, router}, "\n")
@@ -105,7 +118,7 @@ func (s *SquadNormalization) Validate(ctx context.Context, root string) Result {
 	}
 
 	// 6. Check governance terms
-	combinedSurface := strings.Join([]string{squads, rules, sharedRoles}, "\n")
+	combinedSurface := strings.Join([]string{squads, rules, sharedRoles, runtimeSurface}, "\n")
 	// Also scan opencode agents
 	agentsDir := filepath.Join(root, "clients", "opencode", "agents")
 	if entries, err := os.ReadDir(agentsDir); err == nil {
@@ -137,6 +150,13 @@ func (s *SquadNormalization) Validate(ctx context.Context, root string) Result {
 	}
 	if !strings.Contains(delegationPolicy, "squad_usage") && !strings.Contains(router, "squad_usage") {
 		issues = append(issues, "delegation policy/router missing squad_usage")
+	}
+
+	if !fileContainsAll(root, "go-runtime/internal/agents/observability.go",
+		"type TraceID string", "type TraceEvent struct", "type TraceSink interface",
+		"NewTraceEvent", "Validate() error", "MarshalJSON", "NewFileTraceSink",
+		"NewMemoryTraceSink", "RouteRequestWithTrace") {
+		issues = append(issues, "observability runtime is missing required implementation signatures")
 	}
 
 	if len(issues) > 0 {

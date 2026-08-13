@@ -1,12 +1,14 @@
 package convert
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 
+	"github.com/ovav/ovav/internal/permissions"
 	"gopkg.in/yaml.v3"
 )
 
@@ -61,6 +63,12 @@ func ValidateOpenCodeConfig(root string) (issues []ConfigIssue, err error) {
 
 	// 5. Plugin format
 	issues = append(issues, checkPluginFormat(config)...)
+
+	// 6. Unsupported top-level fields
+	issues = append(issues, checkUnsupportedTopLevelFields(config)...)
+
+	// 7. Model identifiers
+	issues = append(issues, checkModelIdentifiers(config)...)
 
 	return issues, nil
 }
@@ -161,6 +169,9 @@ func checkMCPFormat(config map[string]any) []ConfigIssue {
 				Field: fmt.Sprintf("mcp.%s", name), Severity: "critical",
 				Message: "Valor MCP debe ser un objeto",
 			})
+			continue
+		}
+		if enabled, exists := server["enabled"].(bool); exists && !enabled && len(server) == 1 {
 			continue
 		}
 
@@ -302,6 +313,48 @@ func checkPluginFormat(config map[string]any) []ConfigIssue {
 	return issues
 }
 
+func checkUnsupportedTopLevelFields(config map[string]any) []ConfigIssue {
+	if _, exists := config["theme"]; !exists {
+		return nil
+	}
+	return []ConfigIssue{{
+		Field:    "theme",
+		Severity: "critical",
+		Message:  "'theme' no está soportado en opencode.json; configúrelo en tui.json",
+		Fix:      "Eliminar el campo top-level 'theme'",
+	}}
+}
+
+var supportedOpenCodeModels = map[string]struct{}{
+	"openai/gpt-5.6-sol":             {},
+	"minimax-coding-plan/MiniMax-M3": {},
+}
+
+func checkModelIdentifiers(config map[string]any) []ConfigIssue {
+	var issues []ConfigIssue
+	for _, field := range []string{"model", "small_model"} {
+		model, exists := config[field]
+		if !exists {
+			continue
+		}
+		modelID, ok := model.(string)
+		if !ok || modelID == "" {
+			issues = append(issues, ConfigIssue{
+				Field: field, Severity: "critical",
+				Message: "El identificador de modelo debe ser un string no vacío",
+			})
+			continue
+		}
+		if _, supported := supportedOpenCodeModels[modelID]; !supported {
+			issues = append(issues, ConfigIssue{
+				Field: field, Severity: "critical",
+				Message: fmt.Sprintf("Modelo no disponible en la instalación actual: %q", modelID),
+			})
+		}
+	}
+	return issues
+}
+
 // ── OpenCode Config Generation (Canonical YAML → opencode.json) ────────────
 
 // CanonicalOpenCodeConfig mirrors .ovav/source/opencode/config.yaml.
@@ -368,8 +421,13 @@ func GenerateOpenCodeConfig(root string) error {
 	}
 
 	var canonical CanonicalOpenCodeConfig
-	if err := yaml.Unmarshal(data, &canonical); err != nil {
+	decoder := yaml.NewDecoder(bytes.NewReader(data))
+	decoder.KnownFields(true)
+	if err := decoder.Decode(&canonical); err != nil {
 		return fmt.Errorf("parse canonical config: %w", err)
+	}
+	if err := validateCanonicalOpenCodeConfig(canonical); err != nil {
+		return fmt.Errorf("validate canonical config: %w", err)
 	}
 
 	// Build opencode.json structure
@@ -394,6 +452,10 @@ func GenerateOpenCodeConfig(root string) error {
 	if len(canonical.MCP) > 0 {
 		mcp := make(map[string]any)
 		for name, server := range canonical.MCP {
+			if !server.Enabled {
+				mcp[name] = map[string]any{"enabled": false}
+				continue
+			}
 			mcp[name] = map[string]any{
 				"type":    server.Type,
 				"command": server.Command,
@@ -426,6 +488,16 @@ func GenerateOpenCodeConfig(root string) error {
 	}
 
 	// Permissions
+	authority := permissions.NewPermissionAuthority(root)
+	if _, err := os.Stat(authority.PolicyPath); err == nil {
+		projected, projectErr := authority.MaterializePermissionBlock()
+		if projectErr != nil {
+			return fmt.Errorf("load canonical permission authority: %w", projectErr)
+		}
+		canonical.Permissions.Edit = projected.Edit
+		canonical.Permissions.Bash = projected.Bash
+		canonical.Permissions.ExternalDirectory = projected.ExternalDirectory
+	}
 	if canonical.Permissions.Edit != "" || len(canonical.Permissions.Bash) > 0 {
 		perm := make(map[string]any)
 		perm["edit"] = canonical.Permissions.Edit
@@ -477,15 +549,6 @@ func GenerateOpenCodeConfig(root string) error {
 		config["tool_output"] = to
 	}
 
-	// Theme — OVAV uses ovav-dark/light themes from .opencode/themes/
-	// The theme.path must match the ACTUAL files in .opencode/themes/
-	// Actual files: ovav-dark.json, ovav-light.json
-	// Use ovav-dark as the default theme
-	config["theme"] = map[string]string{
-		"name": "ovav",
-		"path": ".opencode/themes/ovav-dark.json",
-	}
-
 	// Write opencode.json (OVERWRITE — OVAV is authoritative)
 	out, err := json.MarshalIndent(config, "", "  ")
 	if err != nil {
@@ -497,5 +560,31 @@ func GenerateOpenCodeConfig(root string) error {
 		return fmt.Errorf("write opencode.json: %w", err)
 	}
 
+	return nil
+}
+
+func validateCanonicalOpenCodeConfig(config CanonicalOpenCodeConfig) error {
+	if config.Schema != "https://opencode.ai/config.json" {
+		return fmt.Errorf("unsupported schema %q", config.Schema)
+	}
+	if config.Runtime.Model == "" {
+		return fmt.Errorf("runtime.model is required")
+	}
+	for name, server := range config.MCP {
+		if !server.Enabled {
+			continue
+		}
+		if server.Type != "local" {
+			return fmt.Errorf("mcp.%s.type must be local", name)
+		}
+		if len(server.Command) == 0 {
+			return fmt.Errorf("mcp.%s.command is required when enabled", name)
+		}
+	}
+	for pattern, decision := range config.Permissions.Bash {
+		if decision != "allow" && decision != "ask" && decision != "deny" {
+			return fmt.Errorf("permissions.bash.%s has invalid decision %q", pattern, decision)
+		}
+	}
 	return nil
 }

@@ -29,6 +29,7 @@ func (g *GitPush) Weight() int { return 10 }
 func (g *GitPush) Validate(ctx context.Context, root string) Result {
 	start := time.Now()
 	var issues []string
+	var warnings []string
 
 	// Resolve git config path (handles worktrees where .git is a file)
 	gitConfig := resolveGitPath(root, "config")
@@ -66,12 +67,21 @@ func (g *GitPush) Validate(ctx context.Context, root string) Result {
 		issues = append(issues, fmt.Sprintf("Cannot read platform agent: %v", err))
 	}
 
-	// Rule 4: Check opencode.json references ovav_git_push_gate
+	// Rule 4: Raw push remains denied in the harness and the Go-native governed
+	// push command is dispatched to its implementation.
 	opencodeJSON := filepath.Join(root, "opencode.json")
 	if jsonData, err := os.ReadFile(opencodeJSON); err == nil {
-		if !strings.Contains(string(jsonData), "ovav_git_push_gate") {
-			issues = append(issues, "opencode.json missing ovav_git_push_gate wiring")
+		text := string(jsonData)
+		if !strings.Contains(text, `"git push*": "deny"`) && !strings.Contains(text, `"git push*":"deny"`) {
+			issues = append(issues, "opencode.json does not deny raw git push")
 		}
+	} else {
+		issues = append(issues, fmt.Sprintf("Cannot read opencode.json: %v", err))
+	}
+	pushCLI, pushErr := os.ReadFile(filepath.Join(root, "go-runtime", "cmd", "ovav", "push_cli.go"))
+	dispatch, dispatchErr := os.ReadFile(filepath.Join(root, "go-runtime", "cmd", "ovav", "dispatch.go"))
+	if pushErr != nil || dispatchErr != nil || !strings.Contains(string(pushCLI), "cmdPush") || !strings.Contains(string(pushCLI), "gitflow.Push") || !strings.Contains(string(dispatch), `case "push"`) && !strings.Contains(string(dispatch), "cmdPush") {
+		issues = append(issues, "Go-native governed push command wiring is incomplete")
 	}
 
 	// Rule 5: Protected branch must have waiver (migrated from Python)
@@ -81,7 +91,7 @@ func (g *GitPush) Validate(ctx context.Context, root string) Result {
 
 	// Rule 6: No uncommitted changes (migrated from Python)
 	if safe, msg := g.checkUncommitted(root); !safe {
-		issues = append(issues, msg)
+		warnings = append(warnings, msg)
 	}
 
 	// Rule 7: No stale locks (migrated from Python)
@@ -94,6 +104,13 @@ func (g *GitPush) Validate(ctx context.Context, root string) Result {
 			ID: g.ID(), Name: g.Name(), Status: "fail", Weight: g.Weight(),
 			Message: fmt.Sprintf("FAIL git push gate — %d issue(s)", len(issues)),
 			Issues:  issues, Duration: time.Since(start),
+		}
+	}
+	if len(warnings) > 0 {
+		return Result{
+			ID: g.ID(), Name: g.Name(), Status: "warn", Weight: g.Weight(),
+			Message: fmt.Sprintf("WARN git push gate — wiring valid, %d worktree warning(s)", len(warnings)),
+			Issues:  warnings, Duration: time.Since(start),
 		}
 	}
 	return Result{

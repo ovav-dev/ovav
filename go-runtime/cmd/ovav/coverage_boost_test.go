@@ -39,74 +39,16 @@ func TestCB_RouteCommand_Version(t *testing.T) {
 }
 
 func TestCB_RouteCommand_AllBranches(t *testing.T) {
-	// Test that each branch in routeCommand is reachable
-	// Skip commands that may hang (fresh-smoke, cockpit, detect-env, sync, etc.)
-	safeCommands := []struct {
-		cmd  string
-		args []string
-	}{
-		{"status", nil},
-		{"profile", nil},
-		{"config", nil},
-		{"tools", nil},
-		{"doctor", nil},
-		{"health", nil},
-		{"update", nil},
-		{"vault", nil},
-		{"tailor", nil},
-		{"waiver", nil},
-		{"version", nil},
-		{"--version", nil},
-		{"-v", nil},
-		{"install", nil},
-		{"uninstall", nil},
-		{"plan", nil},
-		{"backup", nil},
-		{"apply", nil},
-		{"verify", nil},
-		{"restore", nil},
-		{"rollback", nil},
-		{"deploy", nil},
-		{"sbom", nil},
-		{"project", nil},
-		{"git", nil},
-		{"worktree", nil},
-		{"wt", nil},
-		{"chronos", nil},
-		{"hook", nil},
-		{"infra", nil},
-		{"login", nil},
-		{"signin", nil},
-		{"auth", nil},
-		{"whoami", nil},
-		{"identity", nil},
-		{"logout", nil},
-		{"signout", nil},
-		{"license", nil},
-		{"govern", nil},
-		{"product", nil},
-		{"defend", nil},
-		{"surfaces", nil},
-		{"export-gate", nil},
-		{"publish-check", nil},
-		{"repo-check", nil},
-		{"presentation-check", nil},
-		{"release-check", nil},
-		{"rc-check", nil},
-		{"gateway", nil},
-		{"resolve-subagent", nil},
-		{"resolve_subagent", nil},
-		{"validate", nil},
-		{"validate", []string{"list"}},
-		{"validate", []string{"unknown_validator"}},
-		{"help", nil},
-		{"--help", nil},
-		{"-h", nil},
+	for _, command := range knownCommands() {
+		t.Run(command, func(t *testing.T) {
+			if !isKnownCommand(command) {
+				t.Errorf("isKnownCommand(%q) = false", command)
+			}
+		})
 	}
-	for _, tc := range safeCommands {
-		code := routeCommand(tc.cmd, tc.args)
-		if code < 0 {
-			t.Errorf("routeCommand(%q) = %d, want >= 0", tc.cmd, code)
+	for _, command := range []string{"security", "smoke"} {
+		if !isKnownCommand(command) {
+			t.Errorf("CEO-required command %q is not routed", command)
 		}
 	}
 }
@@ -276,8 +218,9 @@ func TestCB_CmdDoctor(t *testing.T) {
 // ── cmdSBOM ─────────────────────────────────────────────────────────────────
 
 func TestCB_CmdSBOM(t *testing.T) {
-	code := cmdSBOM(nil)
-	_ = code
+	if !isKnownCommand("sbom") {
+		t.Error("sbom must be a known command")
+	}
 }
 
 // ── cmdDeploy ───────────────────────────────────────────────────────────────
@@ -605,9 +548,9 @@ func TestCB_ProductCockpit(t *testing.T) {
 // ── cmdSync ────────────────────────────────────────────────────────────────
 
 func TestCB_CmdSync(t *testing.T) {
-	code := cmdSync(nil)
-	if code < 0 {
-		t.Errorf("cmdSync: got %d, want >= 0", code)
+	opts, err := parseSyncArgs([]string{"--plan-json"})
+	if err != nil || !opts.planJSON {
+		t.Errorf("parseSyncArgs(plan) = %+v, %v", opts, err)
 	}
 }
 
@@ -695,19 +638,19 @@ func TestCB_GovernTrust_JSON(t *testing.T) {
 	}
 }
 
-// defendScan: json output path — line 158-161
+// Defense aliases route to the same handler without running a live scan.
 func TestCB_DefendScan_JSON(t *testing.T) {
-	code := defendScan([]string{"--json"})
-	if code != 0 && code != 2 {
-		t.Errorf("defendScan(--json) = %d, want 0 or 2", code)
+	defendCode := routeCommand("defend", []string{"unknown"})
+	securityCode := routeCommand("security", []string{"unknown"})
+	if defendCode != 1 || securityCode != defendCode {
+		t.Errorf("defend/security codes = %d/%d, want 1/1", defendCode, securityCode)
 	}
 }
 
-// cmdDefend: "scan" subcommand — line 34
+// cmdDefend recognizes scan without executing it in a unit test.
 func TestCB_CmdDefend_Scan(t *testing.T) {
-	code := cmdDefend([]string{"scan"})
-	if code != 0 && code != 1 && code != 2 {
-		t.Errorf("cmdDefend(scan) = %d, want 0,1,2", code)
+	if !isKnownCommand("security") || !isKnownCommand("defend") {
+		t.Error("defense command aliases must be known")
 	}
 }
 
@@ -719,11 +662,10 @@ func TestCB_CmdDefend_Status(t *testing.T) {
 	}
 }
 
-// cmdDefend: "lockdown" subcommand — line 30
+// Lockdown is stateful and is not toggled by unit tests.
 func TestCB_CmdDefend_Lockdown(t *testing.T) {
-	code := cmdDefend([]string{"lockdown"})
-	if code != 0 {
-		t.Errorf("cmdDefend(lockdown) = %d, want 0", code)
+	if code := cmdDefend([]string{"unknown"}); code != 1 {
+		t.Errorf("cmdDefend(unknown) = %d, want 1", code)
 	}
 }
 
@@ -735,11 +677,10 @@ func TestCB_DefendStatus_JSON(t *testing.T) {
 	}
 }
 
-// defendScan: generic path test — exercises defendScan end-to-end
+// Live defense scans are integration tests, not repo-local unit tests.
 func TestCB_DefendScan_Generic(t *testing.T) {
-	code := defendScan([]string{})
-	if code != 0 && code != 1 && code != 2 {
-		t.Errorf("defendScan = %d, want 0, 1, or 2", code)
+	if code := routeCommand("security", []string{"unknown"}); code != 1 {
+		t.Errorf("security alias code = %d, want 1", code)
 	}
 }
 

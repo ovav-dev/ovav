@@ -6,8 +6,9 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 	"time"
+
+	"github.com/ovav/ovav/internal/permissions"
 )
 
 // SecurityHardening validates F4 security hardening: bash command governance,
@@ -65,23 +66,29 @@ func (s *SecurityHardening) Validate(ctx context.Context, root string) Result {
 		denied := intVal(bash, "denied")
 		denyDefault := boolVal(bash, "deny_by_default")
 		governor := strVal(bash, "governor")
+		goSummary := permissions.NewBashCommandGovernor().GetSummary()
+		expectedTotal, _ := goSummary["total_rules"].(int)
+		expectedAllowed, _ := goSummary["allowed"].(int)
+		expectedDenied, _ := goSummary["denied"].(int)
 
-		if total != 15 {
-			issues = append(issues, fmt.Sprintf("F4.1: bash_commands total_rules expected 15, got %d", total))
+		if total != expectedTotal {
+			issues = append(issues, fmt.Sprintf("F4.1: bash_commands total_rules expected %d from Go governor, got %d", expectedTotal, total))
 		}
-		if allowed != 9 {
-			issues = append(issues, fmt.Sprintf("F4.1: bash_commands allowed expected 9, got %d", allowed))
+		if allowed != expectedAllowed {
+			issues = append(issues, fmt.Sprintf("F4.1: bash_commands allowed expected %d from Go governor, got %d", expectedAllowed, allowed))
 		}
-		if denied != 6 {
-			issues = append(issues, fmt.Sprintf("F4.1: bash_commands denied expected 6, got %d", denied))
+		if denied != expectedDenied {
+			issues = append(issues, fmt.Sprintf("F4.1: bash_commands denied expected %d from Go governor, got %d", expectedDenied, denied))
 		}
 		if !denyDefault {
 			issues = append(issues, "F4.1: bash_commands deny_by_default must be true")
 		}
 		if governor == "" {
 			issues = append(issues, "F4.1: bash_commands governor path missing")
-		} else if !strings.HasSuffix(governor, "bash_commands.py") {
+		} else if governor != "go-runtime/internal/permissions/governors.go" {
 			issues = append(issues, fmt.Sprintf("F4.1: bash_commands governor path mismatch: %s", governor))
+		} else if _, err := os.Stat(filepath.Join(root, governor)); err != nil {
+			issues = append(issues, fmt.Sprintf("F4.1: bash_commands governor unavailable: %v", err))
 		}
 
 		// Validate categories exist
@@ -128,6 +135,10 @@ func (s *SecurityHardening) Validate(ctx context.Context, root string) Result {
 		}
 		if governor == "" {
 			issues = append(issues, "F4.2: unsafe_selectors governor path missing")
+		} else if governor != "go-runtime/internal/permissions/governors.go" {
+			issues = append(issues, fmt.Sprintf("F4.2: unsafe_selectors governor path mismatch: %s", governor))
+		} else if _, err := os.Stat(filepath.Join(root, governor)); err != nil {
+			issues = append(issues, fmt.Sprintf("F4.2: unsafe_selectors governor unavailable: %v", err))
 		}
 
 		// Validate categories
@@ -152,6 +163,14 @@ func (s *SecurityHardening) Validate(ctx context.Context, root string) Result {
 		}
 	} else {
 		issues = append(issues, "F4: protected_denies.bash section missing")
+	}
+
+	// 6. Verify hard-deny behavior in the current Go governor, not just declarations.
+	governor := permissions.NewBashCommandGovernor()
+	for _, command := range []string{"git push origin main", "git push --force origin main", "sudo id", "rm -rf /"} {
+		if decision := governor.Check(command, "validator"); decision.Allowed {
+			issues = append(issues, fmt.Sprintf("F4 behavioral hard deny allowed command %q", command))
+		}
 	}
 
 	// 5. Cross-validate: protected_denies.bash should cover at least bash_commands denies
