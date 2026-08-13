@@ -4,7 +4,7 @@
   "project": "OVAV",
   "hash_algorithm": "sha256",
   "metadata": {
-    "git_identity": "8720d8206ca525a322d043ac60296ad9b898a794c5549b2ef39295f883012862"
+    "git_identity": "1517ffe042fdf25663110626d5bee856d5ff8c3a7bdffb6924e6d3158aaaa50e"
   },
   "policy": {
     "version": "tracked-content-v1",
@@ -474,7 +474,7 @@
     ".ovav/plan/architecture/mimocode-absorption-v1.md": "4c8216e9946e050b56dbd23d74eaec7002228162614b977a0c5285d82f0ec576",
     ".ovav/plan/architecture_split_core_product.md": "314bdaf1ae294dd6b47c4e80e52b7189fed9be7b11db28a5ad6308d2429599d3",
     ".ovav/plan/business_model.yaml": "26d7f54fcd0b4bbb414b9a7c82e8626665a20ac93c88b4f0ecbb12e30aadb403",
-    ".ovav/plan/caps.yaml": "1385eefb916d5703cb089db990f846e435d9d75c5f4a6964639bf91c340e5da2",
+    ".ovav/plan/caps.yaml": "30403de74b4aff5b4db2896f2ef65c7d97aae0ccb8b126c858d0f70a44b73bdc",
     ".ovav/plan/education_roadmap.yaml": "c82c68f9eae3cc06a9f1725799b4c50d2265edbdbd5c835c361516a2780bb50a",
     ".ovav/plan/f6_cockpit_action_plan.md": "60b9d5e1ef4f8c9845ba5ead6ac0cbc852e49458be551e8ac7fbce821a8f7f89",
     ".ovav/plan/health_audit.yaml": "2d62ff39701bbe93e3141703fb4b046f81e54dd31d8ed9cd61834d40189ba18f",
@@ -2465,7 +2465,7 @@
     "ovav-systems/tests/detector.test.ts": "f1321c2d3619f6bfe8fb9aad962c28de36fdd9e4bdb8c77d4b54dc9d319e0ba8",
     "ovav-systems/tests/integration.test.ts": "0249ab0e42da772b6c8f603c66a80e014e04af84dc9567eeafb9312a05b56dc2",
     "ovav-systems/tests/privacy.test.ts": "580ca35bfed7df2a0625682cb4f9e94baa8b51070808340c24015283fe387c07",
-    "package.json": "8b185f5b324616710a579ccbdb785c9b3cdf5d1364cdf05640a2e7c2f21d88d6",
+    "package.json": "9fc55a213a7963f15fd684da79d02b8ad693696e6585cd5f374be4c05460c946",
     "plans/OVAV-EXPANSION-2026/SUMMARY.md": "a63b8338d4a835c0a1cf4c334107b668af0080ab21a3693edeecab25876102aa",
     "plans/OVAV-INFRASTRUCTURE-ALIGNMENT-2026-08-06.md": "fe76ad55b190645861eaf42fba544455c26040e951db69eaf850404e24d175b4",
     "plans/OVAV-INFRASTRUCTURE-CONSOLIDATION-2026-08-06.md": "339a822e2cf7bee5a6de290f1dd350cdcd5a3b2c707a48a2960fe40897e05fd3",
