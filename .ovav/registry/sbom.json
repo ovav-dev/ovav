@@ -4,7 +4,7 @@
   "project": "OVAV",
   "hash_algorithm": "sha256",
   "metadata": {
-    "git_identity": "3b94c56152d69afc3e9b70ec72f9c8e00e2e8fd47223e29f1828fbe7de27e4a8"
+    "git_identity": "ba020ee28a245d9799f87f0bfeeda0d84f3f357a48a39f729921fdd2e0582cf6"
   },
   "policy": {
     "version": "tracked-content-v1",
@@ -1502,7 +1502,7 @@
     "go-runtime/cmd/ovav-vault-tui/main.go": "f98422fd412e1c7bd9883fa5a9de3efacac01ad5ce78ff0849987326516db32c",
     "go-runtime/cmd/ovav/adversarial_cli.go": "118e3b76d4250a7ba253fe47497a54c720108d1829f936f8154cf7f173eec40d",
     "go-runtime/cmd/ovav/benchmark_cli.go": "82cef817fff045e0f99d2612333bee956dd6d9c88027b9d560bd1d5e2173253e",
-    "go-runtime/cmd/ovav/cli_semantics_test.go": "e65c3f12bcf84cbe33f8470c6dda5cf2b65e88f9957e203feb39d36cc309f64f",
+    "go-runtime/cmd/ovav/cli_semantics_test.go": "9072e325fa8af307be76c318db108d38f278c8407a9df199822ef21ba71ae22c",
     "go-runtime/cmd/ovav/convert_cli.go": "291d1e5bfd9a2b91884fe4f8b5ca61d9c7c180830b695817f9dff69ede651097",
     "go-runtime/cmd/ovav/coverage_boost_test.go": "3bccf3af98900f16c7dd38e3e018173771b35cba824edd8247908c769c36ec1a",
     "go-runtime/cmd/ovav/coverage_cli.go": "6b4b7961aeb2de62226cc820127e91f527a5093be42ec3b796d5cb0d53e7f274",
@@ -1512,7 +1512,7 @@
     "go-runtime/cmd/ovav/dispatch_test.go": "585928b8d9c70d053f844be5f8a27819c675957ed9462d1b754287cee354c0ce",
     "go-runtime/cmd/ovav/fde_cli.go": "2fcaddbf4f5adef2b98f28c04c6309b9a963f8983aa3f56c9be0cbcfe0524117",
     "go-runtime/cmd/ovav/governor_cli.go": "b28d1e4df9c91c35ecbb96679e0f5481b67fbe3aa2d8e5f3b14ab0ab92bd73dd",
-    "go-runtime/cmd/ovav/integrity_cli.go": "21764490f848d13a3dfe705e4564da04ab1ee429a2b5a2a2e9419dab80be5dff",
+    "go-runtime/cmd/ovav/integrity_cli.go": "2076a949baa65240b866564e26ebde7c4cff1d705cb9a3212576c688eab3de65",
     "go-runtime/cmd/ovav/login.go": "d34287060d4970fdc27f25a864ce4b3f7cfbc8f6fda82af452bc440774ccc485",
     "go-runtime/cmd/ovav/login_recovery_test.go": "667bb6b13125a80b5f1a661bfe1004019197eae396984e355b881ca6f83fa36a",
     "go-runtime/cmd/ovav/main.go": "6413f8d7547e56332cba5fd2621d7142fb41e5e82ed321da5cbd92d5f296cbc1",
@@ -1757,8 +1757,8 @@
     "go-runtime/internal/hooks/hooks_extra_test.go": "2051214880f666f1a69585c3b8af3d772a9e00cc068e482f56265042d837c5bb",
     "go-runtime/internal/hooks/hooks_test.go": "5ce634243f1ab6ae1b26e3f6039d02d7e9c04a5a50d0ac5002ebf84250e43693",
     "go-runtime/internal/hooks/stages.go": "1b64df4688ef525d6e3f5480c53ac5b0acff9d9b3080f98de8dde07d06e4ce46",
-    "go-runtime/internal/identity/atomic_linux.go": "9493a55007cb02fe7371442ca31ff82d9a298d4f235087778dbe63dd40d9f323",
-    "go-runtime/internal/identity/atomic_other.go": "ddc685617f600d64298c6e9689b067ab40afde2fb3c2a7e9d32338190d485f40",
+    "go-runtime/internal/identity/atomic_linux.go": "bca7197fed16399f368339059bc7bf69c2e942affc0e2d55c19ee7054e86a37a",
+    "go-runtime/internal/identity/atomic_other.go": "1b2444f2e097dcfa0ff60423aad8e026452276a3b682bfbea395dd82e2796e1d",
     "go-runtime/internal/identity/audit.go": "861d1ec75358ec2509bc4e4857e49394ee99528e0780c820f675ce51cec3da50",
     "go-runtime/internal/identity/identity.go": "39f1bbbeb87adb5c743fb6941ad290a98ac3ba5cae2c5a4ac764013f3bbde0ac",
     "go-runtime/internal/identity/identity_test.go": "9ed3ac176e805ce3bb1968519cf68dc7ce41f0f5f874e75c6d6076b3c4e59d11",
@@ -2204,7 +2204,8 @@
     "go-runtime/internal/theme/theme.go": "82d02533647584dcd626b562bc0ffeb11dd6420cb57ed9be01177656e626b9ea",
     "go-runtime/internal/tools/catalog.go": "d48411f6d031a1b7d6d4bb1dc78f94bffbe2e14c22a919454fe2fde579babe68",
     "go-runtime/internal/tools/catalog_test.go": "8cc480f56dd97d203aca35d4469214743db4cd2334f308a5545e7b84ec9413a0",
-    "go-runtime/internal/truststore/truststore.go": "37ef1babd3dd21af251949891edaaae410724b94c9972ab95d682017422a5fc9",
+    "go-runtime/internal/truststore/truststore.go": "8cdd5b7dd6197404416addf3ba9a0c02127142fe76cb59b1930218732f52e6f2",
+    "go-runtime/internal/truststore/truststore_test.go": "f6bace6833faf4d16917f49475f1f29f539d1442df1e8d9bedb87ed363a674c2",
     "go-runtime/internal/validators/advanced_hardening.go": "e1649557954c21c0be26e97626637dfb22b94421d95e05644841cc06f72f8228",
     "go-runtime/internal/validators/adversarial_vectors.go": "7d9f74656737b1609e21202eb2202a4fe71c88d4869df2cdc1e0889783cef16a",
     "go-runtime/internal/validators/adversarial_verification.go": "8bddc090799c36a6649d191f7bddac7be0e361e871304f3444c558febb82b857",
