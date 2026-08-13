@@ -50,9 +50,9 @@ func NewBashCommandGovernor() *BashCommandGovernor {
 			{Name: "python_inline", Pattern: `^python3\s+-c\s+.*`, Action: "allow", Category: "interpreted_execution", Note: "Inline Python execution", RateLimited: true},
 			{Name: "gh_issue_read", Pattern: `^gh\s+issue\s+(list|view|status)(\s+.*)?$`, Action: "allow", Category: "github_read", Note: "GitHub issue read operations", F0Integrations: []string{"f0.4_network_guard"}, RateLimited: true},
 			{Name: "test_runners", Pattern: `^(python3\s+-m\s+pytest|make\s+test|python3\s+setup\.py\s+test)(\s+.*)?$`, Action: "allow", Category: "testing", Note: "Test execution"},
-			{Name: "governed_git_push", Pattern: `^python3\s+tools/github/ovav_git_push_gate\.py(\s+--confirm)?$`, Action: "allow", Category: "governed_git", Note: "Git push through governed gate", F0Integrations: []string{"f0.5_bootstrap_chain"}},
+			{Name: "governed_git_push", Pattern: `^(ovav\s+push|go\s+run\s+-C\s+go-runtime\s+\./cmd/ovav\s+push)(\s+--dry-run)?$`, Action: "allow", Category: "governed_git", Note: "Git push through Go-native governed command"},
 			// DENY rules (7)
-			{Name: "git_push_force", Pattern: `^git\s+push\s+(-f|--force|--force-with-lease)`, Action: "deny", Category: "source_control_mutate", Note: "Force push permanently blocked"},
+			{Name: "git_push_force", Pattern: `^git\s+push(?:\s+.*)?$`, Action: "deny", Category: "source_control_mutate", Note: "Raw and force git push permanently blocked; use ovav push"},
 			{Name: "git_branch_delete", Pattern: `^git\s+branch\s+(-d|-D|--delete)\s+.*`, Action: "deny", Category: "source_control_mutate", Note: "Branch deletion requires user action"},
 			{Name: "git_checkout_new_branch", Pattern: `^git\s+(checkout|switch)\s+(-b|-c)\s+.*`, Action: "deny", Category: "source_control_mutate", Note: "Branch creation must use OVAV harness"},
 			{Name: "sudo_root", Pattern: `^sudo\s+.*`, Action: "deny", Category: "privilege_escalation", Note: "Root/sudo execution permanently blocked"},

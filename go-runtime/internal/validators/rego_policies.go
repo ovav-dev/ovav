@@ -26,53 +26,36 @@ func (r *RegoPolicies) Validate(ctx context.Context, root string) Result {
 	start := time.Now()
 	var issues []string
 
-	// 1. Check rego engine exists
-	enginePath := filepath.Join(root, "tools", "permissions", "rego_engine.py")
+	// 1. Check the current Go-native engine and its public policy surface.
+	engineRel := "go-runtime/internal/permissions/rego_engine.go"
+	enginePath := filepath.Join(root, engineRel)
 	if info, err := os.Stat(enginePath); os.IsNotExist(err) {
-		issues = append(issues, "Rego engine file missing: tools/permissions/rego_engine.py")
+		issues = append(issues, "Rego engine file missing: "+engineRel)
 	} else if info.Size() == 0 {
-		issues = append(issues, "Rego engine file is empty: tools/permissions/rego_engine.py")
+		issues = append(issues, "Rego engine file is empty: "+engineRel)
 	} else {
 		data, err := os.ReadFile(enginePath)
 		if err == nil {
 			content := string(data)
-			if !strings.Contains(content, "class RegoEngine") {
-				issues = append(issues, "Rego: RegoEngine class not found in rego_engine.py")
-			}
-			if !strings.Contains(content, "BUILTIN_TESTS") {
-				issues = append(issues, "Rego: BUILTIN_TESTS not found in rego_engine.py")
-			}
-			if !strings.Contains(content, "load_policies") {
-				issues = append(issues, "Rego: load_policies method not found")
-			}
-			if !strings.Contains(content, "test_policy") {
-				issues = append(issues, "Rego: test_policy method not found")
-			}
-			// Check deny/allow rule presence
-			hasDeny := strings.Contains(content, "deny")
-			hasAllow := strings.Contains(content, "allow")
-			if !hasDeny {
-				issues = append(issues, "Rego: no deny rules detected — security policies missing")
-			}
-			if !hasAllow {
-				issues = append(issues, "Rego: no allow rules detected — all operations would be denied")
+			for _, signature := range []string{"type RegoEngine", "NewRegoEngine", "LoadPolicies", "Evaluate", "TestPolicy", "BuiltinTests"} {
+				if !strings.Contains(content, signature) {
+					issues = append(issues, fmt.Sprintf("Rego engine missing Go signature %q", signature))
+				}
 			}
 		}
 	}
 
-	// 2. Check Rego policies — may be embedded in rego_engine.py or as .rego files
-	regoDir := filepath.Join(root, ".ovav", "laws")
-	if entries, err := os.ReadDir(regoDir); err == nil {
-		hasRego := false
-		for _, e := range entries {
-			if strings.HasSuffix(e.Name(), ".rego") {
-				hasRego = true
-				break
-			}
+	// 2. Preserve actual policy checks: rules belong in .rego authority files,
+	// not in implementation source.
+	policies, err := readRegoPolicies(root)
+	if err != nil {
+		issues = append(issues, err.Error())
+	} else {
+		if !strings.Contains(policies, "deny") {
+			issues = append(issues, "Rego: no deny rules detected — security policies missing")
 		}
-		if !hasRego {
-			// Not necessarily an error — Rego policies may be embedded in rego_engine.py
-			// which was already verified above
+		if !strings.Contains(policies, "allow") {
+			issues = append(issues, "Rego: no allow rules detected — all operations would be denied")
 		}
 	}
 
@@ -89,6 +72,33 @@ func (r *RegoPolicies) Validate(ctx context.Context, root string) Result {
 		Message:  "PASS rego policies — engine and rules verified",
 		Duration: time.Since(start),
 	}
+}
+
+func readRegoPolicies(root string) (string, error) {
+	var policies strings.Builder
+	count := 0
+	for _, rel := range []string{".ovav/policy/rego", ".ovav/registry/rego_policies"} {
+		entries, err := os.ReadDir(filepath.Join(root, rel))
+		if err != nil {
+			continue
+		}
+		for _, entry := range entries {
+			if entry.IsDir() || !strings.HasSuffix(entry.Name(), ".rego") {
+				continue
+			}
+			data, err := os.ReadFile(filepath.Join(root, rel, entry.Name()))
+			if err != nil {
+				return "", fmt.Errorf("Rego: cannot read policy %s: %w", filepath.Join(rel, entry.Name()), err)
+			}
+			count++
+			policies.Write(data)
+			policies.WriteByte('\n')
+		}
+	}
+	if count == 0 {
+		return "", fmt.Errorf("Rego: no .rego policy files found")
+	}
+	return policies.String(), nil
 }
 
 var _ Validator = (*RegoPolicies)(nil)

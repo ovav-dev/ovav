@@ -1,8 +1,45 @@
-// THEME DEPRECATED - Moved to separate dark/light themes
-// See: ovav-dark.json and ovav-light.json
 {
   "$schema": "https://opencode.ai/theme.json",
-  "name": "OVAV",
-  "deprecated": true,
-  "message": "Use OVAV Dark or OVAV Light instead"
+  "defs": {
+    "syntax_keyword": "#c47d8a",
+    "syntax_number": "#c47d8a",
+    "syntax_string": "#9aaa4a"
+  },
+  "theme": {
+    "accent": { "dark": "#df8997", "light": "#8b4050" },
+    "background": { "dark": "#202124", "light": "#f7f4ee" },
+    "backgroundElement": { "dark": "#2d3035", "light": "#e4ded4" },
+    "backgroundPanel": { "dark": "#25272b", "light": "#ece7dd" },
+    "border": { "dark": "#4b5058", "light": "#aaa49b" },
+    "borderActive": { "dark": "#72b8aa", "light": "#2f685c" },
+    "borderSubtle": { "dark": "#2d3035", "light": "#e4ded4" },
+    "diffAdded": { "dark": "#9bd39e", "light": "#356b39" },
+    "diffAddedBg": { "dark": "#24352a", "light": "#dce8df" },
+    "diffContext": { "dark": "#b5b8be", "light": "#555b63" },
+    "diffContextBg": { "dark": "#25272b", "light": "#ece7dd" },
+    "diffHighlightAdded": { "dark": "#9bd39e", "light": "#356b39" },
+    "diffHighlightRemoved": { "dark": "#ef9a91", "light": "#97392f" },
+    "diffHunkHeader": { "dark": "#91bce4", "light": "#285d82" },
+    "diffRemoved": { "dark": "#ef9a91", "light": "#97392f" },
+    "diffRemovedBg": { "dark": "#3b292a", "light": "#e9dedd" },
+    "error": { "dark": "#e17f74", "light": "#97392f" },
+    "info": { "dark": "#79aee0", "light": "#285d82" },
+    "markdownCode": { "dark": "#86c78a", "light": "#356b39" },
+    "markdownHeading": { "dark": "#72b8aa", "light": "#2f685c" },
+    "markdownLink": { "dark": "#79aee0", "light": "#285d82" },
+    "markdownText": { "dark": "#d9dadd", "light": "#202124" },
+    "primary": { "dark": "#72b8aa", "light": "#2f685c" },
+    "secondary": { "dark": "#aebd68", "light": "#596814" },
+    "success": { "dark": "#86c78a", "light": "#356b39" },
+    "syntaxComment": { "dark": "#979ba3", "light": "#555b63" },
+    "syntaxFunction": { "dark": "#72b8aa", "light": "#2f685c" },
+    "syntaxKeyword": { "dark": "#df8997", "light": "#8b4050" },
+    "syntaxNumber": { "dark": "#df8997", "light": "#8b4050" },
+    "syntaxString": { "dark": "#aebd68", "light": "#596814" },
+    "syntaxVariable": { "dark": "#d9dadd", "light": "#202124" },
+    "text": { "dark": "#d9dadd", "light": "#202124" },
+    "textMuted": { "dark": "#979ba3", "light": "#555b63" },
+    "textSecondary": { "dark": "#b5b8be", "light": "#4f545c" },
+    "warning": { "dark": "#e0b86b", "light": "#785500" }
+  }
 }

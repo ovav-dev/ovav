@@ -46,7 +46,7 @@ El author field muestra: "Thavren [platform_engineering]"
 ```bash
 git config --global user.name "Alexander Salvador"
 git config --global user.email "alexander_mya@outlook.com"  # Email VERIFICADO en GitHub
-git config --global user.signingkey 3DAC13769287AC80           # GPG Key en GitHub
+git config --global user.signingkey 7DE5923582A84DBB           # GPG signing subkey (rotated 2026-08-13)
 git config --global gpg.format openpgp
 git config --global commit.gpgsign true
 ```
@@ -93,10 +93,19 @@ SSH signing fallaba porque la key SSH no tiene email asociado directamente. GPG 
 ```
 
 ### GPG Key (Humano - Verificada en GitHub)
+
+> **Rotation 2026-08-13** — the previous RSA-4096 `3DAC13769287AC80` was lost when the laptop was reformatted. A fresh ED25519 keypair was generated and pinned by the canonical CEO recovery flow (`ovav login --recover-ceo`). The signing subkey below MUST be published to <https://github.com/settings/keys> to keep the "Verified" badge on GitHub.
+
 ```
 /home/braka/.gnupg/
-├── sec   rsa4096/3DAC13769287AC80
-│   └── alexander_mya@outlook.com
+├── sec   ed25519/5F384C5B35CDD0F8  2026-08-13 [C] (primary, cert-only)
+│   └── 1D70BE0236928C49921A781F5F384C5B35CDD0F8
+│   └── uid: Alexander Salvador <alexander_mya@outlook.com>
+├── ssb   ed25519/7DE5923582A84DBB  2026-08-13 [S] (signing subkey — used by git)
+└── trust: ultimate (self-signed)
+```
+
+Public key armored export: see `/tmp/opencode/ovav-gpg-public.asc` (regenerate with `gpg --armor --export 1D70BE0236928C49921A781F5F384C5B35CDD0F8`).
 ```
 
 ### SSH Keys en GitHub (Alexander-Salvador account)

@@ -2,7 +2,7 @@
 
 > **Canonical Reference** — This document is the source of truth for OVAV terminal setup.
 > All agents must consult this before modifying terminal configurations.
-> Last updated: 2026-08-09
+> Last updated: 2026-08-13
 
 ## Environment Detection & Config Paths
 
@@ -38,8 +38,29 @@ local USER = {
 | Windows | `%LOCALAPPDATA%\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json` |
 | WSL2 access | `/mnt/c/Users/<username>/AppData/Local/Packages/Microsoft.WindowsTerminal_8wekyb3d8bbwe/LocalState/settings.json` |
 
-**OVAV Config Source**: `.ovav/source/configs/windows-terminal/settings.json`
-**Deploy**: `config/windows-terminal/settings.json`
+**OVAV Config Source**: `.ovav/source/configs/windows-terminal/ovav.fragment.json`
+**Deploy**: `config/windows-terminal/ovav.fragment.json` (merge fragment, never a full `settings.json` replacement)
+
+### Safe Windows Terminal Workflow
+
+Windows Terminal configuration is merge-only. Never copy an OVAV file over the installed `settings.json`, and never use `ovav convert --inject` for this target.
+
+1. Open Windows Terminal once so its installed `settings.json` exists.
+2. Run a dry-run plan. This parses the installed settings and fragment, validates both against OVAV's Windows Terminal 1.24 structural subset, merges named schemes/themes/profiles/actions, validates the merged result, and reports a UTC timestamped backup path.
+3. Review the merged projection and confirm unrelated settings, actions, profiles, schemes, and themes remain present.
+4. Apply only through a separately approved installer that first copies the installed file to the exact timestamped backup path, writes the planned merge, runs PowerShell `Test-Json`, reruns OVAV structural validation, and restores the backup on failure.
+
+```powershell
+# Canonical no-write planner
+ovav terminal windows plan `
+  --settings "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json" `
+  --fragment ".ovav\source\configs\windows-terminal\ovav.fragment.json"
+
+# Obsolete compatibility wrapper: also dry-run only; -Apply is rejected
+.\.ovav\templates\windows-terminal\merge-wt-settings.ps1
+```
+
+The repository does not claim or bundle the complete Microsoft vendor schema. The planner enforces the WT 1.24 structural subset OVAV uses: object/array types, required names, paired light/dark scheme and UI-theme references, profile GUIDs and command types. The installed Windows Terminal remains the final vendor-schema authority.
 
 ### Fish Shell (WSL2/Linux)
 
@@ -58,10 +79,10 @@ local USER = {
 # Project configs to deploy directory
 ovav convert --configs
 
-# Inject configs to user home (auto-detects environment)
+# Inject supported configs to user home (Windows Terminal is excluded)
 ovav convert --inject
 
-# Force overwrite existing configs
+# Force supported non-Windows-Terminal replacements
 ovav convert --inject --force
 
 # Check sync status
@@ -88,11 +109,11 @@ detectEnvironment():
 - `fish/config.fish` → `~/.config/fish/config.fish`
 - `commands/aliases.fish` → `~/.config/fish/aliases.fish`
 - `git/gitconfig` → `~/.gitconfig`
-- `windows-terminal/settings.json` → `/mnt/c/Users/Alexa/AppData/Local/Packages/.../settings.json`
+- `windows-terminal/ovav.fragment.json` → dry-run merge plan only; no home write
 
 ### windows
 - `wezterm/wezterm.lua` → `%USERPROFILE%\.wezterm.lua`
-- `windows-terminal/settings.json` → `%LOCALAPPDATA%\Packages\...\settings.json`
+- `windows-terminal/ovav.fragment.json` → dry-run merge plan only; no home write
 
 ### linux
 - `fish/config.fish` → `~/.config/fish/config.fish`
@@ -104,7 +125,7 @@ detectEnvironment():
 
 **Auto-detection modules**:
 - `.ovav/source/configs/theme/auto.wezterm.lua` — WezTerm theme switcher
-- `.ovav/source/configs/theme/auto.windows-terminal.json` — Windows Terminal schemes
+- `.ovav/source/configs/windows-terminal/ovav.fragment.json` — paired Windows Terminal schemes and UI themes
 
 **Color Variables** (dark mode default):
 ```lua
@@ -132,14 +153,14 @@ accent_pink = "#c47d8a"
 
 | Issue | Solution |
 |-------|----------|
-| Config changes not taking effect | Use `ovav convert --inject --force` to overwrite |
+| Windows Terminal changes not taking effect | Re-run the dry-run merge plan; never overwrite installed `settings.json` |
 | First WezTerm tab = cmd.exe | Known Windows behavior; ALT+1/2/3 spawns WSL tabs correctly |
 | `[I]` icon in prompt | Nerd Font glyph in shell's oh-my-posh, not WezTerm |
 | Themes not switching | Set `OVAV_COLOR_SCHEME=dark` or `light` env var |
 
 ## Git Config
 
-**OVAV Signing**: GPG key `3DAC13769287AC80`
+**OVAV Signing**: GPG primary `1D70BE0236928C49921A781F5F384C5B35CDD0F8`, signing subkey `7DE5923582A84DBB` (rotated 2026-08-13 after laptop reformat). Original RSA-4096 `3DAC13769287AC80` is no longer in `~/.gnupg`.
 **AI+Human Model**: Author=agent, Committer=human (gets "Verified" badge)
 
 ```bash

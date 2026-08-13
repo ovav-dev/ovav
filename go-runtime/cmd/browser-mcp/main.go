@@ -3,7 +3,7 @@
 // Usage:
 //
 //	browser-mcp                     # stdio mode (for MCP clients)
-//	browser-mcp --http :18922       # HTTP daemon mode (persistent, no restart per call)
+//	browser-mcp --http :18922       # rejected: obsolete insecure HTTP mode
 //	browser-mcp --connect           # Auto-connect to Chrome on CDP port
 //	browser-mcp --endpoint http://HOST:9222  # Connect to specific endpoint
 //
@@ -15,14 +15,9 @@
 package main
 
 import (
-	"encoding/json"
 	"flag"
 	"fmt"
-	"io"
-	"net"
-	"net/http"
 	"os"
-	"strings"
 
 	"github.com/ovav/ovav/internal/browser"
 )
@@ -33,6 +28,10 @@ func main() {
 	port := flag.Int("port", 9222, "Chrome CDP port")
 	endpoint := flag.String("endpoint", "", "CDP endpoint URL (e.g. http://172.22.80.1:9222)")
 	flag.Parse()
+	if err := validateLegacyHTTPMode(*httpAddr); err != nil {
+		fmt.Fprintf(os.Stderr, "browser-mcp: %v\n", err)
+		return
+	}
 
 	// Override from env
 	if p := os.Getenv("BROWSER_CDP_PORT"); p != "" {
@@ -54,13 +53,17 @@ func main() {
 			endpoints = append(endpoints, *endpoint)
 		}
 		endpoints = append(endpoints,
-			fmt.Sprintf("http://172.22.80.1:%d", *port),
 			fmt.Sprintf("http://127.0.0.1:%d", *port),
 		)
+		firewall := browser.NewURLFirewall(currentRoot())
 
 		connected := false
 		for _, ep := range endpoints {
 			fmt.Fprintf(os.Stderr, "browser-mcp: trying %s ...\n", ep)
+			if err := firewall.Validate(ep); err != nil {
+				fmt.Fprintf(os.Stderr, "browser-mcp: endpoint denied: %v\n", err)
+				continue
+			}
 			if err := ctrl.ConnectRemote(ep); err == nil {
 				fmt.Fprintf(os.Stderr, "browser-mcp: connected to Chrome at %s\n", ep)
 				connected = true
@@ -81,75 +84,20 @@ func main() {
 
 	server := browser.NewMCPServer(ctrl)
 
-	if *httpAddr != "" {
-		// HTTP DAEMON MODE — persistent process, survives across MCP calls
-		// No restart per call = no new tabs = stable connection
-		http.HandleFunc("/mcp", func(w http.ResponseWriter, r *http.Request) {
-			if r.Method != http.MethodPost {
-				http.Error(w, "POST required", http.StatusMethodNotAllowed)
-				return
-			}
-			body, err := io.ReadAll(r.Body)
-			if err != nil {
-				http.Error(w, "read error", http.StatusBadRequest)
-				return
-			}
-			defer r.Body.Close()
+	server.Run()
+}
 
-			// Handle newline-delimited JSON (multiple requests in one body)
-			lines := strings.Split(strings.TrimSpace(string(body)), "\n")
-			var lastResponse string
-			for _, line := range lines {
-				line = strings.TrimSpace(line)
-				if line == "" {
-					continue
-				}
-				var req browser.MCPRequest
-				if err := json.Unmarshal([]byte(line), &req); err != nil {
-					continue
-				}
-				resp := server.HandleRequest(req)
-				if resp != nil {
-					data, _ := json.Marshal(resp)
-					lastResponse = string(data)
-				}
-			}
-
-			w.Header().Set("Content-Type", "application/json")
-			if lastResponse != "" {
-				fmt.Fprint(w, lastResponse)
-			} else {
-				fmt.Fprint(w, `{"jsonrpc":"2.0","result":{}}`)
-			}
-		})
-
-		// Health check endpoint
-		http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Set("Content-Type", "application/json")
-			status := ctrl.Status()
-			data, _ := json.Marshal(status)
-			fmt.Fprint(w, string(data))
-		})
-
-		// Bind explicitly to TCP4 to avoid IPv6/IPv4 dual-stack "address in use" on Windows
-		addr := *httpAddr
-		if !strings.Contains(addr, "://") {
-			if !strings.HasPrefix(addr, ":") {
-				addr = ":" + addr
-			}
-		}
-		listener, err := net.Listen("tcp4", addr)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "browser-mcp: listen failed: %v\n", err)
-			os.Exit(1)
-		}
-		fmt.Fprintf(os.Stderr, "browser-mcp: daemon listening on %s (tcp4)\n", addr)
-		if err := http.Serve(listener, nil); err != nil {
-			fmt.Fprintf(os.Stderr, "browser-mcp: http serve failed: %v\n", err)
-			os.Exit(1)
-		}
-	} else {
-		// STDIO MODE — traditional MCP, process per session
-		server.Run()
+func currentRoot() string {
+	root, err := os.Getwd()
+	if err != nil {
+		return "."
 	}
+	return root
+}
+
+func validateLegacyHTTPMode(addr string) error {
+	if addr != "" {
+		return fmt.Errorf("obsolete HTTP mode is disabled; use cmd/browser_server with loopback bind and bearer authentication")
+	}
+	return nil
 }

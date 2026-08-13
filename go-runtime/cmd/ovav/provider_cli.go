@@ -20,10 +20,10 @@ import (
 
 // ActiveProvider represents the current active provider selection
 type ActiveProvider struct {
-	Provider   string    `json:"provider"`
-	Model      string    `json:"model"`
+	Provider  string    `json:"provider"`
+	Model     string    `json:"model"`
 	APIKeyRef string    `json:"api_key_ref"` // Reference name, not the actual key
-	APIKey    string    `json:"-"`          // Never persisted
+	APIKey    string    `json:"-"`           // Never persisted
 	Endpoint  string    `json:"endpoint"`
 	SetAt     time.Time `json:"set_at"`
 	SetBy     string    `json:"set_by"` // "user" or "auto"
@@ -32,10 +32,10 @@ type ActiveProvider struct {
 // ProviderConfig maps user-friendly names to provider settings
 var ProviderConfigs = map[string]struct {
 	Provider  string
-	Model    string
+	Model     string
 	APIKeyEnv string
-	Endpoint string
-	Help     string
+	Endpoint  string
+	Help      string
 }{
 	"hyper": {
 		Provider:  "hyper",
@@ -248,8 +248,8 @@ func providerList(args []string) int {
 			providers = append(providers, info)
 		}
 		data, _ := json.MarshalIndent(struct {
-			Status    string        `json:"status"`
-			Current   string        `json:"current"`
+			Status    string         `json:"status"`
+			Current   string         `json:"current"`
 			Providers []providerInfo `json:"providers"`
 		}{"ok", currentName, providers}, "", "  ")
 		fmt.Println(string(data))

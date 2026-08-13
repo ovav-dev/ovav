@@ -29,7 +29,8 @@ var workspaceArtifacts = []string{
 	".ovav/source/configs/wezterm/ovav-workspace-isolation.wezterm.lua.example",
 	"config/wezterm/wezterm.lua",
 	".ovav/source/configs/wezterm/ovav-windows-loader.wezterm.lua",
-	"tools/workstation/ovav_wezterm_workspace.py",
+	"go-runtime/internal/install/install.go",
+	"go-runtime/internal/tailor/apply.go",
 	".ovav/registry/tool_configs.yaml",
 }
 
@@ -55,7 +56,6 @@ var policyRequiredTokens = []string{
 	"source_template:",
 	"governed_payload: config/wezterm/wezterm.lua",
 	"windows_loader:",
-	"helper_tool: tools/workstation/ovav_wezterm_workspace.py",
 	"blocked_until_explicit_install_approval",
 	"color_profile: ovav_pi_eye_comfort",
 	"inactive_pane_dimming: disabled_brightness_1_0",
@@ -64,22 +64,10 @@ var policyRequiredTokens = []string{
 	"OVAV_WZPROXY_v3",
 }
 
-// Required tool tokens.
-var toolRequiredTokens = []string{
-	"def workspace_name(",
-	"def launch_command(",
-	"def check_current(",
-	"def blocked_apply()",
-	"workspace_scope",
-	"commands_executed",
-	"writes_performed",
-	"Real WezTerm apply is blocked",
-	"no_wezterm_process_launch",
-}
-
 func (w *WorkspaceIsolation) Validate(ctx context.Context, root string) Result {
 	start := time.Now()
 	var issues []string
+	var warnings []string
 	found := 0
 	missing := 0
 
@@ -116,22 +104,29 @@ func (w *WorkspaceIsolation) Validate(ctx context.Context, root string) Result {
 				issues = append(issues, fmt.Sprintf("POLICY_TOKEN_MISSING: '%s' not found in workspace isolation policy", token))
 			}
 		}
+		if strings.Contains(content, "tools/workstation/ovav_wezterm_workspace.py") {
+			warnings = append(warnings, "CONFIG_PROJECTION_STALE: policy still names removed Python workspace helper")
+		}
+	}
+	if data, err := os.ReadFile(filepath.Join(root, ".ovav", "registry", "tool_configs.yaml")); err == nil && strings.Contains(string(data), "tools/workstation/ovav_wezterm_workspace.py") {
+		warnings = append(warnings, "CONFIG_PROJECTION_STALE: tool registry still names removed Python workspace helper")
 	}
 
-	// 4. Validate tool tokens
-	toolPath := filepath.Join(root, "tools", "workstation", "ovav_wezterm_workspace.py")
-	if data, err := os.ReadFile(toolPath); err == nil {
+	// 4. Validate current Go workstation boundary. There is no current Go
+	// workspace-name/launch helper, so this remains an explicit warning and the
+	// global apply boundary must stay blocked.
+	installPath := filepath.Join(root, "go-runtime", "internal", "install", "install.go")
+	if data, err := os.ReadFile(installPath); err == nil {
 		content := string(data)
-		for _, token := range toolRequiredTokens {
+		for _, token := range []string{"ModeDryRun", "PermanentlyBlockedSurfaces", "user_home_config"} {
 			if !strings.Contains(content, token) {
-				issues = append(issues, fmt.Sprintf("TOOL_TOKEN_MISSING: '%s' not found in workstation tool", token))
+				issues = append(issues, fmt.Sprintf("GO_INSTALL_BOUNDARY_MISSING: %s", token))
 			}
 		}
-		// Check that apply is truly blocked
-		if strings.Contains(content, "subprocess.run([\"wezterm\"") {
-			issues = append(issues, "TOOL: workstation tool may launch real wezterm process — apply must remain blocked")
-		}
+	} else {
+		issues = append(issues, fmt.Sprintf("GO_INSTALL_BOUNDARY_MISSING: %v", err))
 	}
+	warnings = append(warnings, "INTENTIONALLY_GATED: no current Go WezTerm workspace launch helper; global apply remains blocked")
 
 	// 5. Validate governed wezterm config — check for OVAV branding and proper module pattern
 	governedLua := filepath.Join(root, "config", "wezterm", "wezterm.lua")
@@ -166,6 +161,9 @@ func (w *WorkspaceIsolation) Validate(ctx context.Context, root string) Result {
 			Issues:   issues,
 			Duration: time.Since(start),
 		}
+	}
+	if len(warnings) > 0 {
+		return Result{ID: w.ID(), Name: w.Name(), Status: "warn", Weight: w.Weight(), Message: "WARN workspace isolation — source projection valid; Go launch helper intentionally gated", Issues: warnings, Duration: time.Since(start)}
 	}
 	return Result{
 		ID: w.ID(), Name: w.Name(), Status: "pass", Weight: w.Weight(),

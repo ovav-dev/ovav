@@ -254,6 +254,11 @@ func (r *RedTeamAudit) Validate(ctx context.Context, root string) Result {
 	broadAgents := 0
 	for _, af := range agentFiles {
 		base := filepath.Base(af)
+		// The central governor is neither an area lead nor a team member. Its
+		// cross-area authority is the object being governed, not scope ambiguity.
+		if isCentralGovernorAgent(base) {
+			continue
+		}
 		// Skip area profile files (these are area declarations, not agents)
 		if strings.HasPrefix(base, "area-") {
 			continue
@@ -380,3 +385,5 @@ func (r *RedTeamAudit) Validate(ctx context.Context, root string) Result {
 		Description: r.Description(),
 	}
 }
+
+func isCentralGovernorAgent(base string) bool { return base == "ovav.md" }

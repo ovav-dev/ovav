@@ -22,7 +22,7 @@ import (
 
 func cmdDefend(args []string) int {
 	sub := "status"
-	if len(args) > 0 {
+	if len(args) > 0 && !strings.HasPrefix(args[0], "-") {
 		sub = args[0]
 		args = args[1:]
 	}

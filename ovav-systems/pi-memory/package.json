@@ -1,6 +1,6 @@
 {
   "name": "@ovav/pi-memory",
-  "version": "3.1.0",
+  "version": "3.4.0",
   "description": "OVAV MEMORY v3 — Proactive memory injection, LiveProfiler signal detection, F0-F5 governance validators, and permission gates for pi coding agent",
   "type": "module",
   "main": "./src/ovav-memory.js",

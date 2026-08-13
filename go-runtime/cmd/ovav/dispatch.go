@@ -80,8 +80,10 @@ func routeCommand(cmd string, args []string) int {
 		return cmdGovern(args)
 	case "product":
 		return cmdProduct(args)
-	case "defend":
+	case "defend", "security":
 		return cmdDefend(args)
+	case "smoke":
+		return cmdSmoke(args)
 	case "surfaces":
 		return cmdSurfaces(args)
 	case "export-gate", "publish-check":
@@ -116,6 +118,10 @@ func routeCommand(cmd string, args []string) int {
 		return cmdValidate(args)
 	case "monitor":
 		return cmdMonitor(args)
+	case "integrity":
+		return cmdIntegrity(args)
+	case "terminal":
+		return cmdTerminal(args)
 	case "push":
 		return cmdPush(args)
 	case "memory", "mem":
@@ -146,11 +152,11 @@ func knownCommands() []string {
 		"login", "signin", "auth",
 		"whoami", "identity",
 		"logout", "signout",
-		"license", "govern", "defend", "product", "surfaces",
+		"license", "govern", "defend", "security", "product", "surfaces",
 		"export-gate", "publish-check",
 		"repo-check", "presentation-check",
 		"release-check", "rc-check",
-		"fresh-smoke", "dogfood",
+		"smoke", "fresh-smoke", "dogfood",
 		"detect-env", "gateway",
 		"sync",
 		"resolve-subagent", "resolve_subagent",
@@ -160,7 +166,7 @@ func knownCommands() []string {
 		"benchmark",
 		"coverage",
 		"validate",
-		"monitor",
+		"monitor", "integrity", "terminal",
 		"push",
 		"memory", "mem",
 		"help", "--help", "-h",

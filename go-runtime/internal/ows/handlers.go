@@ -681,8 +681,14 @@ type SecretFinding struct {
 
 // scanSecretsInChanges scans files changed in branch vs develop for secrets.
 func scanSecretsInChanges(repoRoot, branch string) ([]SecretFinding, error) {
-	// Get list of files changed in this branch vs develop (two-dot: direct comparison)
-	diffCmd := exec.Command("git", "diff", "--name-only", "develop.."+branch)
+	// Get list of files changed in this branch vs develop (two-dot: direct comparison).
+	// Prefer local "develop" first; fall back to "origin/develop" when running in a
+	// freshly cloned worktree where the local ref does not exist yet.
+	diffBase := "develop"
+	if _, err := runGitOutput(repoRoot, "rev-parse", "--verify", "--quiet", diffBase); err != nil {
+		diffBase = "origin/develop"
+	}
+	diffCmd := exec.Command("git", "diff", "--name-only", diffBase+".."+branch)
 	diffCmd.Dir = repoRoot
 	diffOut, err := diffCmd.Output()
 	if err != nil {
@@ -703,7 +709,13 @@ func scanSecretsInChanges(repoRoot, branch string) ([]SecretFinding, error) {
 		// Skip directories that should never be scanned
 		skip := false
 		skipPrefixes := []string{".git/", "node_modules/", "vendor/", ".venv/", "venv/",
-			".ovav/vault/", "go-runtime/bin/", "integrity_backups/", ".wrangler/", "dist/"}
+			".ovav/vault/", "go-runtime/bin/", "integrity_backups/", ".wrangler/", "dist/",
+			// OpenCode agent markdown files — YAML capability configs whose
+			// values are always one of "allow" | "deny" | "ask". The regex
+			// `(password|passwd|pwd)\s*[:=]\s*["']...["']` matches lines like
+			// `cat /etc/passwd: "deny"` because the substring `passwd` appears
+			// in the system path. These are governance rules, not credentials.
+			"go-runtime/internal/runtimes/opencode/agents/"}
 		for _, prefix := range skipPrefixes {
 			if strings.HasPrefix(file, prefix) {
 				skip = true
@@ -736,6 +748,120 @@ func scanSecretsInChanges(repoRoot, branch string) ([]SecretFinding, error) {
 	return findings, nil
 }
 
+// ── OWS secret scanner allowlist (mirrors validators/secrets_hygiene.go) ──
+// These maps suppress false positives where the regex shape matches a benign
+// identifier (public GPG subkey fingerprint, structural const, JSON field tag).
+// Reuses the same philosophy as validators.skipFiles + validators.skipDirs.
+
+// secretFileAllowlist: basenames of files that may contain known-benign
+// "secret-shaped" lines. Files fully exempt from scanning.
+var secretFileAllowlist = map[string]bool{
+	"ovav-commit-wrapper":        true, // GPG signing key fingerprint (public)
+	"permission_authority.json":  true, // mirror of validators.skipFiles
+	"secrets_hygiene.go":         true, // pattern definitions (test fixtures)
+	"secrets_hygiene_test.go":    true, // mirrors validators.skipFiles
+	"validators_test.go":         true, // mirrors validators.skipFiles
+	"check_ovav_ssh_profile.py":  true, // mirrors validators.skipFiles
+	"ovav_public_export_gate.py": true, // mirrors validators.skipFiles
+	"minimax_direct_env.sh":      true, // placeholder API key template
+	"provider_setup.sh":          true, // placeholder API key template
+	"setup_minimax_direct.sh":    true, // placeholder API key template
+}
+
+// secretNameAllowlist: identifiers whose values are NOT secrets — public
+// fingerprints, structural field names, or env vars whose value is metadata.
+// Matched as whole, case-insensitive tokens (word boundaries).
+var secretNameAllowlist = map[string]bool{
+	"GPG_KEY":            true, // public subkey fingerprint (rotated 2026-08-13)
+	"GPG_SIGNING_KEY":    true, // alias for GPG_KEY
+	"SSH_SIGNING_KEY":    true, // SSH key reference (public)
+	"LAST_GIT_OP_REFLOG": true, // git reflog metadata (not a credential)
+	"LASTGITOPREFLOG":    true, // flattened alias for LAST_GIT_OP_REFLOG
+	// Structural Go const identifiers — the regex pattern (KEY/TOKEN/SECRET
+	// followed by `= "..."`) matches the suffix-keyword but the value is a
+	// file path, not a credential. Extend as new constants appear.
+	"WORKTREEHEADSKEY": true, // const in truststore.go — file path constant
+	"STATEFILE":        true, // const in truststore.go — file path constant (defensive)
+	"GATERELPATH":      true, // const in truststore.go — file path constant (defensive)
+}
+
+// goStructTagIdentifier matches Go struct field declarations where the
+// backtick-delimited tag's value is itself a snake_case identifier (no real
+// secret content — JSON field name, not a credential).
+//
+// Examples (each must match):
+//
+//	LastGitOpReflog  string `json:"last_git_op_reflog"`
+//	GateSHA256       string `json:"gate_sha256"`
+//
+// Counter-example (must NOT match — the tag value contains an underscore-
+// separated token that is not a plain identifier, e.g. an actual secret):
+//
+//	APIKey  string `json:"sk-live-supersecretvalue"`
+//
+// Note: `[]byte` is intentionally absent from the type alternatives because
+// Go's RE2 engine interprets the `[` as the start of a character class and
+// `[]` as an empty class, which breaks the surrounding alternation.
+var goStructTagIdentifier = regexp.MustCompile(
+	`\b\w+\s+(string|int|int64|bool|float64|byte|time\.Time)\s+` + // field declaration
+		"`" +
+		`(json|yaml|toml|xml):"[a-z][a-z0-9_]*"` + // snake_case identifier only
+		"`",
+)
+
+// containsAllowedName reports whether `line` contains any whole-word
+// identifier from secretNameAllowlist (case-insensitive).
+func containsAllowedName(line string) bool {
+	if line == "" {
+		return false
+	}
+	upper := strings.ToUpper(line)
+	for name := range secretNameAllowlist {
+		// Build a simple whole-word match using non-word boundaries.
+		// We tokenize on common separators and test each token.
+		token := strings.ToUpper(name)
+		// Use regexp-free split: walk through line at word boundaries.
+		if hasWordToken(upper, token) {
+			return true
+		}
+	}
+	return false
+}
+
+// hasWordToken reports whether `token` appears as a whole word in `line`.
+// "Whole word" means surrounded by non-alphanumeric/underscore characters
+// or string boundaries.
+func hasWordToken(line, token string) bool {
+	if token == "" {
+		return false
+	}
+	idx := 0
+	for {
+		at := strings.Index(line[idx:], token)
+		if at < 0 {
+			return false
+		}
+		abs := idx + at
+		// Check left boundary
+		leftOK := abs == 0 || !isWordByte(line[abs-1])
+		// Check right boundary
+		end := abs + len(token)
+		rightOK := end == len(line) || !isWordByte(line[end])
+		if leftOK && rightOK {
+			return true
+		}
+		idx = abs + 1
+	}
+}
+
+// isWordByte reports whether b is [A-Za-z0-9_] (matches \w in regex).
+func isWordByte(b byte) bool {
+	return (b >= 'A' && b <= 'Z') ||
+		(b >= 'a' && b <= 'z') ||
+		(b >= '0' && b <= '9') ||
+		b == '_'
+}
+
 // matchSecretPatterns checks a single line against all known secret patterns.
 // Uses the same patterns defined in secrets_hygiene.go (imported via validators package).
 func matchSecretPatterns(file string, lineNum int, line string) []SecretFinding {
@@ -744,6 +870,26 @@ func matchSecretPatterns(file string, lineNum int, line string) []SecretFinding 
 	// Skip empty lines and comments (# shell, // C/JS, -- Lua)
 	// For -- skip: ensure it's not a certificate header (-----BEGIN...)
 	if trimmed == "" || strings.HasPrefix(trimmed, "#") || strings.HasPrefix(trimmed, "//") || (strings.HasPrefix(trimmed, "--") && len(trimmed) > 2 && trimmed[2] != '-') {
+		return nil
+	}
+
+	// ── Allowlist #1: file-level skip (basename match) ──
+	// Mirrors validators.skipFiles — known-benign fixture / config files.
+	if secretFileAllowlist[filepath.Base(file)] {
+		return nil
+	}
+
+	// ── Allowlist #2: known-benign identifier (GPG key, reflog field, etc.) ──
+	// Catches suffix-keywords like GPG_KEY, worktreeHeadsKey where the keyword
+	// is at the END of an identifier but the value is structural metadata.
+	if containsAllowedName(trimmed) {
+		return nil
+	}
+
+	// ── Allowlist #3: Go struct field whose tag value is an identifier ──
+	// Catches `LastGitOpReflog  string `json:"last_git_op_reflog"`` where the
+	// regex matches the literal `key"` substring inside the backticked tag.
+	if goStructTagIdentifier.MatchString(trimmed) {
 		return nil
 	}
 
@@ -769,6 +915,9 @@ func matchSecretPatterns(file string, lineNum int, line string) []SecretFinding 
 		{`(?i)hf_[A-Za-z0-9]{32,}`, "HuggingFace API token"},
 		{`(?i)glpat-[A-Za-z0-9\-_]{20,}`, "GitLab personal access token"},
 		{`(?i)(NPM_TOKEN|GITHUB_TOKEN|DOCKER_PASSWORD)\s*=\s*["'][A-Za-z0-9_\-]{8,}["']`, "CI/CD token in config"},
+		// Note: this pattern intentionally allows suffix-keyword identifiers via
+		// the allowlists above (GPG_KEY, struct tags, etc.). Do NOT tighten
+		// with \b without also expanding the name allowlist.
 		{`(?i)(SECRET|TOKEN|KEY|PASSWORD|CREDENTIAL)\s*=\s*["'][A-Za-z0-9_\-\.+/=]{16,}["']`, "Env-style secret in config"},
 	}
 

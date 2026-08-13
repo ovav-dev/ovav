@@ -665,8 +665,8 @@ func TestProjectVisual_InvalidMonitoringYAML(t *testing.T) {
 	if err == nil {
 		t.Error("expected error for invalid monitoring YAML")
 	}
-	if count != 2 {
-		t.Errorf("expected count=2 before error (theme dark+light), got %d", count)
+	if count != 1 {
+		t.Errorf("expected count=1 before error (adaptive theme), got %d", count)
 	}
 }
 

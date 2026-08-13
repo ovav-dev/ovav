@@ -1,7 +1,19 @@
+schema: ovav.auto_triggers.v2
+updated_at: '2026-08-13T12:00:00-03:00'
+status: partial
+execution_scope: git_hook_stages_only
+note: non-git-stage declarations are preserved below as registry-only/disconnected records
 router:
   after_git_stage:
   - validate_git_push_gate
   - integrity_repair
+  before_git_stage:
+  - check_protected_branch
+  - check_secrets_hygiene
+  - validate_workspace_safety_gate
+  - branch_shield
+  - surface_governor
+registry_only_router:
   after_implementation:
   - generate_smoke_tests
   before_apply:
@@ -30,12 +42,6 @@ router:
   - branch_shield
   - check_release_gate
   - pre_push_intelligence
-  before_git_stage:
-  - check_protected_branch
-  - check_secrets_hygiene
-  - validate_workspace_safety_gate
-  - branch_shield
-  - surface_governor
   before_implementation:
   - check_L6_security_zero_trust
   - check_L7_feedback_loop

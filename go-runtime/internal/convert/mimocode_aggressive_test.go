@@ -11,11 +11,11 @@ import (
 // of the mimocode agent generation against the OpenCode baseline.
 //
 // Contract enforced (post AreasOnly refactor):
-//   - Both mimocode and opencode publish ONLY area-*.md to the runtime
-//     directory (TAB picker). Leads and teams remain in the canonical
-//     tree (ovav/agents/leads, ovav/agents/teams) and are NOT leaked
-//     into the user-facing picker. claude-code/cursor still get the
-//     full hierarchy — that's tested separately in convert_test.go.
+//   - Both runtimes publish to isolated runtime directories. MiMoCode publishes
+//     only area-*.md plus the central ovav.md governor; OpenCode publishes its
+//     full hierarchy.
+//     claude-code/cursor still get the full hierarchy — that's tested
+//     separately in convert_test.go.
 //   - Every area file has: mode: primary, hidden: false, name, description,
 //     lead reference, color, governance contracts, authorized functions,
 //     limitations, and a hard stop.
@@ -37,16 +37,15 @@ func TestMimocodeBrain_CompleteValidation(t *testing.T) {
 	agentsRoot := generatePickerRuntime(t)
 
 	// 1. Verify both runtimes exist
-	// Note: OpenCode now outputs to go-runtime/internal/runtimes/opencode/agents
 	for _, rt := range []string{"mimocode", "opencode"} {
 		dir := filepath.Join(agentsRoot, rt, "agents")
-		if rt == "opencode" {
-			// OpenCode outputs to outputRoot/go-runtime/internal/runtimes/opencode/agents
-			// agentsRoot is outputRoot/runtimes, so we go up one level
-			dir = filepath.Join(agentsRoot, "..", "go-runtime", "internal", "runtimes", "opencode", "agents")
-		}
 		if _, err := os.Stat(dir); os.IsNotExist(err) {
-			t.Fatalf("runtime %s/agents/ does not exist at %s", rt, dir)
+			if rt == "opencode" {
+				dir = filepath.Join(agentsRoot, "..", "go-runtime", "internal", "runtimes", "opencode", "agents")
+			}
+			if _, err := os.Stat(dir); os.IsNotExist(err) {
+				t.Fatalf("runtime %s/agents/ does not exist at %s", rt, dir)
+			}
 		}
 	}
 
@@ -64,8 +63,8 @@ func TestMimocodeBrain_CompleteValidation(t *testing.T) {
 		if len(teamLeak) > 0 {
 			t.Errorf("%s: AreasOnly runtime leaked %d team files into picker: %v", rt, len(teamLeak), teamLeak)
 		}
-		if len(files) != 10 {
-			t.Errorf("%s: expected 10 area files, got %d", rt, len(files))
+		if len(files) != 11 {
+			t.Errorf("%s: expected 10 area files plus ovav.md, got %d", rt, len(files))
 		}
 	}
 

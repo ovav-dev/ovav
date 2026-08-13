@@ -7,19 +7,19 @@
     "opencode.json",
     "mimicode.json",
     ".mimocode/global_config/config.json",
-    "clients/opencode/agents/area-platform-engineering.md",
-    "clients/opencode/agents/lead-thavren.md",
-    "clients/opencode/agents/area-research-intelligence.md",
-    "clients/opencode/agents/lead-eidren.md"
+    ".opencode/agents/area-platform-engineering.md",
+    ".opencode/agents/lead-thavren.md",
+    ".opencode/agents/area-research-intelligence.md",
+    ".opencode/agents/lead-eidren.md"
   ],
   "materializer": {
-    "script": "tools/permissions/materialize.py",
+    "implementation": "go-runtime/internal/permissions/permission_authority.go",
     "safe_modes": [
       "--check",
       "--dry-run"
     ],
     "write_mode": "--write",
-    "automatic_trigger": "tools/validators/check_permission_policy_drift.py",
+    "automatic_trigger": "go-runtime/internal/validators/permission_drift.go",
     "drift_response": "log_and_apply_ovav_policy"
   },
   "log_path": ".ovav/runtime/logs/permission_drift.jsonl",
@@ -27,8 +27,8 @@
     "ovav_ultra": {
       "description": "Highest capability tier \u2014 total freedom, telemetry only",
       "models": [
-        "mimo/mimo-auto",
-        "opencode-go/deepseek-v4-pro"
+        "openai/gpt-5.6-sol",
+        "minimax-coding-plan/MiniMax-M3"
       ],
       "use_cases": [
         "architecture_design",
@@ -41,7 +41,7 @@
     "ovav_standard": {
       "description": "Standard tier \u2014 total freedom",
       "models": [
-        "opencode-go/deepseek-v4-pro",
+        "openai/gpt-5.6-sol",
         "minimax-coding-plan/MiniMax-M3"
       ],
       "use_cases": [
@@ -55,7 +55,7 @@
     "ovav_lite": {
       "description": "Fast tier \u2014 total freedom",
       "models": [
-        "opencode-go/deepseek-v4-flash",
+        "openai/gpt-5.6-sol",
         "minimax-coding-plan/MiniMax-M3"
       ],
       "use_cases": [
@@ -102,7 +102,7 @@
       "pr": "allow",
       "close_message": "OVAV Governor \u2014 total freedom mode active.",
       "external_directory": {
-        "*": "allow"
+        "*": "deny"
       }
     },
     "thavren": {
@@ -129,7 +129,7 @@
       "pr": "allow",
       "close_message": "Thavren \u2014 execution complete.",
       "external_directory": {
-        "*": "allow"
+        "*": "deny"
       }
     },
     "eidren": {
@@ -153,7 +153,7 @@
       "git_write": "allow",
       "research": "allow",
       "external_directory": {
-        "*": "allow"
+        "*": "deny"
       }
     },
     "elena": {
@@ -175,7 +175,7 @@
       "push": "allow",
       "pr": "allow",
       "external_directory": {
-        "*": "allow"
+        "*": "deny"
       }
     },
     "dante": {
@@ -196,7 +196,7 @@
       "push": "allow",
       "pr": "allow",
       "external_directory": {
-        "*": "allow"
+        "*": "deny"
       }
     },
     "sofia": {
@@ -218,7 +218,7 @@
       "push": "allow",
       "pr": "allow",
       "external_directory": {
-        "*": "allow"
+        "*": "deny"
       }
     },
     "renata": {
@@ -239,7 +239,7 @@
       "push": "allow",
       "pr": "allow",
       "external_directory": {
-        "*": "allow"
+        "*": "deny"
       }
     },
     "valeria": {
@@ -260,7 +260,7 @@
       "push": "allow",
       "pr": "allow",
       "external_directory": {
-        "*": "allow"
+        "*": "deny"
       }
     },
     "uriel": {
@@ -282,7 +282,7 @@
       "push": "allow",
       "pr": "allow",
       "external_directory": {
-        "*": "allow"
+        "*": "deny"
       }
     },
     "kenji": {
@@ -303,7 +303,7 @@
       "push": "allow",
       "pr": "allow",
       "external_directory": {
-        "*": "allow"
+        "*": "deny"
       }
     },
     "camila": {
@@ -324,7 +324,7 @@
       "push": "allow",
       "pr": "allow",
       "external_directory": {
-        "*": "allow"
+        "*": "deny"
       }
     }
   },
@@ -353,7 +353,7 @@
     },
     "secrets_vault": {
       "require_unlock": true,
-      "governor": "tools/permissions/vault_governance.py",
+      "governor": "go-runtime/internal/vault",
       "key_rotation_days": 90
     }
   },
@@ -373,7 +373,7 @@
   },
   "infrastructure_surfaces": {
     "f2_system_paths": {
-      "governor": "tools/permissions/system_paths.py",
+      "governor": "go-runtime/internal/permissions/governors.go",
       "rules": {
         "/etc": {
           "read": "allow",
@@ -406,17 +406,17 @@
       }
     },
     "f2_external_directory": {
-      "*": "allow",
-      "governor": "tools/permissions/external_directory.py",
+      "*": "deny",
+      "governor": "go-runtime/internal/permissions/permission_authority.go",
       "deny_by_default": true
     },
     "f2_config_governance": {
-      "governor": "tools/permissions/config_governance.py",
+      "governor": "go-runtime/internal/config",
       "auto_switch": true,
       "drift_response": "log_and_apply"
     },
     "f2_plugins": {
-      "governor": "tools/permissions/plugin_governance.py",
+      "governor": "go-runtime/internal/permissions/governors.go",
       "authorized_operators": [
         "thavren",
         "ovav"
@@ -425,7 +425,7 @@
       "plugin_install": "allow"
     },
     "f2_live_behavior": {
-      "governor": "tools/permissions/live_behavior.py",
+      "governor": "go-runtime/internal/permissions/governors.go",
       "behaviors": {
         "install_apply": "allow",
         "backup_rollback": "allow",
@@ -436,7 +436,7 @@
       "mode": "telemetry_only"
     },
     "f2_claims": {
-      "governor": "tools/permissions/claims_governance.py",
+      "governor": "go-runtime/internal/permissions/governors.go",
       "production_ready": "allow_with_f5_validation",
       "global_ready": "allow",
       "mode": "telemetry_only"
@@ -444,10 +444,10 @@
   },
   "security_surfaces": {
     "f4_bash_commands": {
-      "governor": "tools/permissions/bash_commands.py",
-      "total_rules": 15,
+      "governor": "go-runtime/internal/permissions/governors.go",
+      "total_rules": 16,
       "allowed": 9,
-      "denied": 6,
+      "denied": 7,
       "deny_by_default": true,
       "principle": "Deny dangerous commands by default. Telemetry log. Allow with governance.",
       "categories": {
@@ -502,7 +502,7 @@
       }
     },
     "f4_unsafe_selectors": {
-      "governor": "tools/permissions/unsafe_selectors.py",
+      "governor": "go-runtime/internal/permissions/governors.go",
       "total_rules": 10,
       "allowed": 2,
       "denied": 7,
@@ -602,7 +602,7 @@
       }
     },
     "f5_new_states": {
-      "governor": "tools/permissions/new_states.py",
+      "governor": "go-runtime/internal/permissions/governors.go",
       "total_rules": 14,
       "allowed": 12,
       "denied": 2,
@@ -624,7 +624,7 @@
       }
     },
     "f5_gate_liberation": {
-      "governor": "tools/permissions/gate_liberation.py",
+      "governor": "go-runtime/internal/permissions/governors.go",
       "total_rules": 5,
       "allowed": 5,
       "denied": 0,
@@ -655,7 +655,7 @@
     }
   },
   "f5_gate_liberation": {
-    "governor": "tools/permissions/gate_liberation.py",
+    "governor": "go-runtime/internal/permissions/governors.go",
     "total_rules": 5,
     "allowed": 5,
     "denied": 0,
@@ -686,15 +686,19 @@
   },
   "external_directories": {
     "allow": [
-      "/home/braka/BAB",
-      "*"
+      "/home/braka/Systems/ovav/*",
+      "/home/braka/.config/ovav/*",
+      "/home/braka/.local/share/ovav/*",
+      "/home/braka/.local/state/ovav-opencode/*",
+      "/mnt/c/Users/Alexa/AppData/Roaming/wezterm/*",
+      "/tmp/opencode/*"
     ],
-    "note": "Total freedom. OVAV SYSTEMS + OVAV AGENTS trust all paths."
+    "note": "Explicit OVAV state, projection, worktree, temporary, and CEO-requested Windows configuration targets only."
   },
   "workstation_wezterm": {
     "windows_config_path": "C:\\Users\\Alexa\\AppData\\Roaming\\wezterm\\.wezterm.lua",
     "wsl_config_path": "/mnt/c/Users/Alexa/AppData/Roaming/wezterm/.wezterm.lua",
-    "source_path": "/home/braka/Systems/OVAV/config/wezterm/wezterm.lua",
+    "source_path": "/home/braka/Systems/ovav/config/wezterm/wezterm.lua",
     "deploy_method": "powershell.exe Copy-Item from WSL path to Windows AppData"
   },
   "consumer_grants": [

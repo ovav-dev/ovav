@@ -72,13 +72,13 @@ func cmdCoverage(args []string) int {
 	}
 
 	result := map[string]interface{}{
-		"command":    "coverage",
-		"status":     "ok",
-		"threshold":  *minPct,
-		"actual":     totalPct,
-		"passed":     totalPct >= float64(*minPct),
+		"command":     "coverage",
+		"status":      "ok",
+		"threshold":   *minPct,
+		"actual":      totalPct,
+		"passed":      totalPct >= float64(*minPct),
 		"duration_ms": duration.Milliseconds(),
-		"packages":   len(packages),
+		"packages":    len(packages),
 	}
 
 	if jsonOut != nil && *jsonOut {

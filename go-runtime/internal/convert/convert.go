@@ -14,6 +14,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/ovav/ovav/internal/permissions"
 	"gopkg.in/yaml.v3"
 )
 
@@ -139,16 +140,16 @@ type TeamMember struct {
 type Target string
 
 const (
-	TargetOpenCode  Target = "opencode"
-	TargetClaude    Target = "claude-code"
-	TargetCursor    Target = "cursor"
-	TargetMimocode  Target = "mimocode"
-	TargetWindsurf  Target = "windsurf"
-	TargetCopilot   Target = "copilot"
-	TargetContinue  Target = "continue"
-	TargetAider     Target = "aider"
-	TargetGoose     Target = "goose"
-	TargetCrush     Target = "crush"
+	TargetOpenCode Target = "opencode"
+	TargetClaude   Target = "claude-code"
+	TargetCursor   Target = "cursor"
+	TargetMimocode Target = "mimocode"
+	TargetWindsurf Target = "windsurf"
+	TargetCopilot  Target = "copilot"
+	TargetContinue Target = "continue"
+	TargetAider    Target = "aider"
+	TargetGoose    Target = "goose"
+	TargetCrush    Target = "crush"
 )
 
 // RuntimeConverter transforms OVAV canonical agents into CLI-specific output.
@@ -178,16 +179,16 @@ type RuntimeConverter interface {
 // ── Registry ─────────────────────────────────────────────────────────────────
 
 var converters = map[Target]RuntimeConverter{
-	TargetOpenCode:  &OpenCodeConverter{},
-	TargetClaude:    &ClaudeCodeConverter{},
-	TargetCursor:    &CursorConverter{},
-	TargetMimocode:  &MimocodeConverter{},
-	TargetWindsurf:  &WindsurfConverter{},
-	TargetCopilot:   &CopilotConverter{},
-	TargetContinue:  &ContinueConverter{},
-	TargetAider:     &AiderConverter{},
-	TargetGoose:     &GooseConverter{},
-	TargetCrush:     &CrushConverter{},
+	TargetOpenCode: &OpenCodeConverter{},
+	TargetClaude:   &ClaudeCodeConverter{},
+	TargetCursor:   &CursorConverter{},
+	TargetMimocode: &MimocodeConverter{},
+	TargetWindsurf: &WindsurfConverter{},
+	TargetCopilot:  &CopilotConverter{},
+	TargetContinue: &ContinueConverter{},
+	TargetAider:    &AiderConverter{},
+	TargetGoose:    &GooseConverter{},
+	TargetCrush:    &CrushConverter{},
 }
 
 // AvailableTargets returns all registered converter targets.
@@ -390,8 +391,9 @@ func atomicWrite(path string, data []byte, perm os.FileMode) error {
 // via the returned warning string).
 func GenerateGovernor(canonicalRoot, outputRoot string, target Target) (string, error) {
 	// Source: <repoRoot>/.ovav/source/agents/ovav.md
-	// canonicalRoot is typically <repoRoot>/ovav/agents, so we need to go up TWO levels.
-	repoRoot := filepath.Dir(filepath.Dir(canonicalRoot))
+	// canonicalRoot is <repoRoot>/go-runtime/internal/agents; resolve the
+	// repository root rather than assuming a fixed number of parent levels.
+	repoRoot := findRepoRootFrom(canonicalRoot)
 	sourcePath := filepath.Join(repoRoot, ".ovav", "source", "agents", "ovav.md")
 
 	if _, err := os.Stat(sourcePath); os.IsNotExist(err) {
@@ -406,6 +408,13 @@ func GenerateGovernor(canonicalRoot, outputRoot string, target Target) (string, 
 	data, err := os.ReadFile(sourcePath)
 	if err != nil {
 		return "", fmt.Errorf("reading governor source: %w", err)
+	}
+	if target == TargetOpenCode {
+		projected, projectErr := permissions.NewPermissionAuthority(repoRoot).ProjectAgentDocument(string(data), "ovav")
+		if projectErr != nil {
+			return "", fmt.Errorf("projecting governor permissions: %w", projectErr)
+		}
+		data = []byte(projected)
 	}
 
 	outputDir := filepath.Join(outputRoot, converter.OutputDir())
@@ -442,6 +451,22 @@ func GenerateAllWithFilter(canonicalRoot string, target Target, outputRoot strin
 	areas, leads, teams, err := LoadCanonicalAgents(canonicalRoot)
 	if err != nil {
 		return fmt.Errorf("loading canonical agents: %w", err)
+	}
+	if target == TargetOpenCode {
+		repoRoot := findRepoRootFrom(canonicalRoot)
+		projected, projectErr := permissions.NewPermissionAuthority(repoRoot).MaterializePermissionBlock()
+		if projectErr != nil {
+			return fmt.Errorf("loading OpenCode permission authority: %w", projectErr)
+		}
+		for _, area := range areas {
+			area.Permission = mergeOpenCodeProtectedDenies(area.Permission, projected)
+		}
+		for _, lead := range leads {
+			lead.Permission = mergeOpenCodeProtectedDenies(lead.Permission, projected)
+		}
+		for _, team := range teams {
+			team.Permission = mergeOpenCodeProtectedDenies(team.Permission, projected)
+		}
 	}
 
 	outputDir := filepath.Join(outputRoot, converter.OutputDir())
@@ -521,6 +546,36 @@ func GenerateAllWithFilter(canonicalRoot string, target Target, outputRoot strin
 	}
 
 	return nil
+}
+
+// mergeOpenCodeProtectedDenies preserves an agent's narrower permissions while
+// carrying host-level denies into frontmatter, which OpenCode treats as an override.
+func mergeOpenCodeProtectedDenies(local *PermissionBlock, host permissions.PermissionBlock) *PermissionBlock {
+	if local == nil {
+		return nil
+	}
+	merged := &PermissionBlock{
+		Edit:              local.Edit,
+		Bash:              make(map[string]string, len(local.Bash)+len(host.Bash)),
+		ExternalDirectory: make(map[string]string, len(local.ExternalDirectory)+len(host.ExternalDirectory)),
+	}
+	for pattern, decision := range local.Bash {
+		merged.Bash[pattern] = decision
+	}
+	for pattern, decision := range host.Bash {
+		if decision == "deny" {
+			merged.Bash[pattern] = decision
+		}
+	}
+	for pattern, decision := range local.ExternalDirectory {
+		merged.ExternalDirectory[pattern] = decision
+	}
+	for pattern, decision := range host.ExternalDirectory {
+		if decision == "deny" {
+			merged.ExternalDirectory[pattern] = decision
+		}
+	}
+	return merged
 }
 
 // cleanNonAreaAgents removes any lead-* or team-* files from the output dir

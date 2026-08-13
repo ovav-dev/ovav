@@ -802,6 +802,173 @@ func TestMatchSecretPatterns_WildcardSecret(t *testing.T) {
 	}
 }
 
+// ── Allowlist fixes (false positives from feature/fix-full-activation) ─────
+//
+// Background: the candidate branch ships a public GPG subkey fingerprint
+// (`GPG_KEY="7DE5923582A84DBB"` in `.ovav/ovav-commit-wrapper`) and a
+// structural const in truststore.go whose identifier ends in `Key`
+// (`worktreeHeadsKey = ".ovav/runtime/worktree_heads.json"`). The regex
+// `(SECRET|TOKEN|KEY|PASSWORD|CREDENTIAL) = ["']...["']` matched both
+// because the keyword sits at the END of a longer identifier and the
+// value is 16+ chars.
+//
+// These tests pin the allowlist behaviour and verify real secrets are
+// still caught.
+
+func TestMatchSecretPatterns_SkipsGPGKeyInCommitWrapper(t *testing.T) {
+	// File-level allowlist: ovav-commit-wrapper holds the public subkey
+	// fingerprint (rotated 2026-08-13 after laptop reformat). Even though
+	// the value is 16 chars and the regex shape matches, the file is
+	// fully exempt from the OWS pre-merge scanner.
+	findings := matchSecretPatterns(".ovav/ovav-commit-wrapper", 26,
+		`GPG_KEY="7DE5923582A84DBB"`)
+	if len(findings) != 0 {
+		t.Errorf("FAIL: GPG public subkey fingerprint should be skipped by file-level allowlist, got: %+v", findings)
+	}
+}
+
+func TestMatchSecretPatterns_SkipsWorktreeHeadsKey(t *testing.T) {
+	// Suffix-keyword identifier with a file-path value — the const exists
+	// to name a runtime JSON path, NOT to store a credential.
+	line := `	worktreeHeadsKey = ".ovav/runtime/worktree_heads.json"`
+	findings := matchSecretPatterns("go-runtime/internal/truststore/truststore.go", 32, line)
+	if len(findings) != 0 {
+		t.Errorf("FAIL: worktreeHeadsKey const should be skipped by name allowlist, got: %+v", findings)
+	}
+}
+
+func TestMatchSecretPatterns_SkipsStateFile(t *testing.T) {
+	// Same shape as worktreeHeadsKey — defensive entry in the allowlist.
+	line := `	stateFile = ".ovav/runtime/gate_state.json"`
+	findings := matchSecretPatterns("go-runtime/internal/truststore/truststore.go", 31, line)
+	if len(findings) != 0 {
+		t.Errorf("FAIL: stateFile const should be skipped, got: %+v", findings)
+	}
+}
+
+func TestMatchSecretPatterns_SkipsLastGitOpReflogStructTag(t *testing.T) {
+	// Struct field declaration with snake_case JSON tag — the tag value
+	// "last_git_op_reflog" is a field NAME, not a secret.
+	line := `	LastGitOpReflog  string ` + "`json:\"last_git_op_reflog\"`" + `  // Reflog entry`
+	findings := matchSecretPatterns("go-runtime/internal/truststore/truststore.go", 43, line)
+	if len(findings) != 0 {
+		t.Errorf("FAIL: struct field with snake_case JSON tag should be skipped, got: %+v", findings)
+	}
+}
+
+func TestMatchSecretPatterns_SkipsGateSHA256StructTag(t *testing.T) {
+	// Struct field with a non-suffix-keyword name but still a snake_case
+	// JSON tag identifier.
+	line := `	GateSHA256       string ` + "`json:\"gate_sha256\"`" + ``
+	findings := matchSecretPatterns("go-runtime/internal/truststore/truststore.go", 41, line)
+	if len(findings) != 0 {
+		t.Errorf("FAIL: struct field with snake_case JSON tag should be skipped, got: %+v", findings)
+	}
+}
+
+func TestMatchSecretPatterns_SkipsReflogKeyNameToken(t *testing.T) {
+	// Whole-word token from secretNameAllowlist.
+	line := `var reflogKey = LAST_GIT_OP_REFLOG // metadata, not a credential`
+	findings := matchSecretPatterns("go-runtime/internal/truststore/truststore.go", 79, line)
+	if len(findings) != 0 {
+		t.Errorf("FAIL: line containing LAST_GIT_OP_REFLOG should be skipped, got: %+v", findings)
+	}
+}
+
+func TestMatchSecretPatterns_StillCatchesLiveAPIKey(t *testing.T) {
+	// Regression guard: real API keys must still be detected.
+	findings := matchSecretPatterns("config.go", 1, `API_KEY="sk-live-abcdefghijklmnopqrstuvwxyz"`)
+	if len(findings) == 0 {
+		t.Error("FAIL: live API key MUST be detected")
+	}
+}
+
+func TestMatchSecretPatterns_StillCatchesGenericSecret(t *testing.T) {
+	// Regression guard: the wild-card pattern must still catch real secrets.
+	findings := matchSecretPatterns("config.env", 1, `SECRET="abcdefghij1234567890"`)
+	if len(findings) == 0 {
+		t.Error("FAIL: bare SECRET=... must still be detected")
+	}
+}
+
+func TestMatchSecretPatterns_StillCatchesNPMToken(t *testing.T) {
+	// Regression guard: NPM_TOKEN suffix-keyword env var with real value
+	// (matches the dedicated NPM_TOKEN|GITHUB_TOKEN|DOCKER_PASSWORD pattern).
+	findings := matchSecretPatterns("ci.yml", 1, `NPM_TOKEN = "npm_abc12345678901234567890"`)
+	if len(findings) == 0 {
+		t.Error("FAIL: NPM_TOKEN with real value must still be detected")
+	}
+}
+
+func TestMatchSecretPatterns_StillCatchesDockerPassword(t *testing.T) {
+	// Regression guard: DOCKER_PASSWORD suffix-keyword must still match.
+	findings := matchSecretPatterns("ci.yml", 1, `DOCKER_PASSWORD = "supersecretpassword"`)
+	if len(findings) == 0 {
+		t.Error("FAIL: DOCKER_PASSWORD with real value must still be detected")
+	}
+}
+
+func TestMatchSecretPatterns_StructTagWithSecretValueStillFlagged(t *testing.T) {
+	// Counter-example for goStructTagIdentifier: a struct field whose
+	// JSON tag value is NOT a snake_case identifier — the tag value
+	// looks credential-shaped. The struct-tag allowlist must NOT match
+	// (value fails `[a-z][a-z0-9_]*`).
+	//
+	// Note: this line is NOT detected by the env-style secret regex
+	// because there is no `KEY = "..."` shape (no `=` after Key). It
+	// only verifies that goStructTagIdentifier does NOT over-skip.
+	line := `	APIKey  string ` + "`json:\"sk-live-supersecretvalue\"`" + ``
+	if goStructTagIdentifier.MatchString(line) {
+		t.Error("FAIL: struct tag with non-snake_case value MUST NOT match goStructTagIdentifier")
+	}
+}
+
+func TestContainsAllowedName(t *testing.T) {
+	tests := []struct {
+		line string
+		want bool
+	}{
+		{`GPG_KEY="7DE5923582A84DBB"`, true},
+		{`export GPG_KEY="$GPG_KEY"`, true},
+		{`gpg_key="something"`, true}, // case-insensitive
+		{`LastGitOpReflog = LAST_GIT_OP_REFLOG`, true},
+		{`MY_SECRET = "abcdefghij1234567890"`, false},
+		{`worktreeHeadsKey = ".ovav/runtime/worktree_heads.json"`, true},
+		{`MY_GPG_KEY_BACKUP = "real_secret_value"`, false}, // _ before GPG_KEY
+		{`unknown = "x"`, false},
+	}
+	for _, tc := range tests {
+		got := containsAllowedName(tc.line)
+		if got != tc.want {
+			t.Errorf("containsAllowedName(%q) = %v, want %v", tc.line, got, tc.want)
+		}
+	}
+}
+
+func TestGoStructTagIdentifier(t *testing.T) {
+	tests := []struct {
+		line string
+		want bool
+	}{
+		// Struct fields with snake_case JSON tag — should match.
+		{`	LastGitOpReflog  string ` + "`json:\"last_git_op_reflog\"`", true},
+		{`	GateSHA256       string ` + "`json:\"gate_sha256\"`", true},
+		{`	LastGitOpTime    int64  ` + "`json:\"last_git_op_time\"`", true},
+		// Tag value with non-snake-case content — must NOT match.
+		{`	APIKey  string ` + "`json:\"sk-live-supersecretvalue\"`", false},
+		// No backtick — must NOT match.
+		{`	LastGitOpReflog  string`, false},
+		// No struct tag — must NOT match.
+		{`	worktreeHeadsKey = ".ovav/runtime/worktree_heads.json"`, false},
+	}
+	for _, tc := range tests {
+		got := goStructTagIdentifier.MatchString(tc.line)
+		if got != tc.want {
+			t.Errorf("goStructTagIdentifier(%q) = %v, want %v", tc.line, got, tc.want)
+		}
+	}
+}
+
 // ── Forbidden files: more patterns ───────────────────────────────────────
 
 func TestScanForbiddenFiles_BlocksBinary(t *testing.T) {

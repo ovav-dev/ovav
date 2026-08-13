@@ -2,6 +2,7 @@ package convert
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 )
 
@@ -428,7 +429,8 @@ func writePermissionBlock(b *strings.Builder, p *PermissionBlock) {
 	b.WriteString(fmt.Sprintf("  edit: %q\n", p.Edit))
 	if len(p.Bash) > 0 {
 		b.WriteString("  bash:\n")
-		for k, v := range p.Bash {
+		for _, k := range orderedProjectionKeys(p.Bash) {
+			v := p.Bash[k]
 			// Quote keys that start with * or contain special chars to ensure valid YAML
 			if strings.HasPrefix(k, "*") || strings.Contains(k, ":") || strings.Contains(k, "-") {
 				b.WriteString(fmt.Sprintf("    %q: %q\n", k, v))
@@ -439,8 +441,23 @@ func writePermissionBlock(b *strings.Builder, p *PermissionBlock) {
 	}
 	if len(p.ExternalDirectory) > 0 {
 		b.WriteString("  external_directory:\n")
-		for k, v := range p.ExternalDirectory {
+		for _, k := range orderedProjectionKeys(p.ExternalDirectory) {
+			v := p.ExternalDirectory[k]
 			b.WriteString(fmt.Sprintf("    %q: %q\n", k, v))
 		}
 	}
+}
+
+func orderedProjectionKeys(values map[string]string) []string {
+	keys := make([]string, 0, len(values))
+	for key := range values {
+		if key != "*" {
+			keys = append(keys, key)
+		}
+	}
+	sort.Strings(keys)
+	if _, ok := values["*"]; ok {
+		return append([]string{"*"}, keys...)
+	}
+	return keys
 }

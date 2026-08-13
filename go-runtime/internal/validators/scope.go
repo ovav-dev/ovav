@@ -30,15 +30,15 @@ func ClearChangedFiles() {
 // If a scope path doesn't exist in the worktree, the validator is skipped entirely.
 var ValidatorScope = map[string][]string{
 	"agent_governance":          {".ovav/service_areas/", "go-runtime/internal/runtimes/claude-code/agents/"},
-	"agent_runtime_enforcement": {"tools/agent_runtime/"},
-	"squad_normalization":       {"tools/agent_runtime/"},
+	"agent_runtime_enforcement": {"go-runtime/internal/agents/", "go-runtime/internal/validators/context_firewall_v2.go", ".ovav/service_areas/shared/"},
+	"squad_normalization":       {"go-runtime/internal/agents/", "go-runtime/internal/validators/context_firewall_v2.go", ".ovav/registry/", ".ovav/service_areas/shared/"},
 	"tool_config_profiles":      {"tools/cli/"},
 	"service_area_router":       {".ovav/service_areas/"},
 	"agent_ux_visual_delivery":  {".ovav/service_areas/"},
 	"cross_target_consistency":  {".ovav/service_areas/"},
-	"feedback_loop":             {"tools/agent_runtime/"},
-	"rego_policies":             {"tools/permissions/"},
-	"f1_architecture":           {"tools/f1/"},
+	"feedback_loop":             {"go-runtime/internal/agents/belief.go", "go-runtime/internal/memory/governor.go"},
+	"rego_policies":             {"go-runtime/internal/permissions/", ".ovav/registry/rego_policies/", ".ovav/policy/rego/"},
+	"f1_architecture":           {"go-runtime/internal/permissions/", "go-runtime/internal/security/bootstrap.go", ".ovav/policy/"},
 	"context_firewall_v2":       {".ovav/service_areas/"},
 	"context_firewall":          {".ovav/service_areas/"},
 	// caps_chronos_alignment: only runs when caps.yaml was modified in the branch.
@@ -118,6 +118,7 @@ func ScopeCheck(validatorID, root string) (bool, string) {
 			return true, "" // can't diff → run
 		}
 		changedFiles = strings.Split(strings.TrimSpace(string(out)), "\n")
+		changedFiles = append(changedFiles, worktreeChangedFiles(root)...)
 	}
 
 	for _, line := range changedFiles {
@@ -133,6 +134,19 @@ func ScopeCheck(validatorID, root string) (bool, string) {
 	}
 
 	return false, "SKIPPED (scope) — no relevant files changed in this branch"
+}
+
+func worktreeChangedFiles(root string) []string {
+	var files []string
+	for _, args := range [][]string{{"diff", "--name-only"}, {"ls-files", "--others", "--exclude-standard"}} {
+		cmd := exec.Command("git", args...)
+		cmd.Dir = root
+		out, err := cmd.Output()
+		if err == nil {
+			files = append(files, strings.Split(strings.TrimSpace(string(out)), "\n")...)
+		}
+	}
+	return files
 }
 
 func getCurrentBranch(root string) string {
