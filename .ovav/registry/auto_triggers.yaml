@@ -12,7 +12,6 @@ router:
   - check_secrets_hygiene
   - validate_workspace_safety_gate
   - branch_shield
-  - surface_governor
 registry_only_router:
   after_implementation:
   - generate_smoke_tests
