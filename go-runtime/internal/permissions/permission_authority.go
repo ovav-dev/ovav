@@ -2,9 +2,12 @@ package permissions
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -17,7 +20,22 @@ type PermissionAuthority struct {
 	PlatformAgent string
 	ThavrenAlias  string
 	ToolPolicy    string
-	ToolGateway   string
+}
+
+// PermissionBlock is the host projection derived from the canonical authority.
+type PermissionBlock struct {
+	Edit              string
+	Bash              map[string]string
+	ExternalDirectory map[string]string
+}
+
+// MaterializePermissionBlock returns the canonical host permission projection.
+func (a *PermissionAuthority) MaterializePermissionBlock() (PermissionBlock, error) {
+	bash, err := a.expectedBashPermissions()
+	if err != nil {
+		return PermissionBlock{}, err
+	}
+	return PermissionBlock{Edit: "allow", Bash: bash, ExternalDirectory: ExpectedExternalDirectory("")}, nil
 }
 
 // NewPermissionAuthority creates a new authority with default paths.
@@ -29,50 +47,39 @@ func NewPermissionAuthority(root string) *PermissionAuthority {
 		PlatformAgent: filepath.Join(root, ".opencode/agents/area-platform-engineering.md"),
 		ThavrenAlias:  filepath.Join(root, ".opencode/agents/lead-thavren.md"),
 		ToolPolicy:    filepath.Join(root, ".ovav/service_areas/shared/tool_access_policy.yaml"),
-		ToolGateway:   filepath.Join(root, "tools/agent_runtime/tool_gateway.py"),
 	}
 }
 
 // CriticalDenies returns the critical deny patterns.
 func CriticalDenies() map[string]string {
 	return map[string]string{
-		"git push*":                       "deny",
-		"git push --force *":              "deny",
-		"git push -f *":                   "deny",
-		"git branch -D *":                 "deny",
-		"git branch -d *":                 "deny",
-		"gh auth token*":                  "deny",
-		"gh auth login*":                  "deny",
-		"gh pr merge*":                    "deny",
-		"gh release *":                    "deny",
-		"sudo *":                          "deny",
-		"pip install *":                   "deny",
-		"npm install *":                   "deny",
-		"apt install *":                   "deny",
-		"python3 tools/install/*":         "deny",
-		"python3 tools/install_gateway/*": "deny",
-		"python3 tools/memory/*":          "deny",
-		"python3 tools/protocols/*":       "deny",
+		"git push*":                     "deny",
+		"git push --force *":            "deny",
+		"git push --force-with-lease *": "deny",
+		"git push -f *":                 "deny",
+		"git branch -D *":               "deny",
+		"git branch -d *":               "deny",
+		"gh auth token*":                "deny",
+		"gh auth login*":                "deny",
+		"gh pr merge*":                  "deny",
+		"gh release *":                  "deny",
+		"sudo *":                        "deny",
+		"pip install *":                 "deny",
+		"pip3 install *":                "deny",
+		"npm install *":                 "deny",
+		"pnpm add *":                    "deny",
+		"yarn add *":                    "deny",
+		"apt install *":                 "deny",
+		"apt-get install *":             "deny",
+		"go install *":                  "deny",
 	}
 }
 
 // RequiredAllows returns the required allow patterns.
 func RequiredAllows() map[string]string {
 	return map[string]string{
-		"python3 tools/ovav_runtime.py*":                                   "allow",
-		"python3 tools/harnesses/workspace_safety_gate.py*":                "allow",
-		"python3 tools/github/ovav_gh_issue_gate.py*":                      "allow",
-		"python3 -B tools/github/ovav_gh_issue_gate.py*":                   "allow",
-		"python3 tools/github/ovav_git_push_gate.py*":                      "allow",
-		"python3 -B tools/github/ovav_git_push_gate.py*":                   "allow",
-		"python3 tools/permissions/ovav_permission_authority.py*":          "allow",
-		"python3 -B tools/permissions/ovav_permission_authority.py*":       "allow",
-		"python3 tools/permissions/materialize.py*":                        "allow",
-		"python3 -B tools/permissions/materialize.py*":                     "allow",
-		"python3 tools/validators/*.py":                                    "allow",
-		"python3 -B tools/validators/*.py":                                 "allow",
-		"python3 tools/harnesses/check_*.py":                               "allow",
-		"OVAV_EVIDENCE_MODE=strict python3 tools/ovav_runtime.py validate": "allow",
+		"go run -C go-runtime ./cmd/ovav validate*":                "allow",
+		"go run -C go-runtime ./internal/validators/cmd/validate*": "allow",
 		"git status*":               "allow",
 		"git diff*":                 "allow",
 		"git log*":                  "allow",
@@ -89,7 +96,7 @@ func RequiredAllows() map[string]string {
 		"gh pr view*":               "allow",
 		"gh pr status*":             "allow",
 		"gh pr list*":               "allow",
-		"gh pr create*":             "ask",
+		"gh pr create*":             "allow",
 		"pytest*":                   "allow",
 		"python3 -m pytest*":        "allow",
 		"npm test*":                 "allow",
@@ -113,19 +120,52 @@ func ExpectedBashPermissions() map[string]string {
 	return perms
 }
 
+func (a *PermissionAuthority) protectedBashDenies() ([]string, error) {
+	data, err := os.ReadFile(a.PolicyPath)
+	if errors.Is(err, os.ErrNotExist) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, fmt.Errorf("read protected bash denies: %w", err)
+	}
+	var policy struct {
+		ProtectedDenies struct {
+			Bash []string `json:"bash"`
+		} `json:"protected_denies"`
+	}
+	if err := json.Unmarshal(data, &policy); err != nil {
+		return nil, fmt.Errorf("parse protected bash denies: %w", err)
+	}
+	return policy.ProtectedDenies.Bash, nil
+}
+
+func (a *PermissionAuthority) expectedBashPermissions() (map[string]string, error) {
+	permissions := ExpectedBashPermissions()
+	denies, err := a.protectedBashDenies()
+	if err != nil {
+		return nil, err
+	}
+	for _, pattern := range denies {
+		pattern = strings.TrimSpace(pattern)
+		if pattern == "" || pattern == "*" {
+			return nil, fmt.Errorf("invalid protected bash deny %q", pattern)
+		}
+		permissions[pattern] = "deny"
+	}
+	return permissions, nil
+}
+
 // ExpectedExternalDirectory returns the expected external directory permissions.
 func ExpectedExternalDirectory(agentName string) map[string]string {
-	if strings.Contains(strings.ToLower(agentName), "thavren") {
-		return map[string]string{"*": "allow"}
-	}
 	return map[string]string{
-		"/tmp/opencode/*": "allow",
-		"/home/braka/*":   "allow",
-		"/home/braka/.local/state/ovav-opencode/*":    "allow",
-		"/home/braka/.config/ovav/*":                  "allow",
-		"/home/braka/..ovav/source/configs/wezterm/*": "allow",
-		"/home/braka/.local/share/ovav/*":             "allow",
-		"*":                                           "deny",
+		"/tmp/opencode/*":                              "allow",
+		"/home/braka/Systems/ovav/*":                   "allow",
+		"/home/braka/.local/state/ovav-opencode/*":     "allow",
+		"/home/braka/.config/ovav/*":                   "allow",
+		"/home/braka/Systems/ovav/config/wezterm/*":    "allow",
+		"/home/braka/.local/share/ovav/*":              "allow",
+		"/mnt/c/Users/Alexa/AppData/Roaming/wezterm/*": "allow",
+		"*": "deny",
 	}
 }
 
@@ -136,6 +176,18 @@ func ExpectedOpencodePermission() map[string]interface{} {
 		"bash":               ExpectedBashPermissions(),
 		"external_directory": ExpectedExternalDirectory(""),
 	}
+}
+
+func (a *PermissionAuthority) expectedOpencodePermission() (map[string]interface{}, error) {
+	bash, err := a.expectedBashPermissions()
+	if err != nil {
+		return nil, err
+	}
+	return map[string]interface{}{
+		"edit":               "allow",
+		"bash":               bash,
+		"external_directory": ExpectedExternalDirectory(""),
+	}, nil
 }
 
 // MaterializeAll materializes all permission projections.
@@ -216,13 +268,13 @@ func (a *PermissionAuthority) assertPolicySafe() error {
 		return fmt.Errorf("invalid policy JSON: %w", err)
 	}
 	schemaVersion, _ := policy["schema_version"].(string)
-	if schemaVersion != "ovav.permission_authority.v1" && schemaVersion != "ovav.permission_authority.v2" {
+	if schemaVersion != "ovav.permission_authority.v1" && schemaVersion != "ovav.permission_authority.v2" && schemaVersion != "ovav.permission_authority.v3" {
 		return fmt.Errorf("permission authority schema mismatch: %s", schemaVersion)
 	}
 	expectedTargets := map[string]bool{
 		"opencode.json": true,
-		"clients/opencode/agents/area-platform-engineering.md": true,
-		"clients/opencode/agents/lead-thavren.md":              true,
+		".opencode/agents/area-platform-engineering.md": true,
+		".opencode/agents/lead-thavren.md":              true,
 	}
 	declaredTargets, _ := policy["materialized_targets"].([]interface{})
 	for _, t := range declaredTargets {
@@ -248,7 +300,11 @@ func (a *PermissionAuthority) buildOpencodeProjection() (string, error) {
 	if err := json.Unmarshal(data, &config); err != nil {
 		return "", err
 	}
-	config["permission"] = ExpectedOpencodePermission()
+	permission, err := a.expectedOpencodePermission()
+	if err != nil {
+		return "", err
+	}
+	config["permission"] = permission
 	result, err := json.MarshalIndent(config, "", "  ")
 	if err != nil {
 		return "", err
@@ -261,7 +317,12 @@ func (a *PermissionAuthority) buildAgentProjection(path string) (string, error) 
 	if err != nil {
 		return "", err
 	}
-	text := string(data)
+	return a.ProjectAgentDocument(string(data), strings.TrimSuffix(filepath.Base(path), ".md"))
+}
+
+// ProjectAgentDocument replaces one OpenCode agent's managed permission block
+// with the canonical authority projection.
+func (a *PermissionAuthority) ProjectAgentDocument(text, agentName string) (string, error) {
 	if !strings.HasPrefix(text, "---") {
 		return "", fmt.Errorf("agent frontmatter missing")
 	}
@@ -304,9 +365,12 @@ func (a *PermissionAuthority) buildAgentProjection(path string) (string, error) 
 		kept = kept[1:]
 	}
 
-	agentName := strings.TrimSuffix(filepath.Base(path), ".md")
+	bash, err := a.expectedBashPermissions()
+	if err != nil {
+		return "", err
+	}
 	newFrontmatter := append(kept, "# OVAV_PERMISSION_AUTHORITY: .ovav/policy/permission_authority.json")
-	newFrontmatter = append(newFrontmatter, expectedAgentPermissionYAML(agentName)...)
+	newFrontmatter = append(newFrontmatter, agentPermissionYAML(agentName, bash)...)
 
 	if !strings.HasPrefix(body, "\n") {
 		body = "\n" + body
@@ -315,15 +379,32 @@ func (a *PermissionAuthority) buildAgentProjection(path string) (string, error) 
 }
 
 func expectedAgentPermissionYAML(agentName string) []string {
+	return agentPermissionYAML(agentName, ExpectedBashPermissions())
+}
+
+func agentPermissionYAML(agentName string, bash map[string]string) []string {
 	lines := []string{"permission:", "  edit: allow", "  bash:"}
-	for pattern, decision := range ExpectedBashPermissions() {
-		lines = append(lines, fmt.Sprintf("    \"%s\": %s", pattern, decision))
+	for _, pattern := range orderedPermissionPatterns(bash) {
+		decision := bash[pattern]
+		lines = append(lines, fmt.Sprintf("    %s: %s", strconv.Quote(pattern), decision))
 	}
 	lines = append(lines, "  external_directory:")
-	for pattern, decision := range ExpectedExternalDirectory(agentName) {
-		lines = append(lines, fmt.Sprintf("    \"%s\": %s", pattern, decision))
+	for _, pattern := range orderedPermissionPatterns(ExpectedExternalDirectory(agentName)) {
+		decision := ExpectedExternalDirectory(agentName)[pattern]
+		lines = append(lines, fmt.Sprintf("    %s: %s", strconv.Quote(pattern), decision))
 	}
 	return lines
+}
+
+func orderedPermissionPatterns(permissions map[string]string) []string {
+	patterns := make([]string, 0, len(permissions))
+	for pattern := range permissions {
+		if pattern != "*" {
+			patterns = append(patterns, pattern)
+		}
+	}
+	sort.Strings(patterns)
+	return append([]string{"*"}, patterns...)
 }
 
 // CheckAll checks all permission surfaces for drift.
@@ -338,14 +419,14 @@ func (a *PermissionAuthority) CheckAll(writeLog bool) ([]map[string]interface{},
 	drift = append(drift, opencodeDrift...)
 
 	// Check platform agent
-	platformDrift, err := a.checkAgent(a.PlatformAgent, "clients/opencode/agents/area-platform-engineering.md")
+	platformDrift, err := a.checkAgent(a.PlatformAgent, ".opencode/agents/area-platform-engineering.md")
 	if err != nil {
 		return nil, err
 	}
 	drift = append(drift, platformDrift...)
 
 	// Check thavren alias
-	thavrenDrift, err := a.checkAgent(a.ThavrenAlias, "clients/opencode/agents/lead-thavren.md")
+	thavrenDrift, err := a.checkAgent(a.ThavrenAlias, ".opencode/agents/lead-thavren.md")
 	if err != nil {
 		return nil, err
 	}
@@ -376,7 +457,10 @@ func (a *PermissionAuthority) checkOpencode() ([]map[string]interface{}, error) 
 		return nil, err
 	}
 	permission, _ := config["permission"].(map[string]interface{})
-	expected := ExpectedOpencodePermission()
+	expected, err := a.expectedOpencodePermission()
+	if err != nil {
+		return nil, err
+	}
 
 	for _, field := range []string{"edit", "external_directory"} {
 		if fmt.Sprintf("%v", permission[field]) != fmt.Sprintf("%v", expected[field]) {
@@ -443,12 +527,11 @@ func (a *PermissionAuthority) checkAgent(path, name string) ([]map[string]interf
 		"\"git push --force *\": deny",
 		"\"gh auth token*\": deny",
 		"\"sudo *\": deny",
-		"\"python3 tools/github/ovav_git_push_gate.py*\": allow",
-		"\"python3 tools/permissions/ovav_permission_authority.py*\": allow",
-		"\"python3 tools/permissions/materialize.py*\": allow",
+		"\"go run -C go-runtime ./cmd/ovav validate*\": allow",
+		"\"go run -C go-runtime ./internal/validators/cmd/validate*\": allow",
 		"\"git commit*\": allow",
 		"\"git ls-remote *\": allow",
-		"\"gh pr create*\": ask",
+		"\"gh pr create*\": allow",
 		"\"*\": allow",
 	}
 	if strings.Contains(strings.ToLower(name), "thavren") {
@@ -495,19 +578,6 @@ func (a *PermissionAuthority) checkRuntimePolicySurfaces() ([]map[string]interfa
 			if !strings.Contains(string(toolPolicy), exp) {
 				drift = append(drift, map[string]interface{}{
 					"surface": strings.TrimPrefix(a.ToolPolicy, a.Root+"/"),
-					"missing": exp,
-				})
-			}
-		}
-	}
-
-	gateway, err := os.ReadFile(a.ToolGateway)
-	if err == nil {
-		expected := []string{"PLATFORM_APPROVED_GIT", "approved_governed_git_operation"}
-		for _, exp := range expected {
-			if !strings.Contains(string(gateway), exp) {
-				drift = append(drift, map[string]interface{}{
-					"surface": strings.TrimPrefix(a.ToolGateway, a.Root+"/"),
 					"missing": exp,
 				})
 			}

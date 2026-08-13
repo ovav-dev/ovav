@@ -347,8 +347,8 @@ func TestPermissionAuthority_Materialize(t *testing.T) {
 		"schema_version": "ovav.permission_authority.v1",
 		"materialized_targets": []string{
 			"opencode.json",
-			"clients/opencode/agents/area-platform-engineering.md",
-			"clients/opencode/agents/lead-thavren.md",
+			".opencode/agents/area-platform-engineering.md",
+			".opencode/agents/lead-thavren.md",
 		},
 	}
 	policyJSON, _ := json.Marshal(policy)
@@ -423,12 +423,11 @@ permission:
     "git push --force *": deny
     "gh auth token*": deny
     "sudo *": deny
-    "python3 tools/github/ovav_git_push_gate.py*": allow
-    "python3 tools/permissions/ovav_permission_authority.py*": allow
-    "python3 tools/permissions/materialize.py*": allow
+    "go run -C go-runtime ./cmd/ovav validate*": allow
+    "go run -C go-runtime ./internal/validators/cmd/validate*": allow
     "git commit*": allow
     "git ls-remote *": allow
-    "gh pr create*": ask
+    "gh pr create*": allow
     "*": allow
   external_directory:
     "/tmp/opencode/*": allow
