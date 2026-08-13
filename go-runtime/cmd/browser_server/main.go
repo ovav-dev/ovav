@@ -17,20 +17,30 @@ package main
 
 import (
 	"bufio"
+	"crypto/subtle"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
+	"sync"
+	"time"
 
 	"github.com/ovav/ovav/internal/browser"
 )
 
 const (
-	protocolVersion = "2024-11-05"
-	serverName      = "ovav-browser"
-	serverVersion   = "0.1.0"
+	protocolVersion    = "2024-11-05"
+	serverName         = "ovav-browser"
+	serverVersion      = "0.1.0"
+	defaultHTTPAddr    = "127.0.0.1:9222"
+	maxHTTPBody        = int64(1 << 20)
+	httpTokenEnv       = "OVAV_BROWSER_MCP_TOKEN"
+	browserEvaluateEnv = "OVAV_BROWSER_EVALUATE"
 )
 
 // ── MCP Types ─────────────────────────────────────────────────────────────────
@@ -191,7 +201,31 @@ var tools = []Tool{
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 
-var bc *browser.Controller
+type browserController interface {
+	Start() error
+	Stop() error
+	Navigate(string) (string, error)
+	Screenshot(string) (string, error)
+	Click(string) error
+	Type(string, string) error
+	GetHTML(string) (string, error)
+	GetComputedStyles(string) ([]browser.ComputedStyle, error)
+	Evaluate(string) (string, error)
+	GetURL() (string, error)
+}
+
+type mcpServer struct {
+	mu          sync.Mutex
+	ctrl        browserController
+	started     bool
+	root        string
+	validateURL func(string) error
+}
+
+func newMCPServer(ctrl browserController) *mcpServer {
+	root, _ := os.Getwd()
+	return &mcpServer{ctrl: ctrl, root: root, validateURL: browser.NewURLFirewall(root).Validate}
+}
 
 func main() {
 	headless := true
@@ -204,29 +238,60 @@ func main() {
 			if strings.HasPrefix(a, "--http=") || strings.HasPrefix(a, "--http") {
 				httpAddr = strings.TrimPrefix(strings.TrimPrefix(a, "--http="), "--http")
 				if httpAddr == "" {
-					httpAddr = ":9222"
+					httpAddr = defaultHTTPAddr
 				}
 			}
 		}
 	}
 
-	bc = browser.New(browser.WithHeadless(headless))
-	if err := bc.Start(); err != nil {
-		fmt.Fprintf(os.Stderr, "MCP ERROR: %v\n", err)
-		os.Exit(1)
+	server := newMCPServer(browser.New(browser.WithHeadless(headless)))
+	if root, err := browserRepoRoot(); err == nil {
+		server.root = root
+		server.validateURL = browser.NewURLFirewall(root).Validate
 	}
-	defer bc.Stop()
+	defer func() {
+		if err := server.stop(); err != nil {
+			fmt.Fprintf(os.Stderr, "MCP ERROR: browser stop failed: %v\n", err)
+		}
+	}()
 
 	fmt.Fprintf(os.Stderr, "OVAV Browser MCP v%s started (headless=%v)\n", serverVersion, headless)
 
 	if httpAddr != "" {
-		runHTTP(httpAddr)
+		addr, err := normalizeHTTPBind(httpAddr)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "HTTP ERROR: %v\n", err)
+			return
+		}
+		token := os.Getenv(httpTokenEnv)
+		if token == "" {
+			fmt.Fprintf(os.Stderr, "HTTP ERROR: %s is required for HTTP mode\n", httpTokenEnv)
+			return
+		}
+		runHTTP(addr, token, server)
 	} else {
-		runStdio()
+		runStdio(server)
 	}
 }
 
-func runStdio() {
+func browserRepoRoot() (string, error) {
+	dir, err := os.Getwd()
+	if err != nil {
+		return "", err
+	}
+	for {
+		if _, err := os.Stat(filepath.Join(dir, ".ovav", "registry", "network_allowlist.yaml")); err == nil {
+			return dir, nil
+		}
+		parent := filepath.Dir(dir)
+		if parent == dir {
+			return "", errors.New("OVAV repository root not found")
+		}
+		dir = parent
+	}
+}
+
+func runStdio(server *mcpServer) {
 	scanner := bufio.NewScanner(os.Stdin)
 	scanner.Buffer(make([]byte, 1024*1024), 1024*1024) // 1MB buffer for screenshots
 
@@ -238,12 +303,17 @@ func runStdio() {
 
 		var req JSONRPCRequest
 		if err := json.Unmarshal([]byte(line), &req); err != nil {
-			respond(req.ID, nil, &RPCError{Code: -32700, Message: "Parse error", Data: err.Error()})
+			respond(&JSONRPCResponse{
+				JSONRPC: "2.0",
+				ID:      nil,
+				Error:   &RPCError{Code: -32700, Message: "Parse error", Data: err.Error()},
+			})
 			continue
 		}
 
-		result, rpcErr := handleMethod(req.Method, req.Params)
-		respond(req.ID, result, rpcErr)
+		if resp := server.handleRequest(req); resp != nil {
+			respond(resp)
+		}
 	}
 
 	if err := scanner.Err(); err != nil {
@@ -252,16 +322,36 @@ func runStdio() {
 	}
 }
 
-func runHTTP(addr string) {
+func runHTTP(addr, token string, server *mcpServer) {
+	httpServer := &http.Server{
+		Addr:              addr,
+		Handler:           newHTTPHandler(server, token, maxHTTPBody),
+		ReadHeaderTimeout: 5 * time.Second,
+		ReadTimeout:       15 * time.Second,
+		WriteTimeout:      30 * time.Second,
+		IdleTimeout:       60 * time.Second,
+	}
+	fmt.Fprintf(os.Stderr, "HTTP server listening on http://%s/mcp\n", addr)
+	if err := httpServer.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+		fmt.Fprintf(os.Stderr, "HTTP ERROR: %v\n", err)
+	}
+}
+
+func newHTTPHandler(server *mcpServer, token string, maxBody int64) http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/mcp", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			http.Error(w, "POST required", http.StatusMethodNotAllowed)
 			return
 		}
-		body, err := io.ReadAll(r.Body)
+		body, err := io.ReadAll(http.MaxBytesReader(w, r.Body, maxBody))
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			status := http.StatusBadRequest
+			var maxErr *http.MaxBytesError
+			if errors.As(err, &maxErr) {
+				status = http.StatusRequestEntityTooLarge
+			}
+			http.Error(w, http.StatusText(status), status)
 			return
 		}
 
@@ -271,18 +361,45 @@ func runHTTP(addr string) {
 			return
 		}
 
-		result, rpcErr := handleMethod(req.Method, req.Params)
-		writeHTTPResponse(w, JSONRPCResponse{JSONRPC: "2.0", ID: req.ID, Result: result, Error: rpcErr})
+		resp := server.handleRequest(req)
+		if resp == nil {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+		writeHTTPResponse(w, *resp)
 	})
 	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("OK"))
 	})
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		provided := strings.TrimPrefix(r.Header.Get("Authorization"), "Bearer ")
+		if provided == "" || subtle.ConstantTimeCompare([]byte(provided), []byte(token)) != 1 {
+			w.Header().Set("WWW-Authenticate", "Bearer")
+			http.Error(w, "unauthorized", http.StatusUnauthorized)
+			return
+		}
+		mux.ServeHTTP(w, r)
+	})
+}
 
-	fmt.Fprintf(os.Stderr, "HTTP server listening on http://127.0.0.1%s/mcp\n", addr)
-	if err := http.ListenAndServe(addr, mux); err != nil {
-		fmt.Fprintf(os.Stderr, "HTTP ERROR: %v\n", err)
-		os.Exit(1)
+func normalizeHTTPBind(addr string) (string, error) {
+	if addr == "" {
+		addr = defaultHTTPAddr
+	} else if strings.HasPrefix(addr, ":") {
+		addr = "127.0.0.1" + addr
 	}
+	host, port, err := net.SplitHostPort(addr)
+	if err != nil || port == "" {
+		return "", fmt.Errorf("invalid HTTP bind %q", addr)
+	}
+	if strings.EqualFold(host, "localhost") {
+		return net.JoinHostPort(host, port), nil
+	}
+	ip := net.ParseIP(host)
+	if ip == nil || !ip.IsLoopback() {
+		return "", fmt.Errorf("HTTP mode requires a loopback bind, got %q", host)
+	}
+	return net.JoinHostPort(host, port), nil
 }
 
 func writeHTTPResponse(w http.ResponseWriter, resp JSONRPCResponse) {
@@ -290,48 +407,98 @@ func writeHTTPResponse(w http.ResponseWriter, resp JSONRPCResponse) {
 	json.NewEncoder(w).Encode(resp)
 }
 
-func handleMethod(method string, params json.RawMessage) (interface{}, *RPCError) {
-	switch method {
+func (s *mcpServer) handleRequest(req JSONRPCRequest) *JSONRPCResponse {
+	var result interface{}
+	var rpcErr *RPCError
+
+	switch req.Method {
 	case "initialize":
-		return InitializeResult{
+		result = InitializeResult{
 			ProtocolVersion: protocolVersion,
 			ServerInfo:      ServerInfo{Name: serverName, Version: serverVersion},
 			Capabilities:    Capabilities{Tools: &ToolsCapability{ListChanged: false}},
-		}, nil
+		}
 
-	case "initialized":
-		return map[string]string{}, nil
+	case "initialized", "notifications/initialized":
+		result = map[string]string{}
 
 	case "tools/list":
-		return map[string]interface{}{"tools": tools}, nil
+		result = map[string]interface{}{"tools": availableTools()}
 
 	case "tools/call":
 		var p CallToolParams
-		if err := json.Unmarshal(params, &p); err != nil {
-			return nil, &RPCError{Code: -32602, Message: "Invalid params", Data: err.Error()}
+		if err := json.Unmarshal(req.Params, &p); err != nil {
+			rpcErr = &RPCError{Code: -32602, Message: "Invalid params", Data: err.Error()}
+		} else {
+			result, rpcErr = s.callTool(p)
 		}
-		return callTool(p)
 
 	default:
-		return nil, &RPCError{Code: -32601, Message: fmt.Sprintf("Method not found: %s", method)}
+		rpcErr = &RPCError{Code: -32601, Message: fmt.Sprintf("Method not found: %s", req.Method)}
 	}
+
+	if req.ID == nil {
+		return nil
+	}
+	return &JSONRPCResponse{JSONRPC: "2.0", ID: req.ID, Result: result, Error: rpcErr}
 }
 
-func callTool(p CallToolParams) (*CallToolResult, *RPCError) {
+func availableTools() []Tool {
+	if os.Getenv(browserEvaluateEnv) == "1" {
+		return tools
+	}
+	filtered := make([]Tool, 0, len(tools)-1)
+	for _, tool := range tools {
+		if tool.Name != "browser_evaluate" {
+			filtered = append(filtered, tool)
+		}
+	}
+	return filtered
+}
+
+func (s *mcpServer) callTool(p CallToolParams) (*CallToolResult, *RPCError) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	if !isBrowserTool(p.Name) {
+		return nil, &RPCError{Code: -32601, Message: fmt.Sprintf("Tool not found: %s", p.Name)}
+	}
+	if p.Name == "browser_evaluate" && os.Getenv(browserEvaluateEnv) != "1" {
+		return toolError(fmt.Errorf("browser_evaluate disabled; set %s=1 for an explicit capability grant", browserEvaluateEnv)), nil
+	}
+	if !s.started {
+		if err := s.ctrl.Start(); err != nil {
+			return toolError(err), nil
+		}
+		s.started = true
+	}
+
 	switch p.Name {
 	case "browser_navigate":
-		url, _ := p.Arguments["url"].(string)
-		html, err := bc.Navigate(url)
+		target, _ := p.Arguments["url"].(string)
+		if err := s.validateURL(target); err != nil {
+			return toolError(err), nil
+		}
+		html, err := s.ctrl.Navigate(target)
 		if err != nil {
-			return &CallToolResult{IsError: true, Content: []ContentItem{{Type: "text", Text: err.Error()}}}, nil
+			return toolError(err), nil
+		}
+		finalURL, err := s.ctrl.GetURL()
+		if err != nil {
+			return toolError(fmt.Errorf("verify navigation target: %w", err)), nil
+		}
+		if err := s.validateURL(finalURL); err != nil {
+			_ = s.ctrl.Stop()
+			s.started = false
+			return toolError(fmt.Errorf("browser redirect target denied: %w", err)), nil
 		}
 		return &CallToolResult{Content: []ContentItem{{Type: "text", Text: truncate(html, 50000)}}}, nil
 
 	case "browser_screenshot":
 		sel, _ := p.Arguments["selector"].(string)
-		png, err := bc.Screenshot(sel)
+		png, err := s.ctrl.Screenshot(sel)
 		if err != nil {
-			return &CallToolResult{IsError: true, Content: []ContentItem{{Type: "text", Text: err.Error()}}}, nil
+			return toolError(err), nil
 		}
 		return &CallToolResult{Content: []ContentItem{
 			{Type: "image", Data: png, MimeType: "image/png"},
@@ -340,34 +507,34 @@ func callTool(p CallToolParams) (*CallToolResult, *RPCError) {
 
 	case "browser_click":
 		sel, _ := p.Arguments["selector"].(string)
-		err := bc.Click(sel)
+		err := s.ctrl.Click(sel)
 		if err != nil {
-			return &CallToolResult{IsError: true, Content: []ContentItem{{Type: "text", Text: err.Error()}}}, nil
+			return toolError(err), nil
 		}
 		return &CallToolResult{Content: []ContentItem{{Type: "text", Text: fmt.Sprintf("Clicked: %s", sel)}}}, nil
 
 	case "browser_type":
 		sel, _ := p.Arguments["selector"].(string)
 		text, _ := p.Arguments["text"].(string)
-		err := bc.Type(sel, text)
+		err := s.ctrl.Type(sel, text)
 		if err != nil {
-			return &CallToolResult{IsError: true, Content: []ContentItem{{Type: "text", Text: err.Error()}}}, nil
+			return toolError(err), nil
 		}
 		return &CallToolResult{Content: []ContentItem{{Type: "text", Text: fmt.Sprintf("Typed %q into %s", text, sel)}}}, nil
 
 	case "browser_get_html":
 		sel, _ := p.Arguments["selector"].(string)
-		html, err := bc.GetHTML(sel)
+		html, err := s.ctrl.GetHTML(sel)
 		if err != nil {
-			return &CallToolResult{IsError: true, Content: []ContentItem{{Type: "text", Text: err.Error()}}}, nil
+			return toolError(err), nil
 		}
 		return &CallToolResult{Content: []ContentItem{{Type: "text", Text: truncate(html, 50000)}}}, nil
 
 	case "browser_get_styles":
 		sel, _ := p.Arguments["selector"].(string)
-		styles, err := bc.GetComputedStyles(sel)
+		styles, err := s.ctrl.GetComputedStyles(sel)
 		if err != nil {
-			return &CallToolResult{IsError: true, Content: []ContentItem{{Type: "text", Text: err.Error()}}}, nil
+			return toolError(err), nil
 		}
 		var sb strings.Builder
 		for _, s := range styles {
@@ -377,9 +544,9 @@ func callTool(p CallToolParams) (*CallToolResult, *RPCError) {
 
 	case "browser_evaluate":
 		js, _ := p.Arguments["js"].(string)
-		result, err := bc.Evaluate(js)
+		result, err := s.ctrl.Evaluate(js)
 		if err != nil {
-			return &CallToolResult{IsError: true, Content: []ContentItem{{Type: "text", Text: err.Error()}}}, nil
+			return toolError(err), nil
 		}
 		return &CallToolResult{Content: []ContentItem{{Type: "text", Text: result}}}, nil
 
@@ -388,13 +555,30 @@ func callTool(p CallToolParams) (*CallToolResult, *RPCError) {
 	}
 }
 
-func respond(id interface{}, result interface{}, rpcErr *RPCError) {
-	resp := JSONRPCResponse{
-		JSONRPC: "2.0",
-		ID:      id,
-		Result:  result,
-		Error:   rpcErr,
+func isBrowserTool(name string) bool {
+	switch name {
+	case "browser_navigate", "browser_screenshot", "browser_click", "browser_type", "browser_get_html", "browser_get_styles", "browser_evaluate":
+		return true
+	default:
+		return false
 	}
+}
+
+func toolError(err error) *CallToolResult {
+	return &CallToolResult{IsError: true, Content: []ContentItem{{Type: "text", Text: err.Error()}}}
+}
+
+func (s *mcpServer) stop() error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if !s.started {
+		return nil
+	}
+	s.started = false
+	return s.ctrl.Stop()
+}
+
+func respond(resp *JSONRPCResponse) {
 	out, _ := json.Marshal(resp)
 	fmt.Println(string(out))
 }
