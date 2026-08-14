@@ -18,14 +18,91 @@ canonical: true
 version: "103.0"
 plan_version: "103.0"
 capa: 11
-updated_at: "2026-08-13T12:00:00-03:00"
+updated_at: "2026-08-14T13:50:00-05:00"
 updated_by: "thavren"
-build_date: "2026-08-13"
+build_date: "2026-08-14"
 git_head: "git HEAD is the canonical temporal authority; resolve dynamically"
 git_branch: "resolve dynamically from git"
 status: "launch_verification_blocked"
-next_phase: "Governed candidate commit, then generate baseline, commit baseline attestation, and run gate validation"
+next_phase: "Q1 2026 — Phase 1 anti-drift core (ADR-005): ovav deploy run + CI drift gate + versioned runtime integrity baseline. See docs/architecture/ADR-005-anti-drift-2026.md for full 4-phase plan."
 layer_status: "canonical_truth_repair_pending_integrity_baseline"
+
+# ── 2026 Roadmap (ADR-005) ────────────────────────────────────────────────
+roadmap_2026:
+  adr: "docs/architecture/ADR-005-anti-drift-2026.md"
+  decision_date: "2026-08-14"
+  decision_by: "thavren + CEO"
+  status: "accepted"
+  total_effort_sprints: 22
+  current_phase: "Q1 — anti-drift core"
+  current_phase_goal: "Kill manual deploy cycle (fragment → live state)"
+
+  phases:
+    - id: "phase_1_anti_drift"
+      quarter: "Q1 2026"
+      goal: "Eliminate drift between source-of-truth and live state"
+      deliverables:
+        - "ovav deploy run command (auto-deploy fragment → live + restart IT)"
+        - "CI gate: drift-detect (reject merge if fragment ≠ live > N days)"
+        - "Runtime integrity baseline → versioned in repo (not gitignored)"
+        - "ovav drift show (visual diff + suggested fix)"
+        - "IT reload integration (Win32 API trigger)"
+      success_criteria:
+        - "0 drift incidents in Q1 (measured by CI gate)"
+        - "Runtime integrity validable without manual work"
+
+    - id: "phase_2_auto_remediation"
+      quarter: "Q2 2026"
+      goal: "Validators with --fix that auto-correct detected issues"
+      deliverables:
+        - "ovav validate --fix (apply SAFE_FIX auto-corrections)"
+        - "Safe-fix registry (whitelist of auto-fixable validators)"
+        - "Rollback on auto-fix failure (snapshot + atomic rollback)"
+        - "Documentation auto-gen from registry/*.yaml"
+      success_criteria:
+        - "80% of detected issues have auto-fix available"
+        - "0 false positives in auto-fix"
+
+    - id: "phase_3_launch_hardening"
+      quarter: "Q3 2026"
+      goal: "Close Final Launch Verification per ADR-003"
+      deliverables:
+        - "Fuzz testing for validators (go-fuzz)"
+        - "Chaos testing for deploy pipeline"
+        - "IT upgrade path v0.1.4 → GA"
+        - "OpenCode smoke expansion (all entry points)"
+        - "ADR-005 finalized and published"
+      success_criteria:
+        - "Final smoke evidence captured"
+        - "Final tag created"
+        - "Launch verification closed"
+
+    - id: "phase_4_ga_promotion"
+      quarter: "Q4 2026"
+      goal: "GA release (only if Q1-Q3 succeed)"
+      deliverables:
+        - "GA release tag v1.0.0"
+        - "Community prep (README, install, troubleshooting)"
+        - "Bug bashing week"
+        - "Roadmap 2027"
+      success_criteria:
+        - "GA release"
+        - "0 critical bugs"
+
+  # Decisions made during this planning session (2026-08-14)
+  decisions:
+    - id: "DEC-2026-08-14-IT-STRATEGY"
+      question: "IT v0.1.4 alpha vs Windows Terminal?"
+      decision: "Fix IT v0.1.4 with workarounds (no downgrade)"
+      rationale: "IT is OVAV strategic direction; workarounds accumulate but enable upgrade path to GA"
+    - id: "DEC-2026-08-14-PLAN-SCOPE"
+      question: "Plan scope for 2026?"
+      decision: "Full 4-phase plan (22 sprints)"
+      rationale: "CEO requested comprehensive plan; partial scope leaves gaps"
+    - id: "DEC-2026-08-14-DOCS"
+      question: "How to document plan?"
+      decision: "ADR-005 + caps update"
+      rationale: "Auditable, version-controlled, links to plan from caps.yaml"
 
 # ── Producto User-Facing ──────────────────────────────────────────────────
 
