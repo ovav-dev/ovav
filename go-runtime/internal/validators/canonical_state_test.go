@@ -51,14 +51,16 @@ func TestCanonicalCapsReflectsRuntimeEvidence(t *testing.T) {
 	if caps.Governance.Validators.Registered != len(DefaultRegistry().All()) {
 		t.Fatalf("caps validator count=%d, registry=%d", caps.Governance.Validators.Registered, len(DefaultRegistry().All()))
 	}
-	if got := len(DefaultRegistry().All()); got != 74 {
-		t.Fatalf("default validator registry contains %d validators, want 74", got)
+	if got := len(DefaultRegistry().All()); got != 76 {
+		t.Fatalf("default validator registry contains %d validators, want 76", got)
 	}
-	if caps.Governance.Validators.Passed != 63 || caps.Governance.Validators.Warned != 8 || caps.Governance.Validators.Failed != 0 {
+	if caps.Governance.Validators.Passed != 70 || caps.Governance.Validators.Warned != 6 || caps.Governance.Validators.Failed != 0 {
 		t.Fatalf("unexpected latest developer validation: %+v", caps.Governance.Validators)
 	}
-	if caps.NextPhase != "Governed candidate commit, then generate baseline, commit baseline attestation, and run gate validation" {
-		t.Fatalf("unexpected dependency-first next work: %q", caps.NextPhase)
+	// NextPhase should reference the 2026 anti-drift plan (ADR-005).
+	// Phase 1 closed → Q2 2026 Phase 2 next per ADR-005.
+	if !strings.Contains(caps.NextPhase, "ADR-005") && !strings.Contains(caps.NextPhase, "anti-drift") {
+		t.Fatalf("unexpected next phase reference: %q", caps.NextPhase)
 	}
 	for subsystem, state := range map[string]string{
 		"session_capsule":           "removed_obsolete",

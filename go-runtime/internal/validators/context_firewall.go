@@ -41,7 +41,7 @@ func (c *ContextFirewall) Validate(ctx context.Context, root string) Result {
 		issues = append(issues, "FIREWALL: permission_authority.json not found")
 	} else {
 		content := string(data)
-		if strings.Contains(content, `"_ovav_yolo"`) || strings.Contains(content, `"*": "allow"`) {
+		if strings.Contains(content, `"_ovav_yolo"`) || strings.Contains(content, `"*":"allow"`) || strings.Contains(content, `"*": "allow"`) || strings.Contains(content, `"*" : "allow"`) {
 			// OVAV TRUSTED DOMAIN: external_directory allow-by-default is correctly configured.
 		} else {
 			issues = append(issues, "FIREWALL: OVAV TRUSTED DOMAIN marker missing — expected _ovav_yolo or *: allow in permission_authority.json")

@@ -477,7 +477,7 @@ func TestAgentPermission_SQLInjectionInName(t *testing.T) {
 	injectionNames := []string{
 		"Thavren' OR '1'='1",
 		"Thavren\"; DROP TABLE permissions;--",
-		"Thavren\nadmin: true",     // newline splits YAML key; name="Thavren" → matches → pass (correct)
+		"Thavren\nadmin: true",     // markdown YAML parser splits on \n: name="Thavren", admin="true" — passes
 		"Thavren\r\nadmin: true",   // same as above
 		strings.Repeat("A", 10000), // very long name
 	}

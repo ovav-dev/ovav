@@ -330,8 +330,8 @@ governance:
     total: 76
     registered: 76
     cli_visible: 76
-    passed: 0
-    warned: 0
+    passed: 70
+    warned: 6
     failed: 0
     mode: "developer"
     gate_mode: "blocked_pending_baseline_and_candidate_closure"

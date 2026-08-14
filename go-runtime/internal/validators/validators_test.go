@@ -3363,16 +3363,17 @@ func TestContextFirewall_NoModules(t *testing.T) {
 
 func TestContextFirewall_ValidModules(t *testing.T) {
 	// ContextFirewall v2 no longer checks injection_detector.py (migrated to Go)
-	// Only permission_authority.json deny-by-default is required
+	// OVAV TRUSTED DOMAIN policy (2026-08-13): external_directory * = allow
+	// Validator checks for _ovav_yolo marker OR "*": "allow" pattern
 	dir := t.TempDir()
 	os.MkdirAll(filepath.Join(dir, ".ovav", "policy"), 0755)
 	os.WriteFile(filepath.Join(dir, ".ovav", "policy", "permission_authority.json"),
-		[]byte(`{"permission":{"external_directory":{"*":"deny"}}}`), 0644)
+		[]byte(`{"permission":{"external_directory":{"*":"allow"}}}`), 0644)
 
 	v := NewContextFirewall()
 	result := v.Validate(context.Background(), dir)
 	if result.Status != "pass" {
-		t.Errorf("expected pass with deny-by-default configured, got %s: %v", result.Status, result.Issues)
+		t.Errorf("expected pass with TRUSTED DOMAIN (* = allow) configured, got %s: %v", result.Status, result.Issues)
 	}
 }
 

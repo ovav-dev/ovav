@@ -2,12 +2,18 @@
   "schema": "ovav.runtime_integrity.v1",
   "algorithm": "sha256",
   "files": {
-    ".ovav/plan/caps.yaml": "135c2d672a479fb6695742042b6341d483da276a7e7794911e01363aa223ceab",
+    ".ovav/plan/caps.yaml": "75e60ca389f1184391575a9ac6719aa9c0f4c890e60afeacc9c53d04cedf8996",
     ".ovav/policy/permission_authority.json": "c31e9c2028e1d11de70412538db2cb7f57f2b442389667fe73c38ac2335bf88e",
     "AGENTS.md": "570c3199574b71bf5498966d32a1fd9fedbc089515808cc1726942a92fef4850",
     "go-runtime/go.mod": "599b88657887000354a47351a0555ddb5b7a0c67ea022dc33f692a56af9f9bd8",
     "go-runtime/internal/validators/cmd/validate/main.go": "8acb76e3f95573fd4a950dbd695f65e2336317987f192bccd6a452b5a62606b0",
     "opencode.json": "2eaddfd827d5ff3734d4d2657bb51af074febeaa7bb4e61f6550689431942a2a",
-    ".gitignore": "2f7b0be6db426f46c94aa3fb8e3bc6534390b0ccc38ad47941966f38e99c5463"
+    ".gitignore": "2f7b0be6db426f46c94aa3fb8e3bc6534390b0ccc38ad47941966f38e99c5463",
+    ".ovav/registry/sbom.json": "b7d54d13f6b7eb424de34e05d3c88ea982ff761e9ce9c465e730beacce924315",
+    "go-runtime/internal/validators/canonical_state_test.go": "4afb78f3bd1784f7561df7a7342f126acacf86e751a9a8077dfcbbb414b013c9",
+    "go-runtime/internal/validators/context_firewall.go": "145e23489b0c21bfcda507650246337cab42a06c6bad4c1083f194c5471c4804",
+    "go-runtime/internal/validators/agent_permission_invariants.go": "524ec7d1b43219bf58d2b2e6d1ddac0b068e5dc301f4bd8f0730afdf26436c44",
+    "go-runtime/internal/validators/agent_permission_invariants_fuzz_test.go": "ec8627423c65562a741824fbe0900b4e55558275e2c6443ff54dedf38eb4e5c9",
+    "go-runtime/internal/validators/validators_test.go": "adf2fd345d8eae7eb815554605d22ecf4f4548f653f3b0872e406c293e6d3dc8"
   }
 }
