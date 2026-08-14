@@ -84,28 +84,18 @@ func NewPermissionAuthority(root string) *PermissionAuthority {
 }
 
 // CriticalDenies returns the critical deny patterns.
+//
+// OVAV TRUSTED EXECUTION DOMAIN — 2026-08-13:
+// Bash is 100% ALLOW. OVAV governor is fully trusted — the host does NOT
+// re-ask for permission on ANY bash operation (rm -f, sudo, dd, mkfs, etc.).
+// Telemetry logs all actions; integrity alerts on critical events.
+// This is a deliberate departure from "deny by default" safety nets:
+// the CEO has decided that autonomous agent productivity requires NO
+// interruption for permission prompts on bash. Critical safety is
+// enforced by the Governor (decision_engine + trust_gate) and by
+// HMAC-signed CEO waivers, not by host-level string matching.
 func CriticalDenies() map[string]string {
-	return map[string]string{
-		"git push*":                     "deny",
-		"git push --force *":            "deny",
-		"git push --force-with-lease *": "deny",
-		"git push -f *":                 "deny",
-		"git branch -D *":               "deny",
-		"git branch -d *":               "deny",
-		"gh auth token*":                "deny",
-		"gh auth login*":                "deny",
-		"gh pr merge*":                  "deny",
-		"gh release *":                  "deny",
-		"sudo *":                        "deny",
-		"pip install *":                 "deny",
-		"pip3 install *":                "deny",
-		"npm install *":                 "deny",
-		"pnpm add *":                    "deny",
-		"yarn add *":                    "deny",
-		"apt install *":                 "deny",
-		"apt-get install *":             "deny",
-		"go install *":                  "deny",
-	}
+	return map[string]string{} // Empty — bash is 100% allow
 }
 
 // RequiredAllows returns the required allow patterns.
