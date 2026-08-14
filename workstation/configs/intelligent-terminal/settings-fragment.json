@@ -1,5 +1,5 @@
 {
-  "_comment": "OVAV IT v0.2 fragment \u2014 STABLE. Full schema applied.",
+  "_comment": "OVAV IT v0.2 fragment \u2014 STABLE with Cascadia Mono (admin Nerd Fonts install pending).",
   "$schema": "https://aka.ms/terminal-profiles-schema",
   "defaultProfile": "{e3cb3da9-9980-5990-a951-339efdad913d}",
   "theme": "dark",
@@ -64,7 +64,7 @@
   "profiles": {
     "defaults": {
       "font": {
-        "face": "CaskaydiaMono Nerd Font Mono",
+        "face": "Cascadia Mono",
         "size": 12
       },
       "useShellIntegration": false
@@ -76,7 +76,7 @@
         "name": "OVAV",
         "startingDirectory": "//wsl.localhost/Ubuntu-26.04/home/braka/Systems/ovav",
         "font": {
-          "face": "CaskaydiaMono Nerd Font Mono",
+          "face": "Cascadia Mono",
           "size": 12
         }
       },
@@ -86,7 +86,7 @@
         "name": "SYS",
         "startingDirectory": "//wsl.localhost/Ubuntu-26.04/home/braka/.config",
         "font": {
-          "face": "CaskaydiaMono Nerd Font Mono",
+          "face": "Cascadia Mono",
           "size": 12
         }
       },
@@ -96,7 +96,7 @@
         "name": "HUB",
         "startingDirectory": "//wsl.localhost/Ubuntu-26.04/home/braka/Systems",
         "font": {
-          "face": "CaskaydiaMono Nerd Font Mono",
+          "face": "Cascadia Mono",
           "size": 12
         }
       },
@@ -106,7 +106,7 @@
         "name": "WIN",
         "startingDirectory": "//wsl.localhost/Ubuntu-26.04/mnt/c/Users/Alexa",
         "font": {
-          "face": "CaskaydiaMono Nerd Font Mono",
+          "face": "Cascadia Mono",
           "size": 12
         }
       },
@@ -115,7 +115,7 @@
         "hidden": false,
         "name": "Windows PowerShell",
         "font": {
-          "face": "CaskaydiaMono Nerd Font Mono",
+          "face": "Cascadia Mono",
           "size": 12
         }
       },
@@ -124,7 +124,7 @@
         "hidden": false,
         "name": "Command Prompt",
         "font": {
-          "face": "CaskaydiaMono Nerd Font Mono",
+          "face": "Cascadia Mono",
           "size": 12
         }
       },
@@ -134,7 +134,7 @@
         "name": "Azure Cloud Shell",
         "source": "Windows.Terminal.Azure",
         "font": {
-          "face": "CaskaydiaMono Nerd Font Mono",
+          "face": "Cascadia Mono",
           "size": 12
         }
       }
