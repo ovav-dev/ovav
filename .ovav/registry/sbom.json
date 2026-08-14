@@ -4,7 +4,7 @@
   "project": "OVAV",
   "hash_algorithm": "sha256",
   "metadata": {
-    "git_identity": "b17ab2f15924675d5cf92a749e9d1c108ef0c5e656213ddcba20995ee0c6ae31"
+    "git_identity": "0575c1a32a0ee6cde61208a3a76b1e8f930c21eafe6f88cba300a071cf24dfa2"
   },
   "policy": {
     "version": "tracked-content-v1",
@@ -1467,7 +1467,7 @@
     "go-runtime/cmd/ovav/deploy_cli.go": "0f710631c7dbabdbeeb0b694ff8656a97b53fb746cf91618cefd5e54dc8febea",
     "go-runtime/cmd/ovav/deploy_core.go": "4d12b046f91bbbee9239d354f73f4aab8b98ad4d384a225a009784d994d2463b",
     "go-runtime/cmd/ovav/deploy_test.go": "e90362dcea6dc6f927391ac2f30b639560af38b527bdb088fc84b9bcad7fc753",
-    "go-runtime/cmd/ovav/dispatch.go": "ecb59ede80ec587c5ab8712bbde4c7876748ef15ae3927d74de9fbac64d89568",
+    "go-runtime/cmd/ovav/dispatch.go": "e9bde0e3f956a7bd6e597277bb85ece9f7bcacb2435a2c41c96cb7dd383e1ce1",
     "go-runtime/cmd/ovav/dispatch_test.go": "585928b8d9c70d053f844be5f8a27819c675957ed9462d1b754287cee354c0ce",
     "go-runtime/cmd/ovav/docs_cli.go": "1fa2493809950927ea115502834f9a1fec28a33956ae46f8194ee5c0841efd14",
     "go-runtime/cmd/ovav/docs_cli_test.go": "f5d71438aa55491ffa98697a6165f1994826e0340af2743ecf3d42e898d6477a",
@@ -1485,7 +1485,7 @@
     "go-runtime/cmd/ovav/it_test.go": "de82dfd5361add51165a50751e6a3921326672c220ed157cb4636960e612bd4e",
     "go-runtime/cmd/ovav/login.go": "d34287060d4970fdc27f25a864ce4b3f7cfbc8f6fda82af452bc440774ccc485",
     "go-runtime/cmd/ovav/login_recovery_test.go": "667bb6b13125a80b5f1a661bfe1004019197eae396984e355b881ca6f83fa36a",
-    "go-runtime/cmd/ovav/main.go": "cd13191f77e0480eb12f5244e8368dbf584ee27185fdd672462bd253f830ee93",
+    "go-runtime/cmd/ovav/main.go": "eb9e9fb44e2f625a21595f39e9854485dda8eff3bcd60c265c60f28048a5a7e1",
     "go-runtime/cmd/ovav/main_test.go": "7ef017ad9c397abc295f85e8dc66e3be96a471422fe9dee25f9c3510a7dfa743",
     "go-runtime/cmd/ovav/memory_cli.go": "191dbfc74f3bd6613c90b3b7a623902d9b6896c7b5ba875348cce02b0af03d7d",
     "go-runtime/cmd/ovav/monitor_cli.go": "e9c67ab80d8e8781dab732ae97c1f9d37ed615ee6e8b83ffc3f7b5ba54088b61",
@@ -1498,6 +1498,7 @@
     "go-runtime/cmd/ovav/session_atomic_linux.go": "f634cf5e80ab16412fe4ea11f790bff1847c330765b730d00cb95e5f2d1c1c65",
     "go-runtime/cmd/ovav/session_atomic_other.go": "0bcd2bccae8148f33b4ad608f103d1345dbab1f9132a84c28b824340e5c95530",
     "go-runtime/cmd/ovav/smoke_cli.go": "292c16313faba385e1152059cae2c47c83944e8a7863d9093fb66442d9c65635",
+    "go-runtime/cmd/ovav/smoke_expanded_cli.go": "656ed42683b3bae97429d1640a264d9f573f1d72efe366dadd4b71f45c4f46e3",
     "go-runtime/cmd/ovav/sync_cli.go": "82beb0a64b1b260cb701bf555bb5fda361326c53cad75f3bb5a925caf5f27cf9",
     "go-runtime/cmd/ovav/terminal_cli.go": "a0c72e40a08e89d43ef422e7c62cb4befe013aec7ec8f5edc7cd7b12844ffacf",
     "go-runtime/cmd/ovav/validate_fix.go": "601515a35325e59bf3c9bb8d6f96fa7b68dac57b33a0a1ffe79531cf01f30068",
