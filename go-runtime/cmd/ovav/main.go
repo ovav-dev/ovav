@@ -1055,6 +1055,18 @@ func cmdValidate(args []string) int {
 		if a == "--fix" || a == "--fix-list" {
 			return cmdValidateFix(args)
 		}
+		if a == "--help" || a == "-h" {
+			fmt.Println(`OVAV validate — run validation gates
+
+Usage:
+  ovav validate                  # Run all validators (dev mode)
+  ovav validate --mode=gate      # Gate mode (strict)
+  ovav validate --target=X       # Run specific validator
+  ovav validate --fix            # Auto-remediate SAFE_FIX validators (ADR-011)
+  ovav validate --fix-list       # List SAFE_FIX validators
+  ovav validate --help           # This help`)
+			return 0
+		}
 	}
 
 	repoRoot, err := cli.FindRepoRoot()
