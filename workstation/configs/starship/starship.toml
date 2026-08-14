@@ -1,21 +1,8 @@
 # ─────────────────────────────────────────────────────────────
 #  OVAV Night / Day — Starship prompt
-#  Auto-detects via OSC 11 (background query) when supported.
-#  Falls back to Starship palette switching via env var.
+#  Palette selection via $STARSHIP_PALETTE (set by ~/.bashrc
+#  based on $INTELLIGENT_TERMINAL_THEME — see workstation configs).
 # ─────────────────────────────────────────────────────────────
-
-# Detect dark vs light background via OSC 11 query at shell start.
-# Sets STARSHIP_PALETTE accordingly.
-__ovav_detect_palette() {
-  # If Intelligent Terminal exposed $INTELLIGENT_TERMINAL_THEME use it
-  case "${INTELLIGENT_TERMINAL_THEME:-}" in
-    light) export STARSHIP_PALETTE="ovav-day"; return ;;
-    dark)  export STARSHIP_PALETTE="ovav-night"; return ;;
-  esac
-  # Otherwise default to night (OVAV dev preference)
-  export STARSHIP_PALETTE="ovav-night"
-}
-__ovav_detect_palette
 
 # ─── OVAV NIGHT palette ────────────────────────────────────
 [palettes.ovav-night]
