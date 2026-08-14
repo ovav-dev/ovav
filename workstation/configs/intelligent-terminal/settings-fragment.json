@@ -5,7 +5,7 @@
     "list": [
       {
         "name": "OVAV Ubuntu",
-        "guid": "{OVAV-UBUNTU-PROFILE-0001-000000000001}",
+        "guid": "{e3cb3da9-9980-5990-a951-339efdad913d}",
         "source": "Windows.Terminal.Wsl",
         "commandline": "wsl.exe -d Ubuntu-26.04 --cd /home/braka/Systems/ovav",
         "startingDirectory": null,
@@ -31,7 +31,7 @@
       },
       {
         "name": "OpenCode Ubuntu",
-        "guid": "{OVAV-OPENCODE-PROFILE-0001-000000000002}",
+        "guid": "{9de564ce-d049-51b4-bb4d-b60eca2099a1}",
         "source": "Windows.Terminal.Wsl",
         "commandline": "wsl.exe -d Ubuntu-26.04 --cd /home/braka/Systems/ovav -- opencode",
         "startingDirectory": null,
@@ -53,7 +53,7 @@
       },
       {
         "name": "OVAV Scratch",
-        "guid": "{OVAV-SCRATCH-PROFILE-0001-000000000003}",
+        "guid": "{9d51175e-781c-527d-8fc0-82953d909933}",
         "source": "Windows.Terminal.Wsl",
         "commandline": "wsl.exe -d Ubuntu-26.04",
         "startingDirectory": null,
