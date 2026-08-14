@@ -137,6 +137,8 @@ func routeCommand(cmd string, args []string) int {
 		return cmdDrift(args)
 	case "ci":
 		return cmdCI(args)
+	case "docs":
+		return cmdDocs(args)
 	case "it":
 		return cmdIT(args)
 	default:
