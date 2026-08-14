@@ -4,7 +4,7 @@
   "project": "OVAV",
   "hash_algorithm": "sha256",
   "metadata": {
-    "git_identity": "884acc6e9b5a21d9091c154e04184096a32c1c34a248da64d4422b14c681f49f"
+    "git_identity": "dacaf6c44916ea47f73b39e7fe734053d84842721e0ed606285837fcb98c00ec"
   },
   "policy": {
     "version": "tracked-content-v1",
@@ -1459,7 +1459,6 @@
     "go-runtime/cmd/ovav/deploy_test.go": "e90362dcea6dc6f927391ac2f30b639560af38b527bdb088fc84b9bcad7fc753",
     "go-runtime/cmd/ovav/dispatch.go": "52fc82d96ea2850f9ee68d15eaad8f948422e8d2e8e7bb3ae9f4a89c8e4d0acf",
     "go-runtime/cmd/ovav/dispatch_test.go": "585928b8d9c70d053f844be5f8a27819c675957ed9462d1b754287cee354c0ce",
-    "go-runtime/cmd/ovav/drift_cli.go": "61a1f5890e9bb72e6a3c9cf4c213958843a60fec461b50def4e319a59e43d06b",
     "go-runtime/cmd/ovav/drift_show.go": "48ce847931f1ae4b9f3b59e54f1d2a170671c9b805a41b2b4dfa8798c24911a6",
     "go-runtime/cmd/ovav/drift_targets.go": "ec193565cb8095da8af27c0325495de6baa8890a555058988361f7cdf9f95f36",
     "go-runtime/cmd/ovav/drift_test.go": "a185b7a2ba663abc8c35d39cdfc6a9f5a98e7767a80a7a053a16f32ad7d4903f",
@@ -2616,7 +2615,6 @@
     "tools/cpanel/oauth_config.yaml": "bf0be95f7467969d79a00f4efa8a10459ad2420297d158002101b172231d5e7b",
     "tools/cpanel/package.json": "e8516d0713d2126180a6033ccd38f940d2d7c37398d09fe91dcab75bb705488a",
     "tools/cpanel/pnpm-lock.yaml": "21b4fcdbc1bd915ea412c21336ea22fdcf086c6e7bd0a8f3f22539d6331cf23d",
-    "tools/cpanel/pnpm-workspace.yaml": "ac02d96368617c760f093cfe61fdec64b6244007ab3553e0d6621f706f54a353",
     "tools/cpanel/src/App.css": "791272ce8b7d4da4437b7b8c9d5867728cfee7e7adc38cead1ea103e85acf3fd",
     "tools/cpanel/src/App.tsx": "aa59c99ba93774fa8bf021e654e62dcf37cc12741c2f5f9b7d74312ff215af43",
     "tools/cpanel/src/__tests__/App.test.tsx": "0d68190cbce079859ec827d9472b7b0c32c23f565001caaf28a5ee4eeae023dc",
