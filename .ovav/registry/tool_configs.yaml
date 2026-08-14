@@ -86,6 +86,15 @@ tool_config_profiles:
           OVAV_IT_SETTINGS: "absolute path to settings.json (required, no default)"
           OVAV_IT_STATE: "absolute path to state.json (required, no default)"
           OVAV_BACKUP_DIR: 'backup destination (default: $HOME/.ovav-backups, configurable)'
+      - id: deploy-it-keybindings
+        path: workstation/scripts/deploy-it-keybindings.sh
+        purpose: surgical merge of fragment into live settings.json (idempotent deploy)
+        runner: bash
+        env_contract:
+          OVAV_LIVE_IT_SETTINGS: "absolute path to live settings.json (required, no default)"
+          OVAV_FRAGMENT: 'fragment source (default: $OVAV_ROOT/workstation/configs/intelligent-terminal/settings-fragment.json)'
+          OVAV_BACKUP_DIR: 'backup destination (default: $HOME/.ovav-backups)'
+          OVAV_DRY_RUN: 'if "1", report diff without writing (default: 0)'
     apply_posture:
       default: user_invoked_only
       requires:

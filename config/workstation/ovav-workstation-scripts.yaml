@@ -49,6 +49,14 @@ recommended_mode:
       writes_to_disk: true
       requires_backup: true
       kills_processes: false
+    deploy-it-keybindings:
+      path: workstation/scripts/deploy-it-keybindings.sh
+      side_effects: merges_fragment_into_live_settings_json_with_backup
+      writes_to_disk: true
+      requires_backup: true
+      idempotent: true
+      kills_processes: false
+      dry_run_supported: true
 
 must_validate:
   - scripts_root_exists
