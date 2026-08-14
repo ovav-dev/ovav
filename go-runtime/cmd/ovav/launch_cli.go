@@ -12,16 +12,21 @@ import (
 
 // cmdLaunch dispatches ovav launch subcommands.
 //
-// Usage: ovav launch <subcommand>
+// Per ADR-014 (zero-touch launch), running 'ovav launch' with no args launches
+// the interactive wizard that handles the entire ceremony autonomously.
+//
+// Usage: ovav launch [<subcommand>]
 // Subcommands:
-//   evidence   — capture final smoke evidence
-//   tag        — create v1.0.0-rc.1 tag
-//   verify     — final launch verification (CEO waiver required)
-//   status     — show current launch readiness
-//   roadmap    — print 2027 roadmap
+//   (default)    — interactive wizard (smart autonomous flow)
+//   status       — quick readiness check
+//   evidence     — capture artifacts
+//   tag          — create v1.0.0-rc.1 tag
+//   verify       — final verification (CEO waiver)
+//   ceo-decide   — single CEO gate decision
+//   roadmap      — 2027 roadmap
 func cmdLaunch(args []string) int {
 	if len(args) == 0 {
-		return runLaunchStatus(args)
+		return runLaunchWizard(args)
 	}
 	switch args[0] {
 	case "evidence":
@@ -34,6 +39,10 @@ func cmdLaunch(args []string) int {
 		return runLaunchStatus(args[1:])
 	case "roadmap":
 		return runLaunchRoadmap(args[1:])
+	case "wizard":
+		return runLaunchWizard(args[1:])
+	case "ceo-decide":
+		return runLaunchCEODecide(args[1:])
 	case "help", "--help", "-h":
 		printLaunchHelp()
 		return 0
@@ -45,19 +54,257 @@ func cmdLaunch(args []string) int {
 }
 
 func printLaunchHelp() {
-	fmt.Println(`OVAV launch — GA promotion ceremony
+	fmt.Println(`OVAV launch — zero-touch GA promotion (ADR-014)
 
-Per ADR-013, GA promotion is a 4-step ceremony requiring CEO waiver
-for the final verification.
+The single entry point for GA promotion. No commands to memorize.
 
 Usage:
-  ovav launch status       # Current launch readiness
-  ovav launch evidence     # Capture final smoke evidence
-  ovav launch tag          # Create v1.0.0-rc.1 tag
-  ovav launch verify       # Final verification (requires CEO waiver)
-  ovav launch roadmap      # 2027 roadmap
+  ovav launch                        # Interactive wizard (default)
+  ovav launch --status               # Quick readiness check
+  ovav launch --prepare              # Auto-execute fixable actions
+  ovav launch --all --reason=...     # Non-interactive (CI mode)
+  ovav launch --info                  # Read-only
 
-Each step is gated. Step 4 (verify) requires --ceo-waiver flag.`)
+Subcommands (power users):
+  ovav launch status                  # Quick readiness
+  ovav launch evidence                # Capture artifacts
+  ovav launch tag                     # Create v1.0.0-rc.1
+  ovav launch verify --ceo-waiver     # Final verification
+  ovav launch ceo-decide --gate=X    # Single CEO gate
+  ovav launch roadmap                 # 2027 roadmap
+
+The wizard:
+1. Detects state (no CEO knowledge needed)
+2. Auto-executes safe actions
+3. Prompts only for CEO decisions (with full context)
+4. Validates post-state (auto-rollback if regressed)
+5. Logs every step
+
+Run 'ovav launch' to start.`)
+}
+
+// runLaunchCEODecide handles a single CEO gate decision.
+//
+// Per ADR-014, instead of running 3 separate commands (pin, verify, tag),
+// CEO can run a single command per decision:
+//
+//   ovav launch ceo-decide --gate=pin --reason="golden state approved"
+//   ovav launch ceo-decide --gate=verify --reason="all gates pass"
+//   ovav launch ceo-decide --gate=tag --reason="evidence captured"
+//
+// Each decision is gated on previous + audit-logged.
+func runLaunchCEODecide(args []string) int {
+	gate := ""
+	reason := ""
+
+	for _, a := range args {
+		switch {
+		case strings.HasPrefix(a, "--gate="):
+			gate = strings.TrimPrefix(a, "--gate=")
+		case strings.HasPrefix(a, "--reason="):
+			reason = strings.TrimPrefix(a, "--reason=")
+		}
+	}
+
+	if gate == "" {
+		fmt.Println("🚫 CEO decide requires --gate=<name>")
+		fmt.Println()
+		fmt.Println("Available CEO gates:")
+		fmt.Println("  pin      — Approve current baseline as golden state")
+		fmt.Println("  verify   — Final launch verification (closes ceremony)")
+		fmt.Println("  tag      — Approve tag push to remote")
+		return 1
+	}
+
+	if reason == "" {
+		fmt.Println("⚠️  CEO decide requires --reason=<your reason>")
+		fmt.Println("    The reason is logged to the audit trail.")
+		return 1
+	}
+
+	fmt.Printf("🛡️  CEO Decision: %s\n", gate)
+	fmt.Printf("Reason: %s\n\n", reason)
+
+	switch gate {
+	case "pin":
+		return runCEOPin(reason)
+	case "verify":
+		return runCEOVerify(reason)
+	case "tag":
+		return runCEOTag(reason)
+	default:
+		fmt.Printf("Unknown CEO gate: %s\n", gate)
+		return 1
+	}
+}
+
+// runCEOPin handles the pin decision (approves current baseline).
+func runCEOPin(reason string) int {
+	root, err := cliFindRepoRootSafe()
+	if err != nil {
+		return 1
+	}
+
+	// Copy current baseline to pinned
+	src := filepath.Join(root, ".ovav", "integrity_backups", "baseline.json")
+	dst := filepath.Join(root, ".ovav", "integrity_backups", "baseline.pinned.json")
+
+	data, err := os.ReadFile(src)
+	if err != nil {
+		fmt.Printf("❌ Cannot read current baseline: %v\n", err)
+		return 1
+	}
+
+	if err := os.WriteFile(dst, data, 0o644); err != nil {
+		fmt.Printf("❌ Cannot write pinned baseline: %v\n", err)
+		return 1
+	}
+
+	// Log decision
+	logCEODecision(root, "pin", reason)
+	fmt.Println("✅ Pinned baseline created")
+	fmt.Printf("   %s\n", dst)
+	fmt.Println()
+	fmt.Println("Next: ovav launch (wizard will detect this gate passing)")
+	return 0
+}
+
+// runCEOVerify handles the final verification decision.
+func runCEOVerify(reason string) int {
+	root, err := cliFindRepoRootSafe()
+	if err != nil {
+		return 1
+	}
+
+	// Re-check all gates
+	report, err := runLaunchWizardCheckOnly(root)
+	if err != nil {
+		return 1
+	}
+
+	if report.Overall != "ready" {
+		fmt.Println("🚫 Cannot verify — some gates failed:")
+		for _, g := range report.Gates {
+			if g.Status != "pass" {
+				fmt.Printf("   ❌ %s — %s\n", g.ID, g.Detail)
+			}
+		}
+		fmt.Println()
+		fmt.Println("Fix issues first, then retry: ovav launch --prepare")
+		return 1
+	}
+
+	// Update caps.yaml
+	capsPath := filepath.Join(root, ".ovav", "plan", "caps.yaml")
+	data, err := os.ReadFile(capsPath)
+	if err != nil {
+		fmt.Printf("❌ Cannot read caps.yaml: %v\n", err)
+		return 1
+	}
+
+	content := string(data)
+	content = strings.ReplaceAll(content, "launch_verification_blocked", "production_ready")
+	content = strings.ReplaceAll(content, "source-local launch candidate", "production_ready")
+	content = strings.ReplaceAll(content, "blocked_pending_baseline_and_candidate_closure", "verified_production_ready")
+
+	if err := os.WriteFile(capsPath, []byte(content), 0o644); err != nil {
+		fmt.Printf("❌ Cannot write caps.yaml: %v\n", err)
+		return 1
+	}
+
+	// Log decision
+	logCEODecision(root, "verify", reason)
+	fmt.Println("✅ Launch verification COMPLETE")
+	fmt.Println()
+	fmt.Println("OVAV is now in 'production_ready' state.")
+	fmt.Println("Tag v1.0.0-rc.1 should be created (auto via 'ovav launch tag')")
+	return 0
+}
+
+// runCEOTag handles the tag-push decision.
+func runCEOTag(reason string) int {
+	root, err := cliFindRepoRootSafe()
+	if err != nil {
+		return 1
+	}
+
+	// Create tag if not exists
+	out, _ := exec.Command("git", "tag", "-l", "v1.0.0-rc.1").Output()
+	if !strings.Contains(string(out), "v1.0.0-rc.1") {
+		fmt.Println("🏷️  Creating tag v1.0.0-rc.1...")
+		tagMsg := fmt.Sprintf("OVAV v1.0.0 Release Candidate 1\n\nCEO waiver reason: %s", reason)
+		exec.Command("git", "tag", "-a", "v1.0.0-rc.1", "-m", tagMsg).Run()
+	}
+
+	// Log decision
+	logCEODecision(root, "tag", reason)
+	fmt.Println("✅ Tag v1.0.0-rc.1 created")
+	fmt.Println()
+	fmt.Println("Note: 'git push origin v1.0.0-rc.1' is intentionally manual")
+	fmt.Println("      (per CRIT-006: irreversible actions stay human-controlled)")
+	return 0
+}
+
+// runLaunchWizardCheckOnly is the read-only state check (used by runCEOVerify).
+func runLaunchWizardCheckOnly(root string) (ReadinessReport, error) {
+	gates := getLaunchGates()
+	report := ReadinessReport{
+		Timestamp: time.Now().UTC().Format(time.RFC3339),
+		RepoRoot:  root,
+	}
+	for _, gate := range gates {
+		passed, detail, autoFixable := gate.Check(root)
+		status := "fail"
+		if passed {
+			status = "pass"
+		}
+		report.Gates = append(report.Gates, GateReport{
+			ID:          gate.ID,
+			Description: gate.Description,
+			Status:      status,
+			Detail:      detail,
+			CEORequired: gate.CEORequired,
+			AutoFixable: autoFixable,
+		})
+	}
+	// Determine overall
+	allPass := true
+	hasCEO := false
+	for _, gr := range report.Gates {
+		if gr.Status != "pass" {
+			allPass = false
+		}
+		if gr.CEORequired && gr.Status != "pass" {
+			hasCEO = true
+		}
+	}
+	if allPass {
+		report.Overall = "ready"
+	} else if hasCEO {
+		report.Overall = "needs-ceo-attention"
+	} else {
+		report.Overall = "blocked"
+	}
+	return report, nil
+}
+
+// logCEODecision appends to audit trail.
+func logCEODecision(root, gate, reason string) {
+	dir := filepath.Join(root, ".ovav", "registry")
+	os.MkdirAll(dir, 0o755)
+	path := filepath.Join(dir, "ceo_decisions.jsonl")
+	f, _ := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
+	if f != nil {
+		defer f.Close()
+		entry, _ := json.Marshal(map[string]interface{}{
+			"timestamp": time.Now().UTC().Format(time.RFC3339),
+			"operator":  os.Getenv("USER"),
+			"gate":      gate,
+			"reason":    reason,
+		})
+		f.Write(entry)
+		f.Write([]byte("\n"))
+	}
 }
 
 // runLaunchStatus shows current readiness for GA promotion.
