@@ -1,356 +1,82 @@
 {
- "_comment": "OVAV workstation IT v0.2 fragment. 4 uppercase profiles OVAV/SYS/HUB/WIN. Real UUID5 GUIDs. 8 actions including Reload Settings recovery.",
- "defaultProfile": "{e3cb3da9-9980-5990-a951-339efdad913d}",
- "theme": {
-  "light": "OVAV Day UI",
-  "dark": "OVAV Night UI"
- },
- "themes": [
-  {
-   "name": "OVAV Night UI",
-   "tab": {
-    "background": "terminalBackground",
-    "unfocusedBackground": "#0B1020CC",
-    "showCloseButton": "activeOnly",
-    "iconStyle": "monochrome"
-   },
-   "tabRow": {
-    "background": "#0B1020",
-    "unfocusedBackground": "#0A0E1A"
-   },
-   "window": {
-    "applicationTheme": "dark",
-    "useMica": true,
-    "frame": "#2A3A5C",
-    "unfocusedFrame": "#111827"
-   }
+  "_comment": "OVAV IT v0.2 fragment \u2014 MINIMAL schema. No newTabMenu/themes[]/actions[] experimental. Only defaultProfile + theme (STRING) + profiles + schemes.",
+  "$schema": "https://aka.ms/terminal-profiles-schema",
+  "defaultProfile": "{e3cb3da9-9980-5990-a951-339efdad913d}",
+  "theme": "dark",
+  "profiles": {
+    "list": [
+      {
+        "commandline": "wsl.exe -d Ubuntu-26.04",
+        "guid": "{e3cb3da9-9980-5990-a951-339efdad913d}",
+        "name": "OVAV",
+        "startingDirectory": "//wsl.localhost/Ubuntu-26.04/home/braka/Systems/ovav"
+      },
+      {
+        "commandline": "wsl.exe -d Ubuntu-26.04",
+        "guid": "{445f0540-815b-5751-9045-de7354bf23b5}",
+        "name": "SYS",
+        "startingDirectory": "//wsl.localhost/Ubuntu-26.04/home/braka/.config"
+      },
+      {
+        "commandline": "wsl.exe -d Ubuntu-26.04",
+        "guid": "{3effc6bf-75c0-5786-8d37-54b6f9707eb4}",
+        "name": "HUB",
+        "startingDirectory": "//wsl.localhost/Ubuntu-26.04/home/braka/Systems"
+      },
+      {
+        "commandline": "wsl.exe -d Ubuntu-26.04",
+        "guid": "{29516ade-0377-5279-ada0-c37d2200eb7d}",
+        "name": "WIN",
+        "startingDirectory": "//wsl.localhost/Ubuntu-26.04/mnt/c/Users/Alexa"
+      }
+    ]
   },
-  {
-   "name": "OVAV Day UI",
-   "tab": {
-    "background": "terminalBackground",
-    "unfocusedBackground": "#F7F9FCCC",
-    "showCloseButton": "activeOnly",
-    "iconStyle": "monochrome"
-   },
-   "tabRow": {
-    "background": "#F7F9FC",
-    "unfocusedBackground": "#EEF2F7"
-   },
-   "window": {
-    "applicationTheme": "light",
-    "useMica": true,
-    "frame": "#6EA8FE",
-    "unfocusedFrame": "#94A3B8"
-   }
-  }
- ],
- "tabRow": {
-  "background": "#0B1020",
-  "height": 36
- },
- "newTabMenu": [
-  {
-   "type": "action",
-   "id": "OVAV Workspace"
-  },
-  {
-   "type": "separator"
-  },
-  {
-   "type": "profile",
-   "profile": "OVAV"
-  },
-  {
-   "type": "profile",
-   "profile": "SYS"
-  },
-  {
-   "type": "profile",
-   "profile": "HUB"
-  },
-  {
-   "type": "profile",
-   "profile": "WIN"
-  }
- ],
- "showTabsInTitlebar": true,
- "useAcrylicInTabRow": false,
- "useMica": true,
- "tintOpacity": 92,
- "tintColor": "#0B1020",
- "tabWidthMode": "compact",
- "tabSwitcherMode": "mru",
- "windowingBehavior": "useAnyExisting",
- "snapToGridOnResize": true,
- "showTerminalTitleInTitlebar": true,
- "profiles": {
-  "defaults": {
-   "colorScheme": {
-    "light": "OVAV Day",
-    "dark": "OVAV Night"
-   },
-   "opacity": 96,
-   "useAcrylic": false,
-   "padding": "10, 14, 10, 14",
-   "scrollbarState": "hidden"
-  },
-  "list": [
-   {
-    "name": "OVAV",
-    "guid": "{e3cb3da9-9980-5990-a951-339efdad913d}",
-    "source": "Windows.Terminal.Wsl",
-    "commandline": "wsl.exe -d Ubuntu-26.04 --cd /home/braka/Systems/ovav",
-    "startingDirectory": "//wsl.localhost/Ubuntu-26.04/home/braka/Systems/ovav",
-    "font": {
-     "face": "JetBrainsMono NFM",
-     "size": 13,
-     "weight": "normal"
+  "schemes": [
+    {
+      "background": "#F7F9FC",
+      "black": "#1B2430",
+      "blue": "#2563EB",
+      "brightBlack": "#475569",
+      "brightBlue": "#1D4ED8",
+      "brightCyan": "#0E7490",
+      "brightGreen": "#15803D",
+      "brightPurple": "#6D28D9",
+      "brightRed": "#E11D48",
+      "brightWhite": "#0F172A",
+      "brightYellow": "#A16207",
+      "cursorColor": "#0F766E",
+      "cyan": "#0F766E",
+      "foreground": "#1B2430",
+      "green": "#1F7A4C",
+      "name": "OVAV Day",
+      "purple": "#7C3AED",
+      "red": "#C24156",
+      "selectionBackground": "#BFDBFE",
+      "white": "#E2E8F0",
+      "yellow": "#8A5A00"
     },
-    "icon": "\ud83d\udd37",
-    "tabTitle": "\ud83d\udd37 OVAV",
-    "tabColor": "#1E3A8A",
-    "padding": "10, 14, 10, 14",
-    "snapOnInput": true,
-    "altGrAliasing": true,
-    "cursorShape": "bar",
-    "cursorHeight": 100,
-    "antialiasingMode": "grayscale",
-    "scrollbarState": "hidden",
-    "suppressApplicationTitle": true,
-    "hidden": false
-   },
-   {
-    "name": "SYS",
-    "guid": "{445F0540-815B-5751-9045-DE7354BF23B5}",
-    "source": "Windows.Terminal.Wsl",
-    "commandline": "wsl.exe -d Ubuntu-26.04 --cd /home/braka/.config",
-    "startingDirectory": "//wsl.localhost/Ubuntu-26.04/home/braka/.config",
-    "font": {
-     "face": "JetBrainsMono NFM",
-     "size": 13,
-     "weight": "normal"
-    },
-    "icon": "\u2699\ufe0f",
-    "tabTitle": "\u2699\ufe0f SYS",
-    "tabColor": "#115E59",
-    "padding": "10, 14, 10, 14",
-    "snapOnInput": true,
-    "altGrAliasing": true,
-    "cursorShape": "underscore",
-    "cursorHeight": 25,
-    "antialiasingMode": "grayscale",
-    "scrollbarState": "hidden",
-    "suppressApplicationTitle": true,
-    "hidden": false
-   },
-   {
-    "name": "HUB",
-    "guid": "{3EFFC6BF-75C0-5786-8D37-54B6F9707EB4}",
-    "source": "Windows.Terminal.Wsl",
-    "commandline": "wsl.exe -d Ubuntu-26.04 --cd /home/braka/Systems",
-    "startingDirectory": "//wsl.localhost/Ubuntu-26.04/home/braka/Systems",
-    "font": {
-     "face": "JetBrainsMono NFM",
-     "size": 13,
-     "weight": "normal"
-    },
-    "icon": "\ud83d\udcc1",
-    "tabTitle": "\ud83d\udcc1 HUB",
-    "tabColor": "#7E22CE",
-    "padding": "10, 14, 10, 14",
-    "snapOnInput": true,
-    "altGrAliasing": true,
-    "cursorShape": "bar",
-    "cursorHeight": 100,
-    "antialiasingMode": "grayscale",
-    "scrollbarState": "hidden",
-    "suppressApplicationTitle": true,
-    "hidden": false
-   },
-   {
-    "name": "WIN",
-    "guid": "{29516ADE-0377-5279-ADA0-C37D2200EB7D}",
-    "source": "Windows.Terminal.Wsl",
-    "commandline": "wsl.exe -d Ubuntu-26.04 --cd /mnt/c/Users/Alexa",
-    "startingDirectory": "//wsl.localhost/Ubuntu-26.04/mnt/c/Users/Alexa",
-    "font": {
-     "face": "JetBrainsMono NFM",
-     "size": 13,
-     "weight": "normal"
-    },
-    "icon": "\ud83e\ude9f",
-    "tabTitle": "\ud83e\ude9f WIN",
-    "tabColor": "#B45309",
-    "padding": "10, 14, 10, 14",
-    "snapOnInput": true,
-    "altGrAliasing": true,
-    "cursorShape": "filledBox",
-    "cursorHeight": 25,
-    "antialiasingMode": "grayscale",
-    "scrollbarState": "hidden",
-    "suppressApplicationTitle": true,
-    "hidden": false
-   }
+    {
+      "background": "#0B1020",
+      "black": "#1A2233",
+      "blue": "#6EA8FE",
+      "brightBlack": "#4A5568",
+      "brightBlue": "#8FBEFF",
+      "brightCyan": "#80F0DE",
+      "brightGreen": "#9FF1A1",
+      "brightPurple": "#D4B5FF",
+      "brightRed": "#FF8FA3",
+      "brightWhite": "#E8EEF8",
+      "brightYellow": "#F5D88A",
+      "cursorColor": "#5EEAD4",
+      "cyan": "#5EEAD4",
+      "foreground": "#D8E1F0",
+      "green": "#7EE787",
+      "name": "OVAV Night",
+      "purple": "#C099FF",
+      "red": "#FF6B81",
+      "selectionBackground": "#2A3A5C",
+      "white": "#C9D1E0",
+      "yellow": "#F2CC60"
+    }
   ]
- },
- "schemes": [
-  {
-   "background": "#F7F9FC",
-   "black": "#1B2430",
-   "blue": "#2563EB",
-   "brightBlack": "#475569",
-   "brightBlue": "#1D4ED8",
-   "brightCyan": "#0E7490",
-   "brightGreen": "#15803D",
-   "brightPurple": "#6D28D9",
-   "brightRed": "#E11D48",
-   "brightWhite": "#0F172A",
-   "brightYellow": "#A16207",
-   "cursorColor": "#0F766E",
-   "cyan": "#0F766E",
-   "foreground": "#1B2430",
-   "green": "#1F7A4C",
-   "name": "OVAV Day",
-   "purple": "#7C3AED",
-   "red": "#C24156",
-   "selectionBackground": "#BFDBFE",
-   "white": "#E2E8F0",
-   "yellow": "#8A5A00"
-  },
-  {
-   "background": "#0B1020",
-   "black": "#1A2233",
-   "blue": "#6EA8FE",
-   "brightBlack": "#4A5568",
-   "brightBlue": "#8FBEFF",
-   "brightCyan": "#80F0DE",
-   "brightGreen": "#9FF1A1",
-   "brightPurple": "#D4B5FF",
-   "brightRed": "#FF8FA3",
-   "brightWhite": "#E8EEF8",
-   "brightYellow": "#F5D88A",
-   "cursorColor": "#5EEAD4",
-   "cyan": "#5EEAD4",
-   "foreground": "#D8E1F0",
-   "green": "#7EE787",
-   "name": "OVAV Night",
-   "purple": "#C099FF",
-   "red": "#FF6B81",
-   "selectionBackground": "#2A3A5C",
-   "white": "#C9D1E0",
-   "yellow": "#F2CC60"
-  }
- ],
- "actions": [
-  {
-   "name": "OVAV Workspace",
-   "commandline": {
-    "actions": [
-     {
-      "type": "newTab",
-      "profile": "OVAV",
-      "tabTitle": "OVAV \u2014 Main"
-     },
-     {
-      "type": "splitPane",
-      "split": "vertical",
-      "profile": "WIN",
-      "tabTitle": "Agent"
-     },
-     {
-      "type": "splitPane",
-      "split": "horizontal",
-      "profile": "OVAV",
-      "tabTitle": "Logs"
-     }
-    ]
-   },
-   "keybind": "ctrl+shift+grave"
-  },
-  {
-   "name": "OVAV Reload Settings",
-   "commandline": {
-    "actions": [
-     {
-      "type": "reloadSettings"
-     }
-    ]
-   },
-   "keybind": "ctrl+shift+r"
-  },
-  {
-   "name": "New OVAV Tab",
-   "commandline": {
-    "actions": [
-     {
-      "type": "newTab",
-      "profile": "OVAV"
-     }
-    ]
-   },
-   "keybind": "ctrl+shift+t"
-  },
-  {
-   "name": "Split Vertical",
-   "commandline": {
-    "actions": [
-     {
-      "type": "splitPane",
-      "split": "vertical",
-      "profile": "${profile.name}"
-     }
-    ]
-   },
-   "keybind": "ctrl+alt+d"
-  },
-  {
-   "name": "Split Horizontal",
-   "commandline": {
-    "actions": [
-     {
-      "type": "splitPane",
-      "split": "horizontal",
-      "profile": "${profile.name}"
-     }
-    ]
-   },
-   "keybind": "ctrl+alt+s"
-  },
-  {
-   "name": "Focus Left",
-   "commandline": {
-    "actions": [
-     {
-      "type": "moveFocus",
-      "direction": "left"
-     }
-    ]
-   },
-   "keybind": "alt+left"
-  },
-  {
-   "name": "Focus Right",
-   "commandline": {
-    "actions": [
-     {
-      "type": "moveFocus",
-      "direction": "right"
-     }
-    ]
-   },
-   "keybind": "alt+right"
-  },
-  {
-   "name": "Toggle Zoom",
-   "commandline": {
-    "actions": [
-     {
-      "type": "togglePaneZoom"
-     }
-    ]
-   },
-   "keybind": "ctrl+shift+z"
-  }
- ]
 }
