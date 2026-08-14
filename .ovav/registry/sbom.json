@@ -4,7 +4,7 @@
   "project": "OVAV",
   "hash_algorithm": "sha256",
   "metadata": {
-    "git_identity": "615ed761d8f85a7b2603e3e0b55ef38ae811e804be0a6528cb64cf58c9554b20"
+    "git_identity": "ce9302fd1b974d11c2cb38a45024a23f6f91ab4b0bdfa49e7f6f5fca0c0d057e"
   },
   "policy": {
     "version": "tracked-content-v1",
@@ -2753,6 +2753,27 @@
     "web/frontend/tailwind.config.js": "28df76442fbe221316120727c6fb111ec0ec27aabc6e3bcf210f184767a5c6b2",
     "web/frontend/tsconfig.json": "75daa8c513a76f7ccf25abfd264c438e427bc4aaca96e10284fb66f02e4744b1",
     "web/start.sh": "9aa5951e7d3451dab91f478078a6765f18391d8bb68dba56abecf54b5a6a68f6",
+    "workstation/README.md": "faeefc5287c06fb379e773907c562962f19a661fee4e36f261fe93df55ad6b35",
+    "workstation/configs/atuin/config.toml": "922d004ef72a26f150ef1a3ddb87589ef7cb3127b7945b7fefd7f779a2e5f427",
+    "workstation/configs/bashrc/ovav.bashrc": "62b18c0d921b5270d707ec7f47e28a5923367387b4ca8863e07f78a3fe55813a",
+    "workstation/configs/intelligent-terminal/settings-fragment.json": "b2c01bdb000282ab68befab9c02430ac11a820a027b89bae2966b8b16352b658",
+    "workstation/configs/opencode/themes/ovav-day.json": "c25315273b4766f2bf08cd4245a8724dbbf8f8ba4d3d21638e363543ca6e8b95",
+    "workstation/configs/opencode/themes/ovav-night.json": "ee7fb9f29e0b8245f5d7f998348d5fc228bc9b3f27d268af8bd4a5cd130b4af9",
+    "workstation/configs/opencode/tui.json": "f464c7b327493e388ec0ea00cce101d5ab5fe52793e1c0540cb52cef1c57f516",
+    "workstation/configs/powershell/Microsoft.PowerShell_profile.ps1": "f8526a056bda7c291fd3da84428e56c199bf7c82a303153907176cf5ec850091",
+    "workstation/configs/starship/starship.toml": "57a6c21611b3411d8e27581c191ae0e16c07367f84148f21f7983a9c2ac61d8f",
+    "workstation/docs/ARCHITECTURE.md": "f9f0cfcea685ec37731da7bd78b4ce4e89d4790464a6fea0d095d4eec42f3209",
+    "workstation/docs/CHEATSHEET.md": "72ce27b22d29b92a28488da72df75b34b92c4d4ad1cd193e83a2406979c7fbe8",
+    "workstation/docs/DECISIONS.md": "c571aa6267bb2e9eb84f8cdf11219cffb096fb58de66742ca19049eab979b373",
+    "workstation/scripts/benchmark.sh": "097bbf3485b638057858e282939caab53886ed75f6cf924c656abf489dbcf8e8",
+    "workstation/scripts/dedupe-bashrc.sh": "ae722b79d946aed526fa8a074eeaec2f6e3d77678092d406205d197de60312d5",
+    "workstation/scripts/fix-bashrc.sh": "7963530a112d55335be3ce49a2cc6a2fe6594dfb0e31016cc0dc957b646e8c83",
+    "workstation/scripts/install.sh": "75b9e6ed2090430182a1775ef8b50412c94b77e56a8d898c630e39e03f36b921",
+    "workstation/scripts/repair-bashrc.sh": "6224a8cbbb5c71af63a2328e7b28030455c0934613a2a39d05c2310c0f556b3a",
+    "workstation/scripts/restore-missing-inits.sh": "be937438d569d14c1925e9c6216e577267331f1935af51ee7d896774308cab8e",
+    "workstation/scripts/restore-simple.sh": "0cecfcda2c260ecbb3d51fdbd0c8b0ce8b6dced29359777f4ab7afac4d199afc",
+    "workstation/scripts/rollback.sh": "92e3fa5b541f882e1aa35790c3ede39e358a7a55b382a0214061d3252720c871",
+    "workstation/tests/test-e2e.sh": "1feb14b3066582138afc00e1884dd96f9c9c1fd8b84c0b05efb2b9725b5a6bd4",
     "wrangler.toml": "e85b1f57e0ea9aeda30f583984bb257b8f7c4a0832655cb51eede1586459980c"
   }
 }
