@@ -4,7 +4,7 @@
   "project": "OVAV",
   "hash_algorithm": "sha256",
   "metadata": {
-    "git_identity": "0575c1a32a0ee6cde61208a3a76b1e8f930c21eafe6f88cba300a071cf24dfa2"
+    "git_identity": "a694a6d9e28e5a88a2c802f119f7ef652f15b9904672cd79eaac4f905c1e4739"
   },
   "policy": {
     "version": "tracked-content-v1",
@@ -1228,7 +1228,7 @@
     "docs/architecture/ADR-002-microservices-boundary.md": "5ae8f229faa1af2094a9b84eae8187f855a16f7ae1cf56415c8b831181427f31",
     "docs/architecture/ADR-003-validator-migration-strategy.md": "9a6cd64f570a58c0ee1dd52a37d8e24a9620bfae67e578ca3c3d9c7e68943279",
     "docs/architecture/ADR-004-tools-registry-stabilization.md": "96c21cfaf1d951f4e9839972a0e6c0a729b5a4c1f82a0080693449fcb055e96c",
-    "docs/architecture/ADR-005-anti-drift-2026.md": "bbd8cd35420db7ef01f2f9515f0e66a32486762912dc5519df64774e42bf8ef5",
+    "docs/architecture/ADR-005-anti-drift-2026.md": "48d58b0685d9485a278accc4b97ed29becae72c9d0f6d70fb6e6168d0f80cb7e",
     "docs/architecture/ADR-006-baseline-versioning.md": "fc82f9f3de6780201d2db7eb9f5e1b7ec572e45c7333854effb13f325bc0f1e9",
     "docs/architecture/ADR-007-drift-detection.md": "7a28f2135a6ef6af4711d833fcf4674e3f6ba96cdaf7051a98b77293fcc90f84",
     "docs/architecture/ADR-008-deploy-pipeline.md": "eabfe3d7f9ffce204268e683c74f17cc73f45e8a9413b6089029b1fa2057de6f",
