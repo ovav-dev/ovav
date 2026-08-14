@@ -4,7 +4,7 @@
   "project": "OVAV",
   "hash_algorithm": "sha256",
   "metadata": {
-    "git_identity": "87756b6328b62f7f7e5f1de1d160f6514fd041c7e25707fcff26b84f9d8f62ed"
+    "git_identity": "930bc323dca386de4576a848ef1e2e1d88c5cfef9c203b7ef71309ffbace7de3"
   },
   "policy": {
     "version": "tracked-content-v1",
@@ -466,6 +466,7 @@
     ".ovav/governance/system_path_rules.yaml": "4b8a44d9ec0c87a58d8300d29415addc4377379bcf5d9e8822e93510d8d45ae2",
     ".ovav/governance/temporal_limits.yaml": "2f07b56c6abc708dc3ad6f18c20d681f285e98364999b3cb311cf3220fc8143d",
     ".ovav/hooks/pre-commit": "d16caea98c5a4d9a12482da07a7e10f1c8f8bf4e2d1b575345547b4ec67c2bc8",
+    ".ovav/hooks/pre-commit-docs": "ca2ed338ccd1dcc10e1aab4fbeda8d44827a779176404bc74555c6d310fcd98f",
     ".ovav/hooks/pre-push": "78c6c1502c415fe354773d83c2c4176c3c781b5200d84abeb48a62706eae990b",
     ".ovav/identities.json": "098e93476bab6957fae919afa35bb795e2eaf57dbb26dd63c17bec06472c8842",
     ".ovav/knowledge/store.kc": "8bd9110fe0bb65cd5606caf7bf15e8e28e578c7e8fd41de86c080ed8d2feaf42",
@@ -1237,6 +1238,10 @@
     "docs/architecture/OWS_SPEC.md": "6ce24fed2ba405893709e9975f61c739fb822a6a6cf47d13e4f3978ff95d22b4",
     "docs/audit/2026-06-16_FINDINGS_REGISTRY.yaml": "3f9dedaf232ea1fb923b6a184d3cb5d82463a8c87f540df5cb397f4477987e0e",
     "docs/audit/2026-06-16_SYSTEM_WIDE_AUDIT.md": "209a74faf880e8aace3cf8641b3db153492d7d5745a28049e4225722d38406ae",
+    "docs/auto-generated/auto-fix.md": "922c2cb18561d284859c68853b6158a3247213d9dc4ca52785a0590bbc2f832e",
+    "docs/auto-generated/commands.md": "fdf3fccac01856f5dd05f21d2bb42bea34df437c4836831e9476661ea3812254",
+    "docs/auto-generated/drift-targets.md": "45d843f27bea65b168bf2343fd0a8a616772288ced87db25f8cbfb3d9e6063d5",
+    "docs/auto-generated/validators.md": "39fcb664803b8f3370317e5452f1bdc35f79ccf33c9429b0659c7eb1243da7a3",
     "docs/cli-agent-research-2026-07-30.md": "f73e2acbd6962c4d4f95ba9dbdcb82ae2a44eb1982656e0ea439ebb6eadf22cd",
     "docs/consolidated/GROWTH_PLAN.md": "46247935f0064e4c3c5855ea21a6b27cadbcb1b9781e3b54cadbc48620236fed",
     "docs/consolidated/MASTER_EXECUTION_PLAN.md": "2d1b9a410ba3457298da6c7ee0a5cc119a17da90d47d4629b797774e1e5d8173",
@@ -1459,8 +1464,10 @@
     "go-runtime/cmd/ovav/deploy_cli.go": "0f710631c7dbabdbeeb0b694ff8656a97b53fb746cf91618cefd5e54dc8febea",
     "go-runtime/cmd/ovav/deploy_core.go": "4d12b046f91bbbee9239d354f73f4aab8b98ad4d384a225a009784d994d2463b",
     "go-runtime/cmd/ovav/deploy_test.go": "e90362dcea6dc6f927391ac2f30b639560af38b527bdb088fc84b9bcad7fc753",
-    "go-runtime/cmd/ovav/dispatch.go": "52fc82d96ea2850f9ee68d15eaad8f948422e8d2e8e7bb3ae9f4a89c8e4d0acf",
+    "go-runtime/cmd/ovav/dispatch.go": "ecb59ede80ec587c5ab8712bbde4c7876748ef15ae3927d74de9fbac64d89568",
     "go-runtime/cmd/ovav/dispatch_test.go": "585928b8d9c70d053f844be5f8a27819c675957ed9462d1b754287cee354c0ce",
+    "go-runtime/cmd/ovav/docs_cli.go": "1fa2493809950927ea115502834f9a1fec28a33956ae46f8194ee5c0841efd14",
+    "go-runtime/cmd/ovav/docs_cli_test.go": "f5d71438aa55491ffa98697a6165f1994826e0340af2743ecf3d42e898d6477a",
     "go-runtime/cmd/ovav/drift_show.go": "9643a280ffd6082e8dffd364a11c608254d8266054b35ed93481d83fdbe08982",
     "go-runtime/cmd/ovav/drift_targets.go": "ec193565cb8095da8af27c0325495de6baa8890a555058988361f7cdf9f95f36",
     "go-runtime/cmd/ovav/drift_test.go": "a185b7a2ba663abc8c35d39cdfc6a9f5a98e7767a80a7a053a16f32ad7d4903f",
