@@ -66,7 +66,7 @@ fail() { printf "\033[1;31m✗\033[0m %s\n" "$*" >&2; exit 1; }
 
 # ── 1. Backup live settings.json ────────────────────────────
 log "Step 1: Backup live settings.json"
-mkdir -p "$OVAV_BACKUP_DIR"
+mkdir -p "$BACKUP"
 cp -p "$OVAV_LIVE_IT_SETTINGS" "$BACKUP/settings.json.bak"
 ok "Backup at $BACKUP"
 
