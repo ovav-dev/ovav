@@ -250,12 +250,12 @@ governance:
       status: "pass"
 
   validators:
-    total: 72
-    registered: 72
-    cli_visible: 72
+    total: 73
+    registered: 73
+    cli_visible: 73
     passed: 64
     warned: 8
-    failed: 0
+    failed: 1
     mode: "developer"
     gate_mode: "blocked_pending_baseline_and_candidate_closure"
     last_run: "2026-08-14"

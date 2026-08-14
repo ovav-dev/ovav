@@ -193,6 +193,8 @@ func DefaultRegistry(modes ...ValidationMode) *Registry {
 		NewAdversarialVerification(),
 		// Batch 11 — IT keybindings regression guard (2026-08-14)
 		NewITKeybindings(),
+		// Batch 11b — IT live keybindings drift detection (2026-08-14)
+		NewITLiveKeybindings(),
 	)
 }
 
