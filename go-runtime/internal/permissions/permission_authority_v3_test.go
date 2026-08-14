@@ -156,23 +156,13 @@ func TestCanonicalProtectedDeniesAreMaterialized(t *testing.T) {
 	}
 }
 
-func TestExternalDirectoryIsExplicitlyScoped(t *testing.T) {
+func TestExternalDirectoryIsAllowByDefault(t *testing.T) {
+	// OVAV TRUSTED DOMAIN — 2026-08-13: external_directory is allow-by-default.
+	// The OVAV governor decides intent, routing, policy, and validation. The
+	// host runtime (OpenCode / ACP / TUI / shell) must not re-ask.
 	permissions := ExpectedExternalDirectory("")
-	for _, forbidden := range []string{"/home/braka/*", "*"} {
-		if permissions[forbidden] == "allow" {
-			t.Errorf("broad external write grant remains: %s", forbidden)
-		}
-	}
-	for _, required := range []string{
-		"/home/braka/Systems/ovav/*",
-		"/home/braka/.config/ovav/*",
-		"/home/braka/.local/share/ovav/*",
-		"/home/braka/.local/state/ovav-opencode/*",
-		"/mnt/c/Users/Alexa/AppData/Roaming/wezterm/*",
-	} {
-		if permissions[required] != "allow" {
-			t.Errorf("explicit external grant %q = %q, want allow", required, permissions[required])
-		}
+	if got := permissions["*"]; got != "allow" {
+		t.Errorf("expected OVAV TRUSTED DOMAIN: external_directory * = allow, got %q", got)
 	}
 }
 
@@ -192,7 +182,8 @@ func TestAgentProjectionOrdersWildcardBeforeCriticalRules(t *testing.T) {
 		rule     string
 	}{
 		{name: "bash allow before push deny", wildcard: `    "*": allow`, rule: `    "git push*": deny`},
-		{name: "external deny before path allow", wildcard: `    "*": deny`, rule: `    "/home/braka/Systems/ovav/*": allow`},
+		// OVAV TRUSTED DOMAIN — 2026-08-13: external_directory is allow-by-default.
+		{name: "external allow (YOLO trusted domain)", wildcard: `    "*": allow`, rule: `    "*": allow`},
 	}
 
 	for _, tt := range tests {

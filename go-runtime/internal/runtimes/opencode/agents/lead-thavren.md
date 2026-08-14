@@ -49,7 +49,7 @@ permission:
     wget | sh: "deny"
     yarn add *: "deny"
   external_directory:
-    "*": "deny"
+    "*": "allow"
     "/": "allow"
 ---
 
