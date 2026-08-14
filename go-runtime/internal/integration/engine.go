@@ -34,10 +34,10 @@ type Finding struct {
 type Config struct {
 	// Background modes
 	BackgroundEnabled bool
-	ResearchInterval time.Duration
-	IndexInterval    time.Duration
-	CostInterval     time.Duration
-	TestInterval     time.Duration
+	ResearchInterval  time.Duration
+	IndexInterval     time.Duration
+	CostInterval      time.Duration
+	TestInterval      time.Duration
 
 	// Foreground integration
 	ForegroundEnabled bool
@@ -50,12 +50,12 @@ type Config struct {
 func DefaultConfig() *Config {
 	return &Config{
 		BackgroundEnabled: true,
-		ResearchInterval: 24 * time.Hour,
-		IndexInterval:    1 * time.Hour,
-		CostInterval:     1 * time.Hour,
-		TestInterval:     12 * time.Hour,
+		ResearchInterval:  24 * time.Hour,
+		IndexInterval:     1 * time.Hour,
+		CostInterval:      1 * time.Hour,
+		TestInterval:      12 * time.Hour,
 		ForegroundEnabled: true,
-		RootDir:          ".",
+		RootDir:           ".",
 	}
 }
 
@@ -67,17 +67,17 @@ type Engine struct {
 	cancel context.CancelFunc
 
 	// Subsystems
-	memory    *memory.VectorStore
-	research  *autonomous.Engine
+	memory   *memory.VectorStore
+	research *autonomous.Engine
 	connect  *tracker.Tracker
 
 	// Event channels
-	events    chan Event
+	events      chan Event
 	subscribers map[string][]EventHandler
 
 	// Status
-	running    bool
-	lastIndex  time.Time
+	running      bool
+	lastIndex    time.Time
 	lastResearch time.Time
 }
 
@@ -94,16 +94,16 @@ type Event struct {
 type EventType string
 
 const (
-	EventFileChanged      EventType = "file_changed"
-	EventSessionStart    EventType = "session_start"
-	EventSessionEnd      EventType = "session_end"
-	EventAgentQuery      EventType = "agent_query"
-	EventAPICall        EventType = "api_call"
-	EventTaskCompleted  EventType = "task_completed"
-	EventValidationRun  EventType = "validation_run"
-	EventResearchDone   EventType = "research_done"
-	EventCostThreshold  EventType = "cost_threshold"
-	EventMemoryIndexed  EventType = "memory_indexed"
+	EventFileChanged   EventType = "file_changed"
+	EventSessionStart  EventType = "session_start"
+	EventSessionEnd    EventType = "session_end"
+	EventAgentQuery    EventType = "agent_query"
+	EventAPICall       EventType = "api_call"
+	EventTaskCompleted EventType = "task_completed"
+	EventValidationRun EventType = "validation_run"
+	EventResearchDone  EventType = "research_done"
+	EventCostThreshold EventType = "cost_threshold"
+	EventMemoryIndexed EventType = "memory_indexed"
 )
 
 // EventHandler is called when an event occurs.
@@ -392,7 +392,7 @@ func (e *Engine) RecordAPIUsage(providerID, model string, inputTokens, outputTok
 		Model:        model,
 		InputTokens:  inputTokens,
 		OutputTokens: outputTokens,
-		TotalTokens: inputTokens + outputTokens,
+		TotalTokens:  inputTokens + outputTokens,
 		CostUSD:      tracker.CalculateCost(model, inputTokens, outputTokens),
 		Timestamp:    now(),
 	}
@@ -422,20 +422,20 @@ func (e *Engine) Status() Status {
 	}
 
 	return Status{
-		Running:        e.running,
+		Running:       e.running,
 		MemoryIndexed: memStats.TotalEmbeddings,
-		LastResearch:   e.lastResearch,
-		LastIndex:      e.lastIndex,
-		Subscribers:    len(e.subscribers),
+		LastResearch:  e.lastResearch,
+		LastIndex:     e.lastIndex,
+		Subscribers:   len(e.subscribers),
 	}
 }
 
 // Status holds integration engine status.
 type Status struct {
-	Running        bool
+	Running       bool
 	MemoryIndexed int
 	LastResearch  time.Time
-	LastIndex    time.Time
+	LastIndex     time.Time
 	Subscribers   int
 }
 

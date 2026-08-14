@@ -12,11 +12,11 @@ import (
 // ── Delegation Model ────────────────────────────────────────────────
 
 type DelegationModel struct {
-	sessions  []Session
-	chains    []Chain
-	loading   bool
-	cursor    int
-	width     int
+	sessions []Session
+	chains   []Chain
+	loading  bool
+	cursor   int
+	width    int
 }
 
 type Session struct {

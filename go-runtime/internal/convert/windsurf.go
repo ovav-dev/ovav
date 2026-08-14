@@ -20,7 +20,7 @@ type WindsurfConverter struct{}
 
 func (c *WindsurfConverter) FileExtension() string { return ".md" }
 func (c *WindsurfConverter) OutputDir() string     { return "runtimes/windsurf/agents" }
-func (c *WindsurfConverter) AreasOnly() bool        { return true }
+func (c *WindsurfConverter) AreasOnly() bool       { return true }
 
 func (c *WindsurfConverter) ConvertArea(area *Area, _ map[string]*Lead) ([]byte, error) {
 	var b strings.Builder

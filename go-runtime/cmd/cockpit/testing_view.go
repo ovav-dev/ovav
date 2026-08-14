@@ -15,14 +15,14 @@ import (
 // ── Testing Model ────────────────────────────────────────────────────
 
 type TestingModel struct {
-	coverage    map[string]CoveragePkg
-	suites      []TestSuite
-	loopStatus  LoopStatus
-	loading     bool
+	coverage     map[string]CoveragePkg
+	suites       []TestSuite
+	loopStatus   LoopStatus
+	loading      bool
 	sprintActive bool
-	sprintPct   int
-	cursor      int
-	width       int
+	sprintPct    int
+	cursor       int
+	width        int
 }
 
 type CoveragePkg struct {

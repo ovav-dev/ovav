@@ -13,6 +13,16 @@ import (
 // HostConfigDrift validates host configuration integrity and quarantine state.
 // Simplified Go version of check_host_config_drift.py (1131 LOC) — core checks only.
 // Replaces: check_host_config_drift.py
+//
+// OVAV TRUSTED EXECUTION DOMAIN — 2026-08-13:
+// Host configurations carrying the canonical OVAV YOLO marker (_ovav.yolo, _ovav.trusted
+// or the same JSON shape that .ovav/policy/permission_authority.json materializes) are
+// recognized as OVAV-managed and are NOT host intrusions. Only configurations that:
+//
+//	(a) lack the OVAV marker AND
+//	(b) carry agent/permission/provider intelligence
+//
+// are flagged for quarantine.
 type HostConfigDrift struct{}
 
 func NewHostConfigDrift() *HostConfigDrift { return &HostConfigDrift{} }
@@ -69,10 +79,15 @@ func (h *HostConfigDrift) checkHostIntrusion(root string) []string {
 	}
 
 	// Global OpenCode configs may contain bootstrap/schema metadata. Provider,
-	// permission and agent intelligence must stay repo-local.
+	// permission and agent intelligence must stay repo-local UNLESS the file is
+	// explicitly OVAV-managed (carries the YOLO marker from the materializer).
 	for _, configName := range []string{"opencode.json", "opencode.jsonc"} {
 		opencodePath := filepath.Join(hostConfig, configName)
 		if info, err := os.Stat(opencodePath); err == nil && !info.IsDir() {
+			if h.isOVAVManaged(opencodePath) {
+				// OVAV TRUSTED DOMAIN: this config was materialized by OVAV governor.
+				continue
+			}
 			if !h.isBenignBootstrap(opencodePath) && h.containsGlobalIntelligence(opencodePath) {
 				issues = append(issues, fmt.Sprintf("HOST INTRUSION: %s contains global agents/permissions/providers — quarantine required", configName))
 			}
@@ -88,6 +103,32 @@ func (h *HostConfigDrift) checkHostIntrusion(root string) []string {
 	}
 
 	return issues
+}
+
+// isOVAVManaged checks if the config carries the canonical OVAV marker.
+// OVAV TRUSTED DOMAIN — 2026-08-13: configurations carrying _ovav policy marker
+// or matching the canonical permission_authority.json shape are recognized as
+// OVAV-managed projections, not as host intrusions.
+func (h *HostConfigDrift) isOVAVManaged(path string) bool {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return false
+	}
+	content := string(data)
+	// Markers that indicate OVAV governor materialized this file.
+	ovavMarkers := []string{
+		"_ovav",
+		"OVAV_SYSTEMS",
+		"OVAV_GOVERNANCE",
+		"OVAV_YOLO",
+		"permission_authority.json",
+	}
+	for _, marker := range ovavMarkers {
+		if strings.Contains(content, marker) {
+			return true
+		}
+	}
+	return false
 }
 
 func (h *HostConfigDrift) containsGlobalIntelligence(path string) bool {

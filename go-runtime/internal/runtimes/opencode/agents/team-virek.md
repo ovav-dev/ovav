@@ -2,7 +2,7 @@
 name: "Virek"
 description: "Code Reviewer — validación pre-commit, detección de secretos, patrones y consistencia."
 mode: subagent
-model: minimax-coding-plan/MiniMax-M3
+model: opencode-go/qwen3.7-max
 hidden: true
 permission:
   edit: "deny"

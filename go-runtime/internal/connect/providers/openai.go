@@ -90,9 +90,9 @@ func (p *OpenAIProvider) FetchBalance() (*BalanceInfo, error) {
 
 	if resp.StatusCode != http.StatusOK {
 		return &BalanceInfo{
-			Provider: p.Name(),
+			Provider:  p.Name(),
 			Available: 0,
-			Error: fmt.Sprintf("HTTP %d", resp.StatusCode),
+			Error:     fmt.Sprintf("HTTP %d", resp.StatusCode),
 		}, nil
 	}
 
@@ -103,8 +103,8 @@ func (p *OpenAIProvider) FetchBalance() (*BalanceInfo, error) {
 
 	return &BalanceInfo{
 		Provider:  p.Name(),
-		Granted:  balanceResp.TotalGranted,
-		Used:     balanceResp.TotalUsed,
+		Granted:   balanceResp.TotalGranted,
+		Used:      balanceResp.TotalUsed,
 		Available: balanceResp.TotalAvailable,
 	}, nil
 }
@@ -117,10 +117,10 @@ type ProviderUsage struct {
 
 // BalanceInfo holds balance information.
 type BalanceInfo struct {
-	Provider   string
-	Granted    float64
-	Used       float64
-	Available  float64
-	PlanName   string
-	Error      string
+	Provider  string
+	Granted   float64
+	Used      float64
+	Available float64
+	PlanName  string
+	Error     string
 }
