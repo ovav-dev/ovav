@@ -1,5 +1,5 @@
 {
-  "_comment": "OVAV IT v0.2 fragment \u2014 STABLE with Cascadia Mono (admin Nerd Fonts install pending).",
+  "_comment": "OVAV IT v0.2 fragment \u2014 STABLE. Shell integration ON, keybindings default, font=Cascadia Mono.",
   "$schema": "https://aka.ms/terminal-profiles-schema",
   "defaultProfile": "{e3cb3da9-9980-5990-a951-339efdad913d}",
   "theme": "dark",
@@ -67,7 +67,7 @@
         "face": "Cascadia Mono",
         "size": 12
       },
-      "useShellIntegration": false
+      "useShellIntegration": true
     },
     "list": [
       {
