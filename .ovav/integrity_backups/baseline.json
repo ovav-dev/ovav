@@ -8,8 +8,8 @@
     "go-runtime/go.mod": "599b88657887000354a47351a0555ddb5b7a0c67ea022dc33f692a56af9f9bd8",
     "go-runtime/internal/validators/cmd/validate/main.go": "8acb76e3f95573fd4a950dbd695f65e2336317987f192bccd6a452b5a62606b0",
     "opencode.json": "2eaddfd827d5ff3734d4d2657bb51af074febeaa7bb4e61f6550689431942a2a",
-    ".ovav/registry/sbom.json": "f56789e12d9bd311d86e39bbb5d5531e97e2056ccc40f8a7b08e30fcfef0b77c",
-    "go-runtime/cmd/ovav/dispatch.go": "e9bde0e3f956a7bd6e597277bb85ece9f7bcacb2435a2c41c96cb7dd383e1ce1",
+    ".ovav/registry/sbom.json": "2ec876895b7794d93c7866da30a83c2d741f770e6e953a571d64ece16aea41a8",
+    "go-runtime/cmd/ovav/dispatch.go": "ae80aed9106c0b3df6f3a6a70860636cd295e78ecdca2c12b875ab23f672b679",
     "go-runtime/cmd/ovav/main.go": "eb9e9fb44e2f625a21595f39e9854485dda8eff3bcd60c265c60f28048a5a7e1",
     "go-runtime/cmd/ovav/smoke_expanded_cli.go": "656ed42683b3bae97429d1640a264d9f573f1d72efe366dadd4b71f45c4f46e3",
     "docs/architecture/ADR-005-anti-drift-2026.md": "48d58b0685d9485a278accc4b97ed29becae72c9d0f6d70fb6e6168d0f80cb7e"
