@@ -4,7 +4,7 @@
   "project": "OVAV",
   "hash_algorithm": "sha256",
   "metadata": {
-    "git_identity": "c357f32804d37a8ff8c5fdda87417e255b01dedc78d37bab41db899b4ca8ded1"
+    "git_identity": "992ac304113282818e73a9f397681bab6eae175e3e7773f149ebaf7edfc15860"
   },
   "policy": {
     "version": "tracked-content-v1",
@@ -441,7 +441,7 @@
     ".github/workflows/issue-sync.yml": "8122509b95ae0154fe5a9465375f83a81264780a6d541991666c3f8db1b7858b",
     ".github/workflows/pi-memory-release.yml": "db16f244b0685ebb3cf11d79331e3204e8c0b4caab61dd39bcdb23c9df944901",
     ".github/workflows/red-team-cron.yml": "3d47f83f0305d192fcbdb90607d9c9b74191a842c1c94030aa7dd3525638f331",
-    ".gitignore": "5a944766d23f6f7e3d6820aea64b7146936f88f60d16240f4ec624c9d8fb1ccd",
+    ".gitignore": "46c4b68b039ca9ae6367b84025414d6c74ae9c4d8aaf1652b8917f02c2e1ab31",
     ".gitleaks.toml": "b3c966782c9a0860449a83edcd09f780c04a031e31d4b8e826b32d0a56729566",
     ".opencode": "de99cc68664ebb63a0f2927b2df82062ab10c7f4a9d396f72684d73c211f1e08",
     ".ovav/PLAN_RESTORE_2026-08-12.md": "1578e660b1e1160da0ebfd0a8f24c7e4a283d000c743dd555bb1b8d9a2e8b7a2",
