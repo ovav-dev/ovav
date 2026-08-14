@@ -191,6 +191,44 @@
   "useMica": true,
   "tintOpacity": 90,
   "tintColor": "#0B1020",
+  "themes": [
+    {
+      "name": "OVAV Night",
+      "window": {
+        "applicationTheme": "dark",
+        "tabBackground": "#0B1020",
+        "unfocusedTabBackground": "#111827"
+      },
+      "tab": {
+        "background": "#0B1020",
+        "unfocusedBackground": "#0A0E1A"
+      },
+      "colorScheme": "OVAV Night",
+      "tint": {
+        "useMica": true,
+        "tintColor": "#0B1020",
+        "tintOpacity": 90
+      }
+    },
+    {
+      "name": "OVAV Day",
+      "window": {
+        "applicationTheme": "light",
+        "tabBackground": "#F7F9FC",
+        "unfocusedTabBackground": "#EEF2F7"
+      },
+      "tab": {
+        "background": "#F7F9FC",
+        "unfocusedBackground": "#FFFFFF"
+      },
+      "colorScheme": "OVAV Day",
+      "tint": {
+        "useMica": true,
+        "tintColor": "#F7F9FC",
+        "tintOpacity": 95
+      }
+    }
+  ],
   "tabWidthMode": "compact",
   "tabSwitcherMode": "mru",
   "newTabPosition": "afterCurrentTab",
