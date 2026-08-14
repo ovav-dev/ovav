@@ -659,6 +659,16 @@ func cmdRestore(args []string) int {
 // ── Subcommand: deploy ───────────────────────────────────────────────────────
 
 func cmdDeploy(args []string) int {
+	// New: subcommand dispatch (run / status / list / rollback / history / targets)
+	// Legacy: governed deploy (no args or --mode flag)
+	if len(args) > 0 {
+		switch args[0] {
+		case "run", "status", "list", "rollback", "history", "targets",
+			"help", "--help", "-h":
+			return cmdDeployDispatch(args)
+		}
+	}
+	// Legacy path: governed deploy
 	mode := parseModeFlag(args)
 	repoRoot := cli.MustFindRepoRoot()
 	result := install.GovernedDeploy(mode, repoRoot)
@@ -669,6 +679,34 @@ func cmdDeploy(args []string) int {
 		"summary": fmt.Sprintf("Governed deploy: %d entries in %s mode.", result.DeployEntries, mode),
 	}
 	return jsonOutput(output)
+}
+
+// cmdDeployDispatch is the new subcommand-based deploy handler.
+func cmdDeployDispatch(args []string) int {
+	if len(args) == 0 {
+		return runDeployRun(args)
+	}
+	switch args[0] {
+	case "run":
+		return runDeployRun(args[1:])
+	case "status":
+		return runDeployStatus(args[1:])
+	case "list":
+		return runDeployList(args[1:])
+	case "rollback":
+		return runDeployRollback(args[1:])
+	case "history":
+		return runDeployHistory(args[1:])
+	case "targets":
+		return runDeployTargets(args[1:])
+	case "help", "--help", "-h":
+		printDeployHelp()
+		return 0
+	default:
+		fmt.Fprintf(os.Stderr, "OVAV deploy: unknown subcommand %q\n", args[0])
+		printDeployHelp()
+		return 2
+	}
 }
 
 // ── Subcommand: status ──────────────────────────────────────────────────────
