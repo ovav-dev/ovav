@@ -44,7 +44,24 @@ fi
 
 # ── Optional env vars with documented defaults ─────────────
 : "${OVAV_ROOT:=/home/braka/Systems/ovav}"
-OVAV_FRAGMENT="${OVAV_FRAGMENT:-$OVAV_ROOT/workstation/configs/intelligent-terminal/settings-fragment.json}"
+# CRITICAL FIX (2026-08-14): Default fragment path is computed from SCRIPT_DIR
+# (where this deploy script actually lives) instead of from $OVAV_ROOT. This
+# ensures the deploy script uses the fragment from the worktree it lives in,
+# not the main repo's fragment. Without this, running deploy from a worktree
+# silently deploys the OUTDATED fragment from the main repo.
+#
+# Why this matters:
+#   - In OVAV workflow, worktrees contain the NEW fragment (with new bindings)
+#   - Main repo / develop contains the OLD fragment (last merged version)
+#   - Defaulting to $OVAV_ROOT meant: every worktree deploy used develop's
+#     fragment, defeating the entire purpose of working in a worktree
+#   - Symptom: deploy reported success but keybindings stayed the same
+#
+# Resolution: compute default fragment relative to the deploy script location.
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DEFAULT_FRAGMENT_RELATIVE="../configs/intelligent-terminal/settings-fragment.json"
+DEFAULT_FRAGMENT_FROM_SCRIPT="$SCRIPT_DIR/$DEFAULT_FRAGMENT_RELATIVE"
+OVAV_FRAGMENT="${OVAV_FRAGMENT:-$DEFAULT_FRAGMENT_FROM_SCRIPT}"
 OVAV_BACKUP_DIR="${OVAV_BACKUP_DIR:-$HOME/.ovav-backups}"
 OVAV_DRY_RUN="${OVAV_DRY_RUN:-0}"
 TS="$(date +%Y%m%d-%H%M%S)"
@@ -149,7 +166,44 @@ fi
 
 # ── 6. Atomic write ─────────────────────────────────────────
 log "Step 5: Atomic write"
-mv "$TMP" "$OVAV_LIVE_IT_SETTINGS"
+
+# CRITICAL WSL bug discovered 2026-08-14:
+#   mv /tmp/<file> /mnt/c/Users/Alexa/.../settings.json APPEARS to succeed
+#   (exit 0, no error message) but the destination ends up with OLD content.
+#   Verified empirically:
+#     mv TMP LIVE                 → 47 entries (stale) appear ❌
+#     cp -f TMP LIVE              → 47 entries (stale) appear ❌
+#     python heredoc open(LIVE,'w') → 47 entries (stale) appear ❌
+#     python sibling-tmp + same-FS rename → 48 entries persist ✅
+#
+# The fix: write to a SIBLING temp file in the same FS as LIVE, then
+# rename (same-FS rename is reliable even on WSL DrvFS).
+# This is delegated to a separate Python helper to avoid heredoc quoting
+# issues with paths containing special characters.
+
+SCRIPT_DIR_DEPLOY="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+WRITE_HELPER="$SCRIPT_DIR_DEPLOY/_deploy-write-live.py"
+
+# Verify the helper is actually next to this script (defensive)
+if [ ! -f "$WRITE_HELPER" ]; then
+  fail "write helper not found: $WRITE_HELPER (deploy script must live next to _deploy-write-live.py)"
+fi
+
+if [ ! -f "$WRITE_HELPER" ]; then
+  fail "write helper not found: $WRITE_HELPER"
+fi
+
+# Verify helper exists (duplicate check, also serves as sanity)
+[ -f "$WRITE_HELPER" ] || fail "write helper missing: $WRITE_HELPER"
+
+log "Step 5a: Write LIVE via sibling-tmp + same-FS rename (WSL-safe)"
+python3 "$WRITE_HELPER" "$TMP" "$OVAV_LIVE_IT_SETTINGS"
+PYTHON_EXIT=$?
+if [ $PYTHON_EXIT -ne 0 ]; then
+  fail "write to LIVE failed (helper exit $PYTHON_EXIT)"
+fi
+
+rm -f "$TMP"
 trap - EXIT
 ok "live settings.json updated"
 
