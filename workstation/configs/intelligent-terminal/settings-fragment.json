@@ -1,5 +1,5 @@
 {
- "_comment": "OVAV fragment IT v0.2.2192 \u2014 MINIMAL schema. Default Ubuntu-26.04 hidden, dropdown curated to OVAV only. experimental keys (statusBar/commandPalette) removed \u2014 caused JSON parser rejection.",
+ "_comment": "OVAV workstation IT v0.2 fragment. 4 profiles uppercase: OVAV (project root), SYS (.config system), HUB (projects root), WIN (Windows native). defaultProfile=OVAV. All have emoji iconography + distinct tabColor. newTabMenu curated to OVAV-only.",
  "defaultProfile": "{e3cb3da9-9980-5990-a951-339efdad913d}",
  "theme": {
   "light": "OVAV Day UI",
@@ -59,15 +59,19 @@
   },
   {
    "type": "profile",
-   "profile": "OVAV Ubuntu"
+   "profile": "OVAV"
   },
   {
    "type": "profile",
-   "profile": "OpenCode Ubuntu"
+   "profile": "SYS"
   },
   {
    "type": "profile",
-   "profile": "OVAV Scratch"
+   "profile": "HUB"
+  },
+  {
+   "type": "profile",
+   "profile": "WIN"
   }
  ],
  "showTabsInTitlebar": true,
@@ -93,87 +97,100 @@
   },
   "list": [
    {
-    "altGrAliasing": true,
-    "antialiasingMode": "grayscale",
-    "backgroundImage": null,
-    "commandline": "wsl.exe -d Ubuntu-26.04 --cd /home/braka/Systems/ovav",
-    "cursorHeight": 100,
-    "cursorShape": "bar",
-    "font": {
-     "face": "JetBrainsMono NFM",
-     "size": 13,
-     "weight": "normal"
-    },
+    "name": "OVAV",
     "guid": "{e3cb3da9-9980-5990-a951-339efdad913d}",
-    "hidden": false,
+    "source": "Windows.Terminal.Wsl",
+    "commandline": "wsl.exe -d Ubuntu-26.04 --cd /home/braka/Systems/ovav",
+    "startingDirectory": "//wsl.localhost/Ubuntu-26.04/home/braka/Systems/ovav",
+    "font": {
+     "face": "JetBrainsMono NFM",
+     "size": 13,
+     "weight": "normal"
+    },
     "icon": "\ud83d\udd37",
-    "name": "OVAV Ubuntu",
-    "opacity": 92,
-    "padding": "12, 8, 12, 8",
-    "scrollbarState": "hidden",
-    "snapOnInput": true,
-    "source": "Windows.Terminal.Wsl",
-    "startingDirectory": null,
-    "suppressApplicationTitle": true,
     "tabTitle": "\ud83d\udd37 OVAV",
-    "useAcrylic": true,
     "tabColor": "#1E3A8A",
-    "color": "#6EA8FE",
-    "accent": "#6EA8FE"
-   },
-   {
-    "commandline": "wsl.exe -d Ubuntu-26.04 --cd /home/braka/Systems/ovav -- opencode",
-    "cursorHeight": 25,
-    "cursorShape": "filledBox",
-    "font": {
-     "face": "JetBrainsMono NFM",
-     "size": 13,
-     "weight": "normal"
-    },
-    "guid": "{9de564ce-d049-51b4-bb4d-b60eca2099a1}",
-    "hidden": false,
-    "icon": "\ud83e\udd16",
-    "name": "OpenCode Ubuntu",
-    "opacity": 92,
-    "padding": "12, 8, 12, 8",
+    "padding": "10, 14, 10, 14",
     "snapOnInput": true,
-    "source": "Windows.Terminal.Wsl",
-    "startingDirectory": null,
-    "suppressApplicationTitle": true,
-    "tabTitle": "\ud83e\udd16 OpenCode",
-    "useAcrylic": true,
-    "scrollbarState": "hidden",
-    "antialiasingMode": "grayscale",
     "altGrAliasing": true,
-    "tabColor": "#0F766E",
-    "color": "#5EEAD4",
-    "accent": "#5EEAD4"
-   },
-   {
-    "commandline": "wsl.exe -d Ubuntu-26.04",
     "cursorShape": "bar",
+    "cursorHeight": 100,
+    "antialiasingMode": "grayscale",
+    "scrollbarState": "hidden",
+    "suppressApplicationTitle": true,
+    "hidden": false
+   },
+   {
+    "name": "SYS",
+    "guid": "{SYS-2e9f8a3b-7c1d-4e9a-b8f2-9c5d6e3f1a}",
+    "source": "Windows.Terminal.Wsl",
+    "commandline": "wsl.exe -d Ubuntu-26.04 --cd /home/braka/.config",
+    "startingDirectory": "//wsl.localhost/Ubuntu-26.04/home/braka/.config",
     "font": {
      "face": "JetBrainsMono NFM",
      "size": 13,
      "weight": "normal"
     },
-    "guid": "{9d51175e-781c-527d-8fc0-82953d909933}",
-    "hidden": false,
-    "icon": "\u2728",
-    "name": "OVAV Scratch",
-    "source": "Windows.Terminal.Wsl",
-    "startingDirectory": null,
-    "tabTitle": "\u2728 Scratch",
-    "padding": "12, 8, 12, 8",
-    "suppressApplicationTitle": true,
-    "scrollbarState": "hidden",
-    "antialiasingMode": "grayscale",
+    "icon": "\u2699\ufe0f",
+    "tabTitle": "\u2699\ufe0f SYS",
+    "tabColor": "#115E59",
+    "padding": "10, 14, 10, 14",
     "snapOnInput": true,
     "altGrAliasing": true,
+    "cursorShape": "underscore",
+    "cursorHeight": 25,
+    "antialiasingMode": "grayscale",
+    "scrollbarState": "hidden",
+    "suppressApplicationTitle": true,
+    "hidden": false
+   },
+   {
+    "name": "HUB",
+    "guid": "{HUB-7d4e8a1c-2f3b-4a8c-9d1e-5f6c8b9a2d}",
+    "source": "Windows.Terminal.Wsl",
+    "commandline": "wsl.exe -d Ubuntu-26.04 --cd /home/braka/Systems",
+    "startingDirectory": "//wsl.localhost/Ubuntu-26.04/home/braka/Systems",
+    "font": {
+     "face": "JetBrainsMono NFM",
+     "size": 13,
+     "weight": "normal"
+    },
+    "icon": "\ud83d\udcc1",
+    "tabTitle": "\ud83d\udcc1 HUB",
+    "tabColor": "#7E22CE",
+    "padding": "10, 14, 10, 14",
+    "snapOnInput": true,
+    "altGrAliasing": true,
+    "cursorShape": "bar",
     "cursorHeight": 100,
-    "tabColor": "#92400E",
-    "color": "#F2CC60",
-    "accent": "#F2CC60"
+    "antialiasingMode": "grayscale",
+    "scrollbarState": "hidden",
+    "suppressApplicationTitle": true,
+    "hidden": false
+   },
+   {
+    "name": "WIN",
+    "guid": "{WIN-b3f5e8a9-4c2d-4f7b-8e1a-9c3d5e8a7b}",
+    "source": "Windows.Terminal.Wsl",
+    "commandline": "wsl.exe -d Ubuntu-26.04 --cd /mnt/c/Users/Alexa",
+    "startingDirectory": "//wsl.localhost/Ubuntu-26.04/mnt/c/Users/Alexa",
+    "font": {
+     "face": "JetBrainsMono NFM",
+     "size": 13,
+     "weight": "normal"
+    },
+    "icon": "\ud83e\ude9f",
+    "tabTitle": "\ud83e\ude9f WIN",
+    "tabColor": "#B45309",
+    "padding": "10, 14, 10, 14",
+    "snapOnInput": true,
+    "altGrAliasing": true,
+    "cursorShape": "filledBox",
+    "cursorHeight": 25,
+    "antialiasingMode": "grayscale",
+    "scrollbarState": "hidden",
+    "suppressApplicationTitle": true,
+    "hidden": false
    }
   ]
  },
@@ -232,20 +249,14 @@
     "actions": [
      {
       "type": "newTab",
-      "profile": "OVAV Ubuntu",
+      "profile": "OVAV",
       "tabTitle": "OVAV \u2014 Main"
      },
      {
       "type": "splitPane",
       "split": "vertical",
-      "profile": "OpenCode Ubuntu",
+      "profile": "WIN",
       "tabTitle": "Agent"
-     },
-     {
-      "type": "splitPane",
-      "split": "horizontal",
-      "profile": "OVAV Ubuntu",
-      "tabTitle": "Logs"
      }
     ]
    },
@@ -257,7 +268,7 @@
     "actions": [
      {
       "type": "newTab",
-      "profile": "OVAV Ubuntu"
+      "profile": "OVAV"
      }
     ]
    },
