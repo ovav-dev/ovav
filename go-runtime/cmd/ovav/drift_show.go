@@ -191,6 +191,10 @@ func outputDriftJSON(report DriftReport) int {
 		return 1
 	}
 	fmt.Println(string(data))
+	// CI-friendly: exit non-zero if drift detected
+	if report.DriftedTargets > 0 {
+		return 1
+	}
 	return 0
 }
 
