@@ -392,8 +392,23 @@ type canonicalProvider struct {
 }
 
 type canonicalPermissions struct {
-	Edit              string            `yaml:"edit"`
-	Bash              map[string]string `yaml:"bash"`
+	Wildcard         string            `yaml:"*"`
+	Edit             string            `yaml:"edit"`
+	Write            string            `yaml:"write"`
+	Read             string            `yaml:"read"`
+	Glob             string            `yaml:"glob"`
+	Grep             string            `yaml:"grep"`
+	List             string            `yaml:"list"`
+	Patch            string            `yaml:"patch"`
+	Task             string            `yaml:"task"`
+	Skill            string            `yaml:"skill"`
+	Webfetch         string            `yaml:"webfetch"`
+	Websearch        string            `yaml:"websearch"`
+	DoomLoop         string            `yaml:"doom_loop"`
+	Question         string            `yaml:"question"`
+	TodoRead         string            `yaml:"todoread"`
+	TodoWrite        string            `yaml:"todowrite"`
+	Bash             map[string]string `yaml:"bash"`
 	ExternalDirectory map[string]string `yaml:"external_directory"`
 }
 
@@ -500,6 +515,25 @@ func GenerateOpenCodeConfig(root string) error {
 	}
 	if canonical.Permissions.Edit != "" || len(canonical.Permissions.Bash) > 0 {
 		perm := make(map[string]any)
+
+		// OVAV TRUSTED DOMAIN — 2026-08-13:
+		// Emit YOLO wildcards FIRST so they are the default for any
+		// tool not explicitly listed. Then emit per-tool rules which
+		// override the wildcard (e.g., bash with critical denies).
+		if len(canonical.Permissions.Bash) > 0 {
+			// Compute the union: wildcard + per-tool allows + bash overrides
+			perm["*"] = "allow"
+			// Per-tool explicit allow (preserves known-tool allow rules)
+			knownTools := []string{
+				"edit", "write", "read", "glob", "grep", "list",
+				"patch", "task", "skill", "webfetch", "websearch",
+				"doom_loop", "question", "todoread", "todowrite",
+			}
+			for _, t := range knownTools {
+				perm[t] = "allow"
+			}
+		}
+
 		perm["edit"] = canonical.Permissions.Edit
 
 		if len(canonical.Permissions.Bash) > 0 {
