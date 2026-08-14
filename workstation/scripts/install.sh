@@ -85,18 +85,25 @@ else
   cp -p "$INTEL_TERM_SETTINGS" "$BACKUP_DIR/intel-terminal-settings.premerge.json"
 
   # The merge: combine existing settings with OVAV fragment
-  # Uses jq -s (slurp) to merge two JSON objects deeply
-  jq -s '.[0] * .[1]
-         | .profiles.list = ((.[0].profiles.list // []) + (.[1].profiles.list // []) | unique_by(.guid))
-         | .schemes = ((.[0].schemes // []) + (.[1].schemes // []) | unique_by(.name))
-         | .actions = ((.[0].actions // []) + (.[1].actions // []) | unique_by(.name))' \
-    "$INTEL_TERM_SETTINGS" "$FRAG" > "$INTEL_TERM_SETTINGS.tmp"
+  # Uses jq -s (slurp) to merge two JSON objects deeply.
+  # IMPORTANT: After `.| ...` the `.` becomes the merged OBJECT, not the
+  # slurp array. So we cannot use .[0] / .[1] in subsequent expressions —
+  # use $existing / $fragment variables via `as`.
+  jq -s '
+    .[0] as $existing |
+    .[1] as $fragment |
+    $existing * $fragment
+    | .profiles.list = (($existing.profiles.list // []) + ($fragment.profiles.list // []) | unique_by(.guid))
+    | .schemes       = (($existing.schemes       // []) + ($fragment.schemes       // []) | unique_by(.name))
+    | .actions       = (($existing.actions       // []) + ($fragment.actions       // []) | unique_by(.name))
+  ' "$INTEL_TERM_SETTINGS" "$FRAG" > "$INTEL_TERM_SETTINGS.tmp"
 
   if jq empty "$INTEL_TERM_SETTINGS.tmp" 2>/dev/null; then
     mv "$INTEL_TERM_SETTINGS.tmp" "$INTEL_TERM_SETTINGS"
     ok "settings.json merged (validated JSON)"
   else
     err "merged JSON invalid — restoring original"
+    jq . "$INTEL_TERM_SETTINGS.tmp" 2>&1 | head -20
     mv "$BACKUP_DIR/intel-terminal-settings.json.bak" "$INTEL_TERM_SETTINGS"
     exit 1
   fi

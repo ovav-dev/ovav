@@ -1,5 +1,5 @@
 {
-  "_comment": "OVAV workstation additions for Intelligent Terminal. This fragment is MERGED into the user's settings.json by workstation/scripts/install.sh — never overwrites existing keys.",
+  "_comment": "OVAV workstation additions for Intelligent Terminal. This fragment is MERGED into the user's settings.json by workstation/scripts/install.sh — never overwrites existing keys. Intelligent Terminal uses 'themes' (plural array), not 'theme' (singular string). We only ADD to profiles.list, schemes, actions — never replace top-level keys.",
 
   "profiles": {
     "list": [
@@ -124,161 +124,79 @@
       "name": "OVAV Workspace",
       "commandline": {
         "actions": [
-          {
-            "type": "newTab",
-            "profile": "OVAV Ubuntu",
-            "tabTitle": "OVAV — Main"
-          },
-          {
-            "type": "splitPane",
-            "split": "vertical",
-            "profile": "OpenCode Ubuntu",
-            "tabTitle": "Agent"
-          },
-          {
-            "type": "splitPane",
-            "split": "horizontal",
-            "profile": "OVAV Ubuntu",
-            "tabTitle": "Logs"
-          }
+          { "type": "newTab", "profile": "OVAV Ubuntu", "tabTitle": "OVAV — Main" },
+          { "type": "splitPane", "split": "vertical", "profile": "OpenCode Ubuntu", "tabTitle": "Agent" },
+          { "type": "splitPane", "split": "horizontal", "profile": "OVAV Ubuntu", "tabTitle": "Logs" }
         ]
       },
       "keybind": "ctrl+shift+grave"
     },
     {
       "name": "New OVAV Tab",
-      "commandline": {
-        "actions": [
-          {
-            "type": "newTab",
-            "profile": "OVAV Ubuntu",
-            "tabTitle": "OVAV"
-          }
-        ]
-      },
+      "commandline": { "actions": [ { "type": "newTab", "profile": "OVAV Ubuntu", "tabTitle": "OVAV" } ] },
       "keybind": "ctrl+shift+t"
     },
     {
       "name": "OVAV Split Vertical",
-      "commandline": {
-        "actions": [
-          {
-            "type": "splitPane",
-            "split": "vertical",
-            "profile": "${profile.name}"
-          }
-        ]
-      },
+      "commandline": { "actions": [ { "type": "splitPane", "split": "vertical", "profile": "${profile.name}" } ] },
       "keybind": "ctrl+alt+d"
     },
     {
       "name": "OVAV Split Horizontal",
-      "commandline": {
-        "actions": [
-          {
-            "type": "splitPane",
-            "split": "horizontal",
-            "profile": "${profile.name}"
-          }
-        ]
-      },
+      "commandline": { "actions": [ { "type": "splitPane", "split": "horizontal", "profile": "${profile.name}" } ] },
       "keybind": "ctrl+alt+s"
     },
     {
       "name": "OVAV Focus Left",
-      "commandline": {
-        "actions": [
-          { "type": "moveFocus", "direction": "left" }
-        ]
-      },
+      "commandline": { "actions": [ { "type": "moveFocus", "direction": "left" } ] },
       "keybind": "alt+left"
     },
     {
       "name": "OVAV Focus Right",
-      "commandline": {
-        "actions": [
-          { "type": "moveFocus", "direction": "right" }
-        ]
-      },
+      "commandline": { "actions": [ { "type": "moveFocus", "direction": "right" } ] },
       "keybind": "alt+right"
     },
     {
       "name": "OVAV Focus Up",
-      "commandline": {
-        "actions": [
-          { "type": "moveFocus", "direction": "up" }
-        ]
-      },
+      "commandline": { "actions": [ { "type": "moveFocus", "direction": "up" } ] },
       "keybind": "alt+up"
     },
     {
       "name": "OVAV Focus Down",
-      "commandline": {
-        "actions": [
-          { "type": "moveFocus", "direction": "down" }
-        ]
-      },
+      "commandline": { "actions": [ { "type": "moveFocus", "direction": "down" } ] },
       "keybind": "alt+down"
     },
     {
       "name": "OVAV Toggle Zoom",
-      "commandline": {
-        "actions": [
-          { "type": "togglePaneZoom" }
-        ]
-      },
+      "commandline": { "actions": [ { "type": "togglePaneZoom" } ] },
       "keybind": "ctrl+shift+z"
     },
     {
       "name": "OVAV Close Pane",
-      "commandline": {
-        "actions": [
-          { "type": "closePane" }
-        ]
-      },
+      "commandline": { "actions": [ { "type": "closePane" } ] },
       "keybind": "ctrl+shift+w"
     },
     {
       "name": "OVAV Command Palette",
-      "commandline": {
-        "actions": [
-          { "type": "commandPalette" }
-        ]
-      },
+      "commandline": { "actions": [ { "type": "commandPalette" } ] },
       "keybind": "ctrl+shift+p"
     },
     {
       "name": "OVAV Search",
-      "commandline": {
-        "actions": [
-          { "type": "findMatch" }
-        ]
-      },
+      "commandline": { "actions": [ { "type": "findMatch" } ] },
       "keybind": "ctrl+shift+f"
     }
   ],
 
-  "theme": "system",
   "useMica": true,
   "tintOpacity": 90,
   "tintColor": "#0B1020",
-
   "tabWidthMode": "compact",
   "tabSwitcherMode": "mru",
   "newTabPosition": "afterCurrentTab",
   "initialRows": 32,
   "initialCols": 120,
   "rowsToScroll": "system",
-  "maxWidth": 0,
   "padding": "8, 4, 8, 4",
-  "copyOnSelect": false,
-  "focusFollowMouse": false,
-  "windowingBehavior": "useNew",
-  "trimBlockSelection": true,
-  "compatibility": {
-    "winRtInput": false
-  },
-  "rendering": {
-    "screenReaderAnnounce": false
-  }
+  "focusFollowMouse": false
 }
