@@ -12,15 +12,16 @@ import (
 // Agent files go to .github/agents/ (NOT runtimes/copilot/).
 // File extension: .agent.md
 // Fields: description, name, argument-hint, tools, agents, model,
-//          user-invocable, disable-model-invocation, target,
-//          mcp-servers, handoffs, hooks
+//
+//	user-invocable, disable-model-invocation, target,
+//	mcp-servers, handoffs, hooks
 //
 // AreasOnly=true: Copilot doesn't support hierarchical agent hierarchies.
 type CopilotConverter struct{}
 
 func (c *CopilotConverter) FileExtension() string { return ".agent.md" }
 func (c *CopilotConverter) OutputDir() string     { return ".github/agents" }
-func (c *CopilotConverter) AreasOnly() bool        { return true }
+func (c *CopilotConverter) AreasOnly() bool       { return true }
 
 func (c *CopilotConverter) ConvertArea(area *Area, _ map[string]*Lead) ([]byte, error) {
 	var b strings.Builder

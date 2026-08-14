@@ -18,8 +18,10 @@ import (
 // Host configurations carrying the canonical OVAV YOLO marker (_ovav.yolo, _ovav.trusted
 // or the same JSON shape that .ovav/policy/permission_authority.json materializes) are
 // recognized as OVAV-managed and are NOT host intrusions. Only configurations that:
-//   (a) lack the OVAV marker AND
-//   (b) carry agent/permission/provider intelligence
+//
+//	(a) lack the OVAV marker AND
+//	(b) carry agent/permission/provider intelligence
+//
 // are flagged for quarantine.
 type HostConfigDrift struct{}
 

@@ -243,7 +243,7 @@ func optimize(tk *tracker.Tracker) {
 	fmt.Println()
 
 	optimizer := tracker.NewAutoOptimizer(tk)
-	
+
 	recommendations, err := optimizer.GenerateRecommendations()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error generating recommendations: %v\n", err)
@@ -256,7 +256,7 @@ func optimize(tk *tracker.Tracker) {
 	}
 
 	fmt.Printf("💡 Found %d optimization opportunities:\n\n", len(recommendations))
-	
+
 	for i, rec := range recommendations {
 		priorityIcon := "🟡"
 		if rec.Priority > 0.8 {
@@ -264,7 +264,7 @@ func optimize(tk *tracker.Tracker) {
 		} else if rec.Priority > 0.5 {
 			priorityIcon = "🟠"
 		}
-		
+
 		fmt.Printf("%d. %s [%s] %.0f%% priority\n", i+1, priorityIcon, rec.Type, rec.Priority*100)
 		fmt.Printf("   Provider: %s\n", rec.ProviderID)
 		if rec.Model != "" {
@@ -280,31 +280,31 @@ func optimize(tk *tracker.Tracker) {
 	providers := tk.ListProviders()
 	fmt.Println("📈 Provider Performance Analysis:")
 	fmt.Println()
-	
+
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
 	fmt.Fprintf(w, "Provider\tEfficiency\tTrend\tAvg Cost/1K\tBest Model\n")
 	fmt.Fprintf(w, "--------\t----------\t-----\t-----------\t----------\n")
-	
+
 	for _, p := range providers {
 		if !p.Enabled {
 			continue
 		}
-		
+
 		analysis, err := optimizer.AnalyzeProvider(p.ID)
 		if err != nil {
 			continue
 		}
-		
+
 		trendIcon := "➡️"
 		if analysis.TrendDirection == "increasing" {
 			trendIcon = "📈"
 		} else if analysis.TrendDirection == "decreasing" {
 			trendIcon = "📉"
 		}
-		
-		fmt.Fprintf(w, "%s\t%.0f%%\t%s\t$%.4f\t%s\n", 
-			p.ID, 
-			analysis.EfficiencyScore*100, 
+
+		fmt.Fprintf(w, "%s\t%.0f%%\t%s\t$%.4f\t%s\n",
+			p.ID,
+			analysis.EfficiencyScore*100,
 			trendIcon,
 			analysis.AverageCostPerK,
 			analysis.BestModel)

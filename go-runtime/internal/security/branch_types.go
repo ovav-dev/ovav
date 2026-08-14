@@ -16,24 +16,24 @@ import (
 
 // Protected branches (never force-push, never delete)
 var ProtectedBranches = map[string]struct{}{
-	"main":      {},
-	"master":    {},
-	"develop":   {},
-	"staging":   {},
-	"prod":      {},
+	"main":       {},
+	"master":     {},
+	"develop":    {},
+	"staging":    {},
+	"prod":       {},
 	"production": {},
 }
 
 // Protected prefixes (patterns that create protected branches)
 var ProtectedPrefixes = map[string]struct{}{
-	"main":      {},
-	"master":    {},
-	"develop":   {},
-	"staging":   {},
-	"prod":      {},
+	"main":       {},
+	"master":     {},
+	"develop":    {},
+	"staging":    {},
+	"prod":       {},
 	"production": {},
-	"release/":  {},
-	"hotfix/":   {},
+	"release/":   {},
+	"hotfix/":    {},
 }
 
 // UltraBranches — highest criticality (main, master only)
@@ -58,30 +58,30 @@ var ProductionBranches = map[string]struct{}{
 
 // PrimaryBranches — main development targets
 var PrimaryBranches = map[string]struct{}{
-	"main":     {},
-	"master":   {},
-	"develop":  {},
-	"staging":  {},
+	"main":    {},
+	"master":  {},
+	"develop": {},
+	"staging": {},
 }
 
 // WorkBranchPrefixes
 var WorkBranchPrefixes = map[string]struct{}{
-	"feature/":   {},
-	"fix/":       {},
-	"hotfix/":    {},
-	"refactor/":  {},
-	"docs/":      {},
-	"test/":      {},
-	"ci/":        {},
+	"feature/":  {},
+	"fix/":      {},
+	"hotfix/":   {},
+	"refactor/": {},
+	"docs/":     {},
+	"test/":     {},
+	"ci/":       {},
 }
 
 // AllBranchKeys
 var AllBranchKeys = map[string]struct{}{
-	"ultra":       {},
-	"high":        {},
-	"production":  {},
-	"primary":     {},
-	"work":        {},
+	"ultra":        {},
+	"high":         {},
+	"production":   {},
+	"primary":      {},
+	"work":         {},
 	"experimental": {},
 }
 
@@ -102,19 +102,19 @@ var CCBranchMap = map[string]string{
 
 // OVAVBranchMap — OVAV-specific branch map
 var OVAVBranchMap = map[string]string{
-	"feature":   "feature/",
-	"fix":       "fix/",
-	"hotfix":    "hotfix/",
-	"feature/":  "feature/",
-	"fix/":      "fix/",
+	"feature":  "feature/",
+	"fix":      "fix/",
+	"hotfix":   "hotfix/",
+	"feature/": "feature/",
+	"fix/":     "fix/",
 }
 
 // TaskPrefixes
 var TaskPrefixes = map[string]struct{}{
-	"T":     {},
-	"TASK":  {},
-	"BUG":   {},
-	"FIX":   {},
+	"T":      {},
+	"TASK":   {},
+	"BUG":    {},
+	"FIX":    {},
 	"HOTFIX": {},
 }
 
@@ -133,20 +133,20 @@ var LifetimePolicies = map[string]int{
 
 // PrefixTierMap — prefix to tier mapping
 var PrefixTierMap = map[string]string{
-	"main":      "ultra",
-	"master":    "ultra",
-	"release/":  "high",
-	"hotfix/":   "high",
-	"prod":      "production",
+	"main":       "ultra",
+	"master":     "ultra",
+	"release/":   "high",
+	"hotfix/":    "high",
+	"prod":       "production",
 	"production": "production",
-	"develop":   "primary",
-	"staging":   "primary",
-	"feature/":  "work",
-	"fix/":      "work",
-	"refactor/": "work",
-	"docs/":     "work",
-	"test/":     "work",
-	"ci/":       "work",
+	"develop":    "primary",
+	"staging":    "primary",
+	"feature/":   "work",
+	"fix/":       "work",
+	"refactor/":  "work",
+	"docs/":      "work",
+	"test/":      "work",
+	"ci/":        "work",
 }
 
 // IsWorkBranch checks if branch is a work branch (feature/fix/etc.)

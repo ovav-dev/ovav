@@ -10,15 +10,15 @@
 //
 // Architecture:
 //
-//   .ovav/visual/theme/theme.yaml
-//           |
-//           v
-//   internal/theme/theme.go  (engine + getters)
-//           |
-//           +-- cockpit/styles/theme.go  (lipgloss styles)
-//           +-- project/sync.go          (OpenCode JSON generator)
-//           +-- GenerateWezTermLua()     (WezTerm palette)
-//           +-- GenerateWindowsTerminal() (Windows Terminal JSON)
+//	.ovav/visual/theme/theme.yaml
+//	        |
+//	        v
+//	internal/theme/theme.go  (engine + getters)
+//	        |
+//	        +-- cockpit/styles/theme.go  (lipgloss styles)
+//	        +-- project/sync.go          (OpenCode JSON generator)
+//	        +-- GenerateWezTermLua()     (WezTerm palette)
+//	        +-- GenerateWindowsTerminal() (Windows Terminal JSON)
 package theme
 
 import (
@@ -212,35 +212,35 @@ func (t *Theme) Agent(key string) AgentColor {
 // ── Convenience: OVAV Brand Palette ───────────────────────────────────────────
 
 // OVAV brand colors (softened for long sessions).
-func (t *Theme) Thavren() string { return t.BrandColor("thavren") }    // teal — Platform Engineering
-func (t *Theme) Eidren() string  { return t.BrandColor("eidren") }    // olive green — Research
-func (t *Theme) Core() string    { return t.BrandColor("ovav_core") }  // blue-gray — core
+func (t *Theme) Thavren() string { return t.BrandColor("thavren") }     // teal — Platform Engineering
+func (t *Theme) Eidren() string  { return t.BrandColor("eidren") }      // olive green — Research
+func (t *Theme) Core() string    { return t.BrandColor("ovav_core") }   // blue-gray — core
 func (t *Theme) Accent() string  { return t.BrandColor("ovav_accent") } // rose — accent
 
 // ── Convenience: Semantic Palette ──────────────────────────────────────────────
 
-func (t *Theme) Success() string  { return t.SemanticColor("success") }
-func (t *Theme) Error() string    { return t.SemanticColor("error") }
-func (t *Theme) Warning() string  { return t.SemanticColor("warning") }
-func (t *Theme) Info() string     { return t.SemanticColor("info") }
+func (t *Theme) Success() string   { return t.SemanticColor("success") }
+func (t *Theme) Error() string     { return t.SemanticColor("error") }
+func (t *Theme) Warning() string   { return t.SemanticColor("warning") }
+func (t *Theme) Info() string      { return t.SemanticColor("info") }
 func (t *Theme) Highlight() string { return t.SemanticColor("highlight") }
 
 // ── Convenience: Surface Palette (current mode) ───────────────────────────────
 
-func (t *Theme) BGRoot()     string { return t.Surface("bg_root") }
-func (t *Theme) BGPanel()   string { return t.Surface("bg_panel") }
-func (t *Theme) BGElement() string { return t.Surface("bg_element") }
-func (t *Theme) BGHover()   string { return t.Surface("bg_hover") }
+func (t *Theme) BGRoot() string     { return t.Surface("bg_root") }
+func (t *Theme) BGPanel() string    { return t.Surface("bg_panel") }
+func (t *Theme) BGElement() string  { return t.Surface("bg_element") }
+func (t *Theme) BGHover() string    { return t.Surface("bg_hover") }
 func (t *Theme) BGSelected() string { return t.Surface("bg_selected") }
-func (t *Theme) Border()     string { return t.Surface("border") }
+func (t *Theme) Border() string     { return t.Surface("border") }
 func (t *Theme) BorderActive() string {
 	if themeMode == ModeLight {
 		return t.Surface("border_active")
 	}
 	return t.Surface("border_active")
 }
-func (t *Theme) BorderFocus() string { return t.Surface("border_focus") }
-func (t *Theme) TextPrimary()   string { return t.Surface("text_primary") }
+func (t *Theme) BorderFocus() string   { return t.Surface("border_focus") }
+func (t *Theme) TextPrimary() string   { return t.Surface("text_primary") }
 func (t *Theme) TextSecondary() string { return t.Surface("text_secondary") }
-func (t *Theme) TextMuted()    string { return t.Surface("text_muted") }
-func (t *Theme) TextInverse()   string { return t.Surface("text_inverse") }
+func (t *Theme) TextMuted() string     { return t.Surface("text_muted") }
+func (t *Theme) TextInverse() string   { return t.Surface("text_inverse") }
