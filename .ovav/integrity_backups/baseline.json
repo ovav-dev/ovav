@@ -11,6 +11,7 @@
     ".ovav/registry/sbom.json": "da2d5614a7d7854c8ecdf8b1f78c671fc86c86fb3e5021129242689c3d953c82",
     "go-runtime/cmd/ovav/dispatch.go": "e9bde0e3f956a7bd6e597277bb85ece9f7bcacb2435a2c41c96cb7dd383e1ce1",
     "go-runtime/cmd/ovav/main.go": "eb9e9fb44e2f625a21595f39e9854485dda8eff3bcd60c265c60f28048a5a7e1",
-    "go-runtime/cmd/ovav/smoke_expanded_cli.go": "656ed42683b3bae97429d1640a264d9f573f1d72efe366dadd4b71f45c4f46e3"
+    "go-runtime/cmd/ovav/smoke_expanded_cli.go": "656ed42683b3bae97429d1640a264d9f573f1d72efe366dadd4b71f45c4f46e3",
+    "docs/architecture/ADR-005-anti-drift-2026.md": "48d58b0685d9485a278accc4b97ed29becae72c9d0f6d70fb6e6168d0f80cb7e"
   }
 }
