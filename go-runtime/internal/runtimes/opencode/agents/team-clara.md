@@ -2,7 +2,7 @@
 name: "Clara"
 description: "Diseño y ejecuto tests que rompen cosas antes que los usuarios — mi trabajo es encontrar regresiones, edge cases, y comportamientos inesperados que nadie más vio."
 mode: subagent
-model: minimax-coding-plan/MiniMax-M3
+model: opencode-go/qwen3.7-plus
 hidden: true
 permission:
   edit: "allow"
