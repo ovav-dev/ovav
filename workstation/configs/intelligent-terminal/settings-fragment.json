@@ -1,6 +1,6 @@
 {
- "_comment": "OVAV workstation IT v0.2 fragment. 4 profiles uppercase: OVAV (project root), SYS (.config system), HUB (projects root), WIN (Windows native). defaultProfile=OVAV. All have emoji iconography + distinct tabColor. newTabMenu curated to OVAV-only.",
- "defaultProfile": "{e3cb3da9-9980-5990-a951-339efdad913d}",
+ "_comment": "OVAV workstation IT v0.2 fragment. 4 profiles uppercase: OVAV (project root default), SYS (.config), HUB (projects), WIN (Windows). All have real UUID5 GUIDs. Iconography: \ud83d\udd37 \u2699\ufe0f \ud83d\udcc1 \ud83e\ude9f. Distinct tabColor per profile.",
+ "defaultProfile": "{2F24A57E-DE2C-5A2B-898B-732A66A7F6BC}",
  "theme": {
   "light": "OVAV Day UI",
   "dark": "OVAV Night UI"
@@ -122,7 +122,7 @@
    },
    {
     "name": "SYS",
-    "guid": "{SYS-2e9f8a3b-7c1d-4e9a-b8f2-9c5d6e3f1a}",
+    "guid": "{445F0540-815B-5751-9045-DE7354BF23B5}",
     "source": "Windows.Terminal.Wsl",
     "commandline": "wsl.exe -d Ubuntu-26.04 --cd /home/braka/.config",
     "startingDirectory": "//wsl.localhost/Ubuntu-26.04/home/braka/.config",
@@ -146,7 +146,7 @@
    },
    {
     "name": "HUB",
-    "guid": "{HUB-7d4e8a1c-2f3b-4a8c-9d1e-5f6c8b9a2d}",
+    "guid": "{3EFFC6BF-75C0-5786-8D37-54B6F9707EB4}",
     "source": "Windows.Terminal.Wsl",
     "commandline": "wsl.exe -d Ubuntu-26.04 --cd /home/braka/Systems",
     "startingDirectory": "//wsl.localhost/Ubuntu-26.04/home/braka/Systems",
@@ -170,7 +170,7 @@
    },
    {
     "name": "WIN",
-    "guid": "{WIN-b3f5e8a9-4c2d-4f7b-8e1a-9c3d5e8a7b}",
+    "guid": "{29516ADE-0377-5279-ADA0-C37D2200EB7D}",
     "source": "Windows.Terminal.Wsl",
     "commandline": "wsl.exe -d Ubuntu-26.04 --cd /mnt/c/Users/Alexa",
     "startingDirectory": "//wsl.localhost/Ubuntu-26.04/mnt/c/Users/Alexa",
