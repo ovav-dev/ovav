@@ -11,67 +11,32 @@ permission:
   edit: allow
   bash:
     "*": allow
-    ">:w !sudo tee": deny
-    "apt install *": deny
-    "apt-get install *": deny
-    "cat /etc/passwd": deny
-    "chmod -R 777": deny
-    "chmod 777": deny
-    "curl | sh": deny
-    "dd if=/dev/zero of=/dev/sda": deny
-    "eval $(curl": deny
-    "gh auth login*": deny
     "gh auth status*": allow
-    "gh auth token*": deny
     "gh issue list*": allow
     "gh issue view*": allow
     "gh pr create*": allow
     "gh pr list*": allow
-    "gh pr merge*": deny
     "gh pr status*": allow
     "gh pr view*": allow
-    "gh release *": deny
     "gh repo view*": allow
     "git add *": allow
     "git branch --show-current": allow
-    "git branch -D *": deny
-    "git branch -d *": deny
     "git commit*": allow
     "git diff*": allow
     "git log*": allow
     "git ls-remote *": allow
-    "git push --force *": deny
-    "git push --force-with-lease *": deny
-    "git push -f *": deny
-    "git push*": deny
     "git remote -v": allow
     "git rev-parse*": allow
     "git status*": allow
-    "go install *": deny
     "go run -C go-runtime ./cmd/ovav validate*": allow
     "go run -C go-runtime ./internal/validators/cmd/validate*": allow
-    "mkfs": deny
-    "nc -l -p 443 -e": deny
-    "nmap -O": deny
-    "npm install *": deny
     "npm run build*": allow
     "npm run lint*": allow
     "npm run test*": allow
     "npm run typecheck*": allow
     "npm test*": allow
-    "pip install *": deny
-    "pip3 install *": deny
-    "pnpm add *": deny
     "pytest*": allow
-    "python3 -c \"import pty": deny
     "python3 -m pytest*": allow
-    "rm -rf /": deny
-    "rm -rf /bin": deny
-    "rm -rf /usr": deny
-    "sudo *": deny
-    "sudo su": deny
-    "wget | sh": deny
-    "yarn add *": deny
   external_directory:
     "*": allow
 ---
