@@ -18,6 +18,9 @@ import (
 // bindings in inputrc. CEO confirmed shift+arrow should be handled by the
 // TERMINAL (visual selection in IT), not by bash readline (set-mark + motion).
 // The inputrc now leaves shift+arrow unbound so IT can intercept it natively.
+
+// SAFE_FIX: Adds 'deliberately UNBOUND' marker comment to ~/.inputrc if missing.
+// The marker is informational (no behavioral effect), so adding it is safe.
 type BashReadlineBindings struct{}
 
 func NewBashReadlineBindings() *BashReadlineBindings { return &BashReadlineBindings{} }
@@ -113,3 +116,32 @@ func (b *BashReadlineBindings) Validate(_ context.Context, root string) Result {
 }
 
 var _ Validator = (*BashReadlineBindings)(nil)
+
+// Fixable interface implementation for auto-remediation (ADR-011).
+// Idempotent: calling twice produces same result.
+
+func (b *BashReadlineBindings) FixDescription() string {
+	return "Add 'deliberately UNBOUND' marker comment to ~/.inputrc (informational only)"
+}
+
+func (b *BashReadlineBindings) Fix(root string) error {
+	// The validator reads from the FRAGMENT (workstation/configs/inputrc/ovav.inputrc),
+	// not from ~/.inputrc. So the fix must update the fragment, and the deploy
+	// pipeline (ovav deploy run) is responsible for syncing live.
+	inputrc := filepath.Join(root, inputrcRelPath)
+	if !fileExists(inputrc) {
+		// Skip silently — validator will report MISSING
+		return nil
+	}
+	content, err := os.ReadFile(inputrc)
+	if err != nil {
+		return err
+	}
+	if strings.Contains(string(content), "deliberately UNBOUND") {
+		return nil // already fixed
+	}
+	// Add marker at the top
+	marker := "# Shift+arrow: deliberately UNBOUND (handled by terminal layer, not bash readline)\n"
+	newContent := marker + string(content)
+	return os.WriteFile(inputrc, []byte(newContent), 0o644)
+}

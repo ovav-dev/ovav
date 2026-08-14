@@ -1048,6 +1048,13 @@ func cmdDoctor(args []string) int {
 // ── Subcommand: validate ───────────────────────────────────────────────────
 
 func cmdValidate(args []string) int {
+	// Check for --fix flag → dispatch to auto-remediation
+	for _, a := range args {
+		if a == "--fix" || a == "--fix-list" {
+			return cmdValidateFix(args)
+		}
+	}
+
 	repoRoot, err := cli.FindRepoRoot()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: cannot find repo root: %v\n", err)
