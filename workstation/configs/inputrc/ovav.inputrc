@@ -1,0 +1,89 @@
+# ─────────────────────────────────────────────────────────────
+#  OVAV readline config — sourced automatically by bash from
+#  /etc/inputrc + ~/.inputrc. Idempotent. Backed up. Auditable.
+#
+#  Reason this exists (2026-08-14): bash 5.x readline ships with
+#  NO default bindings for shift+arrow (modifier 2). When IT v0.2
+#  is configured to NOT intercept shift+arrow for selection (the
+#  default in many setups), the escape sequence \e[1;2X reaches bash.
+#  Bash 5.x readline beeps (which surfaces as Windows error sound in
+#  WSL) and the final char of the CSI sequence can leak into the input
+#  buffer as a typed letter — that's the "shift+arrow types DABC"
+#  regression CEO reported.
+#
+#  This file provides bindings for shift+arrow (selection-style via
+#  set-mark + motion) plus other commonly-needed readline behaviors
+#  that bash 5.x doesn't ship with by default.
+#
+#  Modifier math (per xterm CSI):
+#    1 = none (plain arrow)
+#    2 = shift
+#    3 = alt (meta)
+#    4 = shift+alt
+#    5 = ctrl
+#    6 = ctrl+shift
+#    7 = ctrl+alt
+#    8 = ctrl+shift+alt
+#
+#  See: https://en.wikipedia.org/wiki/ANSI_escape_code#CSI_sequences
+# ─────────────────────────────────────────────────────────────
+
+# ── General readline behavior ─────────────────────────────────
+set editing-mode emacs
+
+# Disable audible bell (WSL surfaces it as Windows error sound on shift+arrow)
+set bell-style none
+
+set completion-ignore-case on
+set show-all-if-ambiguous on
+set show-all-if-unmodified on
+set page-completions off
+set colored-stats on
+set colored-completion-prefix on
+set enable-bracketed-paste on
+set match-hidden-files on
+
+# ── History search via arrow keys ─────────────────────────────
+"\e[A": history-substring-search-backward
+"\e[B": history-substring-search-forward
+
+# ── Shift+arrow: text selection via set-mark + motion ─────────
+# C-@ is the readline binding for set-mark
+"\e[1;2A": "\C-@\e[A"
+"\e[1;2B": "\C-@\e[B"
+"\e[1;2C": "\C-@\e[C"
+"\e[1;2D": "\C-@\e[D"
+
+# Shift+Ctrl+arrow: select word at a time
+"\e[1;6C": "\C-@\e[1;5C"
+"\e[1;6D": "\C-@\e[1;5D"
+
+# Shift+Alt+arrow: select to line start
+"\e[1;4A": "\C-@\e[1;H"
+"\e[1;4B": "\C-@\e[1;H"
+
+# ── Ctrl+arrow: word motion ───────────────────────────────────
+"\e[1;5C": forward-word
+"\e[1;5D": backward-word
+
+# ── Alt+arrow: word motion ─────────────────────────────────────
+"\e[1;3C": forward-word
+"\e[1;3D": backward-word
+
+# ── Home / End keys ────────────────────────────────────────────
+"\e[H": beginning-of-line
+"\e[F": end-of-line
+"\e[1~": beginning-of-line
+"\e[7~": beginning-of-line
+"\e[4~": end-of-line
+"\e[8~": end-of-line
+
+# ── Delete / Insert keys ───────────────────────────────────────
+"\e[3~": delete-char
+"\e[2~": yank
+
+# ── Misc conveniences ─────────────────────────────────────────
+"\C-x\C-x": exchange-point-and-mark
+"\e[5~": history-substring-search-backward
+"\e[6~": history-substring-search-forward
+"\C-s": forward-search-history
