@@ -1,0 +1,64 @@
+# Atuin configuration — OVAV workstation 2026
+# Rule #15: NO pty-proxy (inmaduro <30d en v18.19.0)
+# Rule #16: MCP server opt-in (herramienta on-demand)
+# Rule #14: AI no activada por default (servicio cloud separado)
+
+## Atuin history database
+[history]
+# Sync is opt-in. Deshabilitado por default — workstation local-only.
+# Activar cuando CEO confirme cuenta Atuin Cloud.
+sync_enabled = false
+
+# Search mode: "fulltext" (substring) | "prefix" | "fuzzy" | "skim"
+# Fuzzy = best UX for shell (recommended by Atuin docs)
+search_mode = "fuzzy"
+
+# Inline height for search UI
+inline_height = 18
+
+## Search filters (rule #18: Atuin owns Ctrl-R; no overlap con fzf)
+[search]
+# Default filters shown in search UI
+filters = [
+    "global",         # all hosts (cuando sync active)
+    "host",           # only this host
+    "session",        # only this session
+    "directory",      # cwd-based
+    "exit",           # by exit code
+    "duration",       # by duration
+    "before",         # date filter
+    "after",          # date filter
+]
+
+## UI / TUI
+[style]
+# Compact mode: minimal border, focused on results
+style = "compact"
+
+# Preview window shows the command + cwd + exit + duration
+# when an entry is highlighted. Disabled in compact mode by default.
+show_preview = false
+
+# Help line at bottom
+show_help = true
+
+## Daemon (rule #15 — daemon estable)
+[daemon]
+# Daemon reduces search latency by keeping history in memory
+enabled = true
+# Bind to localhost only (security)
+bind_address = "127.0.0.1"
+
+## Stats (rule #16 — never blocking)
+[stats]
+# Compute usage statistics on local DB only — never shared without explicit sync
+enabled = true
+# Common commands top list
+common_commands = 10
+
+## Sync (off by default, per rule #14)
+[sync]
+# Will be enabled when CEO provides Atuin Cloud credentials.
+# DO NOT activate until explicit approval + secret stored in vault.
+auto_sync = false
+auto_sync_interval = 60
