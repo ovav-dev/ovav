@@ -1,5 +1,5 @@
 {
- "_comment": "OVAV workstation IT v0.2 fragment. 4 uppercase profiles OVAV/SYS/HUB/WIN with real UUID5 GUIDs + Reload Settings action.",
+ "_comment": "OVAV workstation IT v0.2 fragment. 4 uppercase profiles OVAV/SYS/HUB/WIN. Real UUID5 GUIDs. 8 actions including Reload Settings recovery.",
  "defaultProfile": "{e3cb3da9-9980-5990-a951-339efdad913d}",
  "theme": {
   "light": "OVAV Day UI",
@@ -244,6 +244,31 @@
  ],
  "actions": [
   {
+   "name": "OVAV Workspace",
+   "commandline": {
+    "actions": [
+     {
+      "type": "newTab",
+      "profile": "OVAV",
+      "tabTitle": "OVAV \u2014 Main"
+     },
+     {
+      "type": "splitPane",
+      "split": "vertical",
+      "profile": "WIN",
+      "tabTitle": "Agent"
+     },
+     {
+      "type": "splitPane",
+      "split": "horizontal",
+      "profile": "OVAV",
+      "tabTitle": "Logs"
+     }
+    ]
+   },
+   "keybind": "ctrl+shift+grave"
+  },
+  {
    "name": "OVAV Reload Settings",
    "commandline": {
     "actions": [
@@ -253,6 +278,79 @@
     ]
    },
    "keybind": "ctrl+shift+r"
+  },
+  {
+   "name": "New OVAV Tab",
+   "commandline": {
+    "actions": [
+     {
+      "type": "newTab",
+      "profile": "OVAV"
+     }
+    ]
+   },
+   "keybind": "ctrl+shift+t"
+  },
+  {
+   "name": "Split Vertical",
+   "commandline": {
+    "actions": [
+     {
+      "type": "splitPane",
+      "split": "vertical",
+      "profile": "${profile.name}"
+     }
+    ]
+   },
+   "keybind": "ctrl+alt+d"
+  },
+  {
+   "name": "Split Horizontal",
+   "commandline": {
+    "actions": [
+     {
+      "type": "splitPane",
+      "split": "horizontal",
+      "profile": "${profile.name}"
+     }
+    ]
+   },
+   "keybind": "ctrl+alt+s"
+  },
+  {
+   "name": "Focus Left",
+   "commandline": {
+    "actions": [
+     {
+      "type": "moveFocus",
+      "direction": "left"
+     }
+    ]
+   },
+   "keybind": "alt+left"
+  },
+  {
+   "name": "Focus Right",
+   "commandline": {
+    "actions": [
+     {
+      "type": "moveFocus",
+      "direction": "right"
+     }
+    ]
+   },
+   "keybind": "alt+right"
+  },
+  {
+   "name": "Toggle Zoom",
+   "commandline": {
+    "actions": [
+     {
+      "type": "togglePaneZoom"
+     }
+    ]
+   },
+   "keybind": "ctrl+shift+z"
   }
  ]
 }
