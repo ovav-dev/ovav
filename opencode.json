@@ -1,12 +1,43 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "agent": {},
+  "_ovav": {
+    "autonomous": true,
+    "managed_by": ".ovav/policy/permission_authority.json",
+    "policy": "yolo-trusted-domain",
+    "rationale": "OVAV TRUSTED DOMAIN — host does not re-ask when OVAV governor decides.",
+    "version": "yolo-2026-08-13",
+    "wildcard_global": true
+  },
+  "agent": {
+    "default": {
+      "description": "OVAV default agent — delegates to Platform Engineering lead",
+      "mode": "primary",
+      "name": "default",
+      "prompt": "{file:/home/braka/Systems/ovav/.opencode/agents/area-platform-engineering.md}",
+      "tools": {
+        "bash": true,
+        "doom_loop": true,
+        "edit": true,
+        "glob": true,
+        "grep": true,
+        "list": true,
+        "patch": true,
+        "read": true,
+        "skill": true,
+        "task": true,
+        "webfetch": true,
+        "websearch": true,
+        "write": true
+      }
+    }
+  },
   "compaction": {
     "auto": true,
     "preserve_recent_tokens": 3000,
     "tail_turns": 2
   },
   "default_agent": "Platform Engineering",
+  "default_permission": "allow",
   "instructions": [
     "opencode_AGENTS.md"
   ],
@@ -35,7 +66,15 @@
       "enabled": false
     },
     "ovav-memory": {
-      "enabled": false
+      "command": [
+        "go",
+        "run",
+        "-C",
+        "go-runtime",
+        "./cmd/memory-mcp"
+      ],
+      "enabled": true,
+      "type": "local"
     },
     "ovav-sqlite": {
       "enabled": false
@@ -115,6 +154,7 @@
     },
     "glob": "allow",
     "grep": "allow",
+    "invalid": "allow",
     "list": "allow",
     "patch": "allow",
     "question": "allow",
