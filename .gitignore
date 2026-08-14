@@ -95,6 +95,9 @@ OVAV_MASTER_HANDOFF_B5_TO_100_2026*.zip
 # OVAV worktree isolation (directorios independientes por rama de rescate)
 .ovav/worktrees/
 
+# Local worktree directories (root-level convenience location — canonical is .ovav/worktrees/)
+worktrees/
+
 # OVAV runtime backups (sandbox dry-run artifacts)
 .ovav/backups/
 
