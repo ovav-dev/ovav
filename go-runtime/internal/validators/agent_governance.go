@@ -127,16 +127,16 @@ func (a *AgentGovernance) Validate(ctx context.Context, root string) Result {
 	if harness.isFullHierarchy() {
 		// 2a. Verify required lead agents exist (canonical location)
 		leadAreaMap := map[string]string{
-			"lead-thavren.md":   "platform_engineering",
-			"lead-eidren.md":    "research_intelligence",
-			"lead-dante.md":     "digital_product",
-			"lead-elena.md":     "ux_design",
-			"lead-sofia.md":     "commercial_growth",
-			"lead-uriel.md":     "devops_infrastructure",
-			"lead-valeria.md":   "education_career",
-			"lead-renata.md":    "health_performance",
-			"lead-kenji.md":     "adversarial_intelligence",
-			"lead-camila.md":    "legal_compliance",
+			"lead-thavren.md": "platform_engineering",
+			"lead-eidren.md":  "research_intelligence",
+			"lead-dante.md":   "digital_product",
+			"lead-elena.md":   "ux_design",
+			"lead-sofia.md":   "commercial_growth",
+			"lead-uriel.md":   "devops_infrastructure",
+			"lead-valeria.md": "education_career",
+			"lead-renata.md":  "health_performance",
+			"lead-kenji.md":   "adversarial_intelligence",
+			"lead-camila.md":  "legal_compliance",
 		}
 		for _, lead := range requiredLeads {
 			areaID, ok := leadAreaMap[lead]

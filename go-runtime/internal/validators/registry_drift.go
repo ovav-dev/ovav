@@ -190,21 +190,21 @@ func extractGoValidatorID(path string) string {
 
 // autoTriggersMetaKeys are top-level keys in auto_triggers.yaml that are not
 var autoTriggersMetaKeys = map[string]bool{
-	"schema":            true,
-	"updated_at":        true,
-	"status":            true,
-	"execution_scope":   true,
-	"note":              true,
-	"router":            true,
-	"registry_only_router": true,
-	"sdd_init":             true,
-	"phase_dag":            true,
-	"artifact_dependency":  true,
+	"schema":                  true,
+	"updated_at":              true,
+	"status":                  true,
+	"execution_scope":         true,
+	"note":                    true,
+	"router":                  true,
+	"registry_only_router":    true,
+	"sdd_init":                true,
+	"phase_dag":               true,
+	"artifact_dependency":     true,
 	"result_contract_runtime": true,
-	"h_verify_evidence":    true,
-	"memory_write_gateway": true,
-	"workspace_safety_gate": true,
-	"behavioral_directives": true,
+	"h_verify_evidence":       true,
+	"memory_write_gateway":    true,
+	"workspace_safety_gate":   true,
+	"behavioral_directives":   true,
 }
 
 // eventBlocksForScope returns the list of top-level event-block names that

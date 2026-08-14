@@ -25,14 +25,14 @@ type TrackedProvider struct {
 
 // UsageRecord represents a single usage record.
 type UsageRecord struct {
-	ID          string    `yaml:"id"`
-	ProviderID  string    `yaml:"provider_id"`
-	Model       string    `yaml:"model"`
-	InputTokens int       `yaml:"input_tokens"`
-	OutputTokens int      `yaml:"output_tokens"`
-	TotalTokens int       `yaml:"total_tokens"`
-	CostUSD     float64   `yaml:"cost_usd"`
-	Timestamp   time.Time `yaml:"timestamp"`
+	ID           string    `yaml:"id"`
+	ProviderID   string    `yaml:"provider_id"`
+	Model        string    `yaml:"model"`
+	InputTokens  int       `yaml:"input_tokens"`
+	OutputTokens int       `yaml:"output_tokens"`
+	TotalTokens  int       `yaml:"total_tokens"`
+	CostUSD      float64   `yaml:"cost_usd"`
+	Timestamp    time.Time `yaml:"timestamp"`
 }
 
 // UsageSummary represents aggregated usage for a period.
@@ -289,10 +289,10 @@ type Record struct {
 func CalculateCost(model string, inputTokens, outputTokens int) float64 {
 	// Simple cost estimation based on model
 	costPer1M := map[string]float64{
-		"gpt-4o":         5.00,
+		"gpt-4o":          5.00,
 		"gpt-4o-mini":     0.15,
-		"gpt-4-turbo":    10.00,
-		"gpt-3.5-turbo":  0.50,
+		"gpt-4-turbo":     10.00,
+		"gpt-3.5-turbo":   0.50,
 		"claude-opus-3":   15.00,
 		"claude-sonnet-3": 3.00,
 		"claude-haiku-3":  0.25,

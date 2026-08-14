@@ -11,10 +11,10 @@ import (
 
 // ProgressTracker manages animated progress reporting.
 type ProgressTracker struct {
-	label    string
+	label   string
 	total   int
 	current int
-	mu       sync.Mutex
+	mu      sync.Mutex
 }
 
 // NewProgressTracker creates a new progress tracker.
@@ -38,7 +38,7 @@ func (p *ProgressTracker) Increment(stepLabel string) {
 	}
 	cur := p.current
 	p.mu.Unlock()
-	
+
 	icon := spinnerIcon(cur)
 	if cur >= p.total {
 		fmt.Printf("\r  ✅ %-42s %3d%%\n", stepLabel, pct)
@@ -49,10 +49,10 @@ func (p *ProgressTracker) Increment(stepLabel string) {
 
 // PhaseResult holds the result of a single verification phase.
 type PhaseResult struct {
-	Name    string
-	Pass    bool
-	Issues  []string
-	DurMS   int64
+	Name   string
+	Pass   bool
+	Issues []string
+	DurMS  int64
 }
 
 // VerifyPhases runs multi-stack verification with animated progress.

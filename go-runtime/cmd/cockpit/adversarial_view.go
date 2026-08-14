@@ -12,12 +12,12 @@ import (
 // ── Adversarial Model ──────────────────────────────────────────────
 
 type AdversarialModel struct {
-	gates     []Gate
-	threats   ThreatModel
-	audits    []AuditEntry
-	loading   bool
-	cursor    int
-	width     int
+	gates   []Gate
+	threats ThreatModel
+	audits  []AuditEntry
+	loading bool
+	cursor  int
+	width   int
 }
 
 type Gate struct {

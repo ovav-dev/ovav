@@ -36,21 +36,21 @@ type Model struct {
 	sys  *data.SystemInfo
 
 	// Sub-models
-	installModel   InstallModel
-	tailorModel    TailorModel
-	planDetail     PlanDetailModel
-	cliModel       CLISelectorModel
-	syncModel      SyncModel
-	configModel    ConfigModel
-	updatesModel   UpdatesModel
-	vaultModel     vaultSubModel
+	installModel     InstallModel
+	tailorModel      TailorModel
+	planDetail       PlanDetailModel
+	cliModel         CLISelectorModel
+	syncModel        SyncModel
+	configModel      ConfigModel
+	updatesModel     UpdatesModel
+	vaultModel       vaultSubModel
 	testingModel     TestingModel
 	delegationModel  DelegationModel
 	researchModel    ResearchModel
 	adversarialModel AdversarialModel
 	performanceModel PerformanceModel
 	updateInfo       ProductVersionInfo
-	menuCursor     int
+	menuCursor       int
 
 	// UI state
 	quitting        bool
@@ -76,25 +76,25 @@ func NewModel() Model {
 		BorderForeground(styles.Primary)
 
 	m := Model{
-		nav:            NewNavStack(ViewWelcome),
-		ovavRoot:       ovavRoot,
-		viewport:       vp,
-		menuCursor:     0,
-		loading:        true,
+		nav:               NewNavStack(ViewWelcome),
+		ovavRoot:          ovavRoot,
+		viewport:          vp,
+		menuCursor:        0,
+		loading:           true,
 		inactivityCounter: 0,
-		installModel:   NewInstallModel(),
-		tailorModel:    NewTailorModel(),
-		planDetail:     NewPlanDetailModel(),
-		cliModel:       NewCLISelectorModel(ovavRoot),
-		syncModel:      NewSyncModel(),
-		configModel:    NewConfigModel(),
-		updatesModel:   NewUpdatesModel(),
-		vaultModel:     vaultSubModel{state: vaultStateList, selected: 0, loading: true},
-		testingModel:     NewTestingModel(),
-		delegationModel:  NewDelegationModel(),
-		researchModel:    NewResearchModel(),
-		adversarialModel: NewAdversarialModel(),
-		performanceModel: NewPerformanceModel(),
+		installModel:      NewInstallModel(),
+		tailorModel:       NewTailorModel(),
+		planDetail:        NewPlanDetailModel(),
+		cliModel:          NewCLISelectorModel(ovavRoot),
+		syncModel:         NewSyncModel(),
+		configModel:       NewConfigModel(),
+		updatesModel:      NewUpdatesModel(),
+		vaultModel:        vaultSubModel{state: vaultStateList, selected: 0, loading: true},
+		testingModel:      NewTestingModel(),
+		delegationModel:   NewDelegationModel(),
+		researchModel:     NewResearchModel(),
+		adversarialModel:  NewAdversarialModel(),
+		performanceModel:  NewPerformanceModel(),
 	}
 
 	return m

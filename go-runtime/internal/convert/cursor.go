@@ -12,10 +12,12 @@ import (
 // Verified format: https://cursor.com/docs/customcursor
 //
 // Frontmatter fields for rules (.mdc):
-//   description, alwaysApply (bool), globs (string array)
+//
+//	description, alwaysApply (bool), globs (string array)
 //
 // Frontmatter fields for agents (.cursor/agents/*.md):
-//   name, description, model, readonly (bool), is_background (bool)
+//
+//	name, description, model, readonly (bool), is_background (bool)
 //
 // Since OVAV generates areas as rules AND leads/teams as agents,
 // we output everything as .md files with the appropriate frontmatter.

@@ -112,7 +112,7 @@ func LoadConfig() *Config {
 
 // runtimeProviderConfig represents the persisted provider selection
 type runtimeProviderConfig struct {
-	Provider  Provider `json:"provider"`
+	Provider Provider `json:"provider"`
 	APIKey   string   `json:"api_key"`
 	BaseURL  string   `json:"base_url"`
 	Model    string   `json:"model"`
@@ -141,7 +141,7 @@ func loadRuntimeProvider() *Config {
 		return nil
 	}
 	return &Config{
-		Provider:  p.Provider,
+		Provider: p.Provider,
 		APIKey:   p.APIKey,
 		BaseURL:  p.BaseURL,
 		Model:    p.Model,
