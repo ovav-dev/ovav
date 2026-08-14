@@ -86,6 +86,8 @@ func routeCommand(cmd string, args []string) int {
 		return cmdSmoke(args)
 	case "smoke-all":
 		return cmdSmokeExpanded(args)
+	case "launch":
+		return cmdLaunch(args)
 	case "surfaces":
 		return cmdSurfaces(args)
 	case "export-gate", "publish-check":
