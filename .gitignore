@@ -202,6 +202,8 @@ __pycache__/
 .ovav/quarantine/
 .ovav/runtime/
 .ovav/integrity_backups/
+!.ovav/integrity_backups/baseline.json
+!.ovav/integrity_backups/baseline.pinned.json
 .ovav/registry/backups/
 .ovav/lockdown/
 
