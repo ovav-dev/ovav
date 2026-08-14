@@ -19,9 +19,9 @@ type RunbookResult struct {
 
 // Dispatcher routes alerts to appropriate handlers based on level
 type Dispatcher struct {
-	queue    *Queue
-	runners  map[string]Runbook
-	mu       sync.RWMutex
+	queue   *Queue
+	runners map[string]Runbook
+	mu      sync.RWMutex
 }
 
 // NewDispatcher creates a new alert dispatcher

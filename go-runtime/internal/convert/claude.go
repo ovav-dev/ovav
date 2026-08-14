@@ -11,9 +11,10 @@ import (
 // Verified format: https://docs.anthropic.com/en/docs/claude-code/agents
 //
 // Frontmatter fields (VERIFIED):
-//   name, description, tools, disallowedTools, model, permissionMode,
-//   maxTurns, skills, mcpServers, hooks, memory, background, effort,
-//   isolation, color, initialPrompt
+//
+//	name, description, tools, disallowedTools, model, permissionMode,
+//	maxTurns, skills, mcpServers, hooks, memory, background, effort,
+//	isolation, color, initialPrompt
 //
 // NO type:, hidden:, mode:, permission: blocks — these are OVAV extensions
 // NOT supported by Claude Code's agent format.
