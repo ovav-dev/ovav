@@ -137,6 +137,8 @@ func routeCommand(cmd string, args []string) int {
 		return cmdDrift(args)
 	case "ci":
 		return cmdCI(args)
+	case "it":
+		return cmdIT(args)
 	default:
 		fmt.Fprintf(os.Stderr, "Unknown command: %s\nRun 'ovav help' for usage.\n", cmd)
 		return 2

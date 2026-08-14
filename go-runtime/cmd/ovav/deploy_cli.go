@@ -171,7 +171,30 @@ func runDeployRun(args []string) int {
 		fmt.Println()
 	}
 
-	// Step 6: Audit log
+	// Step 6: IT reload (ADR-010) — only if IT-related targets deployed
+	if !dryRun && status != "failed" {
+		hasITTarget := false
+		for _, t := range results {
+			if t.ID == "it-keybindings" && t.Status == "success" {
+				hasITTarget = true
+				break
+			}
+		}
+		if hasITTarget {
+			fmt.Println("→ Step 6: IT reload (ADR-010)")
+			reloadCode := runITReload(nil)
+			if reloadCode == 0 {
+				fmt.Println("   ✅ IT reload complete")
+			} else if reloadCode == 1 {
+				fmt.Println("   ⚠️  IT reload skipped (no running process or broadcast only)")
+			} else {
+				fmt.Println("   ⚠️  IT reload requires manual intervention")
+			}
+			fmt.Println()
+		}
+	}
+
+	// Step 7: Audit log
 	record := DeployRecord{
 		DeployID:   deployID,
 		Timestamp:  timestamp,
@@ -185,7 +208,7 @@ func runDeployRun(args []string) int {
 	}
 	if !dryRun {
 		_ = appendDeployHistory(root, record)
-		fmt.Printf("→ Step 6: Audit log → .ovav/registry/deploy_history.jsonl\n\n")
+		fmt.Printf("→ Step 7: Audit log → .ovav/registry/deploy_history.jsonl\n\n")
 	}
 
 	// Summary
