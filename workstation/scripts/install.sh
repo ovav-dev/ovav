@@ -32,6 +32,7 @@ ok "tools available"
 # ─── 1. Backup existing config ─────────────────────────────
 log "Backing up existing configs → $BACKUP_DIR"
 [ -f "$HOME/.bashrc" ] && cp -p "$HOME/.bashrc" "$BACKUP_DIR/bashrc.bak" && ok "bashrc"
+[ -f "$HOME/.inputrc" ] && cp -p "$HOME/.inputrc" "$BACKUP_DIR/inputrc.bak" && ok "inputrc"
 [ -f "$HOME/.config/starship.toml" ] && cp -p "$HOME/.config/starship.toml" "$BACKUP_DIR/starship.toml.bak" && ok "starship"
 mkdir -p "$HOME/.config/atuin"
 [ -f "$HOME/.config/atuin/config.toml" ] && cp -p "$HOME/.config/atuin/config.toml" "$BACKUP_DIR/atuin-config.toml.bak" && ok "atuin"
@@ -53,6 +54,28 @@ if ! grep -qF "$OVAV_MARKER" "$HOME/.bashrc" 2>/dev/null; then
   ok "bashrc updated (idempotent append)"
 else
   ok "bashrc already has OVAV block (skipping)"
+fi
+
+# ─── 2b. Install readline config (~/.inputrc) ───────────────
+log "Installing OVAV readline config (inputrc)"
+OVAV_INPUTRC="$HOME/.inputrc"
+INPUTRC_SRC="$WORKSTATION/configs/inputrc/ovav.inputrc"
+OVAV_INPUTRC_MARKER='OVAV readline config — sourced automatically by bash'
+if [ ! -f "$OVAV_INPUTRC" ]; then
+  cp -p "$INPUTRC_SRC" "$OVAV_INPUTRC"
+  ok "inputrc installed (new)"
+elif ! grep -qF "$OVAV_INPUTRC_MARKER" "$OVAV_INPUTRC" 2>/dev/null; then
+  # Existing user inputrc — append OVAV bindings without clobbering user prefs.
+  # Backup first.
+  [ -f "$BACKUP_DIR/inputrc.bak" ] || cp -p "$OVAV_INPUTRC" "$BACKUP_DIR/inputrc.bak"
+  {
+    echo ""
+    echo "# $OVAV_INPUTRC_MARKER"
+    cat "$INPUTRC_SRC"
+  } >> "$OVAV_INPUTRC"
+  ok "inputrc appended (user prefs preserved, backed up)"
+else
+  ok "inputrc already has OVAV block"
 fi
 
 # ─── 3. Install Starship ───────────────────────────────────
@@ -136,6 +159,7 @@ log "Verification"
 [ -f "$HOME/.config/opencode/tui.json" ] && ok "opencode tui.json installed"
 [ -f "$HOME/.config/opencode/themes/ovav-night.json" ] && ok "ovav-night theme installed"
 [ -f "$HOME/.config/opencode/themes/ovav-day.json" ] && ok "ovav-day theme installed"
+[ -f "$HOME/.inputrc" ] && ok "inputrc installed"
 
 if [ -x "$HOME/.local/bin/ovav" ]; then
   ok "OVAV CLI present"
