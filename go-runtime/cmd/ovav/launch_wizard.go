@@ -170,18 +170,94 @@ func getLaunchGates() []LaunchGate {
 	}
 }
 
+
+// runLaunchWizardReadOnly performs state check without auto-fixing.
+func runLaunchWizardReadOnly(root string, mode string) int {
+	fmt.Println("🛡️  OVAV Launch Assistant (read-only, mode: " + mode + ")")
+	fmt.Println()
+	gates := getLaunchGates()
+	report := ReadinessReport{
+		Timestamp: time.Now().UTC().Format(time.RFC3339),
+		RepoRoot:  root,
+	}
+	for _, gate := range gates {
+		passed, detail, _ := gate.Check(root)
+		status := "fail"
+		if passed {
+			status = "pass"
+		}
+		report.Gates = append(report.Gates, GateReport{
+			ID:          gate.ID,
+			Description: gate.Description,
+			Status:      status,
+			Detail:      detail,
+			CEORequired: gate.CEORequired,
+		})
+	}
+	allPass := true
+	ceoGates := []GateReport{}
+	for _, gr := range report.Gates {
+		if gr.Status != "pass" {
+			allPass = false
+		}
+		if gr.CEORequired && gr.Status != "pass" {
+			ceoGates = append(ceoGates, gr)
+		}
+	}
+	if allPass {
+		report.Overall = "ready"
+	} else if len(ceoGates) > 0 {
+		report.Overall = "needs-ceo-attention"
+	} else {
+		report.Overall = "blocked"
+	}
+
+	fmt.Println("─" + strings.Repeat("─", 70))
+	fmt.Printf("📊 Readiness: %s %s\n", overallEmoji(report.Overall), strings.ToUpper(report.Overall))
+	fmt.Println("─" + strings.Repeat("─", 70))
+	for _, gr := range report.Gates {
+		icon := gateEmoji(gr.Status)
+		ceoTag := ""
+		if gr.CEORequired {
+			ceoTag = " [CEO]"
+		}
+		fmt.Printf("%s %s%s — %s\n", icon, gr.ID, ceoTag, gr.Detail)
+	}
+	fmt.Println()
+	if report.Overall == "ready" {
+		fmt.Println("✅ All automatic gates passed!")
+		fmt.Println("Next: ovav launch (to auto-fix remaining) or ovav launch ceo-decide ...")
+	} else if len(ceoGates) > 0 {
+		fmt.Println("⏳ CEO gates pending:")
+		for _, cg := range ceoGates {
+			fmt.Printf("   • %s\n", cg.ID)
+		}
+	} else {
+		fmt.Println("⚠️  Some gates failed. Run: ovav launch (auto-fix)")
+	}
+	saveReadinessReport(root, report)
+	return 0
+}
+
 // runLaunchWizard is the autonomous launch wizard.
 // Single entry point that handles the entire ceremony.
 func runLaunchWizard(args []string) int {
+	// Help first
+	for _, a := range args {
+		if a == "--help" || a == "-h" {
+			printLaunchWizardHelp()
+			return 0
+		}
+	}
+
 	root, err := cliFindRepoRootSafe()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "OVAV launch: %v\n", err)
 		return 1
 	}
 
-	// Parse flags
-	mode := "wizard" // wizard | prepare | all | status | info
-
+	// Parse mode flags
+	mode := "wizard"
 	for _, a := range args {
 		switch a {
 		case "--status":
@@ -192,12 +268,13 @@ func runLaunchWizard(args []string) int {
 			mode = "all"
 		case "--info":
 			mode = "info"
-		case "--help", "-h":
-			printLaunchWizardHelp()
-			return 0
 		}
 	}
-	_ = mode // future use for different behaviors
+
+	// For --info and --status, just check state without auto-fixing
+	if mode == "info" || mode == "status" {
+		return runLaunchWizardReadOnly(root, mode)
+	}
 
 	fmt.Println("🛡️  OVAV Launch Assistant (ADR-014)")
 	fmt.Println()

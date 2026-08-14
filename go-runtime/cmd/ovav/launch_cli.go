@@ -28,6 +28,13 @@ func cmdLaunch(args []string) int {
 	if len(args) == 0 {
 		return runLaunchWizard(args)
 	}
+	// Wizard flags -- pass through to runLaunchWizard
+	for _, a := range args {
+		switch a {
+		case "--status", "--info", "--prepare", "--all", "--help", "-h":
+			return runLaunchWizard(args)
+		}
+	}
 	switch args[0] {
 	case "evidence":
 		return runLaunchEvidence(args[1:])
