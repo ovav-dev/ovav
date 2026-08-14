@@ -1,6 +1,6 @@
 {
- "_comment": "OVAV workstation IT v0.2 fragment. 4 profiles uppercase: OVAV (project root default), SYS (.config), HUB (projects), WIN (Windows). All have real UUID5 GUIDs. Iconography: \ud83d\udd37 \u2699\ufe0f \ud83d\udcc1 \ud83e\ude9f. Distinct tabColor per profile.",
- "defaultProfile": "{2F24A57E-DE2C-5A2B-898B-732A66A7F6BC}",
+ "_comment": "OVAV workstation IT v0.2 fragment. 4 uppercase profiles OVAV/SYS/HUB/WIN with real UUID5 GUIDs + Reload Settings action.",
+ "defaultProfile": "{e3cb3da9-9980-5990-a951-339efdad913d}",
  "theme": {
   "light": "OVAV Day UI",
   "dark": "OVAV Night UI"
@@ -244,153 +244,15 @@
  ],
  "actions": [
   {
-   "name": "OVAV Workspace",
+   "name": "OVAV Reload Settings",
    "commandline": {
     "actions": [
      {
-      "type": "newTab",
-      "profile": "OVAV",
-      "tabTitle": "OVAV \u2014 Main"
-     },
-     {
-      "type": "splitPane",
-      "split": "vertical",
-      "profile": "WIN",
-      "tabTitle": "Agent"
+      "type": "reloadSettings"
      }
     ]
    },
-   "keybind": "ctrl+shift+grave"
-  },
-  {
-   "name": "New OVAV Tab",
-   "commandline": {
-    "actions": [
-     {
-      "type": "newTab",
-      "profile": "OVAV"
-     }
-    ]
-   },
-   "keybind": "ctrl+shift+t"
-  },
-  {
-   "name": "OVAV Split Vertical",
-   "commandline": {
-    "actions": [
-     {
-      "type": "splitPane",
-      "split": "vertical",
-      "profile": "${profile.name}"
-     }
-    ]
-   },
-   "keybind": "ctrl+alt+d"
-  },
-  {
-   "name": "OVAV Split Horizontal",
-   "commandline": {
-    "actions": [
-     {
-      "type": "splitPane",
-      "split": "horizontal",
-      "profile": "${profile.name}"
-     }
-    ]
-   },
-   "keybind": "ctrl+alt+s"
-  },
-  {
-   "name": "OVAV Focus Left",
-   "commandline": {
-    "actions": [
-     {
-      "type": "moveFocus",
-      "direction": "left"
-     }
-    ]
-   },
-   "keybind": "alt+left"
-  },
-  {
-   "name": "OVAV Focus Right",
-   "commandline": {
-    "actions": [
-     {
-      "type": "moveFocus",
-      "direction": "right"
-     }
-    ]
-   },
-   "keybind": "alt+right"
-  },
-  {
-   "name": "OVAV Focus Up",
-   "commandline": {
-    "actions": [
-     {
-      "type": "moveFocus",
-      "direction": "up"
-     }
-    ]
-   },
-   "keybind": "alt+up"
-  },
-  {
-   "name": "OVAV Focus Down",
-   "commandline": {
-    "actions": [
-     {
-      "type": "moveFocus",
-      "direction": "down"
-     }
-    ]
-   },
-   "keybind": "alt+down"
-  },
-  {
-   "name": "OVAV Toggle Zoom",
-   "commandline": {
-    "actions": [
-     {
-      "type": "togglePaneZoom"
-     }
-    ]
-   },
-   "keybind": "ctrl+shift+z"
-  },
-  {
-   "name": "OVAV Close Pane",
-   "commandline": {
-    "actions": [
-     {
-      "type": "closePane"
-     }
-    ]
-   },
-   "keybind": "ctrl+shift+w"
-  },
-  {
-   "name": "OVAV Command Palette",
-   "commandline": {
-    "actions": [
-     {
-      "type": "commandPalette"
-     }
-    ]
-   },
-   "keybind": "ctrl+shift+p"
-  },
-  {
-   "name": "OVAV Search",
-   "commandline": {
-    "actions": [
-     {
-      "type": "findMatch"
-     }
-    ]
-   },
-   "keybind": "ctrl+shift+f"
+   "keybind": "ctrl+shift+r"
   }
  ]
 }
