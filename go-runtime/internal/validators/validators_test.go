@@ -831,8 +831,10 @@ func TestDefaultRegistry_70Validators(t *testing.T) {
 	// 2026-08-14: Added ITKeybindings (regression guard for IT keybindings fragment)
 	// 2026-08-14: Added ITLiveKeybindings (drift detection for live IT settings.json)
 	// 2026-08-14: Added BashReadlineBindings (shift+arrow regression guard)
-	if len(all) != 74 {
-		t.Errorf("expected 74 validators in default registry, got %d", len(all))
+	// 2026-08-14: Added IntegrityBaselineFresh (ADR-006 baseline versioning)
+	// 2026-08-14: Added PinnedBaselineDrift (ADR-006 pinned baseline firewall)
+	if len(all) != 76 {
+		t.Errorf("expected 76 validators in default registry, got %d", len(all))
 	}
 	// Verify each has non-empty ID
 	for _, v := range all {

@@ -327,15 +327,22 @@ governance:
       status: "pass"
 
   validators:
-    total: 74
-    registered: 74
-    cli_visible: 74
-    passed: 65
-    warned: 8
-    failed: 1
+    total: 76
+    registered: 76
+    cli_visible: 76
+    passed: 0
+    warned: 0
+    failed: 0
     mode: "developer"
     gate_mode: "blocked_pending_baseline_and_candidate_closure"
     last_run: "2026-08-14"
+    new_in_2026_08_14_phase1_batch12:
+      - id: "integrity_baseline_fresh"
+        weight: 10
+        description: "Runtime integrity baseline freshness (ADR-006)"
+      - id: "pinned_baseline_drift"
+        weight: 15
+        description: "Pinned baseline drift firewall (ADR-006)"
 
   failed_validators: []
 

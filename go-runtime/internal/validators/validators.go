@@ -197,6 +197,9 @@ func DefaultRegistry(modes ...ValidationMode) *Registry {
 		NewITLiveKeybindings(),
 		// Batch 11c — Bash readline shift+arrow bindings (2026-08-14)
 		NewBashReadlineBindings(),
+		// Batch 12 — Runtime integrity baseline versioning (2026-08-14, ADR-006)
+		NewIntegrityBaselineFresh(mode),
+		NewPinnedBaselineDrift(mode),
 	)
 }
 
