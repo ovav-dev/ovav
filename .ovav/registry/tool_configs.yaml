@@ -18,8 +18,10 @@ tool_config_profiles:
     visible_message: WezTerm detected. OVAV can replace your default WezTerm config with a governed professional workspace profile. OVAV does not install WezTerm. Preview, backup and rollback are required before apply.
     source_policy: config/workstation/ovav-wezterm-workspace-isolation.yaml
     source_template: .ovav/source/configs/wezterm/ovav-workspace-isolation.wezterm.lua.example
-    helper_tool: tools/workstation/ovav_wezterm_workspace.py
-    validator: tools/validators/check_ovav_wezterm_workspace_isolation.py
+    helper_tool_status: removed_python_helper
+    helper_tool_note: "Python helper removed during Go runtime migration; wezterm workspace isolation is now enforced by go-runtime/internal/validators/workspace_isolation.go (no global writes)."
+    validator: go-runtime/internal/validators/workspace_isolation.go
+    path_integrity_validator: go-runtime/internal/validators/wezterm_path_integrity.go
     cli:
       plan: ovav tools wezterm plan
       verify: ovav tools wezterm verify
