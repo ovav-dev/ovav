@@ -1,5 +1,5 @@
 {
- "_comment": "OVAV workstation fragment for Intelligent Terminal v0.2.2192+. Schema fields: theme(paired refs), themes(tabRow+window.frame), profiles.defaults.colorScheme(paired refs), per-profile tabColor for accent identity. Rule #22 (auto day/night) + #26 (modern tabs).",
+ "_comment": "OVAV fragment for IT v0.2.2192 \u2014 DEFAULT PROFILE = OVAV Ubuntu. TabRow at TOP LEVEL + per-theme. All fields aligned to current Microsoft Terminal v1.22 schema.",
  "theme": {
   "light": "OVAV Day UI",
   "dark": "OVAV Night UI"
@@ -44,6 +44,11 @@
    }
   }
  ],
+ "defaultProfile": "{e3cb3da9-9980-5990-a951-339efdad913d}",
+ "tabRow": {
+  "background": "#0B1020",
+  "height": 36
+ },
  "showTabsInTitlebar": true,
  "useAcrylicInTabRow": false,
  "tabWidthMode": "compact",
