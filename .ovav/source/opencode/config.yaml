@@ -39,7 +39,19 @@ providers:
     options:
       timeout: 300000
 permissions:
+  '*': allow
   edit: allow
+  write: allow
+  read: allow
+  glob: allow
+  grep: allow
+  list: allow
+  patch: allow
+  task: allow
+  skill: allow
+  webfetch: allow
+  websearch: allow
+  doom_loop: allow
   bash:
     '*': allow
     apt install *: deny
