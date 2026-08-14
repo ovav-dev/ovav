@@ -10,9 +10,12 @@ import (
 //
 // Usage: ovav hooks <subcommand>
 // Subcommands:
-//   install-pre-commit   — install pre-commit hook enforcing baseline freshness
-//   uninstall-pre-commit — remove OVAV pre-commit hook
-//   status               — show hook installation status
+//   install-pre-commit    — install pre-commit hook enforcing baseline freshness
+//   uninstall-pre-commit  — remove OVAV pre-commit hook
+//   install-pre-push      — install pre-push hook for drift gate (ADR-009)
+//   uninstall-pre-push    — remove OVAV pre-push hook
+//   install-all           — install all OVAV hooks
+//   status                — show all hook installation states
 func cmdHooks(args []string) int {
 	if len(args) == 0 {
 		printHooksHelp()
@@ -23,8 +26,14 @@ func cmdHooks(args []string) int {
 		return cmdHooksInstallPreCommit(args[1:])
 	case "uninstall-pre-commit":
 		return cmdHooksUninstallPreCommit(args[1:])
+	case "install-pre-push":
+		return cmdHooksInstallPrePush(args[1:])
+	case "uninstall-pre-push":
+		return cmdHooksUninstallPrePush(args[1:])
+	case "install-all":
+		return cmdHooksInstallAll(args[1:])
 	case "status":
-		return cmdHooksStatus(args[1:])
+		return cmdHooksStatusAll(args[1:])
 	case "help", "--help", "-h":
 		printHooksHelp()
 		return 0
@@ -41,11 +50,16 @@ func printHooksHelp() {
 Usage:
   ovav hooks install-pre-commit     # install pre-commit baseline freshness hook
   ovav hooks uninstall-pre-commit   # remove OVAV pre-commit hook
-  ovav hooks status                 # show hook installation state
+  ovav hooks install-pre-push       # install pre-push drift gate hook
+  ovav hooks uninstall-pre-push     # remove OVAV pre-push hook
+  ovav hooks install-all            # install all OVAV hooks
+  ovav hooks status                 # show all hook states
 
-Installed hooks enforce ADR-006 (baseline versioning):
-- Protected surface changes require baseline.json update
-- Bypass: OVAV_BYPASS_BASELINE_CHECK=1 git commit ...`)
+Installed hooks enforce ADR-006 (baseline versioning) + ADR-009 (drift gate):
+- pre-commit: protected surface changes require baseline.json update
+- pre-push: blocks push to develop if drift detected
+- Bypass pre-commit: OVAV_BYPASS_BASELINE_CHECK=1 git commit ...
+- Bypass pre-push: OVAV_BYPASS_DRIFT_CHECK=1 git push`)
 }
 
 func cmdHooksInstallPreCommit(args []string) int {
@@ -126,6 +140,10 @@ func cmdHooksUninstallPreCommit(args []string) int {
 }
 
 func cmdHooksStatus(args []string) int {
+	return cmdHooksStatusAll(args)
+}
+
+func cmdHooksStatusAll(args []string) int {
 	root, err := cliFindRepoRootSafe()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "OVAV hooks status: %v\n", err)
@@ -136,13 +154,104 @@ func cmdHooksStatus(args []string) int {
 		fmt.Fprintf(os.Stderr, "OVAV hooks status: %v\n", err)
 		return 1
 	}
-	dest := filepath.Join(gitPath, "hooks", "pre-commit")
-	if _, err := os.Stat(dest); err != nil {
-		fmt.Println("❌ OVAV pre-commit hook NOT installed at", dest)
-		fmt.Println("   Install: ovav hooks install-pre-commit")
+	hooks := []string{"pre-commit", "pre-push"}
+	for _, h := range hooks {
+		dest := filepath.Join(gitPath, "hooks", h)
+		if _, err := os.Stat(dest); err == nil {
+			fmt.Printf("✅ %s: installed at %s\n", h, dest)
+		} else {
+			fmt.Printf("❌ %s: NOT installed (install: ovav hooks install-%s)\n", h, h)
+		}
+	}
+	return 0
+}
+
+func cmdHooksInstallPrePush(args []string) int {
+	return installHook("pre-push")
+}
+
+func cmdHooksUninstallPrePush(args []string) int {
+	return uninstallHook("pre-push")
+}
+
+func cmdHooksInstallAll(args []string) int {
+	rc := 0
+	for _, h := range []string{"pre-commit", "pre-push"} {
+		if installHook(h) != 0 {
+			rc = 1
+		}
+	}
+	return rc
+}
+
+func installHook(name string) int {
+	root, err := cliFindRepoRootSafe()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "OVAV hooks install: %v\n", err)
 		return 1
 	}
-	fmt.Println("✅ OVAV pre-commit hook installed at", dest)
+	source := filepath.Join(root, ".ovav", "hooks", name)
+	if _, err := os.Stat(source); err != nil {
+		fmt.Fprintf(os.Stderr, "OVAV hooks install: source not found: %s\n", source)
+		return 1
+	}
+	gitPath, err := resolveGitDir(root)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "OVAV hooks install: %v\n", err)
+		return 1
+	}
+	hooksDir := filepath.Join(gitPath, "hooks")
+	if err := os.MkdirAll(hooksDir, 0o755); err != nil {
+		fmt.Fprintf(os.Stderr, "OVAV hooks install: mkdir hooks dir: %v\n", err)
+		return 1
+	}
+	dest := filepath.Join(hooksDir, name)
+
+	if data, err := os.ReadFile(dest); err == nil && len(data) > 0 {
+		isOVAV := false
+		for _, marker := range []string{"# OVAV pre-commit hook", "# OVAV pre-push hook"} {
+			if len(data) >= len(marker) && string(data[:len(marker)]) == marker {
+				isOVAV = true
+				break
+			}
+		}
+		if !isOVAV {
+			fmt.Fprintf(os.Stderr, "OVAV hooks install: .git/hooks/%s exists and is not OVAV.\n", name)
+			return 2
+		}
+	}
+
+	data, err := os.ReadFile(source)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "OVAV hooks install: read source: %v\n", err)
+		return 1
+	}
+	if err := os.WriteFile(dest, data, 0o755); err != nil {
+		fmt.Fprintf(os.Stderr, "OVAV hooks install: write dest: %v\n", err)
+		return 1
+	}
+	_ = os.Chmod(dest, 0o755)
+	fmt.Printf("✅ OVAV %s hook installed → %s\n", name, dest)
+	return 0
+}
+
+func uninstallHook(name string) int {
+	root, err := cliFindRepoRootSafe()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "OVAV hooks uninstall: %v\n", err)
+		return 1
+	}
+	gitPath, err := resolveGitDir(root)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "OVAV hooks uninstall: %v\n", err)
+		return 1
+	}
+	dest := filepath.Join(gitPath, "hooks", name)
+	if err := os.Remove(dest); err != nil {
+		fmt.Fprintf(os.Stderr, "OVAV hooks uninstall: %v\n", err)
+		return 1
+	}
+	fmt.Printf("✅ OVAV %s hook removed ← %s\n", name, dest)
 	return 0
 }
 
