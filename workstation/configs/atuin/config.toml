@@ -2,6 +2,7 @@
 # Rule #15: NO pty-proxy (inmaduro <30d en v18.19.0)
 # Rule #16: MCP server opt-in (herramienta on-demand)
 # Rule #14: AI no activada por default (servicio cloud separado)
+# Note: Atuin v18.19.0 schema — only include fields verified to deserialize
 
 ## Atuin history database
 [history]
@@ -15,32 +16,6 @@ search_mode = "fuzzy"
 
 # Inline height for search UI
 inline_height = 18
-
-## Search filters (rule #18: Atuin owns Ctrl-R; no overlap con fzf)
-[search]
-# Default filters shown in search UI
-filters = [
-    "global",         # all hosts (cuando sync active)
-    "host",           # only this host
-    "session",        # only this session
-    "directory",      # cwd-based
-    "exit",           # by exit code
-    "duration",       # by duration
-    "before",         # date filter
-    "after",          # date filter
-]
-
-## UI / TUI
-[style]
-# Compact mode: minimal border, focused on results
-style = "compact"
-
-# Preview window shows the command + cwd + exit + duration
-# when an entry is highlighted. Disabled in compact mode by default.
-show_preview = false
-
-# Help line at bottom
-show_help = true
 
 ## Daemon (rule #15 — daemon estable)
 [daemon]
