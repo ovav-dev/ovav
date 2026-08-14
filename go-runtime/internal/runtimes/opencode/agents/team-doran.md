@@ -2,7 +2,7 @@
 name: "Doran"
 description: "Install Engineer — planificación de instalación, backup/rollback, transición source-to-global."
 mode: subagent
-model: openai/gpt-5.6-sol
+model: opencode-go/qwen3.7-max
 hidden: true
 permission:
   edit: "allow"

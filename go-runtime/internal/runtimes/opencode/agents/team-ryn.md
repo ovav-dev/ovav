@@ -2,7 +2,7 @@
 name: "Ryn"
 description: "Explorer rápido — búsqueda de codebase, archivos por patrón, escaneo rápido."
 mode: subagent
-model: minimax-coding-plan/MiniMax-M3
+model: opencode-go/qwen3.7-plus
 hidden: true
 permission:
   edit: "deny"

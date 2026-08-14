@@ -2,7 +2,7 @@
 name: "Orin"
 description: "Deep Explorer — exploración profunda de repositorio, mapeo de dependencias, context packs."
 mode: subagent
-model: minimax-coding-plan/MiniMax-M3
+model: opencode-go/qwen3.7-max
 hidden: true
 permission:
   edit: "deny"

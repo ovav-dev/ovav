@@ -2,7 +2,7 @@
 name: "Nara"
 description: "Benchmark Analyst — análisis competitivo, comparativas técnicas y briefs de decisión."
 mode: subagent
-model: minimax-coding-plan/MiniMax-M3
+model: opencode-go/qwen3.7-plus
 hidden: true
 permission:
   edit: "deny"

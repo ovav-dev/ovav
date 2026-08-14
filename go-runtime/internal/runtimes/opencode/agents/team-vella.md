@@ -2,7 +2,7 @@
 name: "Vella"
 description: "Testing & QA Engineer — ejecuta tests, detecta regresiones, cubre edge cases."
 mode: subagent
-model: minimax-coding-plan/MiniMax-M3
+model: opencode-go/qwen3.7-max
 hidden: true
 permission:
   edit: "allow"
