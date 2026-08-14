@@ -43,3 +43,62 @@ tool_config_profiles:
       writes_windows_user_config_now: false
       launches_real_wezterm_now: false
       plugin_install_now: false
+  ovav_workstation_scripts:
+    schema_version: ovav.tool_config_profile.v1
+    profile_id: ovav_workstation_scripts
+    display_name: OVAV Workstation Maintenance Scripts
+    tool_id: ovav_workstation_scripts
+    category: workstation_maintenance
+    status: source_local_profile
+    owner_scope: ovav_bab_private
+    visible_in:
+      - ovav_tailor
+      - tools_terminal
+    detection:
+      host: local
+      detected_status: always_available
+      missing_status: present_in_worktree
+      missing_message: OVAV workstation maintenance scripts are bundled with the OVAV source tree and are always available in the worktree.
+    visible_message: OVAV workstation maintenance scripts (audit-it-guids, fix-it-guids, ovav-it-cache-clean, bashrc repair, install, rollback, benchmark). User-invoked, never auto-run. Paths and dependencies are externalized via env vars and config (no hardcoding).
+    source_policy: config/workstation/ovav-workstation-scripts.yaml
+    scripts_root: workstation/scripts/
+    scripts:
+      - id: audit-it-guids
+        path: workstation/scripts/audit-it-guids.sh
+        purpose: detect invalid GUIDs in Intelligent Terminal settings.json (read-only audit)
+        runner: bash
+        env_contract:
+          OVAV_IT_SETTINGS: "absolute path to settings.json (required, no default)"
+          OVAV_AUDIT_MODE: "audit-only | fix (default: audit-only)"
+      - id: fix-it-guids
+        path: workstation/scripts/fix-it-guids.sh
+        purpose: idempotent GUID replacement in Intelligent Terminal settings.json
+        runner: bash
+        env_contract:
+          OVAV_IT_SETTINGS: "absolute path to settings.json (required, no default)"
+          OVAV_BACKUP_DIR: 'backup destination (default: $HOME/.ovav-backups, configurable)'
+          OVAV_GUID_NAMESPACE: "uuid5 namespace for deterministic GUIDs (default: ovav.intelligent-terminal)"
+      - id: ovav-it-cache-clean
+        path: workstation/scripts/ovav-it-cache-clean.sh
+        purpose: full Intelligent Terminal cache reset without process kill
+        runner: bash
+        env_contract:
+          OVAV_IT_SETTINGS: "absolute path to settings.json (required, no default)"
+          OVAV_IT_STATE: "absolute path to state.json (required, no default)"
+          OVAV_BACKUP_DIR: 'backup destination (default: $HOME/.ovav-backups, configurable)'
+    apply_posture:
+      default: user_invoked_only
+      requires:
+        - explicit_user_invocation
+        - backup_before_write
+        - rollback_manifest
+      blocked_until: user_explicit_run
+    boundaries:
+      ovav_auto_runs_scripts: false
+      source_local_only_now: true
+      writes_user_home_now: false
+      writes_user_state_only_with_backup: true
+      bash_dependency: required
+      python3_dependency: required_for_audit_and_fix
+      no_hardcoded_absolute_paths: true
+      paths_externalized_via: env_vars
