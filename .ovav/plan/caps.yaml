@@ -250,10 +250,10 @@ governance:
       status: "pass"
 
   validators:
-    total: 73
-    registered: 73
-    cli_visible: 73
-    passed: 64
+    total: 74
+    registered: 74
+    cli_visible: 74
+    passed: 65
     warned: 8
     failed: 1
     mode: "developer"

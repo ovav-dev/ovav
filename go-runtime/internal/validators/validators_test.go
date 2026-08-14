@@ -830,8 +830,9 @@ func TestDefaultRegistry_70Validators(t *testing.T) {
 	// 2026-08-11: Added WeztermWorkspaceIsolation (migrated from Python)
 	// 2026-08-14: Added ITKeybindings (regression guard for IT keybindings fragment)
 	// 2026-08-14: Added ITLiveKeybindings (drift detection for live IT settings.json)
-	if len(all) != 73 {
-		t.Errorf("expected 73 validators in default registry, got %d", len(all))
+	// 2026-08-14: Added BashReadlineBindings (shift+arrow regression guard)
+	if len(all) != 74 {
+		t.Errorf("expected 74 validators in default registry, got %d", len(all))
 	}
 	// Verify each has non-empty ID
 	for _, v := range all {

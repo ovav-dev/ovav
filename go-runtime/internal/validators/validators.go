@@ -195,6 +195,8 @@ func DefaultRegistry(modes ...ValidationMode) *Registry {
 		NewITKeybindings(),
 		// Batch 11b — IT live keybindings drift detection (2026-08-14)
 		NewITLiveKeybindings(),
+		// Batch 11c — Bash readline shift+arrow bindings (2026-08-14)
+		NewBashReadlineBindings(),
 	)
 }
 
