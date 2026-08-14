@@ -10,10 +10,11 @@ export OVAV_WORKSTATION="${OVAV_ROOT}/workstation"
 
 # ─────────────────────────────────────────────────────────────
 #  PATH (canonical Linux install per rule #11, #33)
+#  Includes /usr/local/bin, OpenCode, Atuin, OVAV locals
 # ─────────────────────────────────────────────────────────────
 case ":$PATH:" in
   *":/usr/local/bin:"*) ;;
-  *) export PATH="/usr/local/bin:/home/braka/.opencode/bin:$PATH" ;;
+  *) export PATH="/usr/local/bin:/home/braka/.opencode/bin:/home/braka/.atuin/bin:$HOME/.local/bin:$PATH" ;;
 esac
 
 # ─────────────────────────────────────────────────────────────
@@ -24,10 +25,9 @@ export TERM=xterm-256color
 
 # ─────────────────────────────────────────────────────────────
 #  ATUIN — history (NO pty-proxy per rule #15)
+#  Critical: must be in PATH BEFORE checking command -v
+#  (Atuin ships its own binary at ~/.atuin/bin, NOT in /usr/local/bin)
 # ─────────────────────────────────────────────────────────────
-if [ -f "$HOME/.atuin/bin/env" ]; then
-  . "$HOME/.atuin/bin/env"
-fi
 if command -v atuin >/dev/null 2>&1; then
   eval "$(atuin init bash --disable-up-arrow 2>/dev/null)"
 fi
