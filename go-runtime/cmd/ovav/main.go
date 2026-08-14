@@ -659,11 +659,11 @@ func cmdRestore(args []string) int {
 // ── Subcommand: deploy ───────────────────────────────────────────────────────
 
 func cmdDeploy(args []string) int {
-	// New: subcommand dispatch (run / status / list / rollback / history / targets)
+	// New: subcommand dispatch (run / status / list / rollback / history / targets / chaos)
 	// Legacy: governed deploy (no args or --mode flag)
 	if len(args) > 0 {
 		switch args[0] {
-		case "run", "status", "list", "rollback", "history", "targets",
+		case "run", "status", "list", "rollback", "history", "targets", "chaos",
 			"help", "--help", "-h":
 			return cmdDeployDispatch(args)
 		}
@@ -699,6 +699,8 @@ func cmdDeployDispatch(args []string) int {
 		return runDeployHistory(args[1:])
 	case "targets":
 		return runDeployTargets(args[1:])
+	case "chaos":
+		return cmdDeployChaos(args[1:])
 	case "help", "--help", "-h":
 		printDeployHelp()
 		return 0
