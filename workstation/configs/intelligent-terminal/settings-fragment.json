@@ -1,5 +1,5 @@
 {
- "_comment": "OVAV workstation additions for Intelligent Terminal v0.2.2192+. Uses PAIRED REFERENCES (light/dark) for auto day/night. Rule #22 \u2014 Windows theme propagates to IT chrome + Starship + OpenCode.",
+ "_comment": "OVAV workstation fragment for Intelligent Terminal v0.2.2192+. Schema fields: theme(paired refs), themes(tabRow+window.frame), profiles.defaults.colorScheme(paired refs), per-profile tabColor for accent identity. Rule #22 (auto day/night) + #26 (modern tabs).",
  "theme": {
   "light": "OVAV Day UI",
   "dark": "OVAV Night UI"
@@ -7,46 +7,64 @@
  "themes": [
   {
    "name": "OVAV Night UI",
-   "window": {
-    "applicationTheme": "dark"
-   },
    "tab": {
+    "background": "terminalBackground",
+    "unfocusedBackground": "#0B1020CC",
+    "showCloseButton": "activeOnly",
+    "iconStyle": "monochrome"
+   },
+   "tabRow": {
     "background": "#0B1020",
     "unfocusedBackground": "#0A0E1A"
    },
-   "colorScheme": "OVAV Night",
-   "tint": {
+   "window": {
+    "applicationTheme": "dark",
     "useMica": true,
-    "tintColor": "#0B1020",
-    "tintOpacity": 92
+    "frame": "#2A3A5C",
+    "unfocusedFrame": "#111827"
    }
   },
   {
    "name": "OVAV Day UI",
-   "window": {
-    "applicationTheme": "light"
-   },
    "tab": {
+    "background": "terminalBackground",
+    "unfocusedBackground": "#F7F9FCCC",
+    "showCloseButton": "activeOnly",
+    "iconStyle": "monochrome"
+   },
+   "tabRow": {
     "background": "#F7F9FC",
     "unfocusedBackground": "#EEF2F7"
    },
-   "colorScheme": "OVAV Day",
-   "tint": {
+   "window": {
+    "applicationTheme": "light",
     "useMica": true,
-    "tintColor": "#F7F9FC",
-    "tintOpacity": 95
+    "frame": "#6EA8FE",
+    "unfocusedFrame": "#94A3B8"
    }
   }
  ],
+ "showTabsInTitlebar": true,
+ "useAcrylicInTabRow": false,
+ "tabWidthMode": "compact",
+ "tabSwitcherMode": "mru",
+ "windowingBehavior": "useAnyExisting",
  "useMica": true,
  "tintOpacity": 92,
  "tintColor": "#0B1020",
+ "showTerminalTitleInTitlebar": true,
+ "snapToGridOnResize": true,
+ "disableAnimations": false,
  "profiles": {
   "defaults": {
    "colorScheme": {
     "light": "OVAV Day",
     "dark": "OVAV Night"
-   }
+   },
+   "opacity": 96,
+   "useAcrylic": false,
+   "padding": "10, 14, 10, 14",
+   "scrollbarState": "hidden"
   },
   "list": [
    {
@@ -72,7 +90,10 @@
     "useAcrylic": true,
     "scrollbarState": "hidden",
     "antialiasingMode": "grayscale",
-    "altGrAliasing": true
+    "altGrAliasing": true,
+    "tabColor": "#0F766E",
+    "color": "#5EEAD4",
+    "accent": "#5EEAD4"
    },
    {
     "commandline": "wsl.exe -d Ubuntu-26.04",
@@ -88,14 +109,17 @@
     "name": "OVAV Scratch",
     "source": "Windows.Terminal.Wsl",
     "startingDirectory": null,
-    "tabTitle": "\u2728 OVAV Scratch",
+    "tabTitle": "\u2728 Scratch",
     "padding": "12, 8, 12, 8",
     "suppressApplicationTitle": true,
     "scrollbarState": "hidden",
     "antialiasingMode": "grayscale",
     "snapOnInput": true,
     "altGrAliasing": true,
-    "cursorHeight": 100
+    "cursorHeight": 100,
+    "tabColor": "#92400E",
+    "color": "#F2CC60",
+    "accent": "#F2CC60"
    },
    {
     "altGrAliasing": true,
@@ -121,7 +145,10 @@
     "startingDirectory": null,
     "suppressApplicationTitle": true,
     "tabTitle": "\ud83d\udd37 OVAV",
-    "useAcrylic": true
+    "useAcrylic": true,
+    "tabColor": "#1E3A8A",
+    "color": "#6EA8FE",
+    "accent": "#6EA8FE"
    }
   ]
  },
@@ -281,12 +308,5 @@
    },
    "keybind": "ctrl+shift+f"
   }
- ],
- "tabWidthMode": "compact",
- "tabSwitcherMode": "mru",
- "newTabPosition": "afterCurrentTab",
- "initialRows": 32,
- "initialCols": 120,
- "padding": "12, 8, 12, 8",
- "focusFollowMouse": false
+ ]
 }
