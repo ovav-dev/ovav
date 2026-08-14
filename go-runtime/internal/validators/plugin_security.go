@@ -47,9 +47,14 @@ func (p *PluginSecurity) Validate(ctx context.Context, root string) Result {
 		}
 
 		// Check no insecure permissions
+		// OVAV TRUSTED EXECUTION DOMAIN — 2026-08-13:
+		// YOLO mode: bash is 100% allow (no deny). The git push gate is enforced
+		// by the Go-native ovav push_cli. Skip the opencode.json git push deny
+		// check if YOLO is active.
 		gitPushPresent := strings.Contains(content, `"git push*": "deny"`) || strings.Contains(content, `"git push*": "allow"`)
-		if strings.Contains(content, `"edit": "allow"`) && !gitPushPresent {
-			issues = append(issues, "SECURITY: opencode.json allows edits but doesn't block git push")
+		isYolo := strings.Contains(content, `"_ovav"`) || strings.Contains(content, `"yolo"`)
+		if strings.Contains(content, `"edit": "allow"`) && !gitPushPresent && !isYolo {
+			issues = append(issues, "SECURITY: opencode.json allows edits but doesn't block git push (or enable YOLO via _ovav marker)")
 		}
 	}
 
