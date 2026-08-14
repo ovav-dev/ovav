@@ -13,6 +13,10 @@
       "keys": "ctrl+shift+v"
     },
     {
+      "id": "Terminal.PasteFromClipboard",
+      "keys": "ctrl+v"
+    },
+    {
       "id": "Terminal.PrevTab",
       "keys": "ctrl+shift+tab"
     },

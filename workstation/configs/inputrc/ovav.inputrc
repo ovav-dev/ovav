@@ -47,26 +47,25 @@ set match-hidden-files on
 "\e[A": history-substring-search-backward
 "\e[B": history-substring-search-forward
 
-# ── Shift+arrow: text selection via set-mark + motion ─────────
-# C-@ is the readline binding for set-mark
-"\e[1;2A": "\C-@\e[A"
-"\e[1;2B": "\C-@\e[B"
-"\e[1;2C": "\C-@\e[C"
-"\e[1;2D": "\C-@\e[D"
+# ── Shift+arrow: deliberately UNBOUND ─────────────────────────
+# bash readline should NOT bind shift+arrow — that's the terminal's job.
+# IT (or any modern terminal) intercepts shift+arrow for VISUAL SELECTION
+# (highlighting text in the terminal UI) and does not pass the keystroke
+# to the shell. If bash has bindings here, it CONFLICTS with the terminal's
+# visual selection behavior — text selection stops working.
+#
+# The original 2026-08-14 inputrc (commit b536521) had set-mark bindings here,
+# but that was a layer mistake: readline set-mark is invisible to the user
+# and does NOT provide the visual selection CEO expects. IT must do it.
+#
+# If you find shift+arrow not selecting visually, the fix is in IT settings,
+# NOT here. See docs/workstation/BASH_READLINE_CONTRACT.md for the full story.
 
-# Shift+Ctrl+arrow: select word at a time
-"\e[1;6C": "\C-@\e[1;5C"
-"\e[1;6D": "\C-@\e[1;5D"
-
-# Shift+Alt+arrow: select to line start
-"\e[1;4A": "\C-@\e[1;H"
-"\e[1;4B": "\C-@\e[1;H"
-
-# ── Ctrl+arrow: word motion ───────────────────────────────────
+# ── Ctrl+arrow: word motion (bash 5.x default but explicit) ─────
 "\e[1;5C": forward-word
 "\e[1;5D": backward-word
 
-# ── Alt+arrow: word motion ─────────────────────────────────────
+# ── Alt+arrow: word motion (bash 5.x default but explicit) ───────
 "\e[1;3C": forward-word
 "\e[1;3D": backward-word
 
