@@ -1,240 +1,292 @@
 {
-  "_comment": "OVAV workstation additions for Intelligent Terminal. This fragment is MERGED into the user's settings.json by workstation/scripts/install.sh — never overwrites existing keys. Intelligent Terminal uses 'themes' (plural array), not 'theme' (singular string). We only ADD to profiles.list, schemes, actions — never replace top-level keys.",
-
-  "profiles": {
-    "list": [
-      {
-        "name": "OVAV Ubuntu",
-        "guid": "{e3cb3da9-9980-5990-a951-339efdad913d}",
-        "source": "Windows.Terminal.Wsl",
-        "commandline": "wsl.exe -d Ubuntu-26.04 --cd /home/braka/Systems/ovav",
-        "startingDirectory": null,
-        "font": {
-          "face": "JetBrainsMono NFM",
-          "size": 13,
-          "weight": "normal"
-        },
-        "colorScheme": "OVAV Night",
-        "useAcrylic": true,
-        "acrylicOpacity": 0.92,
-        "backgroundImage": null,
-        "icon": "🔷",
-        "padding": "8, 4, 8, 4",
-        "snapOnInput": true,
-        "altGrAliasing": true,
-        "cursorShape": "bar",
-        "cursorHeight": 100,
-        "antialiasingMode": "grayscale",
-        "scrollbarState": "hidden",
-        "tabTitle": "OVAV",
-        "suppressApplicationTitle": true
-      },
-      {
-        "name": "OpenCode Ubuntu",
-        "guid": "{9de564ce-d049-51b4-bb4d-b60eca2099a1}",
-        "source": "Windows.Terminal.Wsl",
-        "commandline": "wsl.exe -d Ubuntu-26.04 --cd /home/braka/Systems/ovav -- opencode",
-        "startingDirectory": null,
-        "font": {
-          "face": "JetBrainsMono NFM",
-          "size": 13,
-          "weight": "normal"
-        },
-        "colorScheme": "OVAV Night",
-        "useAcrylic": true,
-        "acrylicOpacity": 0.92,
-        "icon": "🤖",
-        "padding": "8, 4, 8, 4",
-        "snapOnInput": true,
-        "cursorShape": "filledBox",
-        "cursorHeight": 25,
-        "tabTitle": "OpenCode",
-        "suppressApplicationTitle": true
-      },
-      {
-        "name": "OVAV Scratch",
-        "guid": "{9d51175e-781c-527d-8fc0-82953d909933}",
-        "source": "Windows.Terminal.Wsl",
-        "commandline": "wsl.exe -d Ubuntu-26.04",
-        "startingDirectory": null,
-        "font": {
-          "face": "JetBrainsMono NFM",
-          "size": 13,
-          "weight": "normal"
-        },
-        "colorScheme": "OVAV Night",
-        "icon": "✨",
-        "cursorShape": "bar",
-        "tabTitle": "Scratch"
-      }
-    ]
+ "_comment": "OVAV workstation additions for Intelligent Terminal v0.2.2192+. Uses PAIRED REFERENCES (light/dark) for auto day/night. Rule #22 \u2014 Windows theme propagates to IT chrome + Starship + OpenCode.",
+ "theme": {
+  "light": "OVAV Day UI",
+  "dark": "OVAV Night UI"
+ },
+ "themes": [
+  {
+   "name": "OVAV Night UI",
+   "window": {
+    "applicationTheme": "dark"
+   },
+   "tab": {
+    "background": "#0B1020",
+    "unfocusedBackground": "#0A0E1A"
+   },
+   "colorScheme": "OVAV Night",
+   "tint": {
+    "useMica": true,
+    "tintColor": "#0B1020",
+    "tintOpacity": 92
+   }
   },
-
-  "schemes": [
-    {
-      "name": "OVAV Night",
-      "background": "#0B1020",
-      "foreground": "#D8E1F0",
-      "cursorColor": "#5EEAD4",
-      "selectionBackground": "#2A3A5C",
-      "black": "#1A2233",
-      "red": "#FF6B81",
-      "green": "#7EE787",
-      "yellow": "#F2CC60",
-      "blue": "#6EA8FE",
-      "purple": "#C099FF",
-      "cyan": "#5EEAD4",
-      "white": "#C9D1E0",
-      "brightBlack": "#4A5568",
-      "brightRed": "#FF8FA3",
-      "brightGreen": "#9FF1A1",
-      "brightYellow": "#F5D88A",
-      "brightBlue": "#8FBEFF",
-      "brightPurple": "#D4B5FF",
-      "brightCyan": "#80F0DE",
-      "brightWhite": "#E8EEF8"
+  {
+   "name": "OVAV Day UI",
+   "window": {
+    "applicationTheme": "light"
+   },
+   "tab": {
+    "background": "#F7F9FC",
+    "unfocusedBackground": "#EEF2F7"
+   },
+   "colorScheme": "OVAV Day",
+   "tint": {
+    "useMica": true,
+    "tintColor": "#F7F9FC",
+    "tintOpacity": 95
+   }
+  }
+ ],
+ "useMica": true,
+ "tintOpacity": 92,
+ "tintColor": "#0B1020",
+ "profiles": {
+  "defaults": {
+   "colorScheme": {
+    "light": "OVAV Day",
+    "dark": "OVAV Night"
+   }
+  },
+  "list": [
+   {
+    "commandline": "wsl.exe -d Ubuntu-26.04 --cd /home/braka/Systems/ovav -- opencode",
+    "cursorHeight": 25,
+    "cursorShape": "filledBox",
+    "font": {
+     "face": "JetBrainsMono NFM",
+     "size": 13,
+     "weight": "normal"
     },
-    {
-      "name": "OVAV Day",
-      "background": "#F7F9FC",
-      "foreground": "#1B2430",
-      "cursorColor": "#0F766E",
-      "selectionBackground": "#BFDBFE",
-      "black": "#1B2430",
-      "red": "#C24156",
-      "green": "#1F7A4C",
-      "yellow": "#8A5A00",
-      "blue": "#2563EB",
-      "purple": "#7C3AED",
-      "cyan": "#0F766E",
-      "white": "#E2E8F0",
-      "brightBlack": "#475569",
-      "brightRed": "#E11D48",
-      "brightGreen": "#15803D",
-      "brightYellow": "#A16207",
-      "brightBlue": "#1D4ED8",
-      "brightPurple": "#6D28D9",
-      "brightCyan": "#0E7490",
-      "brightWhite": "#0F172A"
-    }
-  ],
-
-  "actions": [
-    {
-      "name": "OVAV Workspace",
-      "commandline": {
-        "actions": [
-          { "type": "newTab", "profile": "OVAV Ubuntu", "tabTitle": "OVAV — Main" },
-          { "type": "splitPane", "split": "vertical", "profile": "OpenCode Ubuntu", "tabTitle": "Agent" },
-          { "type": "splitPane", "split": "horizontal", "profile": "OVAV Ubuntu", "tabTitle": "Logs" }
-        ]
-      },
-      "keybind": "ctrl+shift+grave"
+    "guid": "{9de564ce-d049-51b4-bb4d-b60eca2099a1}",
+    "hidden": false,
+    "icon": "\ud83e\udd16",
+    "name": "OpenCode Ubuntu",
+    "opacity": 92,
+    "padding": "12, 8, 12, 8",
+    "snapOnInput": true,
+    "source": "Windows.Terminal.Wsl",
+    "startingDirectory": null,
+    "suppressApplicationTitle": true,
+    "tabTitle": "\ud83e\udd16 OpenCode",
+    "useAcrylic": true,
+    "scrollbarState": "hidden",
+    "antialiasingMode": "grayscale",
+    "altGrAliasing": true
+   },
+   {
+    "commandline": "wsl.exe -d Ubuntu-26.04",
+    "cursorShape": "bar",
+    "font": {
+     "face": "JetBrainsMono NFM",
+     "size": 13,
+     "weight": "normal"
     },
-    {
-      "name": "New OVAV Tab",
-      "commandline": { "actions": [ { "type": "newTab", "profile": "OVAV Ubuntu", "tabTitle": "OVAV" } ] },
-      "keybind": "ctrl+shift+t"
+    "guid": "{9d51175e-781c-527d-8fc0-82953d909933}",
+    "hidden": false,
+    "icon": "\u2728",
+    "name": "OVAV Scratch",
+    "source": "Windows.Terminal.Wsl",
+    "startingDirectory": null,
+    "tabTitle": "\u2728 OVAV Scratch",
+    "padding": "12, 8, 12, 8",
+    "suppressApplicationTitle": true,
+    "scrollbarState": "hidden",
+    "antialiasingMode": "grayscale",
+    "snapOnInput": true,
+    "altGrAliasing": true,
+    "cursorHeight": 100
+   },
+   {
+    "altGrAliasing": true,
+    "antialiasingMode": "grayscale",
+    "backgroundImage": null,
+    "commandline": "wsl.exe -d Ubuntu-26.04 --cd /home/braka/Systems/ovav",
+    "cursorHeight": 100,
+    "cursorShape": "bar",
+    "font": {
+     "face": "JetBrainsMono NFM",
+     "size": 13,
+     "weight": "normal"
     },
-    {
-      "name": "OVAV Split Vertical",
-      "commandline": { "actions": [ { "type": "splitPane", "split": "vertical", "profile": "${profile.name}" } ] },
-      "keybind": "ctrl+alt+d"
-    },
-    {
-      "name": "OVAV Split Horizontal",
-      "commandline": { "actions": [ { "type": "splitPane", "split": "horizontal", "profile": "${profile.name}" } ] },
-      "keybind": "ctrl+alt+s"
-    },
-    {
-      "name": "OVAV Focus Left",
-      "commandline": { "actions": [ { "type": "moveFocus", "direction": "left" } ] },
-      "keybind": "alt+left"
-    },
-    {
-      "name": "OVAV Focus Right",
-      "commandline": { "actions": [ { "type": "moveFocus", "direction": "right" } ] },
-      "keybind": "alt+right"
-    },
-    {
-      "name": "OVAV Focus Up",
-      "commandline": { "actions": [ { "type": "moveFocus", "direction": "up" } ] },
-      "keybind": "alt+up"
-    },
-    {
-      "name": "OVAV Focus Down",
-      "commandline": { "actions": [ { "type": "moveFocus", "direction": "down" } ] },
-      "keybind": "alt+down"
-    },
-    {
-      "name": "OVAV Toggle Zoom",
-      "commandline": { "actions": [ { "type": "togglePaneZoom" } ] },
-      "keybind": "ctrl+shift+z"
-    },
-    {
-      "name": "OVAV Close Pane",
-      "commandline": { "actions": [ { "type": "closePane" } ] },
-      "keybind": "ctrl+shift+w"
-    },
-    {
-      "name": "OVAV Command Palette",
-      "commandline": { "actions": [ { "type": "commandPalette" } ] },
-      "keybind": "ctrl+shift+p"
-    },
-    {
-      "name": "OVAV Search",
-      "commandline": { "actions": [ { "type": "findMatch" } ] },
-      "keybind": "ctrl+shift+f"
-    }
-  ],
-
-  "useMica": true,
-  "tintOpacity": 90,
-  "tintColor": "#0B1020",
-  "themes": [
-    {
-      "name": "OVAV Night",
-      "window": {
-        "applicationTheme": "dark",
-        "tabBackground": "#0B1020",
-        "unfocusedTabBackground": "#111827"
-      },
-      "tab": {
-        "background": "#0B1020",
-        "unfocusedBackground": "#0A0E1A"
-      },
-      "colorScheme": "OVAV Night",
-      "tint": {
-        "useMica": true,
-        "tintColor": "#0B1020",
-        "tintOpacity": 90
-      }
-    },
-    {
-      "name": "OVAV Day",
-      "window": {
-        "applicationTheme": "light",
-        "tabBackground": "#F7F9FC",
-        "unfocusedTabBackground": "#EEF2F7"
-      },
-      "tab": {
-        "background": "#F7F9FC",
-        "unfocusedBackground": "#FFFFFF"
-      },
-      "colorScheme": "OVAV Day",
-      "tint": {
-        "useMica": true,
-        "tintColor": "#F7F9FC",
-        "tintOpacity": 95
-      }
-    }
-  ],
-  "tabWidthMode": "compact",
-  "tabSwitcherMode": "mru",
-  "newTabPosition": "afterCurrentTab",
-  "initialRows": 32,
-  "initialCols": 120,
-  "rowsToScroll": "system",
-  "padding": "8, 4, 8, 4",
-  "focusFollowMouse": false
+    "guid": "{e3cb3da9-9980-5990-a951-339efdad913d}",
+    "hidden": false,
+    "icon": "\ud83d\udd37",
+    "name": "OVAV Ubuntu",
+    "opacity": 92,
+    "padding": "12, 8, 12, 8",
+    "scrollbarState": "hidden",
+    "snapOnInput": true,
+    "source": "Windows.Terminal.Wsl",
+    "startingDirectory": null,
+    "suppressApplicationTitle": true,
+    "tabTitle": "\ud83d\udd37 OVAV",
+    "useAcrylic": true
+   }
+  ]
+ },
+ "actions": [
+  {
+   "name": "OVAV Workspace",
+   "commandline": {
+    "actions": [
+     {
+      "type": "newTab",
+      "profile": "OVAV Ubuntu",
+      "tabTitle": "OVAV \u2014 Main"
+     },
+     {
+      "type": "splitPane",
+      "split": "vertical",
+      "profile": "OpenCode Ubuntu",
+      "tabTitle": "Agent"
+     },
+     {
+      "type": "splitPane",
+      "split": "horizontal",
+      "profile": "OVAV Ubuntu",
+      "tabTitle": "Logs"
+     }
+    ]
+   },
+   "keybind": "ctrl+shift+grave"
+  },
+  {
+   "name": "New OVAV Tab",
+   "commandline": {
+    "actions": [
+     {
+      "type": "newTab",
+      "profile": "OVAV Ubuntu"
+     }
+    ]
+   },
+   "keybind": "ctrl+shift+t"
+  },
+  {
+   "name": "OVAV Split Vertical",
+   "commandline": {
+    "actions": [
+     {
+      "type": "splitPane",
+      "split": "vertical",
+      "profile": "${profile.name}"
+     }
+    ]
+   },
+   "keybind": "ctrl+alt+d"
+  },
+  {
+   "name": "OVAV Split Horizontal",
+   "commandline": {
+    "actions": [
+     {
+      "type": "splitPane",
+      "split": "horizontal",
+      "profile": "${profile.name}"
+     }
+    ]
+   },
+   "keybind": "ctrl+alt+s"
+  },
+  {
+   "name": "OVAV Focus Left",
+   "commandline": {
+    "actions": [
+     {
+      "type": "moveFocus",
+      "direction": "left"
+     }
+    ]
+   },
+   "keybind": "alt+left"
+  },
+  {
+   "name": "OVAV Focus Right",
+   "commandline": {
+    "actions": [
+     {
+      "type": "moveFocus",
+      "direction": "right"
+     }
+    ]
+   },
+   "keybind": "alt+right"
+  },
+  {
+   "name": "OVAV Focus Up",
+   "commandline": {
+    "actions": [
+     {
+      "type": "moveFocus",
+      "direction": "up"
+     }
+    ]
+   },
+   "keybind": "alt+up"
+  },
+  {
+   "name": "OVAV Focus Down",
+   "commandline": {
+    "actions": [
+     {
+      "type": "moveFocus",
+      "direction": "down"
+     }
+    ]
+   },
+   "keybind": "alt+down"
+  },
+  {
+   "name": "OVAV Toggle Zoom",
+   "commandline": {
+    "actions": [
+     {
+      "type": "togglePaneZoom"
+     }
+    ]
+   },
+   "keybind": "ctrl+shift+z"
+  },
+  {
+   "name": "OVAV Close Pane",
+   "commandline": {
+    "actions": [
+     {
+      "type": "closePane"
+     }
+    ]
+   },
+   "keybind": "ctrl+shift+w"
+  },
+  {
+   "name": "OVAV Command Palette",
+   "commandline": {
+    "actions": [
+     {
+      "type": "commandPalette"
+     }
+    ]
+   },
+   "keybind": "ctrl+shift+p"
+  },
+  {
+   "name": "OVAV Search",
+   "commandline": {
+    "actions": [
+     {
+      "type": "findMatch"
+     }
+    ]
+   },
+   "keybind": "ctrl+shift+f"
+  }
+ ],
+ "tabWidthMode": "compact",
+ "tabSwitcherMode": "mru",
+ "newTabPosition": "afterCurrentTab",
+ "initialRows": 32,
+ "initialCols": 120,
+ "padding": "12, 8, 12, 8",
+ "focusFollowMouse": false
 }
