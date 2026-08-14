@@ -75,6 +75,30 @@ providers:
   minimax-coding-plan:
     options:
       timeout: 300000
+  anthropic:
+    options:
+      timeout: 300000
+  google:
+    options:
+      timeout: 300000
+  cohere:
+    options:
+      timeout: 300000
+  groq:
+    options:
+      timeout: 300000
+  mistral:
+    options:
+      timeout: 300000
+  deepseek:
+    options:
+      timeout: 300000
+  xai:
+    options:
+      timeout: 300000
+  azure:
+    options:
+      timeout: 300000
 permissions:
   '*': allow
   edit: allow
@@ -93,81 +117,8 @@ permissions:
   question: allow
   todoread: allow
   todowrite: allow
+  diff: allow
   bash:
     '*': allow
-    apt install *: deny
-    apt-get install *: deny
-    gh auth login*: deny
-    gh auth status*: allow
-    gh auth token*: deny
-    gh issue list*: allow
-    gh issue view*: allow
-    gh pr create*: allow
-    gh pr list*: allow
-    gh pr merge*: deny
-    gh pr status*: allow
-    gh pr view*: allow
-    gh release *: deny
-    gh repo view*: allow
-    git add *: allow
-    git branch --show-current: allow
-    git branch -d *: deny
-    git branch -D *: deny
-    git commit*: allow
-    git diff*: allow
-    git log*: allow
-    git ls-remote *: allow
-    git push --force *: deny
-    git push --force-with-lease *: deny
-    git push -f *: deny
-    git push*: deny
-    git remote -v: allow
-    git rev-parse*: allow
-    git status*: allow
-    go run -C go-runtime ./cmd/ovav validate*: allow
-    go run -C go-runtime ./internal/validators/cmd/validate*: allow
-    npm install *: deny
-    npm run build*: allow
-    npm run lint*: allow
-    npm run test*: allow
-    npm run typecheck*: allow
-    npm test*: allow
-    pip install *: deny
-    pip3 install *: deny
-    pnpm add *: deny
-    pytest*: allow
-    python3 -m pytest*: allow
-    sudo *: deny
-    yarn add *: deny
-    go install *: deny
+
   external_directory:
-    '*': allow
-# OVAV TRUSTED EXECUTION DOMAIN — 2026-08-13:
-# External directory is allow-by-default. OVAV governor is the upper trust layer.
-# Host does not re-ask. CriticalDenies in bash still applies for catastrophic
-# host-level operations (sudo, chmod 777, rm -rf /, mkfs, dd to /dev/sda).
-references:
-  spec:
-    path: docs
-    description: OVAV spec documents — reference for architecture, contracts, implementation
-      plan, and authority matrix. Use before implementing or modifying governance
-      structures.
-  contracts:
-    path: .ovav/service_areas/shared
-    description: OVAV runtime contracts — visual delivery, safe stop, context economy.
-      Use when output format, error handling, or budget decisions are needed.
-    hidden: true
-  registry:
-    path: .ovav/registry
-    description: OVAV registries — active context ledger, auto triggers, capability
-      scores. Use for state continuity and trigger-aware work.
-    hidden: true
-compaction:
-  auto: true
-  preserve_recent_tokens: 3000
-  tail_turns: 2
-tool_output:
-  max_bytes: 4096
-  max_lines: 80
-user:
-  username: Alexander Salvador
