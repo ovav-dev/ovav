@@ -344,6 +344,75 @@ governance:
         weight: 15
         description: "Pinned baseline drift firewall (ADR-006)"
 
+# ── Phase 1 — Q1 2026 Anti-Drift Core (ADR-005) ────────────────────────────
+phase1_anti_drift:
+  status: "complete"
+  completed: "2026-08-14"
+  completed_by: "thavren"
+  deliverables:
+    - id: "D3"
+      name: "Runtime integrity baseline → versioned"
+      adr: "ADR-006"
+      components:
+        - ".ovav/integrity_backups/baseline.json (tracked in git)"
+        - "integrity_baseline_fresh validator (#75)"
+        - "pinned_baseline_drift validator (#76)"
+        - "ovav hooks install-pre-commit (baseline freshness gate)"
+
+    - id: "D4"
+      name: "ovav drift show — visual fragment vs live diff"
+      adr: "ADR-007"
+      components:
+        - "ovav drift show [--json|--md] (5 registered targets)"
+        - "ovav drift catalog (history)"
+        - "ovav drift targets (list)"
+
+    - id: "D1"
+      name: "ovav deploy run — auto-deploy fragments to live"
+      adr: "ADR-008"
+      components:
+        - "ovav deploy run [--target=X] [--dry-run] [--skip-validate] [--no-rollback]"
+        - "ovav deploy status / list / history / rollback / targets"
+        - "WSL-safe atomic writes (sibling temp + Path.replace)"
+        - "Snapshot + rollback system"
+        - "Audit log (deploy_history.jsonl)"
+
+    - id: "D2"
+      name: "CI drift gate (pre-push hook + ovav ci drift-check)"
+      adr: "ADR-009"
+      components:
+        - ".ovav/hooks/pre-push (bash drift gate)"
+        - "ovav hooks install-pre-push / install-all"
+        - "ovav ci drift-check (for CI runners)"
+
+    - id: "D5"
+      name: "IT reload integration (Win32 API)"
+      adr: "ADR-010"
+      components:
+        - "ovav it reload [--force]"
+        - "ovav it status / pid / logs"
+        - "workstation/scripts/it-reload.ps1 (WM_SETTINGCHANGE broadcast)"
+        - "Deploy integration: auto-reload after IT-keybindings deploy"
+
+  metrics:
+    validators_added: 2
+    validators_total: 76
+    new_commands:
+      - "ovav drift show|catalog|targets"
+      - "ovav deploy run|status|list|rollback|history|targets"
+      - "ovav ci drift-check"
+      - "ovav hooks install-pre-push|install-all"
+      - "ovav it reload|status|pid|logs"
+    hooks_added:
+      - ".ovav/hooks/pre-commit (baseline freshness gate, ADR-006)"
+      - ".ovav/hooks/pre-push (drift gate, ADR-009)"
+    hooks_install_commands:
+      - "ovav hooks install-pre-commit"
+      - "ovav hooks install-pre-push"
+      - "ovav hooks install-all (installs both)"
+    tests_added: 38
+    total_validators_passing: 69
+
   failed_validators: []
 
 # ── Migración Python→Go ─────────────────────────────────────────────────
