@@ -4,7 +4,7 @@
   "project": "OVAV",
   "hash_algorithm": "sha256",
   "metadata": {
-    "git_identity": "0f6e4ac2592770dbb069ae4d82cb2bebb977833785cd964bd5373033e2638509"
+    "git_identity": "090120e9732d6b863d242accab63a97ded7ea77878d97ab0ec9e8dd5925c3a99"
   },
   "policy": {
     "version": "tracked-content-v1",
@@ -476,7 +476,7 @@
     ".ovav/plan/architecture/mimocode-absorption-v1.md": "4c8216e9946e050b56dbd23d74eaec7002228162614b977a0c5285d82f0ec576",
     ".ovav/plan/architecture_split_core_product.md": "314bdaf1ae294dd6b47c4e80e52b7189fed9be7b11db28a5ad6308d2429599d3",
     ".ovav/plan/business_model.yaml": "26d7f54fcd0b4bbb414b9a7c82e8626665a20ac93c88b4f0ecbb12e30aadb403",
-    ".ovav/plan/caps.yaml": "5e6bc81d209582d067717f9b95be1c79d67b59ff5bd1850e98b82278783b7b89",
+    ".ovav/plan/caps.yaml": "282961fd0d62a34d93d5beeac3511a3eae0bce3941ce8b53fc14f166debac3e2",
     ".ovav/plan/education_roadmap.yaml": "c82c68f9eae3cc06a9f1725799b4c50d2265edbdbd5c835c361516a2780bb50a",
     ".ovav/plan/f6_cockpit_action_plan.md": "60b9d5e1ef4f8c9845ba5ead6ac0cbc852e49458be551e8ac7fbce821a8f7f89",
     ".ovav/plan/health_audit.yaml": "2d62ff39701bbe93e3141703fb4b046f81e54dd31d8ed9cd61834d40189ba18f",
@@ -1225,6 +1225,7 @@
     "docs/architecture/ADR-002-microservices-boundary.md": "5ae8f229faa1af2094a9b84eae8187f855a16f7ae1cf56415c8b831181427f31",
     "docs/architecture/ADR-003-validator-migration-strategy.md": "9a6cd64f570a58c0ee1dd52a37d8e24a9620bfae67e578ca3c3d9c7e68943279",
     "docs/architecture/ADR-004-tools-registry-stabilization.md": "96c21cfaf1d951f4e9839972a0e6c0a729b5a4c1f82a0080693449fcb055e96c",
+    "docs/architecture/ADR-005-anti-drift-2026.md": "bbd8cd35420db7ef01f2f9515f0e66a32486762912dc5519df64774e42bf8ef5",
     "docs/architecture/OWS_SPEC.md": "6ce24fed2ba405893709e9975f61c739fb822a6a6cf47d13e4f3978ff95d22b4",
     "docs/audit/2026-06-16_FINDINGS_REGISTRY.yaml": "3f9dedaf232ea1fb923b6a184d3cb5d82463a8c87f540df5cb397f4477987e0e",
     "docs/audit/2026-06-16_SYSTEM_WIDE_AUDIT.md": "209a74faf880e8aace3cf8641b3db153492d7d5745a28049e4225722d38406ae",
@@ -1332,6 +1333,7 @@
     "docs/workstation/BASH_READLINE_CONTRACT.md": "558b2229c6aef83c384c08cfb5bcb8eac2e59ab5594e53e464eeea227e014034",
     "docs/workstation/IT_DEPLOY_PIPELINE.md": "63b32ac9d2124f8ea4009929d5a8a0368fa1b2002e1dbc9f740bdc0301160cec",
     "docs/workstation/IT_KEYBINDINGS_CONTRACT.md": "5ea8d88e62b5d22578a3adfe1c1314daf3d9ee5572410898f1f3e58f18b26062",
+    "docs/workstation/IT_V014_WORKAROUNDS.md": "541043e80b39f10c2b8e5b3cdeb9159f394401372ca2eb850f17284e2139fe49",
     "docs/workstation/OVAV_THAVREN_SSH_INSTALL_PLAN.md": "2d456c5433c7bbd09b56db40ac0b18c256c0cc1d2ae80c50a222aaa93578862a",
     "docs/workstation/OVAV_THAVREN_SSH_PROFILE.md": "076f0a54fd944c3b2be708b0df1e6ed9180dcb193c1ec90f3750308617c5d53d",
     "docs/workstation/OVAV_WEZTERM_WORKSPACE_ISOLATION.md": "25f8b0417cc0848c2bfae65662099bad5ef076804ef23356c37285548129e90c",
