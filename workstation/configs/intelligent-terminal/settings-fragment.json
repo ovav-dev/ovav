@@ -17,7 +17,7 @@
       "keys": "ctrl+shift+tab"
     },
     {
-      "id": null,
+      "id": "Terminal.CopyToClipboard",
       "keys": "ctrl+c"
     },
     {
@@ -25,7 +25,7 @@
       "keys": "shift+insert"
     },
     {
-      "id": "Terminal.MovePaneToTab0",
+      "id": "Terminal.MovePaneRight",
       "keys": "alt+shift+right"
     },
     {
@@ -49,11 +49,11 @@
       "keys": "ctrl+alt+shift+c"
     },
     {
-      "id": null,
+      "id": "Terminal.MoveFocusDown",
       "keys": "alt+down"
     },
     {
-      "id": null,
+      "id": "Terminal.OpenNewTab",
       "keys": "ctrl+shift+t"
     },
     {
@@ -61,7 +61,7 @@
       "keys": "ctrl+w"
     },
     {
-      "id": "Terminal.MovePaneToTab0",
+      "id": "Terminal.MovePaneDown",
       "keys": "alt+shift+down"
     },
     {
@@ -93,15 +93,15 @@
       "keys": "ctrl+5"
     },
     {
-      "id": null,
+      "id": "Terminal.ResetFontSize",
       "keys": "ctrl+shift+0"
     },
     {
-      "id": null,
+      "id": "Terminal.IncreaseFontSize",
       "keys": "ctrl+shift+plus"
     },
     {
-      "id": "Terminal.MovePaneToTab0",
+      "id": "Terminal.MovePaneLeft",
       "keys": "alt+shift+left"
     },
     {
@@ -121,11 +121,11 @@
       "keys": "ctrl+8"
     },
     {
-      "id": null,
+      "id": "Terminal.DecreaseFontSize",
       "keys": "ctrl+minus"
     },
     {
-      "id": null,
+      "id": "Terminal.IncreaseFontSize",
       "keys": "ctrl+plus"
     },
     {
@@ -141,23 +141,23 @@
       "keys": "ctrl+shift+w"
     },
     {
-      "id": null,
+      "id": "Terminal.MoveFocusUp",
       "keys": "alt+up"
     },
     {
-      "id": null,
+      "id": "Terminal.MoveFocusLeft",
       "keys": "alt+left"
     },
     {
-      "id": null,
+      "id": "Terminal.MoveFocusRight",
       "keys": "alt+right"
     },
     {
-      "id": "Terminal.MovePaneToTab0",
+      "id": "Terminal.MovePaneUp",
       "keys": "alt+shift+up"
     },
     {
-      "id": null,
+      "id": "Terminal.PrevTab",
       "keys": "ctrl+shift+comma"
     },
     {
@@ -181,7 +181,7 @@
       "keys": "alt+enter"
     },
     {
-      "id": null,
+      "id": "Terminal.NextTab",
       "keys": "ctrl+shift+period"
     },
     {
@@ -189,7 +189,7 @@
       "keys": "f11"
     },
     {
-      "id": null,
+      "id": "Terminal.ReloadCommandPalette",
       "keys": "ctrl+shift+r"
     }
   ],
