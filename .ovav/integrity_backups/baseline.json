@@ -8,7 +8,7 @@
     "go-runtime/go.mod": "599b88657887000354a47351a0555ddb5b7a0c67ea022dc33f692a56af9f9bd8",
     "go-runtime/internal/validators/cmd/validate/main.go": "8acb76e3f95573fd4a950dbd695f65e2336317987f192bccd6a452b5a62606b0",
     "opencode.json": "2eaddfd827d5ff3734d4d2657bb51af074febeaa7bb4e61f6550689431942a2a",
-    ".gitignore": "2f7b0be6db426f46c94aa3fb8e3bc6534390b0ccc38ad47941966f38e99c5463",
+    ".gitignore": "5a944766d23f6f7e3d6820aea64b7146936f88f60d16240f4ec624c9d8fb1ccd",
     ".ovav/registry/sbom.json": "46ba2f14ab7e49ffe2636e98ee732ea206ef63a28af91b3792c041414b16035a",
     "go-runtime/internal/validators/canonical_state_test.go": "4afb78f3bd1784f7561df7a7342f126acacf86e751a9a8077dfcbbb414b013c9",
     "go-runtime/internal/validators/context_firewall.go": "145e23489b0c21bfcda507650246337cab42a06c6bad4c1083f194c5471c4804",
