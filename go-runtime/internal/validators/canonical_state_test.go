@@ -51,8 +51,8 @@ func TestCanonicalCapsReflectsRuntimeEvidence(t *testing.T) {
 	if caps.Governance.Validators.Registered != len(DefaultRegistry().All()) {
 		t.Fatalf("caps validator count=%d, registry=%d", caps.Governance.Validators.Registered, len(DefaultRegistry().All()))
 	}
-	if got := len(DefaultRegistry().All()); got != 71 {
-		t.Fatalf("default validator registry contains %d validators, want 71", got)
+	if got := len(DefaultRegistry().All()); got != 72 {
+		t.Fatalf("default validator registry contains %d validators, want 72", got)
 	}
 	if caps.Governance.Validators.Passed != 63 || caps.Governance.Validators.Warned != 8 || caps.Governance.Validators.Failed != 0 {
 		t.Fatalf("unexpected latest developer validation: %+v", caps.Governance.Validators)

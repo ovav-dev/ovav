@@ -191,6 +191,8 @@ func DefaultRegistry(modes ...ValidationMode) *Registry {
 		NewCapsSchema(),
 		// Batch 10 — Phase 3 innovation (absorbed from external systems)
 		NewAdversarialVerification(),
+		// Batch 11 — IT keybindings regression guard (2026-08-14)
+		NewITKeybindings(),
 	)
 }
 

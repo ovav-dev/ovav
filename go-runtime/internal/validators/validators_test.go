@@ -828,8 +828,9 @@ func TestDefaultRegistry_70Validators(t *testing.T) {
 	// HeadIntegrity, ArchitectureGuardian, CapsChronosAlignment, CrossTargetConsistency, TodoDebt
 	// These are now handled by OMARS monitors or return SKIP
 	// 2026-08-11: Added WeztermWorkspaceIsolation (migrated from Python)
-	if len(all) != 71 {
-		t.Errorf("expected 70 validators in default registry, got %d", len(all))
+	// 2026-08-14: Added ITKeybindings (regression guard for IT keybindings fragment)
+	if len(all) != 72 {
+		t.Errorf("expected 72 validators in default registry, got %d", len(all))
 	}
 	// Verify each has non-empty ID
 	for _, v := range all {
