@@ -1,5 +1,6 @@
 {
- "_comment": "OVAV fragment for IT v0.2.2192 \u2014 DEFAULT PROFILE = OVAV Ubuntu. TabRow at TOP LEVEL + per-theme. All fields aligned to current Microsoft Terminal v1.22 schema.",
+ "_comment": "OVAV fragment IT v0.2.2192 \u2014 MINIMAL schema. Default Ubuntu-26.04 hidden, dropdown curated to OVAV only. experimental keys (statusBar/commandPalette) removed \u2014 caused JSON parser rejection.",
+ "defaultProfile": "{e3cb3da9-9980-5990-a951-339efdad913d}",
  "theme": {
   "light": "OVAV Day UI",
   "dark": "OVAV Night UI"
@@ -44,22 +45,41 @@
    }
   }
  ],
- "defaultProfile": "{e3cb3da9-9980-5990-a951-339efdad913d}",
  "tabRow": {
   "background": "#0B1020",
   "height": 36
  },
+ "newTabMenu": [
+  {
+   "type": "action",
+   "id": "OVAV Workspace"
+  },
+  {
+   "type": "separator"
+  },
+  {
+   "type": "profile",
+   "profile": "OVAV Ubuntu"
+  },
+  {
+   "type": "profile",
+   "profile": "OpenCode Ubuntu"
+  },
+  {
+   "type": "profile",
+   "profile": "OVAV Scratch"
+  }
+ ],
  "showTabsInTitlebar": true,
  "useAcrylicInTabRow": false,
- "tabWidthMode": "compact",
- "tabSwitcherMode": "mru",
- "windowingBehavior": "useAnyExisting",
  "useMica": true,
  "tintOpacity": 92,
  "tintColor": "#0B1020",
- "showTerminalTitleInTitlebar": true,
+ "tabWidthMode": "compact",
+ "tabSwitcherMode": "mru",
+ "windowingBehavior": "useAnyExisting",
  "snapToGridOnResize": true,
- "disableAnimations": false,
+ "showTerminalTitleInTitlebar": true,
  "profiles": {
   "defaults": {
    "colorScheme": {
@@ -72,6 +92,35 @@
    "scrollbarState": "hidden"
   },
   "list": [
+   {
+    "altGrAliasing": true,
+    "antialiasingMode": "grayscale",
+    "backgroundImage": null,
+    "commandline": "wsl.exe -d Ubuntu-26.04 --cd /home/braka/Systems/ovav",
+    "cursorHeight": 100,
+    "cursorShape": "bar",
+    "font": {
+     "face": "JetBrainsMono NFM",
+     "size": 13,
+     "weight": "normal"
+    },
+    "guid": "{e3cb3da9-9980-5990-a951-339efdad913d}",
+    "hidden": false,
+    "icon": "\ud83d\udd37",
+    "name": "OVAV Ubuntu",
+    "opacity": 92,
+    "padding": "12, 8, 12, 8",
+    "scrollbarState": "hidden",
+    "snapOnInput": true,
+    "source": "Windows.Terminal.Wsl",
+    "startingDirectory": null,
+    "suppressApplicationTitle": true,
+    "tabTitle": "\ud83d\udd37 OVAV",
+    "useAcrylic": true,
+    "tabColor": "#1E3A8A",
+    "color": "#6EA8FE",
+    "accent": "#6EA8FE"
+   },
    {
     "commandline": "wsl.exe -d Ubuntu-26.04 --cd /home/braka/Systems/ovav -- opencode",
     "cursorHeight": 25,
@@ -125,38 +174,57 @@
     "tabColor": "#92400E",
     "color": "#F2CC60",
     "accent": "#F2CC60"
-   },
-   {
-    "altGrAliasing": true,
-    "antialiasingMode": "grayscale",
-    "backgroundImage": null,
-    "commandline": "wsl.exe -d Ubuntu-26.04 --cd /home/braka/Systems/ovav",
-    "cursorHeight": 100,
-    "cursorShape": "bar",
-    "font": {
-     "face": "JetBrainsMono NFM",
-     "size": 13,
-     "weight": "normal"
-    },
-    "guid": "{e3cb3da9-9980-5990-a951-339efdad913d}",
-    "hidden": false,
-    "icon": "\ud83d\udd37",
-    "name": "OVAV Ubuntu",
-    "opacity": 92,
-    "padding": "12, 8, 12, 8",
-    "scrollbarState": "hidden",
-    "snapOnInput": true,
-    "source": "Windows.Terminal.Wsl",
-    "startingDirectory": null,
-    "suppressApplicationTitle": true,
-    "tabTitle": "\ud83d\udd37 OVAV",
-    "useAcrylic": true,
-    "tabColor": "#1E3A8A",
-    "color": "#6EA8FE",
-    "accent": "#6EA8FE"
    }
   ]
  },
+ "schemes": [
+  {
+   "background": "#F7F9FC",
+   "black": "#1B2430",
+   "blue": "#2563EB",
+   "brightBlack": "#475569",
+   "brightBlue": "#1D4ED8",
+   "brightCyan": "#0E7490",
+   "brightGreen": "#15803D",
+   "brightPurple": "#6D28D9",
+   "brightRed": "#E11D48",
+   "brightWhite": "#0F172A",
+   "brightYellow": "#A16207",
+   "cursorColor": "#0F766E",
+   "cyan": "#0F766E",
+   "foreground": "#1B2430",
+   "green": "#1F7A4C",
+   "name": "OVAV Day",
+   "purple": "#7C3AED",
+   "red": "#C24156",
+   "selectionBackground": "#BFDBFE",
+   "white": "#E2E8F0",
+   "yellow": "#8A5A00"
+  },
+  {
+   "background": "#0B1020",
+   "black": "#1A2233",
+   "blue": "#6EA8FE",
+   "brightBlack": "#4A5568",
+   "brightBlue": "#8FBEFF",
+   "brightCyan": "#80F0DE",
+   "brightGreen": "#9FF1A1",
+   "brightPurple": "#D4B5FF",
+   "brightRed": "#FF8FA3",
+   "brightWhite": "#E8EEF8",
+   "brightYellow": "#F5D88A",
+   "cursorColor": "#5EEAD4",
+   "cyan": "#5EEAD4",
+   "foreground": "#D8E1F0",
+   "green": "#7EE787",
+   "name": "OVAV Night",
+   "purple": "#C099FF",
+   "red": "#FF6B81",
+   "selectionBackground": "#2A3A5C",
+   "white": "#C9D1E0",
+   "yellow": "#F2CC60"
+  }
+ ],
  "actions": [
   {
    "name": "OVAV Workspace",
