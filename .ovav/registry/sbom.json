@@ -4,7 +4,7 @@
   "project": "OVAV",
   "hash_algorithm": "sha256",
   "metadata": {
-    "git_identity": "a1b5076c84add3bcc99401c5532a94c96779e419d28efcb6182db4e9a1457046"
+    "git_identity": "236aa645b2a99e4f7edee24838bae8a04d85d6196fed677deefcb0c268da8a9d"
   },
   "policy": {
     "version": "tracked-content-v1",
@@ -1022,7 +1022,7 @@
     ".pi/test-extension.sh": "0cfd892288338d0f31367c22b2a8af0cb8b745354258d5fce4129569bd1f160c",
     ".pre-commit-config.yaml": "aa661f6dd44a0c86afc2556bd20bfc60c15fd3d8849aff01281fd86348141224",
     "AGENTS.md": "570c3199574b71bf5498966d32a1fd9fedbc089515808cc1726942a92fef4850",
-    "CHANGELOG.md": "b1012d4b045bfaac7547cd5f1989392a7fda683cde716bdfa157c44fff29a209",
+    "CHANGELOG.md": "9e2eaa9af4fbc17db6fa771438bbd8822f6319fbe2e91966dc986f0f26057e6f",
     "COMPATIBILITY.md": "85323eeab3515fc84dc6c602533d544000b8c22d81bbdc3ff10745c31ba5f5b7",
     "Dockerfile.cpanel": "16ba8b64de9304e23e7773faf5e88f837883ff7d83e671dcdbe5e3c14e1f99d9",
     "INSTALL.md": "b0ad1eddf9086caf7ebe2d4fcea0543b29d43e2bd35b0991de360e33b2987b87",
@@ -1224,6 +1224,7 @@
     "docs/architecture/ADR-001-go-runtime.md": "6b30fe4dc2be4f54833981bfaa2c48d316a290f7dc7f89b23ad04bbde99fb5c2",
     "docs/architecture/ADR-002-microservices-boundary.md": "5ae8f229faa1af2094a9b84eae8187f855a16f7ae1cf56415c8b831181427f31",
     "docs/architecture/ADR-003-validator-migration-strategy.md": "9a6cd64f570a58c0ee1dd52a37d8e24a9620bfae67e578ca3c3d9c7e68943279",
+    "docs/architecture/ADR-004-tools-registry-stabilization.md": "96c21cfaf1d951f4e9839972a0e6c0a729b5a4c1f82a0080693449fcb055e96c",
     "docs/architecture/OWS_SPEC.md": "6ce24fed2ba405893709e9975f61c739fb822a6a6cf47d13e4f3978ff95d22b4",
     "docs/audit/2026-06-16_FINDINGS_REGISTRY.yaml": "3f9dedaf232ea1fb923b6a184d3cb5d82463a8c87f540df5cb397f4477987e0e",
     "docs/audit/2026-06-16_SYSTEM_WIDE_AUDIT.md": "209a74faf880e8aace3cf8641b3db153492d7d5745a28049e4225722d38406ae",
