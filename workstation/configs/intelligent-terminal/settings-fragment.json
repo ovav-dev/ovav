@@ -1,33 +1,142 @@
 {
-  "_comment": "OVAV IT v0.2 fragment \u2014 MINIMAL schema. No newTabMenu/themes[]/actions[] experimental. Only defaultProfile + theme (STRING) + profiles + schemes.",
+  "_comment": "OVAV IT v0.2 fragment \u2014 STABLE. Full schema applied.",
   "$schema": "https://aka.ms/terminal-profiles-schema",
   "defaultProfile": "{e3cb3da9-9980-5990-a951-339efdad913d}",
   "theme": "dark",
+  "newTabMenu": [
+    {
+      "type": "profile",
+      "profile": "OVAV"
+    },
+    {
+      "type": "profile",
+      "profile": "SYS"
+    },
+    {
+      "type": "profile",
+      "profile": "HUB"
+    },
+    {
+      "type": "profile",
+      "profile": "WIN"
+    },
+    {
+      "type": "separator"
+    },
+    {
+      "type": "remainingProfiles"
+    }
+  ],
+  "themes": [
+    {
+      "name": "OVAV Night",
+      "background": "#0B0E14",
+      "foreground": "#E6EDF3",
+      "selectionBackground": "#1F6FEB",
+      "cursorColor": "#58A6FF",
+      "tabRow": {
+        "background": "#0D1117",
+        "unfocusedBackground": "#161B22",
+        "iconStyle": "default"
+      },
+      "window": {
+        "frame": "#0D1117",
+        "applicationTheme": "dark"
+      }
+    },
+    {
+      "name": "OVAV Day",
+      "background": "#FFFFFF",
+      "foreground": "#1F2328",
+      "selectionBackground": "#0969DA",
+      "cursorColor": "#0969DA",
+      "tabRow": {
+        "background": "#F6F8FA",
+        "unfocusedBackground": "#EAEEF2",
+        "iconStyle": "default"
+      },
+      "window": {
+        "frame": "#F6F8FA",
+        "applicationTheme": "light"
+      }
+    }
+  ],
   "profiles": {
+    "defaults": {
+      "font": {
+        "face": "CaskaydiaMono Nerd Font Mono",
+        "size": 12
+      },
+      "useShellIntegration": false
+    },
     "list": [
       {
         "commandline": "wsl.exe -d Ubuntu-26.04",
         "guid": "{e3cb3da9-9980-5990-a951-339efdad913d}",
         "name": "OVAV",
-        "startingDirectory": "//wsl.localhost/Ubuntu-26.04/home/braka/Systems/ovav"
+        "startingDirectory": "//wsl.localhost/Ubuntu-26.04/home/braka/Systems/ovav",
+        "font": {
+          "face": "CaskaydiaMono Nerd Font Mono",
+          "size": 12
+        }
       },
       {
         "commandline": "wsl.exe -d Ubuntu-26.04",
         "guid": "{445f0540-815b-5751-9045-de7354bf23b5}",
         "name": "SYS",
-        "startingDirectory": "//wsl.localhost/Ubuntu-26.04/home/braka/.config"
+        "startingDirectory": "//wsl.localhost/Ubuntu-26.04/home/braka/.config",
+        "font": {
+          "face": "CaskaydiaMono Nerd Font Mono",
+          "size": 12
+        }
       },
       {
         "commandline": "wsl.exe -d Ubuntu-26.04",
         "guid": "{3effc6bf-75c0-5786-8d37-54b6f9707eb4}",
         "name": "HUB",
-        "startingDirectory": "//wsl.localhost/Ubuntu-26.04/home/braka/Systems"
+        "startingDirectory": "//wsl.localhost/Ubuntu-26.04/home/braka/Systems",
+        "font": {
+          "face": "CaskaydiaMono Nerd Font Mono",
+          "size": 12
+        }
       },
       {
         "commandline": "wsl.exe -d Ubuntu-26.04",
         "guid": "{29516ade-0377-5279-ada0-c37d2200eb7d}",
         "name": "WIN",
-        "startingDirectory": "//wsl.localhost/Ubuntu-26.04/mnt/c/Users/Alexa"
+        "startingDirectory": "//wsl.localhost/Ubuntu-26.04/mnt/c/Users/Alexa",
+        "font": {
+          "face": "CaskaydiaMono Nerd Font Mono",
+          "size": 12
+        }
+      },
+      {
+        "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
+        "hidden": false,
+        "name": "Windows PowerShell",
+        "font": {
+          "face": "CaskaydiaMono Nerd Font Mono",
+          "size": 12
+        }
+      },
+      {
+        "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
+        "hidden": false,
+        "name": "Command Prompt",
+        "font": {
+          "face": "CaskaydiaMono Nerd Font Mono",
+          "size": 12
+        }
+      },
+      {
+        "guid": "{b453ae62-4e3d-5e58-b989-0a998ec441b8}",
+        "hidden": false,
+        "name": "Azure Cloud Shell",
+        "source": "Windows.Terminal.Azure",
+        "font": {
+          "face": "CaskaydiaMono Nerd Font Mono",
+          "size": 12
+        }
       }
     ]
   },
@@ -77,6 +186,54 @@
       "selectionBackground": "#2A3A5C",
       "white": "#C9D1E0",
       "yellow": "#F2CC60"
+    }
+  ],
+  "actions": [
+    {
+      "command": {
+        "action": "newTab",
+        "profile": "OVAV"
+      },
+      "id": "OVAV.tab"
+    },
+    {
+      "command": {
+        "action": "newTab",
+        "profile": "SYS"
+      },
+      "id": "SYS.tab"
+    },
+    {
+      "command": {
+        "action": "newTab",
+        "profile": "HUB"
+      },
+      "id": "HUB.tab"
+    },
+    {
+      "command": {
+        "action": "newTab",
+        "profile": "WIN"
+      },
+      "id": "WIN.tab"
+    },
+    {
+      "command": {
+        "action": "closeOtherTabs"
+      },
+      "id": "OVAV.close-others"
+    },
+    {
+      "command": {
+        "action": "reloadSettings"
+      },
+      "id": "OVAV.reload"
+    },
+    {
+      "command": {
+        "action": "openSystemMenu"
+      },
+      "id": "OVAV.menu"
     }
   ]
 }
