@@ -4,7 +4,7 @@
   "project": "OVAV",
   "hash_algorithm": "sha256",
   "metadata": {
-    "git_identity": "9a1aa07ca37563d48fb10f64f27c4e176b34ab80e04d147d4ce57022a927b058"
+    "git_identity": "c357f32804d37a8ff8c5fdda87417e255b01dedc78d37bab41db899b4ca8ded1"
   },
   "policy": {
     "version": "tracked-content-v1",
@@ -1485,10 +1485,11 @@
     "go-runtime/cmd/ovav/integrity_cli.go": "bb7b218499c08bcf068c6dd2f229ab6c3b4fc023fa2d11208189edba5ed9dcae",
     "go-runtime/cmd/ovav/it_cli.go": "c67dc9a5a6fd07b67e5f999c1b23b616f1b51c0d83330aff07c135217572988e",
     "go-runtime/cmd/ovav/it_test.go": "de82dfd5361add51165a50751e6a3921326672c220ed157cb4636960e612bd4e",
-    "go-runtime/cmd/ovav/launch_cli.go": "779e1a4d45789bee045c8461e7482559573854a2c40cd1774185a95eaba6883a",
+    "go-runtime/cmd/ovav/launch_cli.go": "856bd034558b3e59c0539cd9805527ce4c111bdc9264fd0e98fade62055f4903",
     "go-runtime/cmd/ovav/launch_cli_test.go": "810d88c967f898814edb9198869015042d51fa1c2d1e60cb822645ade93a6f3d",
     "go-runtime/cmd/ovav/launch_context_helper.go": "2e18e92f2a9eff5f489ff14b68264a8c8ce5c65509fa75ac2e40128d862a6b77",
-    "go-runtime/cmd/ovav/launch_wizard.go": "2b25da6b83abc4a89670fa775af128f6f0ebbbcdb423a03cb7e8836893bc73dd",
+    "go-runtime/cmd/ovav/launch_wizard.go": "a5aba0ee084e0f57a82e475bb00a169dd487fa414fb4c8d05563f11f4b9c347b",
+    "go-runtime/cmd/ovav/launch_wizard_readonly_test.go": "32084c624dfac39071dd565eb38513fcce194d6bffaf451b30d86acae07f2f1f",
     "go-runtime/cmd/ovav/launch_wizard_test.go": "dea13106392992d45db5a90643bb979dceef7eb4712ef3eb741693c65a241646",
     "go-runtime/cmd/ovav/login.go": "d34287060d4970fdc27f25a864ce4b3f7cfbc8f6fda82af452bc440774ccc485",
     "go-runtime/cmd/ovav/login_recovery_test.go": "667bb6b13125a80b5f1a661bfe1004019197eae396984e355b881ca6f83fa36a",
