@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-# OVAV tool wrapper (bash-native, MiMo-compatible)
-# Usage: ff [pattern] [path] - fd needs pattern before path
-exec fd --hidden --exclude .git "$@"
