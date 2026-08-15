@@ -4,7 +4,7 @@
   "files": {
     ".ovav/plan/caps.yaml": "887eb0f5b3aceed8d6319626a48d4b10472f0c308c7dc1a6ae8af979e1f95999",
     ".ovav/policy/permission_authority.json": "c31e9c2028e1d11de70412538db2cb7f57f2b442389667fe73c38ac2335bf88e",
-    "AGENTS.md": "0a16571ed0d9a0b25d8b1ab96028dc8a6254ffb8f7b296aebc27c76e5494794d",
+    "AGENTS.md": "eb9a794656e9be6ad3e86d3123080138ef949e78996523650f6b3cb8ab7357d3",
     "go-runtime/go.mod": "599b88657887000354a47351a0555ddb5b7a0c67ea022dc33f692a56af9f9bd8",
     "go-runtime/internal/validators/cmd/validate/main.go": "8acb76e3f95573fd4a950dbd695f65e2336317987f192bccd6a452b5a62606b0",
     "opencode.json": "82a6469c235965ad969d99640bfe6286354b73e61c3c2a99611953a7967b023b"
