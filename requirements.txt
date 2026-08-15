@@ -11,7 +11,7 @@
 #       tiktoken is used by generate_vocab.py for OpenAI token counting.
 #       Both have graceful fallbacks if not installed.
 
-PyYAML>=6.0
+PyYAML>=6.0.3
 pytest>=9.0
 jsonschema>=4.10
 regex>=2024.0
