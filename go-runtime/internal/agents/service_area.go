@@ -14,16 +14,16 @@ var ErrUnknownAgent = errors.New("unknown agent ID")
 type ServiceArea string
 
 const (
-	ServiceAreaPlatform    ServiceArea = "platform"
-	ServiceAreaResearch    ServiceArea = "research"
-	ServiceAreaUX          ServiceArea = "ux"
-	ServiceAreaCommercial  ServiceArea = "commercial"
-	ServiceAreaEducation   ServiceArea = "education"
-	ServiceAreaHealth      ServiceArea = "health"
-	ServiceAreaDevOps      ServiceArea = "devops"
-	ServiceAreaSecurity    ServiceArea = "security"
-	ServiceAreaData        ServiceArea = "data"
-	ServiceAreaLeadership  ServiceArea = "leadership"
+	ServiceAreaPlatform   ServiceArea = "platform"
+	ServiceAreaResearch   ServiceArea = "research"
+	ServiceAreaUX         ServiceArea = "ux"
+	ServiceAreaCommercial ServiceArea = "commercial"
+	ServiceAreaEducation  ServiceArea = "education"
+	ServiceAreaHealth     ServiceArea = "health"
+	ServiceAreaDevOps     ServiceArea = "devops"
+	ServiceAreaSecurity   ServiceArea = "security"
+	ServiceAreaData       ServiceArea = "data"
+	ServiceAreaLeadership ServiceArea = "leadership"
 )
 
 // RouteRequest routes a request to the appropriate service area.
@@ -96,18 +96,18 @@ func InternalRepoAccessDeniedByDefault(agentID string) bool {
 // agentIDToServiceArea maps an agent name to its service area.
 func agentIDToServiceArea(name string) (ServiceArea, error) {
 	areaMap := map[string]ServiceArea{
-		"thavren":  ServiceAreaPlatform,
-		"eidren":   ServiceAreaResearch,
-		"elena":    ServiceAreaUX,
-		"sofia":    ServiceAreaCommercial,
-		"valeria":  ServiceAreaEducation,
-		"renata":   ServiceAreaHealth,
-		"marco":    ServiceAreaDevOps,
-		"clara":    ServiceAreaSecurity,
-		"braka":    ServiceAreaLeadership,
+		"thavren": ServiceAreaPlatform,
+		"eidren":  ServiceAreaResearch,
+		"elena":   ServiceAreaUX,
+		"sofia":   ServiceAreaCommercial,
+		"valeria": ServiceAreaEducation,
+		"renata":  ServiceAreaHealth,
+		"marco":   ServiceAreaDevOps,
+		"clara":   ServiceAreaSecurity,
+		"braka":   ServiceAreaLeadership,
 		// Platform squad
-		"lucas":    ServiceAreaPlatform,
-		"andres":   ServiceAreaPlatform,
+		"lucas":  ServiceAreaPlatform,
+		"andres": ServiceAreaPlatform,
 	}
 
 	area, ok := areaMap[name]

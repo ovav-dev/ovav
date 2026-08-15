@@ -269,7 +269,7 @@ func learn(memoryDir string, args []string) {
 	fmt.Println("✅ Interaction recorded for learning")
 	fmt.Printf("   Query: %s\n", query)
 	fmt.Printf("   Feedback: %.2f\n", feedback)
-	
+
 	// Show prediction if available
 	if context != "" {
 		prediction := engine.PredictAction(query, context)
@@ -298,7 +298,7 @@ func insights(memoryDir string) {
 	}
 
 	fmt.Printf("🧠 Learning Insights (%d found)\n\n", len(insightsList))
-	
+
 	for i, insight := range insightsList {
 		if i >= 10 {
 			break

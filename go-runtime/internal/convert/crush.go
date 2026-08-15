@@ -10,9 +10,10 @@ import (
 // Verified via SDK: internal/agent/types.gen.go AgentV2Info
 //
 // Frontmatter fields (VERIFIED):
-//   id, mode ("subagent"|"primary"|"all"), hidden (bool),
-//   permissions (action/resource/effect), description, system,
-//   color, steps, model
+//
+//	id, mode ("subagent"|"primary"|"all"), hidden (bool),
+//	permissions (action/resource/effect), description, system,
+//	color, steps, model
 //
 // IMPORTANT: use `id` NOT `name` — name is NOT a valid field in Crush SDK.
 // IMPORTANT: `hidden` is a REQUIRED boolean field.

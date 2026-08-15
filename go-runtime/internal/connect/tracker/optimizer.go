@@ -20,26 +20,26 @@ func NewAutoOptimizer(tracker *Tracker) *AutoOptimizer {
 
 // OptimizationRecommendation represents an AI-generated recommendation.
 type OptimizationRecommendation struct {
-	Type        string  `json:"type"` // "switch_provider", "change_model", "optimize_usage"
-	ProviderID  string  `json:"provider_id"`
-	Model       string  `json:"model,omitempty"`
-	Savings     float64 `json:"savings_usd"`
-	Reason      string  `json:"reason"`
-	Priority    float64 `json:"priority"` // 0.0 to 1.0
-	Action      string  `json:"action"`
+	Type       string  `json:"type"` // "switch_provider", "change_model", "optimize_usage"
+	ProviderID string  `json:"provider_id"`
+	Model      string  `json:"model,omitempty"`
+	Savings    float64 `json:"savings_usd"`
+	Reason     string  `json:"reason"`
+	Priority   float64 `json:"priority"` // 0.0 to 1.0
+	Action     string  `json:"action"`
 }
 
 // ProviderAnalysis contains detailed analysis of a provider.
 type ProviderAnalysis struct {
-	ProviderID       string            `json:"provider_id"`
-	TotalCost        float64           `json:"total_cost_usd"`
-	TotalTokens      int               `json:"total_tokens"`
-	AverageCostPerK  float64           `json:"avg_cost_per_1k_tokens"`
-	EfficiencyScore  float64           `json:"efficiency_score"` // 0.0 to 1.0
-	TrendDirection   string            `json:"trend_direction"`  // "increasing", "decreasing", "stable"
-	BestModel        string            `json:"best_model"`
-	WorstModel       string            `json:"worst_model"`
-	UsagePattern     UsagePattern      `json:"usage_pattern"`
+	ProviderID      string       `json:"provider_id"`
+	TotalCost       float64      `json:"total_cost_usd"`
+	TotalTokens     int          `json:"total_tokens"`
+	AverageCostPerK float64      `json:"avg_cost_per_1k_tokens"`
+	EfficiencyScore float64      `json:"efficiency_score"` // 0.0 to 1.0
+	TrendDirection  string       `json:"trend_direction"`  // "increasing", "decreasing", "stable"
+	BestModel       string       `json:"best_model"`
+	WorstModel      string       `json:"worst_model"`
+	UsagePattern    UsagePattern `json:"usage_pattern"`
 }
 
 // UsagePattern describes how a provider is being used.
@@ -75,13 +75,13 @@ func (ao *AutoOptimizer) AnalyzeProvider(providerID string) (*ProviderAnalysis, 
 	for _, r := range records {
 		analysis.TotalCost += r.CostUSD
 		analysis.TotalTokens += r.TotalTokens
-		
+
 		modelCosts[r.Model] += r.CostUSD
 		modelTokens[r.Model] += r.TotalTokens
-		
+
 		dayKey := r.Timestamp.Format("2006-01-02")
 		dailyCosts[dayKey] += r.CostUSD
-		
+
 		hourlyUsage[r.Timestamp.Hour()]++
 	}
 
@@ -94,14 +94,14 @@ func (ao *AutoOptimizer) AnalyzeProvider(providerID string) (*ProviderAnalysis, 
 	var bestModel, worstModel string
 	bestCost := math.MaxFloat64
 	worstCost := 0.0
-	
+
 	for model, cost := range modelCosts {
 		tokens := modelTokens[model]
 		if tokens == 0 {
 			continue
 		}
 		costPerK := (cost / float64(tokens)) * 1000
-		
+
 		if costPerK < bestCost {
 			bestCost = costPerK
 			bestModel = model
@@ -111,7 +111,7 @@ func (ao *AutoOptimizer) AnalyzeProvider(providerID string) (*ProviderAnalysis, 
 			worstModel = model
 		}
 	}
-	
+
 	analysis.BestModel = bestModel
 	analysis.WorstModel = worstModel
 
@@ -129,13 +129,13 @@ func (ao *AutoOptimizer) AnalyzeProvider(providerID string) (*ProviderAnalysis, 
 			costs = append(costs, cost)
 		}
 		sort.Float64s(costs)
-		
+
 		firstHalf := costs[:len(costs)/2]
 		secondHalf := costs[len(costs)/2:]
-		
+
 		avgFirst := average(firstHalf)
 		avgSecond := average(secondHalf)
-		
+
 		if avgSecond > avgFirst*1.2 {
 			analysis.TrendDirection = "increasing"
 		} else if avgSecond < avgFirst*0.8 {
@@ -183,7 +183,7 @@ func (ao *AutoOptimizer) GenerateRecommendations() ([]OptimizationRecommendation
 		if !p.Enabled {
 			continue
 		}
-		
+
 		analysis, err := ao.AnalyzeProvider(p.ID)
 		if err != nil {
 			continue
@@ -212,10 +212,10 @@ func (ao *AutoOptimizer) GenerateRecommendations() ([]OptimizationRecommendation
 					Type:       "switch_provider",
 					ProviderID: id,
 					Savings:    potentialSavings,
-					Reason:     fmt.Sprintf("%.1f%% more expensive than %s", 
+					Reason: fmt.Sprintf("%.1f%% more expensive than %s",
 						(costDiff/cheapestCostPerK)*100, cheapestProvider),
-					Priority:   math.Min(1.0, costDiff/cheapestCostPerK),
-					Action:     fmt.Sprintf("Consider switching from %s to %s for cost savings", id, cheapestProvider),
+					Priority: math.Min(1.0, costDiff/cheapestCostPerK),
+					Action:   fmt.Sprintf("Consider switching from %s to %s for cost savings", id, cheapestProvider),
 				})
 			}
 		}
@@ -224,17 +224,17 @@ func (ao *AutoOptimizer) GenerateRecommendations() ([]OptimizationRecommendation
 		if analysis.WorstModel != "" && analysis.BestModel != "" {
 			worstCost := getCostForModel(analyses[id], analysis.WorstModel)
 			bestCost := getCostForModel(analyses[id], analysis.BestModel)
-			
+
 			if worstCost > bestCost*1.5 { // 50% more expensive
 				recommendations = append(recommendations, OptimizationRecommendation{
 					Type:       "change_model",
 					ProviderID: id,
 					Model:      analysis.WorstModel,
 					Savings:    worstCost - bestCost,
-					Reason:     fmt.Sprintf("Model %s is significantly more expensive than %s", 
+					Reason: fmt.Sprintf("Model %s is significantly more expensive than %s",
 						analysis.WorstModel, analysis.BestModel),
-					Priority:   0.8,
-					Action:     fmt.Sprintf("Switch from %s to %s on %s", 
+					Priority: 0.8,
+					Action: fmt.Sprintf("Switch from %s to %s on %s",
 						analysis.WorstModel, analysis.BestModel, id),
 				})
 			}
@@ -322,7 +322,7 @@ func (ao *AutoOptimizer) PredictFutureCosts(providerID string, days int) (float6
 	// Calculate trend
 	avgCost := average(costs)
 	trend := (costs[len(costs)-1] - costs[0]) / float64(len(costs))
-	
+
 	predictedDaily := avgCost + trend*float64(days)/2
 	return predictedDaily * float64(days), nil
 }

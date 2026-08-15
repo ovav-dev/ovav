@@ -1432,15 +1432,15 @@ func TestHandleMouse_RootMenuItems(t *testing.T) {
 		y      int
 		itemID string
 	}{
-		{7, "updates"},    // row 0
-		{9, "dashboard"},  // row 1
-		{10, "health"},    // row 2
-		{11, "vault"},     // row 3
-		{12, "sync"},      // row 4
-		{13, "config"},    // row 5
-		{14, "install"},   // row 6
-		{15, "tailor"},    // row 7
-		{16, "cli"},       // row 8
+		{7, "updates"},   // row 0
+		{9, "dashboard"}, // row 1
+		{10, "health"},   // row 2
+		{11, "vault"},    // row 3
+		{12, "sync"},     // row 4
+		{13, "config"},   // row 5
+		{14, "install"},  // row 6
+		{15, "tailor"},   // row 7
+		{16, "cli"},      // row 8
 	}
 
 	for _, mc := range menuClicks {

@@ -20,7 +20,7 @@ type GooseConverter struct{}
 
 func (c *GooseConverter) FileExtension() string { return ".md" }
 func (c *GooseConverter) OutputDir() string     { return "runtimes/goose" }
-func (c *GooseConverter) AreasOnly() bool        { return true }
+func (c *GooseConverter) AreasOnly() bool       { return true }
 
 func (c *GooseConverter) ConvertArea(area *Area, _ map[string]*Lead) ([]byte, error) {
 	var b strings.Builder
