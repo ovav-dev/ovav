@@ -1,0 +1,21 @@
+Script started on 2026-08-15 12:35:47-05:00 [COMMAND="bash --rcfile /tmp/opencode/debug-bashrc.sh -i" <not executed on terminal>]
+=== RCFILE START 1786815347.548099810 ===
+BASH_VERSION=5.3.9(1)-release
+himBH=himBH
+BASH_SOURCE[0]=/tmp/opencode/debug-bashrc.sh
+
+history -s done
+atuin pty-proxy init done
+atuin init done
+zoxide init done
+fzf init done
+
+=== Loading ble.sh ===
+ble.sh: ble.sh cannot be loaded into a subshell.
+ble.sh sourced, BLE_VERSION=[]
+BLE_BASE=[]
+bleopt: command not found
+bleopt: command not found
+bleopt: command not found
+
+Script done on 2026-08-15 12:35:53-05:00 [COMMAND_EXIT_CODE="0"]

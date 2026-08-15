@@ -1,0 +1,229 @@
+=== CANARY TEST START 2026-08-15T12:33:40-05:00 ===
+=== TEST 1: ble.sh sources cleanly ===
+ble.sh: This is not an interactive session.
+BLE_VERSION=
+BLE_BASE=
+TEST1=PASS
+=== TEST 2: blerc applies ===
+ble.sh: This is not an interactive session.
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 9: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 10: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 11: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 12: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 13: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 16: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 17: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 18: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 19: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 22: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 23: ble-color-defface: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 24: ble-color-defface: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 25: ble-color-defface: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 28: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 29: ble-color-defface: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 32: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 33: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 34: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 35: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 38: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 39: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 40: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 41: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 42: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 47: ble-bind: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 56: ble-color-defface: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 57: ble-color-defface: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 62: ble-color-setfg: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 73: ble-bind: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 79: bleopt: command not found
+[blerc] loaded: minimal history-suggest config
+complete_auto_complete=
+complete_auto_history=
+bash: -c: line 6: unexpected EOF while looking for matching `"'
+=== TEST 3: Ghost suggestion logic ===
+ble.sh: This is not an interactive session.
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 9: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 10: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 11: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 12: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 13: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 16: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 17: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 18: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 19: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 22: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 23: ble-color-defface: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 24: ble-color-defface: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 25: ble-color-defface: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 28: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 29: ble-color-defface: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 32: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 33: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 34: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 35: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 38: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 39: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 40: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 41: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 42: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 47: ble-bind: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 56: ble-color-defface: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 57: ble-color-defface: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 62: ble-color-setfg: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 73: ble-bind: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 79: bleopt: command not found
+[blerc] loaded: minimal history-suggest config
+history count: 2
+TEST3=PASS
+=== TEST 4: Ctrl+R rebound to ignore ===
+ble.sh: This is not an interactive session.
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 9: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 10: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 11: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 12: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 13: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 16: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 17: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 18: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 19: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 22: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 23: ble-color-defface: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 24: ble-color-defface: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 25: ble-color-defface: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 28: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 29: ble-color-defface: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 32: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 33: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 34: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 35: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 38: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 39: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 40: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 41: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 42: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 47: ble-bind: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 56: ble-color-defface: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 57: ble-color-defface: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 62: ble-color-setfg: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 73: ble-bind: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 79: bleopt: command not found
+[blerc] loaded: minimal history-suggest config
+TEST4=PASS
+=== TEST 5: Starship still works ===
+starship 1.26.0
+branch:main
+commit_hash:fca92d8
+build_time:2026-06-28 17:04:57 +00:00
+build_env:rustc 1.96.0 (ac68faa20 2026-05-25),
+=== TEST 6: Atuin pty-proxy alive ===
+235065 atuin pty-proxy --shell /bin/bash
+atuin 18.19.0 (fb33978d9439ba7e97123c1adc932c6a74e3c8ae)
+=== TEST 7: Atuin init still parses with ble.sh ===
+ble.sh: This is not an interactive session.
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 9: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 10: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 11: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 12: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 13: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 16: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 17: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 18: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 19: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 22: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 23: ble-color-defface: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 24: ble-color-defface: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 25: ble-color-defface: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 28: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 29: ble-color-defface: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 32: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 33: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 34: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 35: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 38: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 39: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 40: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 41: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 42: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 47: ble-bind: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 56: ble-color-defface: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 57: ble-color-defface: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 62: ble-color-setfg: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 73: ble-bind: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 79: bleopt: command not found
+[blerc] loaded: minimal history-suggest config
+ATUIN_INIT_OK=yes
+TEST7=PASS
+=== TEST 8: Atuin pty-proxy init with ble.sh ===
+ble.sh: This is not an interactive session.
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 9: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 10: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 11: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 12: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 13: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 16: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 17: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 18: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 19: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 22: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 23: ble-color-defface: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 24: ble-color-defface: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 25: ble-color-defface: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 28: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 29: ble-color-defface: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 32: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 33: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 34: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 35: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 38: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 39: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 40: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 41: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 42: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 47: ble-bind: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 56: ble-color-defface: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 57: ble-color-defface: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 62: ble-color-setfg: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 73: ble-bind: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 79: bleopt: command not found
+[blerc] loaded: minimal history-suggest config
+PTY_PROXY_OK=yes
+TEST8=PASS
+=== TEST 9: Starship init with ble.sh ===
+ble.sh: This is not an interactive session.
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 9: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 10: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 11: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 12: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 13: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 16: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 17: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 18: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 19: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 22: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 23: ble-color-defface: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 24: ble-color-defface: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 25: ble-color-defface: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 28: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 29: ble-color-defface: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 32: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 33: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 34: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 35: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 38: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 39: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 40: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 41: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 42: bleopt: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 47: ble-bind: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 56: ble-color-defface: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 57: ble-color-defface: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 62: ble-color-setfg: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 73: ble-bind: command not found
+/home/braka/Systems/ovav/.ovav/worktrees/feature-feat-piagent-tui-customization/.ovav-ux-convergence/blerc.template: line 79: bleopt: command not found
+[blerc] loaded: minimal history-suggest config
+STARSHIP_INIT_OK=yes
+TEST9=PASS
+=== TEST 10: Startup time delta ===
+BEFORE (no ble.sh):
+AFTER (ble.sh + blerc):
+=== CANARY TEST END ===
