@@ -4,13 +4,9 @@
   "files": {
     ".ovav/plan/caps.yaml": "887eb0f5b3aceed8d6319626a48d4b10472f0c308c7dc1a6ae8af979e1f95999",
     ".ovav/policy/permission_authority.json": "c31e9c2028e1d11de70412538db2cb7f57f2b442389667fe73c38ac2335bf88e",
-    ".ovav/registry/sbom.json": "2b551b5ee113c071d2cfb1a53339bbf47a65e354a4eb1c926fb49749eecba5fe",
     "AGENTS.md": "570c3199574b71bf5498966d32a1fd9fedbc089515808cc1726942a92fef4850",
-    "go-runtime/cmd/ovav/launch_cli.go": "e34c92c70d24a32e0c4f791d56817676f2bd12d7f76a8eadffe5dc15f77cbb69",
     "go-runtime/go.mod": "599b88657887000354a47351a0555ddb5b7a0c67ea022dc33f692a56af9f9bd8",
-    "go-runtime/internal/validators/canonical_state_test.go": "be38afb658998351f9b195c1d711d0f3ae8daeb96984d1fb4c16202493dac33c",
     "go-runtime/internal/validators/cmd/validate/main.go": "8acb76e3f95573fd4a950dbd695f65e2336317987f192bccd6a452b5a62606b0",
-    "go-runtime/internal/validators/integrity_baseline_fresh.go": "b5bbc705912ae09ce635630f324c4d318667a65e56570e81884046197e2f33ed",
     "opencode.json": "2eaddfd827d5ff3734d4d2657bb51af074febeaa7bb4e61f6550689431942a2a"
   }
 }
