@@ -110,3 +110,53 @@ enable-bracketed-paste
 			res.Status, res.Message, res.Issues)
 	}
 }
+
+// Test 6: Real-fragment regression — section header uses Unicode box-drawing
+// chars (─) for aesthetics; the canonical marker line must still be present
+// verbatim so the validator can detect it. Mirrors the actual production
+// fragment workstation/configs/inputrc/ovav.inputrc.
+func TestBashReadlineBindings_RealFragment_Pass(t *testing.T) {
+	root := writeInputrc(t, `
+# ─── OVAV readline config ────────────────────────────────────
+set bell-style none
+set enable-bracketed-paste on
+
+"\e[1;5C": forward-word
+"\e[1;5D": backward-word
+
+# ── Shift+arrow: deliberately UNBOUND ─────────────────────────
+# Shift+arrow: deliberately UNBOUND
+# bash readline should NOT bind shift+arrow — that's the terminal's job.
+"\e[1;3C": forward-word
+"\e[1;3D": backward-word
+`)
+	v := NewBashReadlineBindings()
+	res := v.Validate(t.Context(), root)
+	if res.Status != "pass" {
+		t.Fatalf("real-fragment regression: expected pass, got %s: %s — issues: %v",
+			res.Status, res.Message, res.Issues)
+	}
+}
+
+// Test 7: Real-fragment regression — section header with box-drawing chars
+// but WITHOUT the canonical marker line MUST warn. Catches the drift where
+// the section header is present but the validator's literal marker is missing.
+func TestBashReadlineBindings_RealFragment_MissingMarker_Warn(t *testing.T) {
+	root := writeInputrc(t, `
+set bell-style none
+set enable-bracketed-paste on
+
+"\e[1;5C": forward-word
+"\e[1;5D": backward-word
+
+# ── Shift+arrow: deliberately UNBOUND ─────────────────────────
+"\e[1;3C": forward-word
+"\e[1;3D": backward-word
+`)
+	v := NewBashReadlineBindings()
+	res := v.Validate(t.Context(), root)
+	if res.Status != "warn" {
+		t.Fatalf("real-fragment missing marker: expected warn, got %s: %s",
+			res.Status, res.Message)
+	}
+}

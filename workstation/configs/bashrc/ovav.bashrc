@@ -28,6 +28,13 @@ export TERM=xterm-256color
 #  Critical: must be in PATH BEFORE checking command -v
 #  (Atuin ships its own binary at ~/.atuin/bin, NOT in /usr/local/bin)
 # ─────────────────────────────────────────────────────────────
+# Atuin pty-proxy init (Phase II Terminal Cortex — pty-proxy canary)
+# This MUST come BEFORE the regular `atuin init` line below.
+# When pty-proxy is enabled in config.toml, this line is a no-op.
+if command -v atuin >/dev/null 2>&1; then
+  eval "$(atuin pty-proxy init bash 2>/dev/null)"
+fi
+
 if command -v atuin >/dev/null 2>&1; then
   eval "$(atuin init bash --disable-up-arrow 2>/dev/null)"
 fi
@@ -95,6 +102,38 @@ if [ -x "$HOME/.local/bin/ovav" ]; then
 fi
 
 # ─────────────────────────────────────────────────────────────
+#  OPTIONAL ALIASES — only when the modern tool is installed
+#  Rationale: do not break shell startup if a tool is missing.
+# ─────────────────────────────────────────────────────────────
+if command -v eza &>/dev/null; then
+    alias ll='eza -la --icons --git'
+    alias lt='eza --tree --level=2 --icons'
+    alias la='eza -a --icons'
+    alias l='eza --icons'
+fi
+command -v bat &>/dev/null && alias cat='bat --style=numbers,changes,header --theme=Tokyo-Night'
+command -v fd &>/dev/null && alias find='fd'
+command -v btop &>/dev/null && alias top='btop'
+command -v nvim &>/dev/null && alias vim='nvim'
+command -v codium &>/dev/null && alias code='codium'
+
+# Editor — prefer Neovim when available
+export EDITOR='nvim'
+export VISUAL='nvim'
+
+# ─────────────────────────────────────────────────────────────
+#  OVAV BLE.SH GHOST SUGGESTION (minimal config — Phase II canary)
+#  ble.sh v0.3.4 — history-based ghost suggestion only
+#  Atuin keeps Ctrl+R. Starship owns prompt. fzf keeps Ctrl-T/Alt-C.
+# ─────────────────────────────────────────────────────────────
+if [ -f ~/.local/share/blesh/ble.sh ]; then
+  source ~/.local/share/blesh/ble.sh
+  [ -f ~/.blerc ] && source ~/.blerc
+  # Ctrl+Z = undo in edit mode (does NOT affect job control for running processes)
+  ble-bind -s 'C-z' 'undo' 2>/dev/null || true
+fi
+
+# ─────────────────────────────────────────────────────────────
 #  ALIASES — productivity (non-critical, no overrides)
 # ─────────────────────────────────────────────────────────────
 alias ll='ls -lah --color=auto'
@@ -108,6 +147,7 @@ alias gl='git log --oneline -20'
 alias ov='ovav'
 alias ovs='ovav status'
 alias ovv='ovav validate'
+alias ovd='ovav doctor --quick'
 alias ocd='opencode'
 alias ocr='opencode --continue'
 

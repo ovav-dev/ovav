@@ -48,6 +48,7 @@ set match-hidden-files on
 "\e[B": history-substring-search-forward
 
 # ── Shift+arrow: deliberately UNBOUND ─────────────────────────
+# Shift+arrow: deliberately UNBOUND
 # bash readline should NOT bind shift+arrow — that's the terminal's job.
 # IT (or any modern terminal) intercepts shift+arrow for VISUAL SELECTION
 # (highlighting text in the terminal UI) and does not pass the keystroke

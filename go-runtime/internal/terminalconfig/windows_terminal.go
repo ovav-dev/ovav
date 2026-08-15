@@ -12,6 +12,17 @@ import (
 
 var windowsTerminalGUID = regexp.MustCompile(`^\{[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\}$`)
 
+// windowsTerminalBuiltinProfileGUIDs are the canonical Windows Terminal
+// profiles that ship pre-installed without an explicit commandline.
+// OVAV profiles that reference these GUIDs (e.g. Windows PowerShell,
+// Command Prompt) are system profiles and don't require commandline in
+// the fragment — Windows Terminal supplies defaults at runtime.
+var windowsTerminalBuiltinProfileGUIDs = map[string]bool{
+	"{61c54bbd-c2c6-5271-96e7-009a87ff44bf}": true, // Windows PowerShell
+	"{0caa0dad-35be-5f56-a8ff-afceeeaa6101}": true, // Command Prompt
+	"{b453ae62-4e3d-5e58-b989-0a998ec441b8}": true, // Azure Cloud Shell
+}
+
 // Plan describes a projection without touching the installed terminal settings.
 type Plan struct {
 	Destination string `json:"destination"`
@@ -87,8 +98,21 @@ func validateWindowsTerminal124Subset(settings map[string]interface{}, requireLo
 				if _, found := profile["guid"]; !found {
 					return fmt.Errorf("profiles.list[%d].guid is required", i)
 				}
-				if _, found := profile["commandline"]; !found {
-					return fmt.Errorf("profiles.list[%d].commandline is required", i)
+				if _, hasCommandline := profile["commandline"]; !hasCommandline {
+					// Allow profiles that are sourced from Windows Terminal
+					// (e.g. Azure Cloud Shell via "source") or that reference
+					// the canonical built-in GUIDs for PowerShell/Command Prompt.
+					// These ship without commandline and Windows Terminal supplies
+					// defaults at runtime — requiring commandline would force
+					// OVAV to duplicate vendor defaults.
+					guid, _ := profile["guid"].(string)
+					if _, hasSource := profile["source"]; hasSource {
+						// sourced profile — commandline optional
+					} else if windowsTerminalBuiltinProfileGUIDs[guid] {
+						// canonical built-in — commandline optional
+					} else {
+						return fmt.Errorf("profiles.list[%d].commandline is required", i)
+					}
 				}
 			}
 			if guid, found := profile["guid"]; found {
