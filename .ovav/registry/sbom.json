@@ -4,7 +4,7 @@
   "project": "OVAV",
   "hash_algorithm": "sha256",
   "metadata": {
-    "git_identity": "3e7e6fa366c3417b93eb705ba96d869ff6fdb5ae39c69e00f05b1420f44b585f"
+    "git_identity": "f0a90a95004858fe4433eea742d1c9071a9bd7ae6496befc32ab9c0639ae3cef"
   },
   "policy": {
     "version": "tracked-content-v1",
@@ -495,7 +495,7 @@
     ".ovav/plans/PLAN-OVAV-MEMORY-LIVE-v3.md": "4c54c76d0b7d0245a06c858befa53c9de041390a3cf111fc4bf84d06d75ffb3c",
     ".ovav/policy/canonical_paths.json": "bebb9f635b95635d5efad2670ec14cee1e0982e5fd82983ee65eaad997cea08a",
     ".ovav/policy/claims.yaml": "dafec41262b7a083e1c39281673a7d5cf187b53c9ca65d7bec5606de12ccea03",
-    ".ovav/policy/permission_authority.json": "122212e0a7ebb4866aafaf8a2775737e9f3183c418800d06405be6ed5240810e",
+    ".ovav/policy/permission_authority.json": "c31e9c2028e1d11de70412538db2cb7f57f2b442389667fe73c38ac2335bf88e",
     ".ovav/projects/ovav-product/webapp/frontend/.gitignore": "02abeba4835180912d05239617d9fae4e16edab8018c476d3dfc65595b24058b",
     ".ovav/projects/ovav-product/webapp/frontend/LANDING_CONTENT_BRIEF.md": "6c3fda92990a0d2ed78d147a27e42bbe226ee03e3df0e5f64efffacad99bf57e",
     ".ovav/projects/ovav-product/webapp/frontend/next.config.js": "90613a74b852313f1be46d10cf4e7bff74e6428b76b0306ffcec1d78115dda7b",
@@ -1011,9 +1011,6 @@
     ".ovav/templates/scripts/setup-wt-pwsh.ps1": "8bbe01d4f56f9b9689f17e2cf359a3830cf580d8adb19c2082acebc04be623b6",
     ".ovav/templates/windows-terminal/merge-wt-settings.ps1": "fe30011805bfb6db13a6c9fd1a8f57d10a968b940504df36818c345925fb1287",
     ".ovav/templates/windows-terminal/settings.json": "baca26a93ca57c3da45f97040cdf369495fb46f5b035a7cd0d24f9fc5af9c3e4",
-    ".ovav/visual/assets/Header OVAV.png": "3a73fb5f0280dee3729758dfa8aa88544c5d0efd7dbaa4428734d9973379e043",
-    ".ovav/visual/assets/OVAV-ICON.png": "2390c23f2b5fdf346970f0ac4f071c08868b4353a848dc84f21bffd5f9101314",
-    ".ovav/visual/assets/OVAV-LOGOTIPE.png": "191d663a30cc1d7f24b4d96360bb9e0a0a1ea0c3c95622925aad2eaed8dc60e4",
     ".ovav/visual/assets/readme/ovav-flow.svg": "913c6ee14f1d40fe51b2ab920a5945dff9dc79dd5807bc93b8774b92ba5e4673",
     ".ovav/visual/assets/readme/ovav-hero.png": "3a73fb5f0280dee3729758dfa8aa88544c5d0efd7dbaa4428734d9973379e043",
     ".ovav/visual/assets/readme/ovav-icon.png": "2390c23f2b5fdf346970f0ac4f071c08868b4353a848dc84f21bffd5f9101314",
