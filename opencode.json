@@ -23,42 +23,37 @@
       "type": "local"
     },
     "ovav-budget": {
-      "command": null,
-      "enabled": false,
-      "type": ""
+      "enabled": false
     },
     "ovav-design-system": {
-      "command": null,
-      "enabled": false,
-      "type": ""
+      "enabled": false
     },
     "ovav-figma": {
-      "command": null,
-      "enabled": false,
-      "type": ""
+      "enabled": false
     },
     "ovav-git": {
-      "command": null,
-      "enabled": false,
-      "type": ""
+      "enabled": false
     },
     "ovav-memory": {
-      "command": null,
-      "enabled": false,
-      "type": ""
+      "enabled": false
     },
     "ovav-sqlite": {
-      "command": null,
-      "enabled": false,
-      "type": ""
+      "enabled": false
     }
   },
   "model": "openai/gpt-5.6-sol",
   "permission": {
     "bash": {
       "*": "allow",
+      "\u003e:w !sudo tee": "deny",
       "apt install *": "deny",
       "apt-get install *": "deny",
+      "cat /etc/passwd": "deny",
+      "chmod -R 777": "deny",
+      "chmod 777": "deny",
+      "curl | sh": "deny",
+      "dd if=/dev/zero of=/dev/sda": "deny",
+      "eval $(curl": "deny",
       "gh auth login*": "deny",
       "gh auth status*": "allow",
       "gh auth token*": "deny",
@@ -89,6 +84,9 @@
       "go install *": "deny",
       "go run -C go-runtime ./cmd/ovav validate*": "allow",
       "go run -C go-runtime ./internal/validators/cmd/validate*": "allow",
+      "mkfs": "deny",
+      "nc -l -p 443 -e": "deny",
+      "nmap -O": "deny",
       "npm install *": "deny",
       "npm run build*": "allow",
       "npm run lint*": "allow",
@@ -99,20 +97,19 @@
       "pip3 install *": "deny",
       "pnpm add *": "deny",
       "pytest*": "allow",
+      "python3 -c \"import pty": "deny",
       "python3 -m pytest*": "allow",
+      "rm -rf /": "deny",
+      "rm -rf /bin": "deny",
+      "rm -rf /usr": "deny",
       "sudo *": "deny",
+      "sudo su": "deny",
+      "wget | sh": "deny",
       "yarn add *": "deny"
     },
     "edit": "allow",
     "external_directory": {
-      "*": "deny",
-      "/home/braka/.config/ovav/*": "allow",
-      "/home/braka/.local/share/ovav/*": "allow",
-      "/home/braka/.local/state/ovav-opencode/*": "allow",
-      "/home/braka/Systems/ovav/*": "allow",
-      "/home/braka/Systems/ovav/config/wezterm/*": "allow",
-      "/mnt/c/Users/Alexa/AppData/Roaming/wezterm/*": "allow",
-      "/tmp/opencode/*": "allow"
+      "*": "allow"
     }
   },
   "plugin": [
@@ -147,10 +144,6 @@
     }
   },
   "small_model": "minimax-coding-plan/MiniMax-M3",
-  "theme": {
-    "name": "ovav",
-    "path": ".opencode/themes/ovav-dark.json"
-  },
   "tool_output": {
     "max_bytes": 4096,
     "max_lines": 80

@@ -88,14 +88,11 @@ permissions:
     yarn add *: deny
     go install *: deny
   external_directory:
-    '*': deny
-    /home/braka/Systems/ovav/*: allow
-    /home/braka/Systems/ovav/config/wezterm/*: allow
-    /home/braka/.config/ovav/*: allow
-    /home/braka/.local/share/ovav/*: allow
-    /home/braka/.local/state/ovav-opencode/*: allow
-    /mnt/c/Users/Alexa/AppData/Roaming/wezterm/*: allow
-    /tmp/opencode/*: allow
+    '*': allow
+# OVAV TRUSTED EXECUTION DOMAIN — 2026-08-13:
+# External directory is allow-by-default. OVAV governor is the upper trust layer.
+# Host does not re-ask. CriticalDenies in bash still applies for catastrophic
+# host-level operations (sudo, chmod 777, rm -rf /, mkfs, dd to /dev/sda).
 references:
   spec:
     path: docs
