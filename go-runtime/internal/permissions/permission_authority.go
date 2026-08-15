@@ -204,10 +204,10 @@ func ExpectedExternalDirectory(agentName string) map[string]string {
 // Per-tool entries override "*" where they exist (e.g., bash has its own
 // map with critical denies). The combination guarantees:
 //
-//   1. Known tools (bash, edit, write, read, glob, etc.) → allow or per-tool map
-//   2. Unknown / future tools → "*": "allow" (autonomous default)
-//   3. Catastrophic bash operations → explicit "deny" (CriticalDenies)
-//   4. external_directory → "*": "allow" (YOLO trust domain)
+//  1. Known tools (bash, edit, write, read, glob, etc.) → allow or per-tool map
+//  2. Unknown / future tools → "*": "allow" (autonomous default)
+//  3. Catastrophic bash operations → explicit "deny" (CriticalDenies)
+//  4. external_directory → "*": "allow" (YOLO trust domain)
 //
 // Result: NO host re-ask. NO --auto flag required. OVAV decides, host runs.
 func ExpectedOpencodePermission() map[string]interface{} {
