@@ -2,7 +2,7 @@
   "schema": "ovav.runtime_integrity.v1",
   "algorithm": "sha256",
   "files": {
-    ".ovav/plan/caps.yaml": "44bf5f1ef3ca5ac473fe9b7b65b9dad68ea4159e986d090c968827d062e2f10a",
+    ".ovav/plan/caps.yaml": "8b894a233c208299759f4d155406beaeb1d9db219a3508348681187c3696edfe",
     ".ovav/policy/permission_authority.json": "c31e9c2028e1d11de70412538db2cb7f57f2b442389667fe73c38ac2335bf88e",
     "AGENTS.md": "570c3199574b71bf5498966d32a1fd9fedbc089515808cc1726942a92fef4850",
     "go-runtime/go.mod": "599b88657887000354a47351a0555ddb5b7a0c67ea022dc33f692a56af9f9bd8",
