@@ -65,7 +65,9 @@ OVAV provides role-based agents specialized for your project stack:
 - Result first, explanation after
 
 ### Git Discipline
-- **NEVER** use `git add .` — stage exact files by path
+- **NEVER** use `git add .` from the shell — stage exact files by path. (The
+  Ovav binary itself uses programmatic git APIs internally for bulk operations
+  like `ovav project sync`; this rule applies to human shell usage.)
 - **NEVER** use raw `git push` or `git merge` — use worktree commands
 - **NEVER** use `--force`, `--skip-gates` on ANY branch
 - Protected branches: `main`, `master`, `develop`, `staging`, `prod`, `production`
