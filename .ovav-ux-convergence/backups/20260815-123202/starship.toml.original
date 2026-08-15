@@ -1,0 +1,110 @@
+# ─────────────────────────────────────────────────────────────
+#  OVAV Night / Day — Starship prompt
+#  Palette selection via $STARSHIP_PALETTE (set by ~/.bashrc
+#  based on $INTELLIGENT_TERMINAL_THEME — see workstation configs).
+# ─────────────────────────────────────────────────────────────
+
+# ─── OVAV NIGHT palette ────────────────────────────────────
+[palettes.ovav-night]
+brand      = '#6EA8FE'
+surface    = '#111827'
+success    = '#7EE787'
+warning    = '#F2CC60'
+danger     = '#FF6B81'
+info       = '#5EEAD4'
+accent     = '#C099FF'
+muted      = '#4A5568'
+text       = '#D8E1F0'
+
+# ─── OVAV DAY palette ──────────────────────────────────────
+[palettes.ovav-day]
+brand      = '#2563EB'
+surface    = '#FFFFFF'
+success    = '#1F7A4C'
+warning    = '#8A5A00'
+danger     = '#C24156'
+info       = '#0F766E'
+accent     = '#7C3AED'
+muted      = '#94A3B8'
+text       = '#1B2430'
+
+# ─── Format (compact, premium, single-line) ────────────────
+format = """
+[░▒▓](#muted)\
+$os\
+$username\
+[]($style)\
+[]($surface)\
+$directory\
+$git_branch\
+$git_status\
+$nodejs\
+$python\
+$golang\
+$rust\
+$java\
+$php\
+$dotnet\
+$cmd_duration\
+$line_break\
+$character"""
+
+# ─── Modules (only useful, no empty clutter) ───────────────
+[directory]
+style = "bold $brand"
+format = "[ $path ]($style)"
+truncation_length = 3
+truncation_symbol = "…/"
+
+[git_branch]
+symbol = ""
+style = "bold $accent"
+
+[git_status]
+style = "$success"
+conflicted = "$danger"
+ahead = "$info"
+behind = "$warning"
+diverged = "$warning"
+untracked = "$muted"
+stashed = "$accent"
+modified = "$warning"
+
+[nodejs]
+symbol = ""
+style = "bold $success"
+
+[python]
+symbol = ""
+style = "bold $warning"
+
+[golang]
+symbol = ""
+style = "bold $info"
+
+[rust]
+symbol = ""
+style = "$danger"
+
+[java]
+symbol = ""
+style = "$accent"
+
+[php]
+symbol = ""
+style = "$accent"
+
+[dotnet]
+symbol = ""
+style = "$info"
+
+[cmd_duration]
+min_time = 2_000
+format = "[ $duration ]($warning)"
+
+[character]
+success_symbol = "[➜]($success)"
+error_symbol   = "[✗]($danger)"
+
+[line_break]
+disabled = false

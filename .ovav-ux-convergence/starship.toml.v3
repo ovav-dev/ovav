@@ -1,0 +1,136 @@
+# ─────────────────────────────────────────────────────────────
+#  OVAV Starship Prompt v3 — Semantic, Compact, Premium
+#  Refactored per OVAV UX Convergence 2026 spec section 21-22
+#
+#  Goal: immediate comprehension, semantic icons, no Powerline
+#        no "on"/"is"/"via", no "v" prefix on versions.
+#
+#  Example target:
+#    📁 ovav  🌿 develop •2  ⬢ 24.19.0  🐍 3.14
+#    ❯
+# ─────────────────────────────────────────────────────────────
+
+# ─── PALETTES (preserve Day/Night, refined) ───────────────────
+[palettes.ovav-night]
+brand      = '#6EA8FE'
+surface    = '#111827'
+success    = '#7EE787'
+warning    = '#F2CC60'
+danger     = '#FF6B81'
+info       = '#5EEAD4'
+accent     = '#C099FF'
+muted      = '#4A5568'
+text       = '#D8E1F0'
+
+[palettes.ovav-day]
+brand      = '#2563EB'
+surface    = '#FFFFFF'
+success    = '#1F7A4C'
+warning    = '#8A5A00'
+danger     = '#C24156'
+info       = '#0F766E'
+accent     = '#7C3AED'
+muted      = '#94A3B8'
+text       = '#1B2430'
+
+# ─── FORMAT: single-line semantic, no Powerline, minimal ─────
+format = "$directory$git_branch$git_status$nodejs$python$golang$character"
+
+# ─── DIRECTORY: 📁 project/directory name (semantic) ───────────
+[directory]
+style = "bold $brand"
+format = "[ 📁 $path ]($style)"
+truncation_length = 3
+truncation_symbol = "…/"
+
+# ─── GIT BRANCH: 🌿 branch (semantic, no "on") ─────────────────
+[git_branch]
+symbol = "🌿 "
+style = "bold $accent"
+format = "[$symbol$branch]($style)"
+
+# ─── GIT STATUS: compact dirty/stash count (no "is") ──────────
+[git_status]
+style = "$warning"
+format = "[$all_status$ahead_behind]($style)"
+conflicted = "⚠️${count} "
+ahead = "⇡${count} "
+behind = "⇣${count} "
+diverged = "⇡⇣${count} "
+untracked = "?${count} "
+stashed = "📦${count} "
+modified = "*${count} "
+renamed = "»${count} "
+deleted = "✘${count} "
+
+# ─── COMMAND DURATION: only slow commands (>5s) ───────────────
+[cmd_duration]
+min_time = 5_000
+format = "[ ⏱ $duration ]($style)"
+style = "yellow"
+
+# ─── CHARACTER: ❯ prompt ───────────────────────────────────────
+[character]
+success_symbol = "[❯](bold $success)"
+error_symbol = "[❯](bold $danger)"
+
+# ─── EXPLICITLY DISABLED: clutter that doesn't add value ────────
+# Each module must have disabled=true; defining format alone includes them
+[hostname]
+disabled = true
+
+[username]
+disabled = true
+
+[os]
+disabled = true
+
+[memory_usage]
+disabled = true
+
+[shell]
+disabled = true
+
+[time]
+disabled = true
+
+[rust]
+disabled = true
+
+[java]
+disabled = true
+
+[php]
+disabled = true
+
+[dotnet]
+disabled = true
+
+[env_var]
+disabled = true
+
+[kubernetes]
+disabled = true
+
+[aws]
+disabled = true
+
+[package]
+disabled = true
+
+[nodejs]
+symbol = "⬢ "
+style = "bold $success"
+format = "[$symbol$version]($style)"
+
+[python]
+symbol = "🐍 "
+style = "bold $warning"
+format = "[$symbol$version]($style)"
+
+[golang]
+symbol = "🐹 "
+style = "bold $info"
+format = "[$symbol$version]($style)"
+
+# ─── END OVAV Starship v3 ──────────────────────────────────────
