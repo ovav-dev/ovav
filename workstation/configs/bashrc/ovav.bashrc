@@ -65,6 +65,11 @@ fi
 # ─────────────────────────────────────────────────────────────
 if command -v starship >/dev/null 2>&1; then
   export STARSHIP_CONFIG="${OVAV_ROOT}/workstation/configs/starship/starship.toml"
+  # Theme sync — follow Intelligent Terminal theme if exposed
+  case "${INTELLIGENT_TERMINAL_THEME:-}" in
+    light) export STARSHIP_PALETTE="ovav-day" ;;
+    *)     export STARSHIP_PALETTE="ovav-night" ;;
+  esac
   eval "$(starship init bash 2>/dev/null)"
 fi
 
