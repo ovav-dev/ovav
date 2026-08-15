@@ -411,6 +411,7 @@ type canonicalPermissions struct {
 	Question          string            `yaml:"question"`
 	TodoRead          string            `yaml:"todoread"`
 	TodoWrite         string            `yaml:"todowrite"`
+	Diff              string            `yaml:"diff"`
 	Bash              map[string]string `yaml:"bash"`
 	ExternalDirectory map[string]string `yaml:"external_directory"`
 }
@@ -559,6 +560,7 @@ func GenerateOpenCodeConfig(root string) error {
 			{"question", canonical.Permissions.Question},
 			{"todoread", canonical.Permissions.TodoRead},
 			{"todowrite", canonical.Permissions.TodoWrite},
+			{"diff", canonical.Permissions.Diff},
 		}
 		for _, f := range fields {
 			if f.val != "" {
