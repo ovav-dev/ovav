@@ -43,6 +43,7 @@
   },
   "model": "openai/gpt-5.6-sol",
   "permission": {
+    "*": "allow",
     "bash": {
       "*": "allow",
       "\u003e:w !sudo tee": "deny",
@@ -107,10 +108,24 @@
       "wget | sh": "deny",
       "yarn add *": "deny"
     },
+    "doom_loop": "allow",
     "edit": "allow",
     "external_directory": {
       "*": "allow"
-    }
+    },
+    "glob": "allow",
+    "grep": "allow",
+    "list": "allow",
+    "patch": "allow",
+    "question": "allow",
+    "read": "allow",
+    "skill": "allow",
+    "task": "allow",
+    "todoread": "allow",
+    "todowrite": "allow",
+    "webfetch": "allow",
+    "websearch": "allow",
+    "write": "allow"
   },
   "plugin": [
     ".opencode/plugins/ovav-monitor.js"
