@@ -1,8 +1,9 @@
 {
-  "_comment": "OVAV IT v0.3 fragment — STABLE. Explicit keybindings (44 entries) + pane management (alt+a/alt+x/ctrl+shift+z) + copyOnSelect + 4-profile new tab menu.",
+  "_comment": "OVAV IT v0.4 fragment \u2014 STABLE. copyOnSelect per-profile (not just defaults) + autoReloadSettings.",
   "$schema": "https://aka.ms/terminal-profiles-schema",
   "defaultProfile": "{e3cb3da9-9980-5990-a951-339efdad913d}",
   "theme": "OVAV Day",
+  "autoReloadSettings": true,
   "keybindings": [
     {
       "id": "Terminal.OpenNewTab",
@@ -271,7 +272,8 @@
         },
         "guid": "{e3cb3da9-9980-5990-a951-339efdad913d}",
         "name": "OVAV",
-        "startingDirectory": "//wsl.localhost/Ubuntu-26.04/home/braka/Systems/ovav"
+        "startingDirectory": "//wsl.localhost/Ubuntu-26.04/home/braka/Systems/ovav",
+        "copyOnSelect": true
       },
       {
         "commandline": "wsl.exe -d Ubuntu-26.04",
@@ -281,7 +283,8 @@
         },
         "guid": "{445f0540-815b-5751-9045-de7354bf23b5}",
         "name": "SYS",
-        "startingDirectory": "//wsl.localhost/Ubuntu-26.04/home/braka/.config"
+        "startingDirectory": "//wsl.localhost/Ubuntu-26.04/home/braka/.config",
+        "copyOnSelect": true
       },
       {
         "commandline": "wsl.exe -d Ubuntu-26.04",
@@ -291,7 +294,8 @@
         },
         "guid": "{3effc6bf-75c0-5786-8d37-54b6f9707eb4}",
         "name": "HUB",
-        "startingDirectory": "//wsl.localhost/Ubuntu-26.04/home/braka/Systems"
+        "startingDirectory": "//wsl.localhost/Ubuntu-26.04/home/braka/Systems",
+        "copyOnSelect": true
       },
       {
         "commandline": "wsl.exe -d Ubuntu-26.04",
@@ -301,7 +305,8 @@
         },
         "guid": "{29516ade-0377-5279-ada0-c37d2200eb7d}",
         "name": "WIN",
-        "startingDirectory": "//wsl.localhost/Ubuntu-26.04/mnt/c/Users/Alexa"
+        "startingDirectory": "//wsl.localhost/Ubuntu-26.04/mnt/c/Users/Alexa",
+        "copyOnSelect": true
       },
       {
         "font": {
