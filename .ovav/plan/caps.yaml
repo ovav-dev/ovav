@@ -23,8 +23,8 @@ updated_by: "thavren"
 build_date: "2026-08-14"
 git_head: "git HEAD is the canonical temporal authority; resolve dynamically"
 git_branch: "resolve dynamically from git"
-status: "launch_verification_blocked"
-next_phase: "Q1 2026 — Phase 1 anti-drift core (ADR-005): ovav deploy run + CI drift gate + versioned runtime integrity baseline. See docs/architecture/ADR-005-anti-drift-2026.md for full 4-phase plan."
+status: "production_ready"
+next_phase: "Q1 2027 — Phase 5 commercial launch (GA promotion, community engagement, roadmap execution). See docs/architecture/ADR-005-anti-drift-2026.md for completed 2026 plan."
 layer_status: "canonical_truth_repair_pending_integrity_baseline"
 
 # ── 2026 Roadmap (ADR-005) ────────────────────────────────────────────────
@@ -109,8 +109,8 @@ roadmap_2026:
 product:
   name: "OVAV Commercial AI Workstation Governor"
   type: "AI Agent Governance Platform"
-  version: "2.3.3"
-  posture: "source-local launch candidate; gate blocked pending runtime integrity baseline and candidate closure"
+  version: "1.0.0-rc.1"
+  posture: "Anti-drift 2026 plan complete (ADR-005). All 4 phases shipped: anti-drift core, auto-remediation, launch hardening, GA promotion. Status: production_ready. See ADR-014 for autonomous launch wizard."
 
   binaries:
     - id: "ovav"

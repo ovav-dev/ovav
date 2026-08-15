@@ -2,14 +2,13 @@
   "schema": "ovav.runtime_integrity.v1",
   "algorithm": "sha256",
   "files": {
-    ".ovav/plan/caps.yaml": "75e60ca389f1184391575a9ac6719aa9c0f4c890e60afeacc9c53d04cedf8996",
+    ".ovav/plan/caps.yaml": "160de592afd15bbab3da837cbd5f5f2d01483ed9cb82a61768a056013b4c156f",
     ".ovav/policy/permission_authority.json": "c31e9c2028e1d11de70412538db2cb7f57f2b442389667fe73c38ac2335bf88e",
     "AGENTS.md": "570c3199574b71bf5498966d32a1fd9fedbc089515808cc1726942a92fef4850",
     "go-runtime/go.mod": "599b88657887000354a47351a0555ddb5b7a0c67ea022dc33f692a56af9f9bd8",
     "go-runtime/internal/validators/cmd/validate/main.go": "8acb76e3f95573fd4a950dbd695f65e2336317987f192bccd6a452b5a62606b0",
     "opencode.json": "2eaddfd827d5ff3734d4d2657bb51af074febeaa7bb4e61f6550689431942a2a",
-    ".ovav/registry/sbom.json": "f76a4fc89d846d2ab57f08d811fc83149e82fc5ca1578a29a9293817ba4b18c2",
-    "go-runtime/cmd/ovav/launch_wizard.go": "93dfed636943aca4b5df959939398250535cb36ba5dac8908fb421808139a00b",
-    "go-runtime/cmd/ovav/launch_wizard_readonly_test.go": "8d01647ffbfadd77fe92b725ad0079792afe1d9106520c964ac031a5c78ffe2c"
+    ".ovav/registry/sbom.json": "1aeeb0f503397c38d9a505befaaf3f4191fbb0fef4681a7c0f4fa4c6b3657c44",
+    "go-runtime/cmd/ovav/launch_cli.go": "e34c92c70d24a32e0c4f791d56817676f2bd12d7f76a8eadffe5dc15f77cbb69"
   }
 }
