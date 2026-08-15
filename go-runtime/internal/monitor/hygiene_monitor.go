@@ -24,7 +24,7 @@ func NewHygieneMonitor(repoRoot string) *HygieneMonitor {
 	}
 }
 
-func (m *HygieneMonitor) Name() string   { return "hygiene" }
+func (m *HygieneMonitor) Name() string            { return "hygiene" }
 func (m *HygieneMonitor) Interval() time.Duration { return m.interval }
 
 // Run executes the OWS hygiene scan and converts findings to alerts

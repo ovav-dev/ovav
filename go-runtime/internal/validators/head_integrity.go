@@ -79,7 +79,9 @@ func (h *HeadIntegrity) readTrustedHead(root string) (worktreeRoot, trusted stri
 	if err != nil {
 		return "", ""
 	}
-	var rec struct{ TrustedHeadSHA string `json:"trusted_head_sha"` }
+	var rec struct {
+		TrustedHeadSHA string `json:"trusted_head_sha"`
+	}
 	if err := json.Unmarshal(data, &rec); err == nil && rec.TrustedHeadSHA != "" {
 		return "", rec.TrustedHeadSHA
 	}

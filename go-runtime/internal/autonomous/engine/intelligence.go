@@ -49,13 +49,13 @@ func (il *IntelligenceLayer) PredictiveAnalysis(findings []autonomous.Finding) (
 
 // Prediction represents an AI-generated prediction about future trends.
 type Prediction struct {
-	Category   string    `json:"category"`
-	Trend      string    `json:"trend"`
-	Direction  string    `json:"direction"` // "increasing", "decreasing", "stable"
-	Confidence float64   `json:"confidence"`
-	Timeframe  string    `json:"timeframe"`
-	Reasoning  string    `json:"reasoning"`
-	Actions    []string  `json:"actions"`
+	Category   string   `json:"category"`
+	Trend      string   `json:"trend"`
+	Direction  string   `json:"direction"` // "increasing", "decreasing", "stable"
+	Confidence float64  `json:"confidence"`
+	Timeframe  string   `json:"timeframe"`
+	Reasoning  string   `json:"reasoning"`
+	Actions    []string `json:"actions"`
 }
 
 func (il *IntelligenceLayer) analyzeCategory(category string, findings []autonomous.Finding) Prediction {
@@ -84,17 +84,17 @@ func (il *IntelligenceLayer) analyzeCategory(category string, findings []autonom
 		sort.Slice(timestamps, func(i, j int) bool {
 			return timestamps[i].Before(timestamps[j])
 		})
-		
+
 		recentCount := 0
 		now := time.Now()
 		lastWeek := now.AddDate(0, 0, -7)
-		
+
 		for _, t := range timestamps {
 			if t.After(lastWeek) {
 				recentCount++
 			}
 		}
-		
+
 		if recentCount > len(timestamps)/2 {
 			direction = "increasing"
 		} else if recentCount < len(timestamps)/4 {
@@ -105,7 +105,7 @@ func (il *IntelligenceLayer) analyzeCategory(category string, findings []autonom
 	confidence := math.Min(avgSeverity*0.8+float64(len(findings))*0.02, 1.0)
 
 	// Generate reasoning
-	reasoning := fmt.Sprintf("Based on %d findings in %s with average severity %.2f", 
+	reasoning := fmt.Sprintf("Based on %d findings in %s with average severity %.2f",
 		len(findings), category, avgSeverity)
 
 	// Suggest actions
@@ -124,28 +124,28 @@ func (il *IntelligenceLayer) analyzeCategory(category string, findings []autonom
 
 func (il *IntelligenceLayer) generateActions(category, direction string, severity float64) []string {
 	var actions []string
-	
+
 	if severity > 0.7 {
 		actions = append(actions, fmt.Sprintf("Immediate review of %s required", category))
 		actions = append(actions, "Escalate to senior team for analysis")
 	}
-	
+
 	if direction == "increasing" {
 		actions = append(actions, fmt.Sprintf("Set up enhanced monitoring for %s", category))
 		actions = append(actions, "Increase research frequency for this area")
 	} else if direction == "decreasing" {
 		actions = append(actions, fmt.Sprintf("Verify improvements in %s are sustainable", category))
 	}
-	
+
 	actions = append(actions, "Document findings in knowledge base")
-	
+
 	return actions
 }
 
 // CorrelateFindings finds relationships between different findings.
 func (il *IntelligenceLayer) CorrelateFindings(findings []autonomous.Finding) []Correlation {
 	var correlations []Correlation
-	
+
 	for i := 0; i < len(findings); i++ {
 		for j := i + 1; j < len(findings); j++ {
 			corr := il.findCorrelation(findings[i], findings[j])
@@ -154,11 +154,11 @@ func (il *IntelligenceLayer) CorrelateFindings(findings []autonomous.Finding) []
 			}
 		}
 	}
-	
+
 	sort.Slice(correlations, func(i, j int) bool {
 		return correlations[i].Strength > correlations[j].Strength
 	})
-	
+
 	return correlations
 }
 

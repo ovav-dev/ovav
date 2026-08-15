@@ -31,7 +31,7 @@ func NewAgentProjectionMonitor(repoRoot string) *AgentProjectionMonitor {
 	}
 }
 
-func (m *AgentProjectionMonitor) Name() string { return "agent_projection" }
+func (m *AgentProjectionMonitor) Name() string            { return "agent_projection" }
 func (m *AgentProjectionMonitor) Interval() time.Duration { return m.interval }
 
 // Run executes the projection consistency check

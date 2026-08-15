@@ -113,25 +113,25 @@ func (r *MonitorRegistry) RunLoop(ctx context.Context) {
 
 // HealthReport is the summary of all monitor runs
 type HealthReport struct {
-	TS         time.Time
-	Monitors   int
-	TotalAlerts int
-	CRIT       int
-	ERROR      int
-	WARN       int
-	INFO       int
-	AutoFixed  int
-	Pending    int
-	Duration   time.Duration
+	TS            time.Time
+	Monitors      int
+	TotalAlerts   int
+	CRIT          int
+	ERROR         int
+	WARN          int
+	INFO          int
+	AutoFixed     int
+	Pending       int
+	Duration      time.Duration
 	MonitorStatus map[string]string // monitor name -> status
 }
 
 // GenerateHealthReport creates a summary report
 func (r *MonitorRegistry) GenerateHealthReport(ctx context.Context) *HealthReport {
 	report := &HealthReport{
-		TS:             time.Now(),
-		Monitors:       len(r.monitors),
-		MonitorStatus:  make(map[string]string),
+		TS:            time.Now(),
+		Monitors:      len(r.monitors),
+		MonitorStatus: make(map[string]string),
 	}
 
 	pending, _ := r.dispatcher.Queue().GetPending()

@@ -84,12 +84,12 @@ func (lle *LiveLearningEngine) detectPatterns(interaction Interaction) {
 	if pattern, exists := lle.patterns[contextKey]; exists {
 		pattern.Frequency++
 		pattern.LastSeen = interaction.Timestamp
-		
+
 		// Update success rate with exponential moving average
 		oldWeight := 1.0 - lle.learningRate
 		newWeight := lle.learningRate
 		pattern.SuccessRate = oldWeight*pattern.SuccessRate + newWeight*math.Max(0, interaction.Feedback)
-		
+
 		// Update confidence based on frequency and consistency
 		pattern.Confidence = math.Min(1.0, float64(pattern.Frequency)/10.0*pattern.SuccessRate)
 	} else {
@@ -122,7 +122,7 @@ func (lle *LiveLearningEngine) PredictAction(query, context string) *Prediction 
 	defer lle.mu.RUnlock()
 
 	contextKey := extractContextKey(context)
-	
+
 	var bestPattern *Pattern
 	bestScore := -1.0
 
@@ -139,10 +139,10 @@ func (lle *LiveLearningEngine) PredictAction(query, context string) *Prediction 
 	}
 
 	return &Prediction{
-		PatternID:   bestPattern.ID,
-		Action:      bestPattern.Action,
-		Confidence:  bestPattern.Confidence,
-		Reasoning:   fmt.Sprintf("Based on %d similar interactions with %.0f%% success rate", 
+		PatternID:  bestPattern.ID,
+		Action:     bestPattern.Action,
+		Confidence: bestPattern.Confidence,
+		Reasoning: fmt.Sprintf("Based on %d similar interactions with %.0f%% success rate",
 			bestPattern.Frequency, bestPattern.SuccessRate*100),
 	}
 }
@@ -158,16 +158,16 @@ type Prediction struct {
 func (lle *LiveLearningEngine) calculatePatternScore(pattern *Pattern, contextKey string) float64 {
 	// Base score from success rate
 	score := pattern.SuccessRate * 0.5
-	
+
 	// Boost for recency
 	hoursSince := time.Since(pattern.LastSeen).Hours()
 	recencyBonus := math.Max(0, 1.0-hoursSince/168.0) // Decay over 1 week
 	score += recencyBonus * 0.3
-	
+
 	// Boost for frequency
 	freqBonus := math.Min(1.0, float64(pattern.Frequency)/20.0)
 	score += freqBonus * 0.2
-	
+
 	return score
 }
 
@@ -177,24 +177,24 @@ func (lle *LiveLearningEngine) GetInsights() []Insight {
 	defer lle.mu.RUnlock()
 
 	var insights []Insight
-	
+
 	for _, pattern := range lle.patterns {
 		if pattern.Frequency >= 3 && pattern.Confidence > 0.5 {
 			insights = append(insights, Insight{
-				Type:        "pattern",
-				Description: fmt.Sprintf("Recurring pattern '%s' detected (%d occurrences, %.0f%% success)", 
+				Type: "pattern",
+				Description: fmt.Sprintf("Recurring pattern '%s' detected (%d occurrences, %.0f%% success)",
 					pattern.Name, pattern.Frequency, pattern.SuccessRate*100),
 				Recommendation: fmt.Sprintf("Consider automating: %s", pattern.Action),
-				Priority:      pattern.Confidence,
+				Priority:       pattern.Confidence,
 			})
 		}
 	}
-	
+
 	// Sort by priority
 	sort.Slice(insights, func(i, j int) bool {
 		return insights[i].Priority > insights[j].Priority
 	})
-	
+
 	return insights
 }
 
@@ -212,7 +212,7 @@ func (lle *LiveLearningEngine) Optimize() error {
 	defer lle.mu.Unlock()
 
 	now := time.Now()
-	
+
 	// Apply forgetting factor to old patterns
 	for id, pattern := range lle.patterns {
 		daysSince := now.Sub(pattern.LastSeen).Hours() / 24.0
@@ -234,11 +234,11 @@ func (lle *LiveLearningEngine) Stats() LearningStats {
 	defer lle.mu.RUnlock()
 
 	return LearningStats{
-		TotalInteractions: len(lle.interactions),
-		TotalPatterns:     len(lle.patterns),
+		TotalInteractions:      len(lle.interactions),
+		TotalPatterns:          len(lle.patterns),
 		HighConfidencePatterns: lle.countHighConfidencePatterns(),
-		LastOptimization:  lle.lastOptimization,
-		AverageSuccessRate: lle.calculateAverageSuccessRate(),
+		LastOptimization:       lle.lastOptimization,
+		AverageSuccessRate:     lle.calculateAverageSuccessRate(),
 	}
 }
 
@@ -265,7 +265,7 @@ func (lle *LiveLearningEngine) calculateAverageSuccessRate() float64 {
 	if len(lle.patterns) == 0 {
 		return 0
 	}
-	
+
 	total := 0.0
 	for _, p := range lle.patterns {
 		total += p.SuccessRate

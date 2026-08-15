@@ -343,10 +343,10 @@ func TestClaudeCodeConverter_ConvertLead(t *testing.T) {
 	md := string(output)
 
 	checks := []string{
-		"name:",          // Claude format uses name field
-		"description:",   // Claude format uses description field
-		"# Thavren",      // heading uses lead.Name
-		"**Origin:**",    // Origin field is output
+		"name:",        // Claude format uses name field
+		"description:", // Claude format uses description field
+		"# Thavren",    // heading uses lead.Name
+		"**Origin:**",  // Origin field is output
 		"## Authorized Functions",
 		"## Limitations",
 		"## Hard Stop",
@@ -384,10 +384,10 @@ func TestClaudeCodeConverter_ConvertTeam(t *testing.T) {
 	checks := []string{
 		"name:",           // Claude format uses name field
 		"description:",    // Claude format uses description field
-		"# Clara",        // heading uses team.Name
-		"**Country:**",   // Country field is output
+		"# Clara",         // heading uses team.Name
+		"**Country:**",    // Country field is output
 		"**Reports to:**", // Reports to field is output
-		"**Area:**",      // Area field is output
+		"**Area:**",       // Area field is output
 		"## Function",
 		"## Actions",
 	}
@@ -424,11 +424,11 @@ func TestCursorConverter_ConvertLead(t *testing.T) {
 	md := string(output)
 
 	checks := []string{
-		`name: "thavren"`,        // Cursor uses name field with ID
-		"description:",            // Cursor uses description field
-		"readonly:",              // Cursor specific field
-		"# Thavren",              // heading uses lead.Name
-		"Origin:",                // Origin field is output
+		`name: "thavren"`, // Cursor uses name field with ID
+		"description:",    // Cursor uses description field
+		"readonly:",       // Cursor specific field
+		"# Thavren",       // heading uses lead.Name
+		"Origin:",         // Origin field is output
 		"## Authorized Functions",
 		"## Limitations",
 		"## Hard Stop",
@@ -472,13 +472,13 @@ func TestCursorConverter_ConvertTeam(t *testing.T) {
 	md := string(output)
 
 	checks := []string{
-		`name: "clara"`,         // Cursor uses name field with ID
-		"description:",           // Cursor uses description field
-		"readonly:",             // Cursor specific field
-		"# Clara",               // heading uses team.Name
-		"Country:",              // Country field is output
-		"Reports to:",          // Reports to field is output
-		"Area:",                // Area field is output
+		`name: "clara"`, // Cursor uses name field with ID
+		"description:",  // Cursor uses description field
+		"readonly:",     // Cursor specific field
+		"# Clara",       // heading uses team.Name
+		"Country:",      // Country field is output
+		"Reports to:",   // Reports to field is output
+		"Area:",         // Area field is output
 		"## Function",
 		"## Actions",
 	}

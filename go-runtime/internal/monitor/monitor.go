@@ -3,5 +3,6 @@
 // don't block, and auto-fix when possible.
 //
 // Architecture:
-//   Monitor → Alert → Dispatcher → Queue → [AutoFix | Human | Archive]
+//
+//	Monitor → Alert → Dispatcher → Queue → [AutoFix | Human | Archive]
 package monitor

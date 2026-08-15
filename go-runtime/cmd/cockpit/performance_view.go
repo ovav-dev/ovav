@@ -13,13 +13,13 @@ import (
 // ── Performance Model ───────────────────────────────────────────────
 
 type PerformanceModel struct {
-	goroutines  int
-	heapAlloc    int
-	heapTotal    int
-	gcCycles     int
-	cpuLoad      int
-	latencies    map[string][]int
-	width        int
+	goroutines int
+	heapAlloc  int
+	heapTotal  int
+	gcCycles   int
+	cpuLoad    int
+	latencies  map[string][]int
+	width      int
 }
 
 func NewPerformanceModel() PerformanceModel {
@@ -30,12 +30,12 @@ func NewPerformanceModel() PerformanceModel {
 	return PerformanceModel{
 		goroutines: runtime.NumGoroutine(),
 		heapAlloc:  int(m.Alloc / 1024 / 1024), // MB
-		heapTotal:  int(m.Sys / 1024 / 1024),    // MB
+		heapTotal:  int(m.Sys / 1024 / 1024),   // MB
 		gcCycles:   int(m.NumGC),
 		cpuLoad:    2, // Would need external metric
 		latencies: map[string][]int{
-			"ovav-validate":  {10, 12, 15, 11, 14, 18, 12, 10, 13, 15},
-			"kc-compile":     {8, 9, 7, 10, 8, 9, 11, 8, 7, 9},
+			"ovav-validate": {10, 12, 15, 11, 14, 18, 12, 10, 13, 15},
+			"kc-compile":    {8, 9, 7, 10, 8, 9, 11, 8, 7, 9},
 			"memory-recall": {5, 6, 4, 7, 5, 6, 8, 5, 4, 6},
 		},
 	}

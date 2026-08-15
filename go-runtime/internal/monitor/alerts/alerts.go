@@ -2,10 +2,11 @@
 // Alerts are emitted by monitors and stored in .ovav/runtime/alerts/
 //
 // Queue structure:
-//   queue.jsonl      — pending alerts (awaiting processing)
-//   auto_fixed.jsonl — alerts resolved automatically
-//   acknowledged.jsonl — alerts resolved by human
-//   archived.jsonl   — old alerts for audit trail
+//
+//	queue.jsonl      — pending alerts (awaiting processing)
+//	auto_fixed.jsonl — alerts resolved automatically
+//	acknowledged.jsonl — alerts resolved by human
+//	archived.jsonl   — old alerts for audit trail
 package alerts
 
 import (
@@ -22,17 +23,17 @@ import (
 // Alert represents a single system alert
 type Alert struct {
 	ID      string      `json:"id"`
-	TS      time.Time  `json:"ts"`
-	Level   AlertLevel `json:"level"`    // CRIT | ERROR | WARN | INFO
-	Source  string     `json:"source"`   // Which monitor generated it
-	Issue   string     `json:"issue"`    // Human-readable issue
-	Files   []string   `json:"files,omitempty"`
-	Runbook string     `json:"runbook,omitempty"` // Auto-fix runbook name
-	Status  AlertStatus `json:"status"`  // pending | auto-fixed | acknowledged | archived
+	TS      time.Time   `json:"ts"`
+	Level   AlertLevel  `json:"level"`  // CRIT | ERROR | WARN | INFO
+	Source  string      `json:"source"` // Which monitor generated it
+	Issue   string      `json:"issue"`  // Human-readable issue
+	Files   []string    `json:"files,omitempty"`
+	Runbook string      `json:"runbook,omitempty"` // Auto-fix runbook name
+	Status  AlertStatus `json:"status"`            // pending | auto-fixed | acknowledged | archived
 	// Resolution tracking
-	ResolvedTS  *time.Time `json:"resolved_ts,omitempty"`
-	ResolvedBy  string     `json:"resolved_by,omitempty"`
-	Resolution  string     `json:"resolution,omitempty"`
+	ResolvedTS *time.Time `json:"resolved_ts,omitempty"`
+	ResolvedBy string     `json:"resolved_by,omitempty"`
+	Resolution string     `json:"resolution,omitempty"`
 }
 
 // AlertLevel defines alert severity
@@ -62,10 +63,10 @@ type Queue struct {
 }
 
 const (
-	fileQueue      = "queue.jsonl"
-	fileAutoFixed  = "auto_fixed.jsonl"
+	fileQueue        = "queue.jsonl"
+	fileAutoFixed    = "auto_fixed.jsonl"
 	fileAcknowledged = "acknowledged.jsonl"
-	fileArchived   = "archived.jsonl"
+	fileArchived     = "archived.jsonl"
 )
 
 // NewQueue creates a new alert queue

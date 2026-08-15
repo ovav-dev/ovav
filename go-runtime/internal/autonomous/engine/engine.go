@@ -9,8 +9,8 @@ import (
 
 	"github.com/ovav/ovav/internal/autonomous"
 	"github.com/ovav/ovav/internal/autonomous/parser"
-	"github.com/ovav/ovav/internal/autonomous/scraper"
 	"github.com/ovav/ovav/internal/autonomous/scheduler"
+	"github.com/ovav/ovav/internal/autonomous/scraper"
 	"gopkg.in/yaml.v3"
 )
 
@@ -24,8 +24,8 @@ type Engine struct {
 
 // Config holds engine configuration.
 type Config struct {
-	DataDir  string
-	Timeout  time.Duration
+	DataDir string
+	Timeout time.Duration
 }
 
 // New creates a new research engine.
@@ -55,11 +55,11 @@ func New(cfg Config) (*Engine, error) {
 func (e *Engine) Run() (*autonomous.ResearchResult, error) {
 	start := time.Now()
 	result := &autonomous.ResearchResult{
-		Timestamp:  start,
+		Timestamp:   start,
 		URLsScraped: []string{},
-		Findings:   []autonomous.Finding{},
-		Changes:    []autonomous.Change{},
-		Errors:     []string{},
+		Findings:    []autonomous.Finding{},
+		Changes:     []autonomous.Change{},
+		Errors:      []string{},
 	}
 
 	var dueTargets []scheduler.Target
@@ -75,7 +75,7 @@ func (e *Engine) Run() (*autonomous.ResearchResult, error) {
 
 	for _, target := range dueTargets {
 		result.URLsScraped = append(result.URLsScraped, target.URL)
-		
+
 		findings, changes, err := e.researchTarget(&target)
 		if err != nil {
 			result.Errors = append(result.Errors, fmt.Sprintf("%s: %v", target.ID, err))
@@ -84,10 +84,10 @@ func (e *Engine) Run() (*autonomous.ResearchResult, error) {
 
 		result.Findings = append(result.Findings, findings...)
 		result.Changes = append(result.Changes, changes...)
-		
+
 		// Update scheduler
 		e.scheduler.UpdateTarget(&target)
-		
+
 		// Update in-memory targets
 		for i, t := range e.targets {
 			if t.ID == target.ID {
@@ -298,8 +298,8 @@ func (e *Engine) RunTarget(targetID string) (*autonomous.ResearchResult, error) 
 
 	start := time.Now()
 	result := &autonomous.ResearchResult{
-		TargetID:   targetID,
-		Timestamp:  start,
+		TargetID:    targetID,
+		Timestamp:   start,
 		URLsScraped: []string{target.URL},
 	}
 
