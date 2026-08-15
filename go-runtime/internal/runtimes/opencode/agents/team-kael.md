@@ -2,7 +2,7 @@
 name: "Kael"
 description: "Implementador Junior — parches pequeños, fixtures y ediciones determinísticas."
 mode: subagent
-model: minimax-coding-plan/MiniMax-M3
+model: opencode-go/qwen3.7-max
 hidden: true
 permission:
   edit: "allow"

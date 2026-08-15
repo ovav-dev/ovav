@@ -68,6 +68,17 @@
     }
   },
   "principle": "ALLOW ALL with telemetry. Deny nothing by default. OVAV SYSTEMS + OVAV AGENTS are fully trusted.",
+  "_ovav_yolo": {
+    "applied": "2026-08-13",
+    "rationale": "OpenCode YOLO + OVAV Trusted Execution Domain — host must not re-ask when OVAV governor has decided. CriticalDenies remains as catastrophic-operation baseline (force-push, sudo, rm -rf /, mkfs, dd, etc.).",
+    "external_directory_default": "allow",
+    "bash_default": "allow",
+    "edit_default": "allow",
+    "write_default": "allow",
+    "read_default": "allow",
+    "doom_loop_default": "allow",
+    "trust_boundary": "RAW HOST DOMAIN: bash primitives (rm -rf /, sudo, mkfs) → CriticalDenies. OVAV TRUSTED DOMAIN: anything routed through OVAV governor → ALLOW with telemetry."
+  },
   "telemetry": {
     "log_all_actions": true,
     "log_destination": ".ovav/runtime/logs/telemetry.jsonl",
@@ -102,7 +113,7 @@
       "pr": "allow",
       "close_message": "OVAV Governor \u2014 total freedom mode active.",
       "external_directory": {
-        "*": "deny"
+        "*": "allow"
       }
     },
     "thavren": {
@@ -129,7 +140,7 @@
       "pr": "allow",
       "close_message": "Thavren \u2014 execution complete.",
       "external_directory": {
-        "*": "deny"
+        "*": "allow"
       }
     },
     "eidren": {
@@ -153,7 +164,7 @@
       "git_write": "allow",
       "research": "allow",
       "external_directory": {
-        "*": "deny"
+        "*": "allow"
       }
     },
     "elena": {
@@ -175,7 +186,7 @@
       "push": "allow",
       "pr": "allow",
       "external_directory": {
-        "*": "deny"
+        "*": "allow"
       }
     },
     "dante": {
@@ -196,7 +207,7 @@
       "push": "allow",
       "pr": "allow",
       "external_directory": {
-        "*": "deny"
+        "*": "allow"
       }
     },
     "sofia": {
@@ -218,7 +229,7 @@
       "push": "allow",
       "pr": "allow",
       "external_directory": {
-        "*": "deny"
+        "*": "allow"
       }
     },
     "renata": {
@@ -239,7 +250,7 @@
       "push": "allow",
       "pr": "allow",
       "external_directory": {
-        "*": "deny"
+        "*": "allow"
       }
     },
     "valeria": {
@@ -260,7 +271,7 @@
       "push": "allow",
       "pr": "allow",
       "external_directory": {
-        "*": "deny"
+        "*": "allow"
       }
     },
     "uriel": {
@@ -282,7 +293,7 @@
       "push": "allow",
       "pr": "allow",
       "external_directory": {
-        "*": "deny"
+        "*": "allow"
       }
     },
     "kenji": {
@@ -303,7 +314,7 @@
       "push": "allow",
       "pr": "allow",
       "external_directory": {
-        "*": "deny"
+        "*": "allow"
       }
     },
     "camila": {
@@ -324,7 +335,7 @@
       "push": "allow",
       "pr": "allow",
       "external_directory": {
-        "*": "deny"
+        "*": "allow"
       }
     }
   },
@@ -406,9 +417,10 @@
       }
     },
     "f2_external_directory": {
-      "*": "deny",
+      "*": "allow",
       "governor": "go-runtime/internal/permissions/permission_authority.go",
-      "deny_by_default": true
+      "deny_by_default": false,
+      "rationale": "OVAV TRUSTED DOMAIN — 2026-08-13. Host does not re-ask."
     },
     "f2_config_governance": {
       "governor": "go-runtime/internal/config",
@@ -686,14 +698,9 @@
   },
   "external_directories": {
     "allow": [
-      "/home/braka/Systems/ovav/*",
-      "/home/braka/.config/ovav/*",
-      "/home/braka/.local/share/ovav/*",
-      "/home/braka/.local/state/ovav-opencode/*",
-      "/mnt/c/Users/Alexa/AppData/Roaming/wezterm/*",
-      "/tmp/opencode/*"
+      "*"
     ],
-    "note": "Explicit OVAV state, projection, worktree, temporary, and CEO-requested Windows configuration targets only."
+    "note": "OVAV TRUSTED DOMAIN — 2026-08-13: External directories are allowed by default. OVAV governor is the upper trust layer. CriticalDenies still applies for catastrophic host-level operations. RAW HOST DOMAIN operations (rm -rf /, sudo, mkfs, dd to /dev) remain denied."
   },
   "workstation_wezterm": {
     "windows_config_path": "C:\\Users\\Alexa\\AppData\\Roaming\\wezterm\\.wezterm.lua",
@@ -753,10 +760,11 @@
   ],
   "role_surfaces": {},
   "context_firewall": {
-    "description": "Context firewall hardening - external directory deny by default",
+    "description": "Context firewall hardening - external directory allow by default under OVAV TRUSTED DOMAIN (2026-08-13). Critical host-level operations remain protected via CriticalDenies.",
     "external_directory": {
-      "*": "deny",
-      "deny_by_default": true
+      "*": "allow",
+      "deny_by_default": false,
+      "rationale": "OVAV governor is the upper trust layer. Host does not re-ask."
     }
   }
 }

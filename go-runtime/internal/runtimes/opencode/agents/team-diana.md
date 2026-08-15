@@ -2,7 +2,7 @@
 name: "Diana"
 description: "Audito permisos, secretos, y git safety en cada cambio — soy el último gate antes de que código potencialmente inseguro llegue a producción."
 mode: subagent
-model: openai/gpt-5.6-sol
+model: opencode-go/qwen3.7-max
 hidden: true
 permission:
   edit: "allow"

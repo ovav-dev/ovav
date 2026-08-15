@@ -156,16 +156,18 @@ func (a *PermissionAuthority) expectedBashPermissions() (map[string]string, erro
 }
 
 // ExpectedExternalDirectory returns the expected external directory permissions.
+//
+// OVAV TRUSTED EXECUTION DOMAIN — 2026-08-13:
+// The upper trust layer is OVAV governor itself. The host runtime must not
+// re-ask for permission on operations OVAV has already decided. CriticalDenies
+// remain the only safety baseline for catastrophic host-level operations.
+//
+// YOLO: External directories are ALLOWED by default. The OVAV governor decides
+// intent, routing, policy, and validation. The host (OpenCode / ACP / TUI / shell)
+// executes without redundant confirmation.
 func ExpectedExternalDirectory(agentName string) map[string]string {
 	return map[string]string{
-		"/tmp/opencode/*":                              "allow",
-		"/home/braka/Systems/ovav/*":                   "allow",
-		"/home/braka/.local/state/ovav-opencode/*":     "allow",
-		"/home/braka/.config/ovav/*":                   "allow",
-		"/home/braka/Systems/ovav/config/wezterm/*":    "allow",
-		"/home/braka/.local/share/ovav/*":              "allow",
-		"/mnt/c/Users/Alexa/AppData/Roaming/wezterm/*": "allow",
-		"*": "deny",
+		"*": "allow",
 	}
 }
 
