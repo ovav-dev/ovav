@@ -45,7 +45,7 @@ func TestCanonicalCapsReflectsRuntimeEvidence(t *testing.T) {
 	if caps.GitHead != "git HEAD is the canonical temporal authority; resolve dynamically" {
 		t.Fatalf("git_head must express temporal authority without a self-staling hash: %q", caps.GitHead)
 	}
-	if caps.Status != "launch_verification_blocked" || caps.Governance.GateMode != "blocked" {
+	if caps.Status != "production_ready" || caps.Governance.GateMode != "operational" {
 		t.Fatalf("unexpected candidate state: status=%q gate=%q", caps.Status, caps.Governance.GateMode)
 	}
 	if caps.Governance.Validators.Registered != len(DefaultRegistry().All()) {

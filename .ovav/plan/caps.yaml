@@ -296,8 +296,8 @@ governance:
   security_posture: "F4 + L6 Zero Trust"
   protected_branch: "resolved from git"
   waiver_active: false
-  gate_mode: "blocked"
-  gate_blocker: "runtime integrity baseline and candidate closure are pending"
+  gate_mode: "operational"
+  gate_blocker: "none — Anti-Drift 2026 plan complete (ADR-005), launch verification closed (ADR-003), autonomous wizard deployed (ADR-014)"
 
   gates:
     - name: "Protected Branch Gate"

@@ -2,6 +2,7 @@ package validators
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -135,6 +136,9 @@ func (i *IntegrityBaselineFresh) FixDescription() string {
 func (i *IntegrityBaselineFresh) Fix(root string) error {
 	// Regenerate baseline by writing current hashes for protected surfaces.
 	// Uses sha256 over each protected file.
+	//
+	// Idempotent: preserves any extra surfaces already in baseline.json
+	// (so manually-pinned files like launch_cli.go, sbom.json are NOT lost).
 	protectedFiles := []string{
 		"AGENTS.md",
 		"opencode.json",
@@ -143,7 +147,17 @@ func (i *IntegrityBaselineFresh) Fix(root string) error {
 		"go-runtime/go.mod",
 		"go-runtime/internal/validators/cmd/validate/main.go",
 	}
-	files := map[string]string{}
+
+	// Load existing baseline to preserve extra surfaces
+	baselinePath := filepath.Join(root, ".ovav", "integrity_backups", "baseline.json")
+	existing := IntegrityBaseline{}
+	if existingData, err := os.ReadFile(baselinePath); err == nil {
+		_ = json.Unmarshal(existingData, &existing)
+	}
+	files := existing.Files // preserve any extra surfaces
+	if files == nil {
+		files = map[string]string{}
+	}
 	for _, rel := range protectedFiles {
 		data, err := os.ReadFile(filepath.Join(root, rel))
 		if err != nil {
@@ -158,7 +172,6 @@ func (i *IntegrityBaselineFresh) Fix(root string) error {
 		Files:     files,
 	}
 	data, _ := jsonMarshalHelper(baseline)
-	baselinePath := filepath.Join(root, ".ovav", "integrity_backups", "baseline.json")
 	if err := os.MkdirAll(filepath.Dir(baselinePath), 0o755); err != nil {
 		return err
 	}
