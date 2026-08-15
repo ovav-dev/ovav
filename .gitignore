@@ -398,3 +398,14 @@ go-runtime/cmd/ovav/.mimocode/
 clients/crush/config/minimax_direct_env.sh
 clients/crush/config/provider_setup.sh
 clients/crush/config/setup_minimax_direct.sh
+
+# ── OVAV workspace drift (untracked from CI/workflow artifacts) ──
+# Added 2026-08-15: drift markers from CI workflows
+.feature-commit-marker
+.reverify-trigger
+
+# ── OVAV local secrets (GPG signing keys, never commit) ──
+.ovav/keys/
+
+# ── Local binaries (gitignored, never commit binaries) ──
+bin/
