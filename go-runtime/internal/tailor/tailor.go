@@ -141,6 +141,11 @@ func NewState(detectedTools map[string]bool) *State {
 		SelectedPlan: "nucleo",
 		LastMessage:  "Choose a plan to unlock your setup.",
 	}
+	// Activate every tool/role whose MinPlan rank is at or below the
+	// default-selected plan ("nucleo"). Without this, the composer would
+	// show "Plan: Core | 0 tools · 0 roles" because items default to
+	// Active=false and disableDisallowed only turns OFF items, never ON.
+	s.ApplyAllowed()
 
 	// Capture initial snapshot as "applied"
 	snapshot := s.Snapshot()

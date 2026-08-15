@@ -158,3 +158,54 @@ func TestPlanWindowsTerminalRejectsInvalidWT124Structures(t *testing.T) {
 		})
 	}
 }
+
+// Test: Built-in Windows Terminal profiles (PowerShell, Command Prompt,
+// Azure Cloud Shell) do NOT require commandline in the fragment. Windows
+// Terminal supplies defaults at runtime. This mirrors the production
+// fragment at workstation/configs/intelligent-terminal/settings-fragment.json
+// which includes all three as named-only profiles.
+func TestPlanWindowsTerminalBuiltinProfiles_NoCommandline_Pass(t *testing.T) {
+	current := `{"profiles":{"list":[]}}`
+	fragment := `{
+		"profiles":{"defaults":{"colorScheme":{"light":"OVAV Day","dark":"OVAV Night"}},"list":[
+			{"guid":"{22222222-2222-2222-2222-222222222222}","name":"OVAV","commandline":"wsl.exe"},
+			{"guid":"{61c54bbd-c2c6-5271-96e7-009a87ff44bf}","name":"Windows PowerShell"},
+			{"guid":"{0caa0dad-35be-5f56-a8ff-afceeeaa6101}","name":"Command Prompt"},
+			{"guid":"{b453ae62-4e3d-5e58-b989-0a998ec441b8}","name":"Azure Cloud Shell","source":"Windows.Terminal.Azure"}
+		]},
+		"schemes":[{"name":"OVAV Day"},{"name":"OVAV Night"}]
+	}`
+	if _, err := PlanWindowsTerminal([]byte(current), []byte(fragment), "settings.json", time.Time{}); err != nil {
+		t.Fatalf("expected built-in profiles without commandline to pass, got error: %v", err)
+	}
+}
+
+// Test: Non-built-in profiles (OVAV-defined or third-party) still require
+// commandline in the fragment. The strict-mode rule applies only to system
+// profiles that ship with Windows Terminal by default.
+func TestPlanWindowsTerminalNonBuiltin_NoCommandline_Fail(t *testing.T) {
+	current := `{"profiles":{"list":[]}}`
+	fragment := `{
+		"profiles":{"defaults":{},"list":[
+			{"guid":"{33333333-3333-3333-3333-333333333333}","name":"Custom"}
+		]}
+	}`
+	_, err := PlanWindowsTerminal([]byte(current), []byte(fragment), "settings.json", time.Time{})
+	if err == nil || !strings.Contains(err.Error(), "commandline is required") {
+		t.Fatalf("expected commandline-required error for custom profile, got: %v", err)
+	}
+}
+
+// Test: Profiles with a `source` field don't need commandline either —
+// they're externally-sourced and Windows Terminal resolves them at runtime.
+func TestPlanWindowsTerminalSourcedProfile_NoCommandline_Pass(t *testing.T) {
+	current := `{"profiles":{"list":[]}}`
+	fragment := `{
+		"profiles":{"defaults":{},"list":[
+			{"guid":"{44444444-4444-4444-4444-444444444444}","name":"External","source":"Windows.Terminal.Wsl"}
+		]}
+	}`
+	if _, err := PlanWindowsTerminal([]byte(current), []byte(fragment), "settings.json", time.Time{}); err != nil {
+		t.Fatalf("expected sourced profile without commandline to pass, got error: %v", err)
+	}
+}

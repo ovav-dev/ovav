@@ -28,7 +28,7 @@ OVAV is a **multi-language, multi-harness AI workstation governor** with three m
   - `internal/validators/` — 50+ validation gates (security, architecture, compliance)
   - `internal/governor/` — decision engine, delegation protocol, trust gate
   - `internal/memory/` — agent memory, vector store, live learning
-  - `internal/gitflow/` — worktree management (owc/owd workflow)
+  - `internal/gitflow/` — worktree management (native, no shell scripts)
   - `internal/vault/` — secrets management, encryption, rotation
   - `internal/connect/` — provider abstraction (Anthropic, OpenAI, MiniMax)
 
@@ -143,17 +143,17 @@ npm run lint          # Type check: tsc --noEmit
 
 ### Worktree Workflow
 
-OVAV uses git worktrees for feature isolation:
+OVAV uses git worktrees for feature isolation. The worktree system is fully native in the Go runtime:
 
 ```bash
-owc <feature-name>        # Create new worktree branch (alias: ovav-owc)
-                          # Example: owc feat-add-login
+ovav worktree owc <feature-name>    # Create new worktree (alias: ovav worktree create)
+                                    # Example: ovav worktree owc feat-add-login
 
 # ... work on feature ...
 
-owd                       # Merge worktree back to develop + cleanup (alias: ovav-owd)
-owl                       # List active worktrees
-owclean                   # Remove stale worktrees
+ovav worktree owd                   # Merge worktree back to develop + cleanup
+ovav worktree owl                   # List active worktrees
+ovav worktree owclean               # Remove stale worktrees
 ```
 
 **Worktree rules:**
@@ -174,8 +174,9 @@ ovav status               # Check system status
 ovav memory <query>       # Query agent memory
 ovav delegate <agent>     # Delegate task to subagent
 ovav validate             # Run validation gates
-ovav worktree create      # Create worktree (same as owc)
-ovav worktree done        # Complete worktree (same as owd)
+ovav worktree create      # Create worktree (alias: ovav worktree owc)
+ovav worktree done        # Complete worktree (alias: ovav worktree owd)
+ovav worktree list        # List worktrees (alias: ovav worktree owl)
 ```
 
 ### Session Greeting
@@ -223,9 +224,11 @@ tools/                   → Python tools and services
 .opencode/skills/        → OpenCode harness skills
 .mimocode/skills/        → MiMoCode harness skills
 
-bin/                     → Shell tools and aliases
-  owc, owd, owl, ...     → Worktree management shortcuts
-  ovav-owlib.sh          → Worktree library (core logic)
+bin/                     → Compiled binaries and shell helpers
+  ovav                    → OVAV Go runtime CLI (worktree system, validators, governance)
+  ovav-cockpit            → Cockpit TUI (Bubble Tea)
+  git-filter-repo         → git-filter-repo utility
+  node-health-fix.sh      → Node + mise environment repair script
 
 docs-site/               → Documentation website
 web/                     → Docker deployment configs
@@ -316,18 +319,18 @@ npm run test    # Vitest
 ## Common Workflows
 
 ### Adding a New Feature
-1. Create worktree: `owc feat-my-feature`
+1. Create worktree: `ovav worktree owc feat-my-feature`
 2. Implement changes in isolated branch
 3. Run tests: `cd go-runtime && make test`
 4. Validate: `ovav validate`
-5. Complete: `owd`
+5. Complete: `ovav worktree owd`
 
 ### Fixing a Bug
-1. Create worktree: `owc fix-bug-description`
+1. Create worktree: `ovav worktree owc fix-bug-description`
 2. Reproduce issue
 3. Apply fix with tests
 4. Run validators: `ovav validate`
-5. Complete: `owd`
+5. Complete: `ovav worktree owd`
 
 ### Updating Capabilities
 1. Edit `.ovav/plan/caps.yaml`
@@ -348,7 +351,7 @@ npm run test    # Vitest
 - `.ovav/plan/caps.yaml` — Canonical capability definitions
 - `.ovav/service_areas/` — Domain-specific configurations
 - `tools/cpanel/src/App.tsx` — Control panel main component
-- `bin/ovav-owlib.sh` — Worktree management library
+- `bin/ovav` — Native Go binary; worktree system lives at `ovav worktree <cmd>` (owc/owd/owl absorbed into the runtime as of v3.x)
 
 ---
 
