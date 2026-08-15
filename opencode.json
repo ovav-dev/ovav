@@ -73,6 +73,14 @@
     },
     "ovav-sqlite": {
       "enabled": false
+    },
+    "atuin": {
+      "command": [
+        "atuin",
+        "mcp"
+      ],
+      "type": "local",
+      "enabled": true
     }
   },
   "model": "openai/gpt-5.6-sol",
@@ -129,7 +137,8 @@
     "write": "allow"
   },
   "plugin": [
-    ".opencode/plugins/ovav-monitor.js"
+    ".opencode/plugins/ovav-monitor.js",
+    ".opencode/plugins/ovav-atuin-bridge.js"
   ],
   "provider": {
     "anthropic": {
