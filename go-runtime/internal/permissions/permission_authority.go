@@ -27,15 +27,48 @@ type PermissionBlock struct {
 	Edit              string
 	Bash              map[string]string
 	ExternalDirectory map[string]string
+	Extra             map[string]string // OVAV TRUSTED DOMAIN: wildcard + per-tool allows
 }
 
 // MaterializePermissionBlock returns the canonical host permission projection.
+//
+// OVAV TRUSTED EXECUTION DOMAIN — 2026-08-13:
+// Returns a fully YOLO permission block: every tool category gets "allow"
+// via the "*" wildcard, and bash preserves CriticalDenies for catastrophic
+// operations. This makes the host fully autonomous — no --auto flag, no
+// re-ask, no permission prompts.
 func (a *PermissionAuthority) MaterializePermissionBlock() (PermissionBlock, error) {
 	bash, err := a.expectedBashPermissions()
 	if err != nil {
 		return PermissionBlock{}, err
 	}
-	return PermissionBlock{Edit: "allow", Bash: bash, ExternalDirectory: ExpectedExternalDirectory("")}, nil
+	// Build a map with global wildcard + per-tool explicit allow.
+	// opencode treats "*" as the default for any tool not explicitly listed.
+	perms := map[string]string{}
+	perms["*"] = "allow"
+	perms["edit"] = "allow"
+	perms["write"] = "allow"
+	perms["read"] = "allow"
+	perms["glob"] = "allow"
+	perms["grep"] = "allow"
+	perms["list"] = "allow"
+	perms["patch"] = "allow"
+	perms["task"] = "allow"
+	perms["skill"] = "allow"
+	perms["webfetch"] = "allow"
+	perms["websearch"] = "allow"
+	perms["doom_loop"] = "allow"
+	// Merge bash (with critical denies) into the flat map
+	for k, v := range bash {
+		perms[k] = v
+	}
+	perms["external_directory"] = "*" // marker — handled as map by writer
+	return PermissionBlock{
+		Edit:              "allow",
+		Bash:              bash,
+		ExternalDirectory: ExpectedExternalDirectory(""),
+		Extra:             perms,
+	}, nil
 }
 
 // NewPermissionAuthority creates a new authority with default paths.
@@ -172,12 +205,39 @@ func ExpectedExternalDirectory(agentName string) map[string]string {
 }
 
 // ExpectedOpencodePermission returns the expected opencode.json permission block.
+//
+// OVAV TRUSTED EXECUTION DOMAIN — 2026-08-13:
+// The "*" key is the global default for any tool/category not explicitly
+// configured. Setting it to "allow" makes YOLO fully autonomous — opencode
+// will not prompt for any tool whose name is not in the config.
+//
+// Per-tool entries override "*" where they exist (e.g., bash has its own
+// map with critical denies). The combination guarantees:
+//
+//   1. Known tools (bash, edit, write, read, glob, etc.) → allow or per-tool map
+//   2. Unknown / future tools → "*": "allow" (autonomous default)
+//   3. Catastrophic bash operations → explicit "deny" (CriticalDenies)
+//   4. external_directory → "*": "allow" (YOLO trust domain)
+//
+// Result: NO host re-ask. NO --auto flag required. OVAV decides, host runs.
 func ExpectedOpencodePermission() map[string]interface{} {
-	return map[string]interface{}{
-		"edit":               "allow",
-		"bash":               ExpectedBashPermissions(),
-		"external_directory": ExpectedExternalDirectory(""),
-	}
+	perms := make(map[string]interface{})
+	perms["*"] = "allow" // Global wildcard: any unmatched tool → allow
+	perms["edit"] = "allow"
+	perms["write"] = "allow"
+	perms["read"] = "allow"
+	perms["glob"] = "allow"
+	perms["grep"] = "allow"
+	perms["list"] = "allow"
+	perms["patch"] = "allow"
+	perms["task"] = "allow"
+	perms["skill"] = "allow"
+	perms["webfetch"] = "allow"
+	perms["websearch"] = "allow"
+	perms["doom_loop"] = "allow"
+	perms["bash"] = ExpectedBashPermissions()
+	perms["external_directory"] = ExpectedExternalDirectory("")
+	return perms
 }
 
 func (a *PermissionAuthority) expectedOpencodePermission() (map[string]interface{}, error) {
@@ -185,11 +245,23 @@ func (a *PermissionAuthority) expectedOpencodePermission() (map[string]interface
 	if err != nil {
 		return nil, err
 	}
-	return map[string]interface{}{
-		"edit":               "allow",
-		"bash":               bash,
-		"external_directory": ExpectedExternalDirectory(""),
-	}, nil
+	perms := make(map[string]interface{})
+	perms["*"] = "allow" // Global wildcard for unmatched tools
+	perms["edit"] = "allow"
+	perms["write"] = "allow"
+	perms["read"] = "allow"
+	perms["glob"] = "allow"
+	perms["grep"] = "allow"
+	perms["list"] = "allow"
+	perms["patch"] = "allow"
+	perms["task"] = "allow"
+	perms["skill"] = "allow"
+	perms["webfetch"] = "allow"
+	perms["websearch"] = "allow"
+	perms["doom_loop"] = "allow"
+	perms["bash"] = bash
+	perms["external_directory"] = ExpectedExternalDirectory("")
+	return perms, nil
 }
 
 // MaterializeAll materializes all permission projections.
