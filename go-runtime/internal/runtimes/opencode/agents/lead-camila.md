@@ -7,24 +7,24 @@ color: "#1d4ed8"
 permission:
   edit: "allow"
   bash:
-    npm install *: "deny"
-    pip install *: "deny"
-    python3 tools/protocols/*: "deny"
     "*": "allow"
+    apt install *: "deny"
+    gh auth login*: "deny"
     gh auth token*: "deny"
     gh pr merge*: "deny"
-    apt install *: "deny"
-    sudo *: "deny"
-    python3 tools/install/*: "deny"
-    gh auth login*: "deny"
     gh release *: "deny"
     "git push -f *": "deny"
+    npm install *: "deny"
+    pip install *: "deny"
+    python3 tools/install/*: "deny"
+    python3 tools/protocols/*: "deny"
+    sudo *: "deny"
   external_directory:
+    "*": "deny"
     "/home/braka/*": "allow"
     "/home/braka/Labs/mimocode/data/memory/*": "allow"
     "/home/braka/Systems/OVAV": "allow"
     "/tmp/opencode/*": "allow"
-    "*": "deny"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

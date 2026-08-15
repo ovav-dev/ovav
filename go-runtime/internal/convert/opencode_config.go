@@ -362,6 +362,7 @@ func checkModelIdentifiers(config map[string]any) []ConfigIssue {
 type CanonicalOpenCodeConfig struct {
 	Version     string                        `yaml:"version"`
 	Schema      string                        `yaml:"schema"`
+	Ovav        map[string]any                `yaml:"_ovav"`
 	Runtime     canonicalRuntime              `yaml:"runtime"`
 	MCP         map[string]canonicalMCPServer `yaml:"mcp"`
 	Plugins     []string                      `yaml:"plugins"`
@@ -374,11 +375,12 @@ type CanonicalOpenCodeConfig struct {
 }
 
 type canonicalRuntime struct {
-	Model        string         `yaml:"model"`
-	SmallModel   string         `yaml:"small_model"`
-	DefaultAgent string         `yaml:"default_agent"`
-	Instructions []string       `yaml:"instructions"`
-	Agent        map[string]any `yaml:"agent"`
+	Model             string         `yaml:"model"`
+	SmallModel        string         `yaml:"small_model"`
+	DefaultAgent      string         `yaml:"default_agent"`
+	DefaultPermission string         `yaml:"default_permission"`
+	Instructions      []string       `yaml:"instructions"`
+	Agent             map[string]any `yaml:"agent"`
 }
 
 type canonicalMCPServer struct {
@@ -392,7 +394,24 @@ type canonicalProvider struct {
 }
 
 type canonicalPermissions struct {
+	Wildcard          string            `yaml:"*"`
 	Edit              string            `yaml:"edit"`
+	Write             string            `yaml:"write"`
+	Read              string            `yaml:"read"`
+	Glob              string            `yaml:"glob"`
+	Grep              string            `yaml:"grep"`
+	List              string            `yaml:"list"`
+	Patch             string            `yaml:"patch"`
+	Task              string            `yaml:"task"`
+	Skill             string            `yaml:"skill"`
+	Webfetch          string            `yaml:"webfetch"`
+	Websearch         string            `yaml:"websearch"`
+	DoomLoop          string            `yaml:"doom_loop"`
+	Invalid           string            `yaml:"invalid"`
+	Question          string            `yaml:"question"`
+	TodoRead          string            `yaml:"todoread"`
+	TodoWrite         string            `yaml:"todowrite"`
+	Diff              string            `yaml:"diff"`
 	Bash              map[string]string `yaml:"bash"`
 	ExternalDirectory map[string]string `yaml:"external_directory"`
 }
@@ -436,10 +455,18 @@ func GenerateOpenCodeConfig(root string) error {
 	// Schema
 	config["$schema"] = canonical.Schema
 
+	// OVAV marker (preserved through the projection)
+	if len(canonical.Ovav) > 0 {
+		config["_ovav"] = canonical.Ovav
+	}
+
 	// Runtime
 	config["model"] = canonical.Runtime.Model
 	config["small_model"] = canonical.Runtime.SmallModel
 	config["default_agent"] = canonical.Runtime.DefaultAgent
+	if canonical.Runtime.DefaultPermission != "" {
+		config["default_permission"] = canonical.Runtime.DefaultPermission
+	}
 	config["instructions"] = canonical.Runtime.Instructions
 	config["agent"] = canonical.Runtime.Agent
 
@@ -500,7 +527,49 @@ func GenerateOpenCodeConfig(root string) error {
 	}
 	if canonical.Permissions.Edit != "" || len(canonical.Permissions.Bash) > 0 {
 		perm := make(map[string]any)
-		perm["edit"] = canonical.Permissions.Edit
+
+		// OVAV TRUSTED DOMAIN — 2026-08-13:
+		// Emit YOLO wildcards FIRST so they are the default for any
+		// tool not explicitly listed. Then emit per-tool rules which
+		// override the wildcard (e.g., bash with critical denies).
+		// Source of truth is the canonicalPermissions struct fields.
+		if canonical.Permissions.Wildcard != "" {
+			perm["*"] = canonical.Permissions.Wildcard
+		} else {
+			perm["*"] = "allow"
+		}
+
+		// Per-tool allow (each field in canonicalPermissions, except bash/ext_dir)
+		type permField struct {
+			key, val string
+		}
+		fields := []permField{
+			{"edit", canonical.Permissions.Edit},
+			{"write", canonical.Permissions.Write},
+			{"read", canonical.Permissions.Read},
+			{"glob", canonical.Permissions.Glob},
+			{"grep", canonical.Permissions.Grep},
+			{"list", canonical.Permissions.List},
+			{"patch", canonical.Permissions.Patch},
+			{"task", canonical.Permissions.Task},
+			{"skill", canonical.Permissions.Skill},
+			{"webfetch", canonical.Permissions.Webfetch},
+			{"websearch", canonical.Permissions.Websearch},
+			{"doom_loop", canonical.Permissions.DoomLoop},
+			{"invalid", canonical.Permissions.Invalid},
+			{"question", canonical.Permissions.Question},
+			{"todoread", canonical.Permissions.TodoRead},
+			{"todowrite", canonical.Permissions.TodoWrite},
+			{"diff", canonical.Permissions.Diff},
+		}
+		for _, f := range fields {
+			if f.val != "" {
+				perm[f.key] = f.val
+			} else {
+				// Default to "allow" if not specified (YOLO completeness)
+				perm[f.key] = "allow"
+			}
+		}
 
 		if len(canonical.Permissions.Bash) > 0 {
 			bash := make(map[string]any)

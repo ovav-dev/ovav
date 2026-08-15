@@ -18,7 +18,7 @@ type ContinueConverter struct{}
 
 func (c *ContinueConverter) FileExtension() string { return ".md" }
 func (c *ContinueConverter) OutputDir() string     { return ".continue/agents" }
-func (c *ContinueConverter) AreasOnly() bool        { return true }
+func (c *ContinueConverter) AreasOnly() bool       { return true }
 
 func (c *ContinueConverter) ConvertArea(area *Area, _ map[string]*Lead) ([]byte, error) {
 	var b strings.Builder

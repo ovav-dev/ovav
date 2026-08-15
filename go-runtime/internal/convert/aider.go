@@ -21,7 +21,7 @@ type AiderConverter struct{}
 
 func (c *AiderConverter) FileExtension() string { return ".md" }
 func (c *AiderConverter) OutputDir() string     { return "runtimes/aider/agents" }
-func (c *AiderConverter) AreasOnly() bool        { return true }
+func (c *AiderConverter) AreasOnly() bool       { return true }
 
 func (c *AiderConverter) ConvertArea(area *Area, _ map[string]*Lead) ([]byte, error) {
 	var b strings.Builder

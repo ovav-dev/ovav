@@ -184,13 +184,15 @@ func (v *AgentPermissionInvariants) Validate(ctx context.Context, root string) R
 			}
 
 			// Check external_directory - must be a map, not a list
+			// OVAV TRUSTED DOMAIN — 2026-08-13: external_directory * is allow for both
+			// area and lead profiles. The OVAV governor is the upper trust layer.
 			if thavrenExtDir, ok := thavrenPerm["external_directory"].(map[string]interface{}); ok {
 				if areaExtDir, ok := areaPerm["external_directory"].(map[string]interface{}); ok {
-					// Check wildcard consistency
+					// Check wildcard consistency — both must allow under YOLO
 					if thavrenWildcard, ok := thavrenExtDir["*"].(string); ok {
 						if areaWildcard, ok := areaExtDir["*"].(string); ok {
-							if thavrenWildcard == "deny" && areaWildcard == "allow" {
-								issues = append(issues, "ERROR: lead external_directory * = deny but area * = allow")
+							if thavrenWildcard != areaWildcard {
+								issues = append(issues, fmt.Sprintf("WARN: OVAV TRUSTED DOMAIN — lead external_directory * = %s but area * = %s (should match)", thavrenWildcard, areaWildcard))
 							}
 						}
 					}

@@ -13,27 +13,27 @@ import (
 
 // SelfHealingEngine monitors system health and performs automatic repairs.
 type SelfHealingEngine struct {
-	mu               sync.RWMutex
-	systems          map[string]*SystemHealth
-	recoveryActions  []RecoveryAction
-	healingHistory   []HealingEvent
+	mu                sync.RWMutex
+	systems           map[string]*SystemHealth
+	recoveryActions   []RecoveryAction
+	healingHistory    []HealingEvent
 	autoRepairEnabled bool
-	checkInterval    time.Duration
-	lastCheck        time.Time
+	checkInterval     time.Duration
+	lastCheck         time.Time
 }
 
 // SystemHealth represents the health status of a subsystem.
 type SystemHealth struct {
-	Name           string    `json:"name"`
-	Status         string    `json:"status"` // "healthy", "degraded", "critical", "offline"
-	Uptime         time.Duration `json:"uptime"`
-	LastCheck      time.Time `json:"last_check"`
-	ErrorRate      float64   `json:"error_rate"` // 0.0 to 1.0
-	ResponseTime   time.Duration `json:"response_time"`
-	MemoryUsage    float64   `json:"memory_usage"` // percentage
-	CPUUsage       float64   `json:"cpu_usage"` // percentage
-	DiskUsage      float64   `json:"disk_usage"` // percentage
-	Issues         []Issue   `json:"issues"`
+	Name         string        `json:"name"`
+	Status       string        `json:"status"` // "healthy", "degraded", "critical", "offline"
+	Uptime       time.Duration `json:"uptime"`
+	LastCheck    time.Time     `json:"last_check"`
+	ErrorRate    float64       `json:"error_rate"` // 0.0 to 1.0
+	ResponseTime time.Duration `json:"response_time"`
+	MemoryUsage  float64       `json:"memory_usage"` // percentage
+	CPUUsage     float64       `json:"cpu_usage"`    // percentage
+	DiskUsage    float64       `json:"disk_usage"`   // percentage
+	Issues       []Issue       `json:"issues"`
 }
 
 // Issue represents a detected problem.
@@ -48,14 +48,14 @@ type Issue struct {
 
 // RecoveryAction represents an automated repair action.
 type RecoveryAction struct {
-	ID          string    `json:"id"`
-	Name        string    `json:"name"`
-	Description string    `json:"description"`
-	Type        string    `json:"type"` // "restart", "cleanup", "rebuild", "rollback", "scale"
-	Target      string    `json:"target"`
-	Status      string    `json:"status"` // "pending", "in_progress", "completed", "failed"
-	ExecutedAt  *time.Time `json:"executed_at,omitempty"`
-	Result      string    `json:"result,omitempty"`
+	ID          string        `json:"id"`
+	Name        string        `json:"name"`
+	Description string        `json:"description"`
+	Type        string        `json:"type"` // "restart", "cleanup", "rebuild", "rollback", "scale"
+	Target      string        `json:"target"`
+	Status      string        `json:"status"` // "pending", "in_progress", "completed", "failed"
+	ExecutedAt  *time.Time    `json:"executed_at,omitempty"`
+	Result      string        `json:"result,omitempty"`
 	Duration    time.Duration `json:"duration,omitempty"`
 }
 
@@ -86,7 +86,7 @@ func NewSelfHealingEngine() *SelfHealingEngine {
 func (she *SelfHealingEngine) RegisterSystem(name string) {
 	she.mu.Lock()
 	defer she.mu.Unlock()
-	
+
 	she.systems[name] = &SystemHealth{
 		Name:      name,
 		Status:    "healthy",
@@ -100,22 +100,22 @@ func (she *SelfHealingEngine) RegisterSystem(name string) {
 func (she *SelfHealingEngine) UpdateHealth(name string, metrics HealthMetrics) {
 	she.mu.Lock()
 	defer she.mu.Unlock()
-	
+
 	sys, exists := she.systems[name]
 	if !exists {
 		return
 	}
-	
+
 	sys.LastCheck = time.Now()
 	sys.ErrorRate = metrics.ErrorRate
 	sys.ResponseTime = metrics.ResponseTime
 	sys.MemoryUsage = metrics.MemoryUsage
 	sys.CPUUsage = metrics.CPUUsage
 	sys.DiskUsage = metrics.DiskUsage
-	
+
 	// Detect issues based on thresholds
 	she.detectIssues(sys)
-	
+
 	// Update status based on overall health
 	she.updateSystemStatus(sys)
 }
@@ -139,7 +139,7 @@ func (she *SelfHealingEngine) detectIssues(sys *SystemHealth) {
 		if sys.ErrorRate > 0.5 {
 			severity = "critical"
 		}
-		
+
 		sys.Issues = append(sys.Issues, Issue{
 			ID:          fmt.Sprintf("issue-%d", len(sys.Issues)+1),
 			Severity:    severity,
@@ -148,14 +148,14 @@ func (she *SelfHealingEngine) detectIssues(sys *SystemHealth) {
 			Category:    "performance",
 		})
 	}
-	
+
 	// Check memory usage
 	if sys.MemoryUsage > 80 {
 		severity := "warning"
 		if sys.MemoryUsage > 90 {
 			severity = "critical"
 		}
-		
+
 		sys.Issues = append(sys.Issues, Issue{
 			ID:          fmt.Sprintf("issue-%d", len(sys.Issues)+1),
 			Severity:    severity,
@@ -164,7 +164,7 @@ func (she *SelfHealingEngine) detectIssues(sys *SystemHealth) {
 			Category:    "resources",
 		})
 	}
-	
+
 	// Check CPU usage
 	if sys.CPUUsage > 85 {
 		sys.Issues = append(sys.Issues, Issue{
@@ -175,14 +175,14 @@ func (she *SelfHealingEngine) detectIssues(sys *SystemHealth) {
 			Category:    "resources",
 		})
 	}
-	
+
 	// Check disk usage
 	if sys.DiskUsage > 85 {
 		severity := "warning"
 		if sys.DiskUsage > 95 {
 			severity = "critical"
 		}
-		
+
 		sys.Issues = append(sys.Issues, Issue{
 			ID:          fmt.Sprintf("issue-%d", len(sys.Issues)+1),
 			Severity:    severity,
@@ -197,7 +197,7 @@ func (she *SelfHealingEngine) updateSystemStatus(sys *SystemHealth) {
 	criticalCount := 0
 	errorCount := 0
 	warningCount := 0
-	
+
 	for _, issue := range sys.Issues {
 		switch issue.Severity {
 		case "critical":
@@ -208,7 +208,7 @@ func (she *SelfHealingEngine) updateSystemStatus(sys *SystemHealth) {
 			warningCount++
 		}
 	}
-	
+
 	if criticalCount > 0 {
 		sys.Status = "critical"
 	} else if errorCount > 0 {
@@ -224,30 +224,30 @@ func (she *SelfHealingEngine) updateSystemStatus(sys *SystemHealth) {
 func (she *SelfHealingEngine) RunDiagnostics() []DiagnosisResult {
 	she.mu.Lock()
 	defer she.mu.Unlock()
-	
+
 	var results []DiagnosisResult
-	
+
 	for name, sys := range she.systems {
 		result := she.diagnoseSystem(name, sys)
 		results = append(results, result)
-		
+
 		// Auto-repair if enabled and issues found
 		if she.autoRepairEnabled && len(sys.Issues) > 0 {
 			she.attemptAutoRepair(name, sys)
 		}
 	}
-	
+
 	she.lastCheck = time.Now()
 	return results
 }
 
 // DiagnosisResult contains diagnostic findings.
 type DiagnosisResult struct {
-	SystemName string   `json:"system_name"`
-	Status     string   `json:"status"`
-	Issues     []Issue  `json:"issues"`
+	SystemName      string   `json:"system_name"`
+	Status          string   `json:"status"`
+	Issues          []Issue  `json:"issues"`
 	Recommendations []string `json:"recommendations"`
-	HealthScore float64  `json:"health_score"` // 0.0 to 1.0
+	HealthScore     float64  `json:"health_score"` // 0.0 to 1.0
 }
 
 func (she *SelfHealingEngine) diagnoseSystem(name string, sys *SystemHealth) DiagnosisResult {
@@ -257,23 +257,23 @@ func (she *SelfHealingEngine) diagnoseSystem(name string, sys *SystemHealth) Dia
 		Issues:     make([]Issue, len(sys.Issues)),
 	}
 	copy(result.Issues, sys.Issues)
-	
+
 	// Generate recommendations
 	result.Recommendations = she.generateRecommendations(sys)
-	
+
 	// Calculate health score
 	result.HealthScore = she.calculateHealthScore(sys)
-	
+
 	return result
 }
 
 func (she *SelfHealingEngine) generateRecommendations(sys *SystemHealth) []string {
 	var recommendations []string
-	
+
 	for _, issue := range sys.Issues {
 		switch issue.Category {
 		case "performance":
-			recommendations = append(recommendations, 
+			recommendations = append(recommendations,
 				fmt.Sprintf("Investigate high error rate in %s - consider adding retry logic or circuit breakers", sys.Name))
 		case "resources":
 			if sys.MemoryUsage > 80 {
@@ -289,17 +289,17 @@ func (she *SelfHealingEngine) generateRecommendations(sys *SystemHealth) []strin
 				fmt.Sprintf("Disk cleanup needed for %s - archive old data or expand storage", sys.Name))
 		}
 	}
-	
+
 	if len(recommendations) == 0 {
 		recommendations = append(recommendations, "System operating normally")
 	}
-	
+
 	return recommendations
 }
 
 func (she *SelfHealingEngine) calculateHealthScore(sys *SystemHealth) float64 {
 	score := 1.0
-	
+
 	// Penalize for issues
 	for _, issue := range sys.Issues {
 		switch issue.Severity {
@@ -311,20 +311,20 @@ func (she *SelfHealingEngine) calculateHealthScore(sys *SystemHealth) float64 {
 			score -= 0.1
 		}
 	}
-	
+
 	// Penalize for resource usage
 	if sys.MemoryUsage > 90 {
 		score -= 0.2
 	} else if sys.MemoryUsage > 80 {
 		score -= 0.1
 	}
-	
+
 	if sys.CPUUsage > 90 {
 		score -= 0.2
 	} else if sys.CPUUsage > 80 {
 		score -= 0.1
 	}
-	
+
 	if sys.ErrorRate > 0.5 {
 		score -= 0.3
 	} else if sys.ErrorRate > 0.2 {
@@ -332,7 +332,7 @@ func (she *SelfHealingEngine) calculateHealthScore(sys *SystemHealth) float64 {
 	} else if sys.ErrorRate > 0.1 {
 		score -= 0.05
 	}
-	
+
 	return math.Max(0, score)
 }
 
@@ -341,7 +341,7 @@ func (she *SelfHealingEngine) attemptAutoRepair(systemName string, sys *SystemHe
 		if issue.Severity == "critical" || issue.Severity == "error" {
 			action := she.createRecoveryAction(systemName, issue)
 			she.recoveryActions = append(she.recoveryActions, action)
-			
+
 			// Execute repair asynchronously
 			go she.executeRepair(action, systemName, issue)
 		}
@@ -350,7 +350,7 @@ func (she *SelfHealingEngine) attemptAutoRepair(systemName string, sys *SystemHe
 
 func (she *SelfHealingEngine) createRecoveryAction(systemName string, issue Issue) RecoveryAction {
 	actionType := "investigate"
-	
+
 	switch issue.Category {
 	case "resources":
 		if strings.Contains(issue.Description, "memory") {
@@ -363,7 +363,7 @@ func (she *SelfHealingEngine) createRecoveryAction(systemName string, issue Issu
 	case "performance":
 		actionType = "restart"
 	}
-	
+
 	return RecoveryAction{
 		ID:          fmt.Sprintf("action-%d", len(she.recoveryActions)+1),
 		Name:        fmt.Sprintf("Auto-repair: %s", issue.Description),
@@ -376,11 +376,11 @@ func (she *SelfHealingEngine) createRecoveryAction(systemName string, issue Issu
 
 func (she *SelfHealingEngine) executeRepair(action RecoveryAction, systemName string, issue Issue) {
 	startTime := time.Now()
-	
+
 	// Simulate repair actions (in real implementation, these would perform actual fixes)
 	var success bool
 	var result string
-	
+
 	switch action.Type {
 	case "cleanup":
 		success = true
@@ -398,9 +398,9 @@ func (she *SelfHealingEngine) executeRepair(action RecoveryAction, systemName st
 		success = false
 		result = "Manual intervention required"
 	}
-	
+
 	duration := time.Since(startTime)
-	
+
 	// Update action status
 	she.mu.Lock()
 	for i, a := range she.recoveryActions {
@@ -413,7 +413,7 @@ func (she *SelfHealingEngine) executeRepair(action RecoveryAction, systemName st
 			break
 		}
 	}
-	
+
 	// Log healing event
 	event := HealingEvent{
 		Timestamp:  startTime,
@@ -426,7 +426,7 @@ func (she *SelfHealingEngine) executeRepair(action RecoveryAction, systemName st
 	}
 	she.healingHistory = append(she.healingHistory, event)
 	she.mu.Unlock()
-	
+
 	// Remove resolved issue if repair was successful
 	if success {
 		she.mu.Lock()
@@ -448,7 +448,7 @@ func (she *SelfHealingEngine) executeRepair(action RecoveryAction, systemName st
 func (she *SelfHealingEngine) GetHealingStats() HealingStats {
 	she.mu.RLock()
 	defer she.mu.RUnlock()
-	
+
 	stats := HealingStats{
 		TotalSystems:      len(she.systems),
 		HealthySystems:    0,
@@ -458,7 +458,7 @@ func (she *SelfHealingEngine) GetHealingStats() HealingStats {
 		SuccessfulRepairs: 0,
 		AvgRepairTime:     0,
 	}
-	
+
 	for _, sys := range she.systems {
 		switch sys.Status {
 		case "healthy":
@@ -469,7 +469,7 @@ func (she *SelfHealingEngine) GetHealingStats() HealingStats {
 			stats.CriticalSystems++
 		}
 	}
-	
+
 	totalDuration := time.Duration(0)
 	for _, event := range she.healingHistory {
 		if event.Success {
@@ -477,11 +477,11 @@ func (she *SelfHealingEngine) GetHealingStats() HealingStats {
 			totalDuration += event.Duration
 		}
 	}
-	
+
 	if stats.SuccessfulRepairs > 0 {
 		stats.AvgRepairTime = totalDuration / time.Duration(stats.SuccessfulRepairs)
 	}
-	
+
 	return stats
 }
 
@@ -500,27 +500,27 @@ type HealingStats struct {
 func (she *SelfHealingEngine) CleanupTempFiles(pattern string, maxAge time.Duration) (int, error) {
 	tempDir := os.TempDir()
 	searchPattern := filepath.Join(tempDir, pattern)
-	
+
 	matches, err := filepath.Glob(searchPattern)
 	if err != nil {
 		return 0, fmt.Errorf("glob pattern: %w", err)
 	}
-	
+
 	removed := 0
 	cutoff := time.Now().Add(-maxAge)
-	
+
 	for _, match := range matches {
 		info, err := os.Stat(match)
 		if err != nil {
 			continue
 		}
-		
+
 		if info.ModTime().Before(cutoff) {
 			if err := os.Remove(match); err == nil {
 				removed++
 			}
 		}
 	}
-	
+
 	return removed, nil
 }

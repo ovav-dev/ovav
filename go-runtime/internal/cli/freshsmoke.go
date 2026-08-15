@@ -269,9 +269,9 @@ func truncate(s string, max int) string {
 // `go test ./...` represents a passing run. Go test output uses three
 // package markers:
 //
-//   ok    <pkg>  <duration>   — package passed
-//   ?     <pkg>  [no test files] — package has no test files (PASS)
-//   FAIL  <pkg>  <reason>   — package failed
+//	ok    <pkg>  <duration>   — package passed
+//	?     <pkg>  [no test files] — package has no test files (PASS)
+//	FAIL  <pkg>  <reason>   — package failed
 //
 // A trailing `FAIL` summary line (no package) is printed when any
 // package failed, but we ignore it because it never appears without a

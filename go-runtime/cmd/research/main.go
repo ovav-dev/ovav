@@ -144,7 +144,7 @@ func analyze(eng *engine.Engine) {
 	fmt.Println()
 
 	intel := eng.GetIntelligenceLayer()
-	
+
 	findings, err := eng.ListFindings()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error loading findings: %v\n", err)
@@ -189,7 +189,7 @@ func analyze(eng *engine.Engine) {
 			if i >= 5 {
 				break
 			}
-			fmt.Printf("  • %s ↔ %s (strength: %.0f%%, type: %s)\n", 
+			fmt.Printf("  • %s ↔ %s (strength: %.0f%%, type: %s)\n",
 				c.Finding1, c.Finding2, c.Strength*100, c.Type)
 		}
 		fmt.Println()
@@ -209,7 +209,7 @@ func analyze(eng *engine.Engine) {
 			Enabled:   t.Enabled,
 		})
 	}
-	
+
 	prioritized := intel.PrioritizeTargets(targets, findings)
 	if len(prioritized) > 0 {
 		fmt.Println("🎯 Prioritized Research Targets:")

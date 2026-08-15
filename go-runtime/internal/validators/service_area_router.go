@@ -25,9 +25,9 @@ func (s *ServiceAreaRouter) Weight() int { return 8 }
 
 // areaProfiles maps each area to its canonical YAML file.
 var areaProfiles = []struct {
-	id        string
-	name      string
-	file      string
+	id   string
+	name string
+	file string
 }{
 	{id: "platform_engineering", name: "Platform Engineering", file: "platform_engineering/area_boundaries.yaml"},
 	{id: "research_intelligence", name: "Research Intelligence", file: "research_intelligence/area_boundaries.yaml"},

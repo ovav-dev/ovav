@@ -3,19 +3,21 @@
 // Architecture v2.0: Modular projectors for each artifact type.
 //
 // Canonical source structure:
-//   .ovav/source/configs/   — Tool configs (wezterm, fish, git, etc.)
-//   .ovav/source/harnesses/ — Test harnesses
-//   .ovav/source/programs/   — CI/CD, deploy programs
-//   .ovav/source/agents/    — Agent definitions
-//   .ovav/source/skills/    — Skill definitions
-//   .ovav/visual/           — Theme, assets
+//
+//	.ovav/source/configs/   — Tool configs (wezterm, fish, git, etc.)
+//	.ovav/source/harnesses/ — Test harnesses
+//	.ovav/source/programs/   — CI/CD, deploy programs
+//	.ovav/source/agents/    — Agent definitions
+//	.ovav/source/skills/    — Skill definitions
+//	.ovav/visual/           — Theme, assets
 //
 // Projection targets:
-//   config/                 — Tool configs
-//   .github/workflows/      — CI programs
-//   go-runtime/.../harness — Test harnesses
-//   clients/opencode/       — Agent projections
-//   .opencode/             — Skills, themes, plugins
+//
+//	config/                 — Tool configs
+//	.github/workflows/      — CI programs
+//	go-runtime/.../harness — Test harnesses
+//	clients/opencode/       — Agent projections
+//	.opencode/             — Skills, themes, plugins
 //
 // Each projector is independent and can be run separately.
 package projector
@@ -68,7 +70,7 @@ func FindProjector(name string) Projector {
 // ConfigsProjector projects tool configs from .ovav/source/configs/ to config/.
 type ConfigsProjector struct{}
 
-func (p *ConfigsProjector) Name() string     { return "configs" }
+func (p *ConfigsProjector) Name() string      { return "configs" }
 func (p *ConfigsProjector) SourceDir() string { return ".ovav/source/configs" }
 func (p *ConfigsProjector) DeployDir() string { return "config" }
 
@@ -132,7 +134,7 @@ func (p *ConfigsProjector) Project(root string, verbose bool) (int, error) {
 // VisualProjector projects visual assets (theme, monitoring, assets).
 type VisualProjector struct{}
 
-func (p *VisualProjector) Name() string     { return "visual" }
+func (p *VisualProjector) Name() string      { return "visual" }
 func (p *VisualProjector) SourceDir() string { return ".ovav/visual" }
 func (p *VisualProjector) DeployDir() string { return ".opencode" } // partial
 
@@ -176,7 +178,7 @@ func (p *VisualProjector) Project(root string, verbose bool) (int, error) {
 // AgentsProjector projects agent definitions to CLI runtimes.
 type AgentsProjector struct{}
 
-func (p *AgentsProjector) Name() string     { return "agents" }
+func (p *AgentsProjector) Name() string      { return "agents" }
 func (p *AgentsProjector) SourceDir() string { return ".ovav/source/agents" }
 func (p *AgentsProjector) DeployDir() string { return "clients/opencode/agents" }
 
@@ -209,7 +211,7 @@ func (p *AgentsProjector) Project(root string, verbose bool) (int, error) {
 // SkillsProjector projects skills to .opencode/skills/.
 type SkillsProjector struct{}
 
-func (p *SkillsProjector) Name() string     { return "skills" }
+func (p *SkillsProjector) Name() string      { return "skills" }
 func (p *SkillsProjector) SourceDir() string { return ".ovav/source/skills" }
 func (p *SkillsProjector) DeployDir() string { return ".opencode/skills" }
 
@@ -239,7 +241,7 @@ func (p *SkillsProjector) Project(root string, verbose bool) (int, error) {
 // ProgramsProjector projects CI/CD and deploy programs.
 type ProgramsProjector struct{}
 
-func (p *ProgramsProjector) Name() string     { return "programs" }
+func (p *ProgramsProjector) Name() string      { return "programs" }
 func (p *ProgramsProjector) SourceDir() string { return ".ovav/source/programs" }
 func (p *ProgramsProjector) DeployDir() string { return ".github/workflows" }
 
@@ -293,7 +295,7 @@ func (p *ProgramsProjector) Project(root string, verbose bool) (int, error) {
 // HarnessesProjector projects test harnesses.
 type HarnessesProjector struct{}
 
-func (p *HarnessesProjector) Name() string     { return "harnesses" }
+func (p *HarnessesProjector) Name() string      { return "harnesses" }
 func (p *HarnessesProjector) SourceDir() string { return ".ovav/source/harnesses" }
 func (p *HarnessesProjector) DeployDir() string { return "go-runtime/internal/testing/harnesses" }
 
