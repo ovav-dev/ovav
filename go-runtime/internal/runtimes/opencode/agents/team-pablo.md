@@ -2,7 +2,7 @@
 name: "Pablo"
 description: "Valido cada commit antes de que llegue a la rama principal — reviso patrones, consistencia, y adherence a los estándares de código de OVAV."
 mode: subagent
-model: minimax-coding-plan/MiniMax-M3
+model: opencode-go/qwen3.7-max
 hidden: true
 permission:
   edit: "allow"
