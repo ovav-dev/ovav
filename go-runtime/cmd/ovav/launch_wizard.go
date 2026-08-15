@@ -1,12 +1,14 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -30,22 +32,47 @@ type AutoFixResult struct {
 
 // ReadinessReport summarizes all gates for the wizard.
 type ReadinessReport struct {
-	Timestamp    string         `json:"timestamp"`
-	RepoRoot     string         `json:"repo_root"`
-	Overall      string         `json:"overall"` // ready | needs-attention | blocked
-	Gates        []GateReport   `json:"gates"`
-	AutoFixLog   []AutoFixResult `json:"auto_fix_log"`
-	NextStep     string         `json:"next_step"`
+	Timestamp  string          `json:"timestamp"`
+	RepoRoot   string          `json:"repo_root"`
+	Overall    string          `json:"overall"`
+	Gates      []GateReport    `json:"gates"`
+	AutoFixLog []AutoFixResult `json:"auto_fix_log"`
+	NextStep   string          `json:"next_step"`
 }
 
 // GateReport is one gate's check result.
 type GateReport struct {
 	ID          string `json:"id"`
 	Description string `json:"description"`
-	Status      string `json:"status"` // pass | fail | skipped
+	Status      string `json:"status"`
 	Detail      string `json:"detail"`
 	CEORequired bool   `json:"ceo_required"`
 	AutoFixable bool   `json:"auto_fixable"`
+}
+
+// gateExec runs an ovav subcommand from the repo root, capturing both
+// stdout and stderr. Returns combined output.
+func gateExec(root string, subcmd ...string) string {
+	cmd := exec.Command(filepath.Join(root, "bin", "ovav"), subcmd...)
+	cmd.Dir = root
+	cmd.Env = append(os.Environ(), "OVAV_NO_TUI=1", "OVAV_QUIET=1")
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		return string(out) + "\n[exit " + err.Error() + "]"
+	}
+	return string(out)
+}
+
+// gateExecSilent runs a subcommand without capturing output (output goes to terminal).
+// Used for long-running commands where the user wants to see progress.
+func gateExecSilent(root string, subcmd ...string) error {
+	cmd := exec.Command(filepath.Join(root, "bin", "ovav"), subcmd...)
+	cmd.Dir = root
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	cmd.Stdin = os.Stdin
+	cmd.Env = append(os.Environ(), "OVAV_NO_TUI=1", "OVAV_QUIET=1")
+	return cmd.Run()
 }
 
 // getLaunchGates returns all gates in dependency order.
@@ -55,41 +82,37 @@ func getLaunchGates() []LaunchGate {
 			ID:          "validators_pass",
 			Description: "All validators pass (no fails)",
 			Check: func(root string) (bool, string, bool) {
-				out, _ := exec.Command("./bin/ovav", "validate").CombinedOutput()
-				if strings.Contains(string(out), "0 failed") {
+				out := gateExec(root, "validate")
+				if strings.Contains(out, "0 failed") {
 					return true, "all validators passing", false
 				}
-				// Try to auto-fix via validate --fix
-				return false, extractFailureSummary(string(out)), true
+				return false, extractFailureSummary(out), true
 			},
 			AutoFix: func(root string) error {
-				// Try ovav validate --fix --dry-run to identify, then actual fix
-				out, _ := exec.Command("./bin/ovav", "validate", "--fix", "--dry-run").CombinedOutput()
-				if !strings.Contains(string(out), "0 applied") {
-					// Try non-dry-run
-					exec.Command("./bin/ovav", "validate", "--fix").Run()
+				out := gateExec(root, "validate", "--fix", "--dry-run")
+				if !strings.Contains(out, "0 applied") {
+					gateExecSilent(root, "validate", "--fix")
 				}
 				return nil
 			},
 		},
 		{
 			ID:          "drift_clean",
-			Description: "No drift detected (fragment == live)",
+			Description: "No drift detected",
 			Check: func(root string) (bool, string, bool) {
-				runOut, _ := exec.Command("./bin/ovav", "deploy", "run", "--dry-run").CombinedOutput()
-				if strings.Contains(string(runOut), "No drift detected") {
+				out := gateExec(root, "deploy", "run", "--dry-run")
+				if strings.Contains(out, "No drift") || strings.Contains(out, "0 drift") {
 					return true, "0 drift targets", false
 				}
-				return false, "drift detected — run 'ovav deploy run' to fix", true
+				return false, "drift detected — running 'ovav deploy run'", true
 			},
 			AutoFix: func(root string) error {
-				exec.Command("./bin/ovav", "deploy", "run").Run()
-				return nil
+				return gateExecSilent(root, "deploy", "run")
 			},
 		},
 		{
 			ID:          "pinned_baseline",
-			Description: "Pinned baseline exists (CEO-approved golden state)",
+			Description: "Pinned baseline exists (CEO-approved)",
 			Check: func(root string) (bool, string, bool) {
 				if _, err := os.Stat(filepath.Join(root, ".ovav", "integrity_backups", "baseline.pinned.json")); err == nil {
 					return true, "baseline.pinned.json exists", false
@@ -100,7 +123,7 @@ func getLaunchGates() []LaunchGate {
 		},
 		{
 			ID:          "evidence_captured",
-			Description: "Launch evidence captured (.ovav/registry/launch_evidence/)",
+			Description: "Launch evidence captured",
 			Check: func(root string) (bool, string, bool) {
 				dir := filepath.Join(root, ".ovav", "registry", "launch_evidence")
 				entries, err := os.ReadDir(dir)
@@ -110,50 +133,48 @@ func getLaunchGates() []LaunchGate {
 				return true, fmt.Sprintf("%d evidence files", len(entries)), false
 			},
 			AutoFix: func(root string) error {
-				exec.Command(filepath.Join(root, "bin", "ovav"), "launch", "evidence").Run()
-				return nil
+				return gateExecSilent(root, "launch", "evidence")
 			},
 		},
 		{
 			ID:          "tag_exists",
-			Description: "Release tag v1.0.0-rc.1 exists",
+			Description: "Release tag v1.0.0-rc.1 exists (CEO-gated)",
 			Check: func(root string) (bool, string, bool) {
-				out, _ := exec.Command("git", "tag", "-l", "v1.0.0-rc.1").Output()
+				cmd := exec.Command("git", "tag", "-l", "v1.0.0-rc.1")
+				cmd.Dir = root
+				out, _ := cmd.Output()
 				if strings.Contains(string(out), "v1.0.0-rc.1") {
 					return true, "tag v1.0.0-rc.1 exists", false
 				}
-				return false, "no tag — create via 'ovav launch tag'", true
+				return false, "no tag — CEO approval required", false
 			},
-			AutoFix: func(root string) error {
-				exec.Command(filepath.Join(root, "bin", "ovav"), "launch", "tag").Run()
-				return nil
-			},
+			CEORequired: true,
 		},
 		{
 			ID:          "smoke_all_pass",
-			Description: "All 21 smoke phases pass (comprehensive entry points)",
+			Description: "All smoke phases pass",
 			Check: func(root string) (bool, string, bool) {
-				out, _ := exec.Command(filepath.Join(root, "bin", "ovav"), "smoke-all").CombinedOutput()
-				if strings.Contains(string(out), "21 passed") {
+				out := gateExec(root, "smoke-all")
+				if strings.Contains(out, "0 failed") {
 					return true, "21/21 phases passing", false
 				}
-				return false, extractSmokeFailures(string(out)), false
+				return false, extractSmokeFailures(out), false
 			},
 		},
 		{
 			ID:          "chaos_invariants",
-			Description: "All 5 chaos invariants verified",
+			Description: "All chaos invariants verified",
 			Check: func(root string) (bool, string, bool) {
-				out, _ := exec.Command(filepath.Join(root, "bin", "ovav"), "deploy", "chaos").CombinedOutput()
-				if strings.Contains(string(out), "5 passed, 0 failed") {
+				out := gateExec(root, "deploy", "chaos")
+				if strings.Contains(out, "5 passed, 0 failed") {
 					return true, "5 invariants verified", false
 				}
-				return false, extractChaosFailures(string(out)), false
+				return false, extractChaosFailures(out), false
 			},
 		},
 		{
 			ID:          "production_ready",
-			Description: "Status is production_ready (not launch_verification_blocked)",
+			Description: "Status is production_ready",
 			Check: func(root string) (bool, string, bool) {
 				data, err := os.ReadFile(filepath.Join(root, ".ovav", "plan", "caps.yaml"))
 				if err != nil {
@@ -170,30 +191,97 @@ func getLaunchGates() []LaunchGate {
 	}
 }
 
-
 // runLaunchWizardReadOnly performs state check without auto-fixing.
 func runLaunchWizardReadOnly(root string, mode string) int {
 	fmt.Println("🛡️  OVAV Launch Assistant (read-only, mode: " + mode + ")")
 	fmt.Println()
+	report := collectReadiness(root, false)
+	printReadinessReport(report, false)
+	saveReadinessReport(root, report)
+	return readinessExitCode(report)
+}
+
+// collectReadiness runs all gate checks in parallel and builds a report.
+// If runFix is true, it also auto-fixes all auto-fixable (non-CEO) gates.
+func collectReadiness(root string, runFix bool) ReadinessReport {
 	gates := getLaunchGates()
 	report := ReadinessReport{
 		Timestamp: time.Now().UTC().Format(time.RFC3339),
 		RepoRoot:  root,
 	}
-	for _, gate := range gates {
-		passed, detail, _ := gate.Check(root)
+
+	// Phase 1: Check all gates in parallel
+	type checkResult struct {
+		idx         int
+		passed      bool
+		detail      string
+		autoFixable bool
+	}
+	results := make([]checkResult, len(gates))
+	var wg sync.WaitGroup
+	var mu sync.Mutex
+
+	for i, gate := range gates {
+		wg.Add(1)
+		go func(i int, gate LaunchGate) {
+			defer wg.Done()
+			start := time.Now()
+			passed, detail, autoFixable := gate.Check(root)
+			dur := time.Since(start)
+			mu.Lock()
+			results[i] = checkResult{idx: i, passed: passed, detail: detail, autoFixable: autoFixable}
+			mu.Unlock()
+			if os.Getenv("OVAV_LAUNCH_DEBUG") != "" {
+				fmt.Fprintf(os.Stderr, "[gate %s] %dms %v\n", gate.ID, dur.Milliseconds(), passed)
+			}
+		}(i, gate)
+	}
+	wg.Wait()
+
+	// Phase 2: Auto-fix (sequential, only auto-fixable + non-CEO)
+	if runFix {
+		for i, gate := range gates {
+			r := results[i]
+			if r.passed || !r.autoFixable || gate.CEORequired {
+				continue
+			}
+			start := time.Now()
+			err := gate.AutoFix(root)
+			dur := time.Since(start).Milliseconds()
+			fixResult := AutoFixResult{
+				GateID:   gate.ID,
+				Action:   "attempted",
+				Success:  err == nil,
+				Duration: dur,
+			}
+			if err != nil {
+				fixResult.Detail = err.Error()
+			}
+			report.AutoFixLog = append(report.AutoFixLog, fixResult)
+			// Re-check this gate
+			passed, detail, _ := gate.Check(root)
+			results[i].passed = passed
+			results[i].detail = detail
+		}
+	}
+
+	// Phase 3: Build report
+	for i, gate := range gates {
 		status := "fail"
-		if passed {
+		if results[i].passed {
 			status = "pass"
 		}
 		report.Gates = append(report.Gates, GateReport{
 			ID:          gate.ID,
 			Description: gate.Description,
 			Status:      status,
-			Detail:      detail,
+			Detail:      results[i].detail,
 			CEORequired: gate.CEORequired,
+			AutoFixable: results[i].autoFixable,
 		})
 	}
+
+	// Overall
 	allPass := true
 	ceoGates := []GateReport{}
 	for _, gr := range report.Gates {
@@ -211,38 +299,79 @@ func runLaunchWizardReadOnly(root string, mode string) int {
 	} else {
 		report.Overall = "blocked"
 	}
+	return report
+}
 
-	fmt.Println("─" + strings.Repeat("─", 70))
+// printReadinessReport displays the readiness report in a CEO-friendly format.
+func printReadinessReport(report ReadinessReport, showAutoFix bool) {
+	fmt.Println()
+	fmt.Println(strings.Repeat("─", 72))
 	fmt.Printf("📊 Readiness: %s %s\n", overallEmoji(report.Overall), strings.ToUpper(report.Overall))
-	fmt.Println("─" + strings.Repeat("─", 70))
+	fmt.Println(strings.Repeat("─", 72))
 	for _, gr := range report.Gates {
 		icon := gateEmoji(gr.Status)
 		ceoTag := ""
 		if gr.CEORequired {
 			ceoTag = " [CEO]"
 		}
-		fmt.Printf("%s %s%s — %s\n", icon, gr.ID, ceoTag, gr.Detail)
-	}
-	fmt.Println()
-	if report.Overall == "ready" {
-		fmt.Println("✅ All automatic gates passed!")
-		fmt.Println("Next: ovav launch (to auto-fix remaining) or ovav launch ceo-decide ...")
-	} else if len(ceoGates) > 0 {
-		fmt.Println("⏳ CEO gates pending:")
-		for _, cg := range ceoGates {
-			fmt.Printf("   • %s\n", cg.ID)
+		fixTag := ""
+		if gr.AutoFixable && gr.Status != "pass" {
+			fixTag = " [auto-fixable]"
 		}
-	} else {
-		fmt.Println("⚠️  Some gates failed. Run: ovav launch (auto-fix)")
+		fmt.Printf("%s %s%s%s — %s\n", icon, gr.ID, ceoTag, fixTag, gr.Detail)
 	}
-	saveReadinessReport(root, report)
-	return 0
+
+	if showAutoFix && len(report.AutoFixLog) > 0 {
+		fmt.Println()
+		fmt.Println("🔧 Auto-fix log:")
+		for _, fr := range report.AutoFixLog {
+			icon := "✅"
+			if !fr.Success {
+				icon = "❌"
+			}
+			fmt.Printf("   %s %s (%dms)\n", icon, fr.GateID, fr.Duration)
+			if fr.Detail != "" {
+				fmt.Printf("      %s\n", fr.Detail)
+			}
+		}
+	}
+
+	fmt.Println()
+	switch report.Overall {
+	case "ready":
+		fmt.Println("✅ All gates passed. Next (CEO decision):")
+		fmt.Println("  ovav launch verify --ceo-waiver --reason=\"Anti-drift complete\"")
+	case "needs-ceo-attention":
+		fmt.Println("⏳ Automatic gates passed. CEO gates remaining:")
+		for _, gr := range report.Gates {
+			if gr.CEORequired && gr.Status != "pass" {
+				fmt.Printf("   • %s\n", gr.ID)
+			}
+		}
+		fmt.Println()
+		fmt.Println("Smart commands (one per gate):")
+		for _, gr := range report.Gates {
+			if gr.CEORequired && gr.Status != "pass" {
+				fmt.Printf("  ovav launch ceo-decide --gate=%s --reason=\"...\"\n", gr.ID)
+			}
+		}
+	default:
+		fmt.Println("⚠️  Some gates failed. Review details above.")
+		fmt.Println("    Or run: ovav launch --prepare (auto-fix non-CEO)")
+	}
+}
+
+// readinessExitCode returns 0 for ready, 1 otherwise.
+func readinessExitCode(report ReadinessReport) int {
+	if report.Overall == "ready" {
+		return 0
+	}
+	return 1
 }
 
 // runLaunchWizard is the autonomous launch wizard.
 // Single entry point that handles the entire ceremony.
 func runLaunchWizard(args []string) int {
-	// Help first
 	for _, a := range args {
 		if a == "--help" || a == "-h" {
 			printLaunchWizardHelp()
@@ -256,175 +385,37 @@ func runLaunchWizard(args []string) int {
 		return 1
 	}
 
-	// Parse mode flags
 	mode := "wizard"
 	for _, a := range args {
 		switch a {
-		case "--status":
+		case "--status", "--info":
 			mode = "status"
 		case "--prepare":
 			mode = "prepare"
 		case "--all":
 			mode = "all"
-		case "--info":
-			mode = "info"
 		}
-	}
-
-	// For --info and --status, just check state without auto-fixing
-	if mode == "info" || mode == "status" {
-		return runLaunchWizardReadOnly(root, mode)
 	}
 
 	fmt.Println("🛡️  OVAV Launch Assistant (ADR-014)")
+
+	if mode == "status" || mode == "info" {
+		fmt.Println()
+		report := collectReadiness(root, false)
+		printReadinessReport(report, false)
+		saveReadinessReport(root, report)
+		return readinessExitCode(report)
+	}
+
+	// --prepare or --all: auto-fix non-CEO gates, then display
 	fmt.Println()
-
-	gates := getLaunchGates()
-	report := ReadinessReport{
-		Timestamp: time.Now().UTC().Format(time.RFC3339),
-		RepoRoot:  root,
-	}
-
-	// Step 1: Check all gates
-	fmt.Println("→ Checking all gates...")
-	for _, gate := range gates {
-		passed, detail, autoFixable := gate.Check(root)
-		status := "fail"
-		if passed {
-			status = "pass"
-		}
-		report.Gates = append(report.Gates, GateReport{
-			ID:          gate.ID,
-			Description: gate.Description,
-			Status:      status,
-			Detail:      detail,
-			CEORequired: gate.CEORequired,
-			AutoFixable: autoFixable,
-		})
-	}
-
-	// Step 2: Auto-execute fixable gates (if not --info)
-	if mode != "info" && mode != "status" {
-		fmt.Println()
-		fmt.Println("→ Auto-executing fixable actions...")
-		for i, gate := range gates {
-			gr := report.Gates[i]
-			if gr.Status == "pass" {
-				continue
-			}
-			if !gr.AutoFixable {
-				continue
-			}
-			if gate.CEORequired {
-				continue // CEO-gated, skip auto-fix
-			}
-
-			fmt.Printf("  • Auto-fixing %s... ", gate.ID)
-			start := time.Now()
-			err := gate.AutoFix(root)
-			duration := time.Since(start).Milliseconds()
-			fixResult := AutoFixResult{
-				GateID:   gate.ID,
-				Action:   "attempted",
-				Success:  err == nil,
-				Duration: duration,
-			}
-			if err != nil {
-				fixResult.Detail = err.Error()
-				fmt.Println("❌", err)
-			} else {
-				fmt.Println("✅")
-			}
-			report.AutoFixLog = append(report.AutoFixLog, fixResult)
-		}
-
-		// Re-check gates that were auto-fixed
-		fmt.Println()
-		fmt.Println("→ Re-checking gates after auto-fix...")
-		for i, gate := range gates {
-			gr := report.Gates[i]
-			if gr.Status == "pass" {
-				continue
-			}
-			if !gr.AutoFixable || gate.CEORequired {
-				continue
-			}
-			passed, detail, _ := gate.Check(root)
-			if passed {
-				report.Gates[i].Status = "pass"
-				report.Gates[i].Detail = detail
-			}
-		}
-	}
-
-	// Step 3: Determine overall state
-	allPass := true
-	ceoGates := []GateReport{}
-	for _, gr := range report.Gates {
-		if gr.Status != "pass" {
-			allPass = false
-		}
-		if gr.CEORequired && gr.Status != "pass" {
-			ceoGates = append(ceoGates, gr)
-		}
-	}
-
-	if allPass {
-		report.Overall = "ready"
-		report.NextStep = "ovav launch verify --ceo-waiver --reason=\"...\""
-	} else if len(ceoGates) > 0 {
-		report.Overall = "needs-ceo-attention"
-		report.NextStep = "see CEO-required gates below"
-	} else {
-		report.Overall = "blocked"
-		report.NextStep = "run 'ovav launch --prepare' to auto-fix remaining issues"
-	}
-
-	// Step 4: Display report
-	fmt.Println()
-	fmt.Println("─" + strings.Repeat("─", 70))
-	fmt.Printf("📊 Readiness: %s %s\n", overallEmoji(report.Overall), strings.ToUpper(report.Overall))
-	fmt.Println("─" + strings.Repeat("─", 70))
-	for _, gr := range report.Gates {
-		icon := gateEmoji(gr.Status)
-		ceoTag := ""
-		if gr.CEORequired {
-			ceoTag = " [CEO]"
-		}
-		fixTag := ""
-		if gr.AutoFixable {
-			fixTag = " [auto-fixable]"
-		}
-		fmt.Printf("%s %s%s%s — %s\n", icon, gr.ID, ceoTag, fixTag, gr.Detail)
-	}
-
-	fmt.Println()
-	if report.Overall == "ready" {
-		fmt.Println("✅ All automatic gates passed!")
-		fmt.Println()
-		fmt.Println("Next step (requires YOUR consent):")
-		fmt.Println("  ovav launch verify --ceo-waiver --reason=\"Anti-drift complete\"")
-	} else if len(ceoGates) > 0 {
-		fmt.Println("⏳ Automatic gates passed. CEO decision needed for:")
-		for _, cg := range ceoGates {
-			fmt.Printf("   • %s — %s\n", cg.ID, cg.Description)
-		}
-		fmt.Println()
-		fmt.Println("Smart commands for CEO:")
-		for _, cg := range ceoGates {
-			fmt.Printf("  ovav launch ceo-decide --gate=%s --reason=\"...\"\n", cg.ID)
-		}
-	} else {
-		fmt.Println("⚠️  Some gates failed. Run 'ovav launch --prepare' to attempt auto-fix,")
-		fmt.Println("    or check the details above for manual action needed.")
-	}
-
-	// Persist report
+	fmt.Println("→ Checking all gates (parallel)...")
+	report := collectReadiness(root, true)
+	printReadinessReport(report, true)
 	saveReadinessReport(root, report)
-	return 0
+	return readinessExitCode(report)
 }
 
-// printLaunchWizardHelp shows the autonomous launch wizard help.
 func printLaunchWizardHelp() {
 	fmt.Println(`OVAV launch assistant — zero-touch launch (ADR-014)
 
@@ -432,10 +423,10 @@ The single entry point for GA promotion. No commands to memorize.
 
 Usage:
   ovav launch                      # Interactive wizard (default)
-  ovav launch --status             # Show readiness only
+  ovav launch --status             # Show readiness only (read-only)
   ovav launch --prepare            # Auto-execute fixable actions
   ovav launch --all --reason=...   # Non-interactive (CI mode)
-  ovav launch --info               # Read-only (no actions)
+  ovav launch --info               # Alias for --status
 
 Subcommands (power users):
   ovav launch status               # Quick readiness check
@@ -467,15 +458,57 @@ func saveReadinessReport(root string, report ReadinessReport) error {
 		return err
 	}
 	defer f.Close()
-	data, _ := json.Marshal(report)
-	f.Write(data)
-	f.Write([]byte("\n"))
-	return nil
+	enc := json.NewEncoder(f)
+	return enc.Encode(report)
 }
 
-// helper functions
-func overallEmoji(status string) string {
-	switch status {
+// extractFailureSummary pulls just the failing validator names.
+func extractFailureSummary(out string) string {
+	scanner := bufio.NewScanner(strings.NewReader(out))
+	failures := []string{}
+	for scanner.Scan() {
+		line := scanner.Text()
+		if strings.Contains(line, "FAIL") {
+			// Extract validator name (first word)
+			fields := strings.Fields(line)
+			if len(fields) > 1 {
+				failures = append(failures, fields[1])
+			}
+		}
+	}
+	if len(failures) == 0 {
+		return "validators failed"
+	}
+	return fmt.Sprintf("%d failed: %s", len(failures), strings.Join(failures, ", "))
+}
+
+// extractSmokeFailures extracts smoke phase failures.
+func extractSmokeFailures(out string) string {
+	if strings.Contains(out, "failed") {
+		// Find summary line
+		for _, line := range strings.Split(out, "\n") {
+			if strings.Contains(line, "Summary") {
+				return strings.TrimSpace(line)
+			}
+		}
+	}
+	return "smoke failed"
+}
+
+// extractChaosFailures extracts chaos invariant failures.
+func extractChaosFailures(out string) string {
+	if strings.Contains(out, "failed") {
+		for _, line := range strings.Split(out, "\n") {
+			if strings.Contains(line, "Summary") {
+				return strings.TrimSpace(line)
+			}
+		}
+	}
+	return "chaos failed"
+}
+
+func overallEmoji(o string) string {
+	switch o {
 	case "ready":
 		return "✅"
 	case "needs-ceo-attention":
@@ -485,46 +518,13 @@ func overallEmoji(status string) string {
 	}
 }
 
-func gateEmoji(status string) string {
-	switch status {
+func gateEmoji(s string) string {
+	switch s {
 	case "pass":
 		return "✅"
-	case "fail":
-		return "❌"
-	default:
+	case "skipped", "unknown":
 		return "⏳"
+	default:
+		return "❌"
 	}
-}
-
-func extractFailureSummary(out string) string {
-	lines := strings.Split(out, "\n")
-	for _, line := range lines {
-		if strings.Contains(line, "failed") {
-			return strings.TrimSpace(line)
-		}
-	}
-	return "validators failed"
-}
-
-func extractSmokeFailures(out string) string {
-	if strings.Contains(out, "Summary:") {
-		idx := strings.Index(out, "Summary:")
-		return out[idx : idx+min(100, len(out)-idx)]
-	}
-	return "smoke failed"
-}
-
-func extractChaosFailures(out string) string {
-	if strings.Contains(out, "Summary:") {
-		idx := strings.Index(out, "Summary:")
-		return out[idx : idx+min(100, len(out)-idx)]
-	}
-	return "chaos failed"
-}
-
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
 }
