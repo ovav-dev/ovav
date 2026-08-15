@@ -112,8 +112,25 @@ jq -s '
   | .schemes        = (($existing.schemes // []) + ($fragment.schemes // []) | unique_by(.name))
   | .actions        = (($existing.actions // []) + ($fragment.actions // []) | unique_by(.id))
   | .profiles.list  = (
-      (($existing.profiles.list // []) + ($fragment.profiles.list // []))
-      | unique_by(.guid)
+      # Filter existing profiles to ONLY those whose GUID is in the fragment
+      # OR is a Windows Terminal canonical built-in (PowerShell / Command Prompt
+      # / Azure Cloud Shell). Stale profiles from prior experiments (e.g.
+      # OPS/OpenCode/Scratch) are removed so the new-tab dropdown stays clean.
+      (
+        ($fragment.profiles.list // [])
+        + (
+          ($existing.profiles.list // [])
+          | map(
+              select(
+                (.guid as $g | ($fragment.profiles.list // []) | map(.guid) | index($g))
+                or (.guid == "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}")  # Windows PowerShell
+                or (.guid == "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}")  # Command Prompt
+                or (.guid == "{b453ae62-4e3d-5e58-b989-0a998ec441b8}")  # Azure Cloud Shell
+              )
+            )
+        )
+        | unique_by(.guid)
+      )
     )
   | .profiles.defaults = (
       # Fragment defaults win; fall back to existing if fragment omits

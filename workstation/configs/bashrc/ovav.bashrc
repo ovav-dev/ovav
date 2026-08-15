@@ -129,8 +129,9 @@ export VISUAL='nvim'
 if [ -f ~/.local/share/blesh/ble.sh ]; then
   source ~/.local/share/blesh/ble.sh
   [ -f ~/.blerc ] && source ~/.blerc
-  # Ctrl+Z = undo in edit mode (does NOT affect job control for running processes)
-  ble-bind -s 'C-z' 'undo' 2>/dev/null || true
+  # Ctrl+Z = undo in edit mode (does NOT affect job control for running processes).
+  # Use -c (command), not -s (string) — -s would insert the literal "undo" text.
+  ble-bind -c 'C-z' undo 2>/dev/null || true
 fi
 
 # ─────────────────────────────────────────────────────────────
