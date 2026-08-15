@@ -11,16 +11,16 @@ import (
 // AutoFixOrchestrator runs safe-fix validators with snapshot/rollback.
 //
 // Per ADR-011:
-//   1. Snapshot files
-//   2. Collect safe-fix candidates
-//   3. Apply fixes
-//   4. Verify no regression
-//   5. Rollback on failure
+//  1. Snapshot files
+//  2. Collect safe-fix candidates
+//  3. Apply fixes
+//  4. Verify no regression
+//  5. Rollback on failure
 type AutoFixOrchestrator struct {
-	root         string
-	dryRun       bool
-	ceoWaiver    bool
-	maxFixes     int
+	root      string
+	dryRun    bool
+	ceoWaiver bool
+	maxFixes  int
 }
 
 // NewAutoFixOrchestrator creates an orchestrator.

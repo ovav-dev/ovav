@@ -17,13 +17,14 @@ import (
 //
 // Usage: ovav launch [<subcommand>]
 // Subcommands:
-//   (default)    — interactive wizard (smart autonomous flow)
-//   status       — quick readiness check
-//   evidence     — capture artifacts
-//   tag          — create v1.0.0-rc.1 tag
-//   verify       — final verification (CEO waiver)
-//   ceo-decide   — single CEO gate decision
-//   roadmap      — 2027 roadmap
+//
+//	(default)    — interactive wizard (smart autonomous flow)
+//	status       — quick readiness check
+//	evidence     — capture artifacts
+//	tag          — create v1.0.0-rc.1 tag
+//	verify       — final verification (CEO waiver)
+//	ceo-decide   — single CEO gate decision
+//	roadmap      — 2027 roadmap
 func cmdLaunch(args []string) int {
 	if len(args) == 0 {
 		return runLaunchWizard(args)
@@ -95,9 +96,9 @@ Run 'ovav launch' to start.`)
 // Per ADR-014, CEO can run a single command per decision. The wizard's
 // gate IDs are accepted directly:
 //
-//   ovav launch ceo-decide --gate=pinned_baseline --reason="..."
-//   ovav launch ceo-decide --gate=tag_exists --reason="..."
-//   ovav launch ceo-decide --gate=production_ready --reason="..."
+//	ovav launch ceo-decide --gate=pinned_baseline --reason="..."
+//	ovav launch ceo-decide --gate=tag_exists --reason="..."
+//	ovav launch ceo-decide --gate=production_ready --reason="..."
 //
 // Short aliases also work: pin/verify/tag.
 //

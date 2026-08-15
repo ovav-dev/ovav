@@ -56,8 +56,8 @@ func (i *IntegrityBaselineFresh) WithPinnedRequired() *IntegrityBaselineFresh {
 	return i
 }
 
-func (i *IntegrityBaselineFresh) ID() string                  { return "integrity_baseline_fresh" }
-func (i *IntegrityBaselineFresh) Name() string                { return "Integrity Baseline Freshness" }
+func (i *IntegrityBaselineFresh) ID() string   { return "integrity_baseline_fresh" }
+func (i *IntegrityBaselineFresh) Name() string { return "Integrity Baseline Freshness" }
 func (i *IntegrityBaselineFresh) Description() string {
 	return "Verifies runtime integrity baseline is recent and (optionally) pinned"
 }
@@ -126,6 +126,7 @@ func (i *IntegrityBaselineFresh) Validate(ctx context.Context, root string) Resu
 		Duration:    time.Since(start),
 	}
 }
+
 // Fixable interface implementation (ADR-011).
 // Idempotent: regenerating with same files produces same baseline.
 

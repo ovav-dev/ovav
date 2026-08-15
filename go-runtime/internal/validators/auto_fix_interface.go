@@ -22,20 +22,20 @@ type Fixable interface {
 
 // FixResult is one auto-fix attempt outcome.
 type FixResult struct {
-	ValidatorID string `json:"validator_id"`
-	Description string `json:"description"`
-	Outcome     string `json:"outcome"` // applied | skipped | failed | no-op | rollback
-	Error       string `json:"error,omitempty"`
-	DurationMs  int64  `json:"duration_ms"`
+	ValidatorID string   `json:"validator_id"`
+	Description string   `json:"description"`
+	Outcome     string   `json:"outcome"` // applied | skipped | failed | no-op | rollback
+	Error       string   `json:"error,omitempty"`
+	DurationMs  int64    `json:"duration_ms"`
 	Files       []string `json:"files,omitempty"` // files touched by this fix
 }
 
 // SafeFixEntry is one entry in the safe-fix registry (whitelist).
 type SafeFixEntry struct {
-	ValidatorID   string   `   string:"validator_id"`
-	Description   string   `   string:"description"`
-	RiskLevel     string   `   string:"risk_level"` // low | medium | high
-	RequiresWaiver bool   `   string:"requires_waiver"` // CEO waiver needed
+	ValidatorID      string   `   string:"validator_id"`
+	Description      string   `   string:"description"`
+	RiskLevel        string   `   string:"risk_level"`      // low | medium | high
+	RequiresWaiver   bool     `   string:"requires_waiver"` // CEO waiver needed
 	ProtectedTargets []string `   string:"protected_targets,omitempty"`
 }
 

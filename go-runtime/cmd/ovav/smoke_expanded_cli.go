@@ -29,16 +29,16 @@ type ExpandedSmokeResult struct {
 // Per Phase 3 / D4 of ADR-005.
 //
 // Phases tested:
-//   1. CLI dispatch — every top-level command responds to --help
-//   2. Validator registry — DefaultRegistry() returns valid validators
-//   3. Drift targets — DefaultTargets() returns 5 targets
-//   4. Deploy subcommands — run / status / list / history / targets / rollback / chaos
-//   5. Hooks — install/status/uninstall subcommands
-//   6. CI — drift-check
-//   7. IT — status / reload / pid / logs
-//   8. Auto-fix — registry + orchestrator
-//   9. Docs — generate / check
-//   10. Validate — full validation pass
+//  1. CLI dispatch — every top-level command responds to --help
+//  2. Validator registry — DefaultRegistry() returns valid validators
+//  3. Drift targets — DefaultTargets() returns 5 targets
+//  4. Deploy subcommands — run / status / list / history / targets / rollback / chaos
+//  5. Hooks — install/status/uninstall subcommands
+//  6. CI — drift-check
+//  7. IT — status / reload / pid / logs
+//  8. Auto-fix — registry + orchestrator
+//  9. Docs — generate / check
+//  10. Validate — full validation pass
 func cmdSmokeExpanded(args []string) int {
 	timeout := 60 * time.Second
 	for _, a := range args {

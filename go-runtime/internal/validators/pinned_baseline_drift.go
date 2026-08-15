@@ -32,8 +32,8 @@ func NewPinnedBaselineDrift(modes ...ValidationMode) *PinnedBaselineDrift {
 	return &PinnedBaselineDrift{mode: mode}
 }
 
-func (p *PinnedBaselineDrift) ID() string         { return "pinned_baseline_drift" }
-func (p *PinnedBaselineDrift) Name() string       { return "Pinned Baseline Drift" }
+func (p *PinnedBaselineDrift) ID() string   { return "pinned_baseline_drift" }
+func (p *PinnedBaselineDrift) Name() string { return "Pinned Baseline Drift" }
 func (p *PinnedBaselineDrift) Description() string {
 	return "Compares current runtime baseline against last CEO-approved pinned baseline"
 }
