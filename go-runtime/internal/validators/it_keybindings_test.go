@@ -156,6 +156,57 @@ func TestITKeybindings_AllBuiltinActionsResolve(t *testing.T) {
 		seen[id] = true
 	}
 	if len(seen) < 50 {
-		t.Fatalf("expected at least 50 built-in IT actions, got %d", len(seen))
+		t.Fatalf("expected at least 50 built-in IT actions, got %d (if you intentionally added more actions, bump this threshold)", len(seen))
+	}
+}
+
+// TestITKeybindings_OVAVPaneManagement_Pass — regression for the round-3
+// CEO-mandated pane management scheme:
+//
+//	alt+a            → Terminal.SplitPaneDown   (open new pane, coherent default)
+//	alt+shift+a      → Terminal.SplitPaneRight  (open new pane, alternate direction)
+//	alt+x            → Terminal.ClosePane        (close focused pane)
+//	ctrl+shift+z     → Terminal.TogglePaneZoom   (maximize/restore pane)
+//
+// This test ensures all four resolve against the builtin-actions allowlist and
+// don't collide with each other or with previously-validated alt+arrow focus bindings.
+func TestITKeybindings_OVAVPaneManagement_Pass(t *testing.T) {
+	root := writeFragment(t, `{
+		"keybindings": [
+			{"id": "Terminal.SplitPaneDown",  "keys": "alt+a"},
+			{"id": "Terminal.SplitPaneRight", "keys": "alt+shift+a"},
+			{"id": "Terminal.ClosePane",      "keys": "alt+x"},
+			{"id": "Terminal.TogglePaneZoom", "keys": "ctrl+shift+z"},
+			{"id": "Terminal.MoveFocusUp",    "keys": "alt+up"},
+			{"id": "Terminal.MoveFocusDown",  "keys": "alt+down"},
+			{"id": "Terminal.MoveFocusLeft",  "keys": "alt+left"},
+			{"id": "Terminal.MoveFocusRight", "keys": "alt+right"}
+		]
+	}`)
+	v := NewITKeybindings()
+	res := v.Validate(t.Context(), root)
+	if res.Status != "pass" {
+		t.Fatalf("OVAV pane management keys must pass; got %s: %s — issues: %v",
+			res.Status, res.Message, res.Issues)
+	}
+}
+
+// TestITKeybindings_DuplicateKey_DifferentAction_Warn — two keybindings that
+// share a key combination but map to different actions MUST be flagged so the
+// IT doesn't silently drop one. Catches accidental key collisions during
+// fragment edits. The validator emits a WARN (not FAIL) because Windows
+// Terminal silently drops the duplicate — it's a UX bug, not a security bug.
+func TestITKeybindings_DuplicateKey_DifferentAction_Warn(t *testing.T) {
+	root := writeFragment(t, `{
+		"keybindings": [
+			{"id": "Terminal.ClosePane",      "keys": "alt+x"},
+			{"id": "Terminal.OpenSystemMenu", "keys": "alt+x"}
+		]
+	}`)
+	v := NewITKeybindings()
+	res := v.Validate(t.Context(), root)
+	if res.Status != "warn" {
+		t.Fatalf("expected warn for duplicate key alt+x mapped to different actions, got %s: %s",
+			res.Status, res.Message)
 	}
 }

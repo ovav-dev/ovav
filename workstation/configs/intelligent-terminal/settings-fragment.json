@@ -1,5 +1,5 @@
 {
-  "_comment": "OVAV IT v0.2 fragment \u2014 STABLE. Explicit keybindings (42 entries) + shell integration.",
+  "_comment": "OVAV IT v0.3 fragment — STABLE. Explicit keybindings (44 entries) + pane management (alt+a/alt+x/ctrl+shift+z) + copyOnSelect + 4-profile new tab menu.",
   "$schema": "https://aka.ms/terminal-profiles-schema",
   "defaultProfile": "{e3cb3da9-9980-5990-a951-339efdad913d}",
   "theme": "OVAV Day",
@@ -29,8 +29,8 @@
       "keys": "shift+insert"
     },
     {
-      "id": "Terminal.MovePaneRight",
-      "keys": "alt+shift+right"
+      "id": "Terminal.ClosePane",
+      "keys": "alt+x"
     },
     {
       "id": "Terminal.CopyToClipboard",
@@ -63,6 +63,10 @@
     {
       "id": "User.closeTab.0",
       "keys": "ctrl+w"
+    },
+    {
+      "id": "Terminal.MovePaneRight",
+      "keys": "alt+shift+right"
     },
     {
       "id": "Terminal.MovePaneDown",
@@ -134,15 +138,15 @@
     },
     {
       "id": "Terminal.SplitPaneDown",
-      "keys": "alt+shift+d"
+      "keys": "alt+a"
     },
     {
       "id": "Terminal.SplitPaneRight",
-      "keys": "alt+shift+r"
+      "keys": "alt+shift+a"
     },
     {
-      "id": "Terminal.ClosePane",
-      "keys": "ctrl+shift+w"
+      "id": "Terminal.TogglePaneZoom",
+      "keys": "ctrl+shift+z"
     },
     {
       "id": "Terminal.MoveFocusUp",
@@ -217,12 +221,6 @@
       "icon": null,
       "profile": "{29516ade-0377-5279-ada0-c37d2200eb7d}",
       "type": "profile"
-    },
-    {
-      "type": "separator"
-    },
-    {
-      "type": "remainingProfiles"
     }
   ],
   "themes": [
@@ -258,6 +256,7 @@
   "profiles": {
     "defaults": {
       "colorScheme": "OVAV Day",
+      "copyOnSelect": true,
       "font": {
         "face": "Cascadia Mono",
         "size": 12
