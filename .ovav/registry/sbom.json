@@ -4,7 +4,7 @@
   "project": "OVAV",
   "hash_algorithm": "sha256",
   "metadata": {
-    "git_identity": "2086bc14a95fa3162003aae33a4493c5ab8a3bf90982bf517469415e066d3d23"
+    "git_identity": "878945e4bc1760036bb05987a2ee4cc9da084b6d0027f8eefe9606a83f268919"
   },
   "policy": {
     "version": "tracked-content-v1",
@@ -479,7 +479,7 @@
     ".ovav/plan/architecture/mimocode-absorption-v1.md": "4c8216e9946e050b56dbd23d74eaec7002228162614b977a0c5285d82f0ec576",
     ".ovav/plan/architecture_split_core_product.md": "314bdaf1ae294dd6b47c4e80e52b7189fed9be7b11db28a5ad6308d2429599d3",
     ".ovav/plan/business_model.yaml": "26d7f54fcd0b4bbb414b9a7c82e8626665a20ac93c88b4f0ecbb12e30aadb403",
-    ".ovav/plan/caps.yaml": "75e60ca389f1184391575a9ac6719aa9c0f4c890e60afeacc9c53d04cedf8996",
+    ".ovav/plan/caps.yaml": "44bf5f1ef3ca5ac473fe9b7b65b9dad68ea4159e986d090c968827d062e2f10a",
     ".ovav/plan/education_roadmap.yaml": "c82c68f9eae3cc06a9f1725799b4c50d2265edbdbd5c835c361516a2780bb50a",
     ".ovav/plan/f6_cockpit_action_plan.md": "60b9d5e1ef4f8c9845ba5ead6ac0cbc852e49458be551e8ac7fbce821a8f7f89",
     ".ovav/plan/health_audit.yaml": "2d62ff39701bbe93e3141703fb4b046f81e54dd31d8ed9cd61834d40189ba18f",
