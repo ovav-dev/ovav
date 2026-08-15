@@ -12,10 +12,12 @@ import (
 // Per ADR-011: auto-remediation for safe-fix validators.
 //
 // Usage:
-//   ovav validate --fix [--dry-run] [--strategy=atomic|best-effort] [--ceo-waiver]
+//
+//	ovav validate --fix [--dry-run] [--strategy=atomic|best-effort] [--ceo-waiver]
 //
 // Subcommands (when --fix not present):
-//   ovav validate --fix --list     # List safe-fix validators
+//
+//	ovav validate --fix --list     # List safe-fix validators
 func cmdValidateFix(args []string) int {
 	root, err := cliFindRepoRootSafe()
 	if err != nil {

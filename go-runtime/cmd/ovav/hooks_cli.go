@@ -10,12 +10,13 @@ import (
 //
 // Usage: ovav hooks <subcommand>
 // Subcommands:
-//   install-pre-commit    — install pre-commit hook enforcing baseline freshness
-//   uninstall-pre-commit  — remove OVAV pre-commit hook
-//   install-pre-push      — install pre-push hook for drift gate (ADR-009)
-//   uninstall-pre-push    — remove OVAV pre-push hook
-//   install-all           — install all OVAV hooks
-//   status                — show all hook installation states
+//
+//	install-pre-commit    — install pre-commit hook enforcing baseline freshness
+//	uninstall-pre-commit  — remove OVAV pre-commit hook
+//	install-pre-push      — install pre-push hook for drift gate (ADR-009)
+//	uninstall-pre-push    — remove OVAV pre-push hook
+//	install-all           — install all OVAV hooks
+//	status                — show all hook installation states
 func cmdHooks(args []string) int {
 	if len(args) == 0 {
 		printHooksHelp()

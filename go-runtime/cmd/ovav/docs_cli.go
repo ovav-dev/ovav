@@ -14,9 +14,10 @@ import (
 //
 // Usage: ovav docs <subcommand>
 // Subcommands:
-//   generate              — Generate all auto-generated docs
-//   generate --target=X   — Generate specific doc (validators | commands | drift-targets | auto-fix)
-//   check                 — Verify docs are up-to-date (CI mode)
+//
+//	generate              — Generate all auto-generated docs
+//	generate --target=X   — Generate specific doc (validators | commands | drift-targets | auto-fix)
+//	check                 — Verify docs are up-to-date (CI mode)
 func cmdDocs(args []string) int {
 	if len(args) == 0 {
 		printDocsHelp()

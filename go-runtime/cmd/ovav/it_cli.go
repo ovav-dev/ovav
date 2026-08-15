@@ -14,11 +14,12 @@ import (
 //
 // Usage: ovav it <subcommand>
 // Subcommands:
-//   reload            — trigger IT reload via Win32 broadcast (ADR-010)
-//   reload --force    — restart IT process if broadcast fails
-//   status            — check if IT process is running
-//   pid               — print IT process ID (for scripting)
-//   logs              — tail IT logs (if accessible)
+//
+//	reload            — trigger IT reload via Win32 broadcast (ADR-010)
+//	reload --force    — restart IT process if broadcast fails
+//	status            — check if IT process is running
+//	pid               — print IT process ID (for scripting)
+//	logs              — tail IT logs (if accessible)
 func cmdIT(args []string) int {
 	if len(args) == 0 {
 		return runITReload(args) // default to reload

@@ -16,22 +16,22 @@ import (
 // DeploySnapshot is the pre-deploy state for a single target.
 // One snapshot per target per deploy. Rollback = restore from snapshots.
 type DeploySnapshot struct {
-	TargetID   string `json:"target_id"`
-	LivePath   string `json:"live_path"`
-	Content    []byte `json:"content,omitempty"`
-	Hash       string `json:"hash"`
-	Existed    bool   `json:"existed"`
+	TargetID string `json:"target_id"`
+	LivePath string `json:"live_path"`
+	Content  []byte `json:"content,omitempty"`
+	Hash     string `json:"hash"`
+	Existed  bool   `json:"existed"`
 }
 
 // DeployRecord is one entry in deploy_history.jsonl.
 type DeployRecord struct {
-	DeployID    string          `json:"deploy_id"`
-	Timestamp   string          `json:"timestamp"`
-	Operator    string          `json:"operator"`
-	Targets     []DeployTargetResult `json:"targets"`
-	Status      string          `json:"status"` // success | partial | failed | dry-run
-	DurationMs  int64           `json:"duration_ms"`
-	FromDrift   string          `json:"from_drift,omitempty"` // path to drift report if any
+	DeployID   string               `json:"deploy_id"`
+	Timestamp  string               `json:"timestamp"`
+	Operator   string               `json:"operator"`
+	Targets    []DeployTargetResult `json:"targets"`
+	Status     string               `json:"status"` // success | partial | failed | dry-run
+	DurationMs int64                `json:"duration_ms"`
+	FromDrift  string               `json:"from_drift,omitempty"` // path to drift report if any
 }
 
 // DeployTargetResult is one target's deploy outcome.

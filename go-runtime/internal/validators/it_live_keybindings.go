@@ -174,10 +174,10 @@ func (l *ITLiveKeybindings) Validate(_ context.Context, root string) Result {
 
 	if len(issues) > 0 {
 		return Result{
-			ID:       l.ID(),
-			Name:     l.Name(),
-			Status:   "fail",
-			Weight:   l.Weight(),
+			ID:     l.ID(),
+			Name:   l.Name(),
+			Status: "fail",
+			Weight: l.Weight(),
 			Message: fmt.Sprintf(
 				"FAIL — %d keybinding issue(s) in live IT settings (%s). Re-run: workstation/scripts/deploy-it-keybindings.sh",
 				len(issues), livePath),

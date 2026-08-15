@@ -66,8 +66,8 @@ func TestRunChaosTest_InvariantViolation(t *testing.T) {
 	scenario := ChaosScenario{
 		ID:          "test_violation",
 		Description: "Force invariant violation",
-		Setup: func(root string) error { return nil },
-		Restore: func(root string) error { return nil },
+		Setup:       func(root string) error { return nil },
+		Restore:     func(root string) error { return nil },
 		Verify: func(root string) error {
 			return os.ErrInvalid // always fails
 		},
@@ -89,7 +89,7 @@ func TestRunChaosTest_SetupFails(t *testing.T) {
 			return os.ErrPermission
 		},
 		Restore: func(root string) error { return nil },
-		Verify: func(root string) error { return nil },
+		Verify:  func(root string) error { return nil },
 	}
 	tempDir, _ := os.MkdirTemp("", "chaos-test-*")
 	defer os.RemoveAll(tempDir)

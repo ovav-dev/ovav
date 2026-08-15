@@ -40,10 +40,10 @@ const inputrcRelPath = "workstation/configs/inputrc/ovav.inputrc"
 // produces a WARN (not FAIL) — they're recommendations, not hard
 // requirements.
 var recommendedTokens = []string{
-	"bell-style none",                // suppress WSL→Windows error sound
-	"enable-bracketed-paste",         // prevent pasted text from being interpreted
-	"\\e[1;5C",                        // ctrl+right word forward (bash 5.x has this; explicit for documentation)
-	"\\e[1;5D",                        // ctrl+left word backward
+	"bell-style none",        // suppress WSL→Windows error sound
+	"enable-bracketed-paste", // prevent pasted text from being interpreted
+	"\\e[1;5C",               // ctrl+right word forward (bash 5.x has this; explicit for documentation)
+	"\\e[1;5D",               // ctrl+left word backward
 }
 
 // shiftArrowExplicitlyUnbound is a special marker we check for in inputrc.

@@ -11,20 +11,20 @@ import (
 type DriftType string
 
 const (
-	DriftMissingInLive    DriftType = "missing_in_live"
+	DriftMissingInLive     DriftType = "missing_in_live"
 	DriftMissingInFragment DriftType = "missing_in_fragment"
-	DriftModified         DriftType = "modified"
-	DriftAdded            DriftType = "added"
-	DriftIdentical        DriftType = "identical"
+	DriftModified          DriftType = "modified"
+	DriftAdded             DriftType = "added"
+	DriftIdentical         DriftType = "identical"
 )
 
 // DriftItem is a single drift observation between fragment and live.
 type DriftItem struct {
-	Type         DriftType    `json:"type"`
-	Path         string       `json:"path"` // JSON path / section name
-	FragmentJSON string       `json:"fragment,omitempty"`
-	LiveJSON     string       `json:"live,omitempty"`
-	SuggestedFix string       `json:"suggested_fix,omitempty"`
+	Type         DriftType `json:"type"`
+	Path         string    `json:"path"` // JSON path / section name
+	FragmentJSON string    `json:"fragment,omitempty"`
+	LiveJSON     string    `json:"live,omitempty"`
+	SuggestedFix string    `json:"suggested_fix,omitempty"`
 }
 
 // DriftTarget is a (fragment, live) pair plus comparison logic.
@@ -48,11 +48,11 @@ type DriftTargetReport struct {
 
 // DriftReport is the full drift report across all targets.
 type DriftReport struct {
-	Timestamp      string             `json:"timestamp"`
-	RepoRoot       string             `json:"repo_root"`
-	TotalTargets   int                `json:"total_targets"`
-	DriftedTargets int                `json:"drifted_targets"`
-	TotalItems     int                `json:"total_items"`
+	Timestamp      string              `json:"timestamp"`
+	RepoRoot       string              `json:"repo_root"`
+	TotalTargets   int                 `json:"total_targets"`
+	DriftedTargets int                 `json:"drifted_targets"`
+	TotalItems     int                 `json:"total_items"`
 	Targets        []DriftTargetReport `json:"targets"`
 }
 

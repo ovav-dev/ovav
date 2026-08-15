@@ -60,8 +60,8 @@ func FixRegistrySnapshot(root string, entries []SafeFixEntry) (string, error) {
 	}
 
 	manifest := struct {
-		DeployID  string         `json:"deploy_id"`
-		Timestamp string         `json:"timestamp"`
+		DeployID  string            `json:"deploy_id"`
+		Timestamp string            `json:"timestamp"`
 		Files     map[string]string `json:"files"`
 	}{
 		DeployID:  deployID,
@@ -122,12 +122,12 @@ func FixRegistryRollback(snapDir string) error {
 
 // FixResultLog is one entry in the auto-fix history.
 type FixResultLog struct {
-	DeployID string       `json:"deploy_id"`
-	Operator string       `json:"operator"`
-	Results  []FixResult  `json:"results"`
-	Outcome  string       `json:"outcome"` // success | partial | failed | dry-run
-	StartedAt string      `json:"started_at"`
-	DurationMs int64      `json:"duration_ms"`
+	DeployID   string      `json:"deploy_id"`
+	Operator   string      `json:"operator"`
+	Results    []FixResult `json:"results"`
+	Outcome    string      `json:"outcome"` // success | partial | failed | dry-run
+	StartedAt  string      `json:"started_at"`
+	DurationMs int64       `json:"duration_ms"`
 }
 
 // AppendFixHistory appends a fix result to .ovav/registry/auto_fix_history.jsonl.

@@ -12,11 +12,12 @@ import (
 //
 // Usage: ovav drift <subcommand>
 // Subcommands:
-//   show [target]      — visual diff fragment vs live (D4)
-//   show --json        — JSON output for CI
-//   show --md          — markdown output for PR comments
-//   catalog            — show drift history (drift_catalog.jsonl)
-//   targets            — list registered drift targets
+//
+//	show [target]      — visual diff fragment vs live (D4)
+//	show --json        — JSON output for CI
+//	show --md          — markdown output for PR comments
+//	catalog            — show drift history (drift_catalog.jsonl)
+//	targets            — list registered drift targets
 func cmdDrift(args []string) int {
 	if len(args) == 0 {
 		return runDriftShow(args)

@@ -10,8 +10,9 @@ import (
 //
 // Usage: ovav ci <subcommand>
 // Subcommands:
-//   drift-check    — run drift check, exit non-zero if drift found
-//   drift-check --json — JSON output
+//
+//	drift-check    — run drift check, exit non-zero if drift found
+//	drift-check --json — JSON output
 func cmdCI(args []string) int {
 	if len(args) == 0 {
 		printCIHelp()
