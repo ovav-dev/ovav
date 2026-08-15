@@ -92,12 +92,14 @@ Run 'ovav launch' to start.`)
 
 // runLaunchCEODecide handles a single CEO gate decision.
 //
-// Per ADR-014, instead of running 3 separate commands (pin, verify, tag),
-// CEO can run a single command per decision:
+// Per ADR-014, CEO can run a single command per decision. The wizard's
+// gate IDs are accepted directly:
 //
-//   ovav launch ceo-decide --gate=pin --reason="golden state approved"
-//   ovav launch ceo-decide --gate=verify --reason="all gates pass"
-//   ovav launch ceo-decide --gate=tag --reason="evidence captured"
+//   ovav launch ceo-decide --gate=pinned_baseline --reason="..."
+//   ovav launch ceo-decide --gate=tag_exists --reason="..."
+//   ovav launch ceo-decide --gate=production_ready --reason="..."
+//
+// Short aliases also work: pin/verify/tag.
 //
 // Each decision is gated on previous + audit-logged.
 func runLaunchCEODecide(args []string) int {
@@ -117,9 +119,11 @@ func runLaunchCEODecide(args []string) int {
 		fmt.Println("🚫 CEO decide requires --gate=<name>")
 		fmt.Println()
 		fmt.Println("Available CEO gates:")
-		fmt.Println("  pin      — Approve current baseline as golden state")
-		fmt.Println("  verify   — Final launch verification (closes ceremony)")
-		fmt.Println("  tag      — Approve tag push to remote")
+		fmt.Println("  pinned_baseline — Approve current baseline as golden state")
+		fmt.Println("  tag_exists      — Approve release tag creation")
+		fmt.Println("  production_ready — Final launch verification (closes ceremony)")
+		fmt.Println()
+		fmt.Println("Aliases: pin, verify, tag")
 		return 1
 	}
 
@@ -132,15 +136,17 @@ func runLaunchCEODecide(args []string) int {
 	fmt.Printf("🛡️  CEO Decision: %s\n", gate)
 	fmt.Printf("Reason: %s\n\n", reason)
 
+	// Map wizard gate IDs to internal actions
 	switch gate {
-	case "pin":
+	case "pinned_baseline", "pin":
 		return runCEOPin(reason)
-	case "verify":
-		return runCEOVerify(reason)
-	case "tag":
+	case "tag_exists", "tag":
 		return runCEOTag(reason)
+	case "production_ready", "verify":
+		return runCEOVerify(reason)
 	default:
 		fmt.Printf("Unknown CEO gate: %s\n", gate)
+		fmt.Println("Run with --gate=<name>, or see --help for the list.")
 		return 1
 	}
 }
