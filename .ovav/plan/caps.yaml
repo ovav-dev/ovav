@@ -109,7 +109,7 @@ roadmap_2026:
 product:
   name: "OVAV Commercial AI Workstation Governor"
   type: "AI Agent Governance Platform"
-  version: "1.0.0-rc.1"
+  version: "rc.1"
   posture: "Anti-drift 2026 plan complete (ADR-005). All 4 phases shipped: anti-drift core, auto-remediation, launch hardening, GA promotion. Status: production_ready. See ADR-014 for autonomous launch wizard."
 
   binaries:
