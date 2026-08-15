@@ -129,9 +129,17 @@ export VISUAL='nvim'
 if [ -f ~/.local/share/blesh/ble.sh ]; then
   source ~/.local/share/blesh/ble.sh
   [ -f ~/.blerc ] && source ~/.blerc
-  # Ctrl+Z = undo in edit mode (does NOT affect job control for running processes).
-  # Use -c (command), not -s (string) — -s would insert the literal "undo" text.
-  ble-bind -c 'C-z' undo 2>/dev/null || true
+  # Ctrl+Z = undo in edit mode.
+  #
+  # ble-bind flag semantics:
+  #   -f widget : call widget function (CORRECT for readline widgets)
+  #   -c cmd    : execute cmd as a SHELL command (wrong — `undo` isn't a shell cmd)
+  #   -s string : insert string literally (wrong — would type the literal "undo")
+  #
+  # ble.sh maps readline function names to widget functions via
+  # ~/.local/share/blesh/keymap/emacs.rlfunc.txt. The `undo` readline function
+  # maps to the `emacs/undo` widget (NOT a flat `undo` widget name).
+  ble-bind -f 'C-z' emacs/undo 2>/dev/null || true
 fi
 
 # ─────────────────────────────────────────────────────────────
