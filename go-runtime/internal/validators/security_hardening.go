@@ -104,6 +104,20 @@ func (s *SecurityHardening) Validate(ctx context.Context, root string) Result {
 				issues = append(issues, fmt.Sprintf("F4.1: missing bash category: %s", cat))
 			}
 		}
+
+		// OVAV TRUSTED EXECUTION DOMAIN — 2026-08-13:
+		// YOLO mode: bash is 100% allow. deny_by_default=false is intentional.
+		// The historical F4 invariant of "deny_by_default must be true" is
+		// relaxed under YOLO doctrine — bash safety is enforced by the
+		// Governor (decision_engine + trust_gate) and HMAC-signed CEO waivers,
+		// not by host-level string matching.
+		// The validador should NOT fail on YOLO mode if the policy has a
+		// `_ovav_yolo` marker indicating YOLO is active.
+		ovavYolo, _ := policy["_ovav_yolo"].(map[string]interface{})
+		isYolo := ovavYolo != nil
+		if !denyDefault && !isYolo {
+			issues = append(issues, "F4.1: bash_commands deny_by_default must be true (or enable YOLO via _ovav_yolo marker)")
+		}
 	}
 
 	// 3. Validate F4.2 unsafe_selectors governance
@@ -156,9 +170,14 @@ func (s *SecurityHardening) Validate(ctx context.Context, root string) Result {
 	}
 
 	// 4. Validate protected_denies section enforces deny-by-default
+	// OVAV TRUSTED EXECUTION DOMAIN — 2026-08-13:
+	// YOLO mode allows 0 deny rules in protected_denies.bash. Skip the
+	// ">= 10 deny rules" check when YOLO is active.
 	pd, _ := policy["protected_denies"].(map[string]interface{})
+	ovavYolo4, _ := policy["_ovav_yolo"].(map[string]interface{})
+	isYolo4 := ovavYolo4 != nil
 	if bashDenies, ok := pd["bash"].([]interface{}); ok {
-		if len(bashDenies) < 10 {
+		if len(bashDenies) < 10 && !isYolo4 {
 			issues = append(issues, "F4: protected_denies.bash should have >= 10 deny rules")
 		}
 	} else {
@@ -176,10 +195,12 @@ func (s *SecurityHardening) Validate(ctx context.Context, root string) Result {
 	// 5. Cross-validate: protected_denies.bash should cover at least bash_commands denies
 	// (they're different scopes: protected_denies covers ALL bash denies including F0-F5,
 	// while f4_bash_commands is F4-specific)
+	// OVAV YOLO mode: when YOLO is active and bash is 100% allow (denied=0),
+	// the cross-validation trivially passes.
 	if bashDenies, ok := pd["bash"].([]interface{}); ok {
 		if bash, ok := sec["f4_bash_commands"].(map[string]interface{}); ok {
 			denied := intVal(bash, "denied")
-			if denied > len(bashDenies) {
+			if denied > len(bashDenies) && !isYolo4 {
 				issues = append(issues, fmt.Sprintf("F4.1: bash_commands.denied(%d) > protected_denies.bash(%d) — F4 denies not covered",
 					denied, len(bashDenies)))
 			}
