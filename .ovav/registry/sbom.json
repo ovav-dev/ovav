@@ -4,7 +4,7 @@
   "project": "OVAV",
   "hash_algorithm": "sha256",
   "metadata": {
-    "git_identity": "1f5fc4ab22563329b9eeb040fae52643868f7e81197d60937b5570ee9c0f0035"
+    "git_identity": "798234b499a4b3bbdc480734074eaf9f75f836e876b303183d4f6a9f6a9a5ef3"
   },
   "policy": {
     "version": "tracked-content-v1",
@@ -1703,6 +1703,7 @@
     "go-runtime/internal/autonomous/scheduler/scheduler_test.go": "66611371a2ef45bea70c0e7f399810702b2f7a4f5e3a59d4073f5b710e05ed55",
     "go-runtime/internal/autonomous/scraper/scraper.go": "3046e90553f104b898e42334adef20a00d79c63cfa2b5fc57a9aa028b58a282c",
     "go-runtime/internal/autonomous/types.go": "e6433f109d0f093128a00b1d4f554769bcf2cc15a72edf657b57d237524786e5",
+    "go-runtime/internal/bashrc/bashrc_test.go": "c0c8d66e2a84322930e13b8ba5066b660578e39062aa4b097a1aece8b8a27a90",
     "go-runtime/internal/benchmark/detectors.go": "abd340a348c8b42a805753188f268241dd5d0860a163fabaa0277ee7f7452b4d",
     "go-runtime/internal/benchmark/metrics.go": "62c529975882df21aaef62efca35ca472b4e3acd1132d628ee5d5a32a1a6dd9c",
     "go-runtime/internal/benchmark/report.go": "9ee9fba77e5f1438db4bd3ff19fcba0a9708095d249742477fecea7830123386",
@@ -2882,7 +2883,7 @@
     "web/start.sh": "9aa5951e7d3451dab91f478078a6765f18391d8bb68dba56abecf54b5a6a68f6",
     "workstation/README.md": "faeefc5287c06fb379e773907c562962f19a661fee4e36f261fe93df55ad6b35",
     "workstation/configs/atuin/config.toml": "922d004ef72a26f150ef1a3ddb87589ef7cb3127b7945b7fefd7f779a2e5f427",
-    "workstation/configs/bashrc/ovav.bashrc": "aaf59f7f8eb8a7e4c5fa165c6722e42be5b05bf4e102e4a9d506008ac9942bfa",
+    "workstation/configs/bashrc/ovav.bashrc": "bbd24ee0e0112548db148bf09dd7d9ecce7665fb5d9a7ab19ca84a9e1cf5029e",
     "workstation/configs/inputrc/DEPLOY_LOG.md": "465acf6d5022c35add74b3014fd83c7d39f7007cb505adb70dc7ebcc21ae30b0",
     "workstation/configs/inputrc/ovav.inputrc": "e62d77237e83aae084e1db65ef6e41bb56b7a36b61cc8f27ae97441f6ac28e9e",
     "workstation/configs/intelligent-terminal/DEPLOY_LOG.md": "e5385a486b50e9e603407b25c47ae3e89eb724aacde0be15f3aee1ad4c3981f4",
