@@ -4,7 +4,7 @@
   "project": "OVAV",
   "hash_algorithm": "sha256",
   "metadata": {
-    "git_identity": "878945e4bc1760036bb05987a2ee4cc9da084b6d0027f8eefe9606a83f268919"
+    "git_identity": "526a239ecc7e8ee104922714c5a7cd6c4dcca86b8f701d0f2b834ccd6aaa8e40"
   },
   "policy": {
     "version": "tracked-content-v1",
@@ -479,7 +479,7 @@
     ".ovav/plan/architecture/mimocode-absorption-v1.md": "4c8216e9946e050b56dbd23d74eaec7002228162614b977a0c5285d82f0ec576",
     ".ovav/plan/architecture_split_core_product.md": "314bdaf1ae294dd6b47c4e80e52b7189fed9be7b11db28a5ad6308d2429599d3",
     ".ovav/plan/business_model.yaml": "26d7f54fcd0b4bbb414b9a7c82e8626665a20ac93c88b4f0ecbb12e30aadb403",
-    ".ovav/plan/caps.yaml": "44bf5f1ef3ca5ac473fe9b7b65b9dad68ea4159e986d090c968827d062e2f10a",
+    ".ovav/plan/caps.yaml": "8b894a233c208299759f4d155406beaeb1d9db219a3508348681187c3696edfe",
     ".ovav/plan/education_roadmap.yaml": "c82c68f9eae3cc06a9f1725799b4c50d2265edbdbd5c835c361516a2780bb50a",
     ".ovav/plan/f6_cockpit_action_plan.md": "60b9d5e1ef4f8c9845ba5ead6ac0cbc852e49458be551e8ac7fbce821a8f7f89",
     ".ovav/plan/health_audit.yaml": "2d62ff39701bbe93e3141703fb4b046f81e54dd31d8ed9cd61834d40189ba18f",
@@ -2211,7 +2211,7 @@
     "go-runtime/internal/validators/behavioral_directives.go": "d34d86fa9e88df014340a1ae437309ef17ffc10da2ebc15be93147671972f7e5",
     "go-runtime/internal/validators/bootstrap_chain.go": "4db3e46572661a4242b1d8513acebfd181bbfd1929df762ed945bf3b85f66cf2",
     "go-runtime/internal/validators/canonical_integrity.go": "cfebb900b5e6ba4f65b36cefffc67ce7a09400792759536960461537d9be89e3",
-    "go-runtime/internal/validators/canonical_state_test.go": "4afb78f3bd1784f7561df7a7342f126acacf86e751a9a8077dfcbbb414b013c9",
+    "go-runtime/internal/validators/canonical_state_test.go": "be38afb658998351f9b195c1d711d0f3ae8daeb96984d1fb4c16202493dac33c",
     "go-runtime/internal/validators/caps_chronos_alignment.go": "7203c5089707910a99001cabea30a2aa3dc3016f404d72528c60c362c6a9f3bb",
     "go-runtime/internal/validators/caps_schema.go": "6eb2baca216706990ec6662f6c1672c039ccab638e4c976d34ee9c21c804aed4",
     "go-runtime/internal/validators/caps_single_next.go": "5bfc449250386f45b8c172622c73eff2feba4a63f43fd1de56eb075c1cea8c1d",
@@ -2246,7 +2246,7 @@
     "go-runtime/internal/validators/head_integrity.go": "e2e4ed4ef227919f52c7348f6b33957f9a5c170820a25803454de301e9ddb5b1",
     "go-runtime/internal/validators/host_config_drift.go": "c0ceac6c9ce48858a90eb1617c61aabc0bf8f196cb10573f10a8d7106a1b38be",
     "go-runtime/internal/validators/install_verification.go": "0994efe5b8ceba2378b37d6d3fcf4fb98bbc3933d31746ddd03b207fba4b26d8",
-    "go-runtime/internal/validators/integrity_baseline_fresh.go": "8cfe56e89697f963f3a95d8df01310969747047433a642ca95eb3a50a6fba551",
+    "go-runtime/internal/validators/integrity_baseline_fresh.go": "b5bbc705912ae09ce635630f324c4d318667a65e56570e81884046197e2f33ed",
     "go-runtime/internal/validators/integrity_baseline_fresh_test.go": "fbdf63773106cc15d03215507ad995c0b86906442adf27e4f62ef6fb15a2b534",
     "go-runtime/internal/validators/invalid_fixtures.go": "4960f68a86ecc4c8afe46633cbe0a74fb42403788a88e0a17bc7a78885a78703",
     "go-runtime/internal/validators/it_keybindings.go": "72af3df0be6ba8d18a5182c0d6601d93942e08fec680856865d9c03d3a0b7a04",

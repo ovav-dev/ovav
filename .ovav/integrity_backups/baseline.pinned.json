@@ -9,6 +9,8 @@
     "go-runtime/internal/validators/cmd/validate/main.go": "8acb76e3f95573fd4a950dbd695f65e2336317987f192bccd6a452b5a62606b0",
     "opencode.json": "2eaddfd827d5ff3734d4d2657bb51af074febeaa7bb4e61f6550689431942a2a",
     "go-runtime/cmd/ovav/launch_cli.go": "e34c92c70d24a32e0c4f791d56817676f2bd12d7f76a8eadffe5dc15f77cbb69",
-    ".ovav/registry/sbom.json": "63f6ee5b4e63a6be6adb68971f88b556da934048f290800e3766dcb6f11fc365"
+    ".ovav/registry/sbom.json": "27ff76567be2b70019f78fa4d1cfb525fca496cc1e54605bfa8a015e3ecde371",
+    "go-runtime/internal/validators/canonical_state_test.go": "be38afb658998351f9b195c1d711d0f3ae8daeb96984d1fb4c16202493dac33c",
+    "go-runtime/internal/validators/integrity_baseline_fresh.go": "b5bbc705912ae09ce635630f324c4d318667a65e56570e81884046197e2f33ed"
   }
 }
