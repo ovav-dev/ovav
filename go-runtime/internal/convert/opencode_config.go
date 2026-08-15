@@ -375,12 +375,12 @@ type CanonicalOpenCodeConfig struct {
 }
 
 type canonicalRuntime struct {
-	Model             string         `yaml:"model"`
-	SmallModel        string         `yaml:"small_model"`
-	DefaultAgent      string         `yaml:"default_agent"`
-	DefaultPermission string         `yaml:"default_permission"`
-	Instructions      []string       `yaml:"instructions"`
-	Agent             map[string]any `yaml:"agent"`
+	Model            string         `yaml:"model"`
+	SmallModel       string         `yaml:"small_model"`
+	DefaultAgent     string         `yaml:"default_agent"`
+	DefaultPermission string        `yaml:"default_permission"`
+	Instructions     []string       `yaml:"instructions"`
+	Agent            map[string]any `yaml:"agent"`
 }
 
 type canonicalMCPServer struct {
