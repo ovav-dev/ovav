@@ -1,10 +1,16 @@
 # ─────────────────────────────────────────────────────────────
-#  OVAV Night / Day — Starship prompt
-#  Palette selection via $STARSHIP_PALETTE (set by ~/.bashrc
-#  based on $INTELLIGENT_TERMINAL_THEME — see workstation configs).
+#  OVAV Starship Prompt v3 — Semantic, Compact, Premium
+#  Refactored per OVAV UX Convergence 2026 spec section 21-22
+#
+#  Goal: immediate comprehension, semantic icons, no Powerline
+#        no "on"/"is"/"via", no "v" prefix on versions.
+#
+#  Example target:
+#    📁 ovav  🌿 develop •2  ⬢ 24.19.0  🐍 3.14
+#    ❯
 # ─────────────────────────────────────────────────────────────
 
-# ─── OVAV NIGHT palette ────────────────────────────────────
+# ─── PALETTES (preserve Day/Night, refined) ───────────────────
 [palettes.ovav-night]
 brand      = '#6EA8FE'
 surface    = '#111827'
@@ -16,7 +22,6 @@ accent     = '#C099FF'
 muted      = '#4A5568'
 text       = '#D8E1F0'
 
-# ─── OVAV DAY palette ──────────────────────────────────────
 [palettes.ovav-day]
 brand      = '#2563EB'
 surface    = '#FFFFFF'
@@ -28,83 +33,104 @@ accent     = '#7C3AED'
 muted      = '#94A3B8'
 text       = '#1B2430'
 
-# ─── Format (compact, premium, single-line) ────────────────
-format = """
-[░▒▓](#muted)\
-$os\
-$username\
-[]($style)\
-[]($surface)\
-$directory\
-$git_branch\
-$git_status\
-$nodejs\
-$python\
-$golang\
-$rust\
-$java\
-$php\
-$dotnet\
-$cmd_duration\
-$line_break\
-$character"""
+# ─── FORMAT: single-line semantic, no Powerline, minimal ─────
+format = "$directory$git_branch$git_status$nodejs$python$golang$character"
 
-# ─── Modules (only useful, no empty clutter) ───────────────
+# ─── DIRECTORY: 📁 project/directory name (semantic) ───────────
 [directory]
 style = "bold $brand"
-format = "[ $path ]($style)"
+format = "[ 📁 $path ]($style)"
 truncation_length = 3
 truncation_symbol = "…/"
 
+# ─── GIT BRANCH: 🌿 branch (semantic, no "on") ─────────────────
 [git_branch]
-symbol = ""
+symbol = "🌿 "
 style = "bold $accent"
+format = "[$symbol$branch]($style)"
 
+# ─── GIT STATUS: compact dirty/stash count (no "is") ──────────
 [git_status]
-style = "$success"
-conflicted = "$danger"
-ahead = "$info"
-behind = "$warning"
-diverged = "$warning"
-untracked = "$muted"
-stashed = "$accent"
-modified = "$warning"
+style = "$warning"
+format = "[$all_status$ahead_behind]($style)"
+conflicted = "⚠️${count} "
+ahead = "⇡${count} "
+behind = "⇣${count} "
+diverged = "⇡⇣${count} "
+untracked = "?${count} "
+stashed = "📦${count} "
+modified = "*${count} "
+renamed = "»${count} "
+deleted = "✘${count} "
 
-[nodejs]
-symbol = ""
-style = "bold $success"
+# ─── COMMAND DURATION: only slow commands (>5s) ───────────────
+[cmd_duration]
+min_time = 5_000
+format = "[ ⏱ $duration ]($style)"
+style = "yellow"
 
-[python]
-symbol = ""
-style = "bold $warning"
+# ─── CHARACTER: ❯ prompt ───────────────────────────────────────
+[character]
+success_symbol = "[❯](bold $success)"
+error_symbol = "[❯](bold $danger)"
 
-[golang]
-symbol = ""
-style = "bold $info"
+# ─── EXPLICITLY DISABLED: clutter that doesn't add value ────────
+# Each module must have disabled=true; defining format alone includes them
+[hostname]
+disabled = true
+
+[username]
+disabled = true
+
+[os]
+disabled = true
+
+[memory_usage]
+disabled = true
+
+[shell]
+disabled = true
+
+[time]
+disabled = true
 
 [rust]
-symbol = ""
-style = "$danger"
+disabled = true
 
 [java]
-symbol = ""
-style = "$accent"
+disabled = true
 
 [php]
-symbol = ""
-style = "$accent"
+disabled = true
 
 [dotnet]
-symbol = ""
-style = "$info"
+disabled = true
 
-[cmd_duration]
-min_time = 2_000
-format = "[ $duration ]($warning)"
+[env_var]
+disabled = true
 
-[character]
-success_symbol = "[➜]($success)"
-error_symbol   = "[✗]($danger)"
+[kubernetes]
+disabled = true
 
-[line_break]
-disabled = false
+[aws]
+disabled = true
+
+[package]
+disabled = true
+
+[nodejs]
+symbol = "⬢ "
+style = "bold $success"
+format = "[$symbol$version]($style)"
+
+[python]
+symbol = "🐍 "
+style = "bold $warning"
+format = "[$symbol$version]($style)"
+
+[golang]
+symbol = "🐹 "
+style = "bold $info"
+format = "[$symbol$version]($style)"
+
+# ─── END OVAV Starship v3 ──────────────────────────────────────
