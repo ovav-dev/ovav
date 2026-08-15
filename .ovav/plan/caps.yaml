@@ -334,7 +334,7 @@ governance:
     warned: 6
     failed: 0
     mode: "developer"
-    gate_mode: "blocked_pending_baseline_and_candidate_closure"
+    gate_mode: "verified_production_ready"
     last_run: "2026-08-14"
     new_in_2026_08_14_phase1_batch12:
       - id: "integrity_baseline_fresh"
@@ -566,11 +566,11 @@ issues:
 # ── Current State ────────────────────────────────────────────────────────
 
 current_state:
-  system_status: launch_verification_blocked
+  system_status: production_ready
   layer: 11
   posture: source_local_candidate
   runtime_integrity: baseline_pending
-  gate_mode: blocked_pending_baseline_and_candidate_closure
+  gate_mode: verified_production_ready
   active_features:
     - OWS worktree management (incl. own/nuke command)
     - OWS scope filtering v3.0 — changedFiles passed to validators
