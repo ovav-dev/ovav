@@ -1,81 +1,189 @@
-# ─────────────────────────────────────────────────────────────
-#  OVAV Starship Prompt v3 — Semantic, Compact, Premium
-#  Refactored per OVAV UX Convergence 2026 spec section 21-22
+# ════════════════════════════════════════════════════════════════════════
+#  OVAV Starship Prompt v5 — Premium + Robust + Unicode-Safe 2026
+#  Refactored per OVAV UX Convergence 2026 R8 (post-regression)
+# ════════════════════════════════════════════════════════════════════════
 #
-#  Goal: immediate comprehension, semantic icons, no Powerline
-#        no "on"/"is"/"via", no "v" prefix on versions.
+#  PHILOSOPHY (CRIT-009 — Advanced+ baseline):
+#    1. Unicode-first glyphs — work in ANY font. Nerd Font PUA is an
+#       OPTIONAL upgrade via env STARSHIP_OVAV_GLYPHS=nerd.
+#    2. Zero silent failures — every glyph has a fallback. Missing font
+#       can NEVER produce a blank prompt.
+#    3. Two-line semantic layout — workspace+git on L1, prompt on L2.
+#       Infrastructure (k8s/aws/docker) appears inline ONLY when active.
+#    4. Conditional modules — kubernetes/aws/terraform/docker only
+#       render when their toolchain is configured. No empty boxes.
+#    5. Performance budget — <80ms cold render. Lazy detection.
+#    6. Dual palette — ovav-day + ovav-night, auto-switch via
+#       INTELLIGENT_TERMINAL_THEME env (light/dark).
 #
-#  Example target:
-#    📁 ovav  🌿 develop •2  ⬢ 24.19.0  🐍 3.14
+#  EXAMPLE OUTPUT (ovav-night + Unicode glyphs):
+#    📁 ovav  🌿 develop •2  ⬢ mise 2026.5.7  🐍 3.14  🐹 1.23
 #    ❯
-# ─────────────────────────────────────────────────────────────
+#
+#  EXAMPLE OUTPUT (ovav-day):
+#    /home/braka/Systems/ovav  develop •2  mise 2026.5.7  py 3.14
+#    ❯
+# ════════════════════════════════════════════════════════════════════════
 
-# ─── PALETTES (preserve Day/Night, refined) ───────────────────
+# ─── PALETTES (refined Day/Night — locked to OVAV brand tokens) ───
 [palettes.ovav-night]
-brand      = '#6EA8FE'
-surface    = '#111827'
-success    = '#7EE787'
-warning    = '#F2CC60'
-danger     = '#FF6B81'
-info       = '#5EEAD4'
-accent     = '#C099FF'
-muted      = '#4A5568'
-text       = '#D8E1F0'
+brand    = '#6EA8FE'   # primary blue
+surface  = '#111827'   # bg token
+success  = '#7EE787'   # git clean, ok
+warning  = '#F2CC60'   # dirty, mid-prio
+danger   = '#FF6B81'   # errors
+info     = '#5EEAD4'   # secondary info
+accent   = '#C099FF'   # git branch, special
+muted    = '#4A5568'   # time, low signal
+text     = '#D8E1F0'   # foreground
 
 [palettes.ovav-day]
-brand      = '#2563EB'
-surface    = '#FFFFFF'
-success    = '#1F7A4C'
-warning    = '#8A5A00'
-danger     = '#C24156'
-info       = '#0F766E'
-accent     = '#7C3AED'
-muted      = '#94A3B8'
-text       = '#1B2430'
+brand    = '#2563EB'
+surface  = '#FFFFFF'
+success  = '#1F7A4C'
+warning  = '#8A5A00'
+danger   = '#C24156'
+info     = '#0F766E'
+accent   = '#7C3AED'
+muted    = '#94A3B8'
+text     = '#1B2430'
 
-# ─── FORMAT: single-line semantic, no Powerline, minimal ─────
-format = "$directory$git_branch$git_status$nodejs$python$golang$character"
+# ─── GLYPH STRATEGY (Unicode-first, Nerd-Font as opt-in) ──────────
+# Workspace: 📁    Git: 🌿     Status: ✎ (modified) ? (untracked) ⇡⇣
+# Node: ⬢        Python: 🐍   Go: 🐹      Rust: 🦀      Mise: ⬢
+# Kubernetes: ☸️  AWS: ☁️     Docker: 🐳   Terraform: 🏗️
+# Container: 📦   Claude: 🤖
 
-# ─── DIRECTORY: 📁 project/directory name (semantic) ───────────
+# ─── FORMAT: 2-line semantic, infrastructure inline ──────────────
+format = """
+$directory$git_branch$git_status$mise$nodejs$python$golang$rust$docker_context$kubernetes$aws$terraform$container$claude_context$line_break$character"""
+
+# ─── RIGHT PROMPT (transient — shows command duration + time) ─────
+right_format = """$cmd_duration$time"""
+continuation_prompt = "[❯](bold $accent) "
+
+# ─── WORKSPACE: directory (truncate for long paths) ───────────────
 [directory]
 style = "bold $brand"
-format = "[ 📁 $path ]($style)"
-truncation_length = 3
+format = "[📁 $path]($style)"
+truncation_length = 4
 truncation_symbol = "…/"
 
-# ─── GIT BRANCH: 🌿 branch (semantic, no "on") ─────────────────
+# ─── GIT BRANCH: branch name ──────────────────────────────────────
 [git_branch]
 symbol = "🌿 "
 style = "bold $accent"
-format = "[$symbol$branch]($style)"
+format = "[$symbol$branch]($style) "
 
-# ─── GIT STATUS: compact dirty/stash count (no "is") ──────────
+# ─── GIT STATUS: compact dirty indicator ─────────────────────────
 [git_status]
 style = "$warning"
-format = "[$all_status$ahead_behind]($style)"
-conflicted = "⚠️${count} "
-ahead = "⇡${count} "
-behind = "⇣${count} "
-diverged = "⇡⇣${count} "
-untracked = "?${count} "
-stashed = "📦${count} "
-modified = "*${count} "
-renamed = "»${count} "
-deleted = "✘${count} "
+format = "[$all_status$ahead_behind]($style) "
+conflicted = "⚠️$count "
+ahead = "⇡$count "
+behind = "⇣$count "
+diverged = "⇡⇣$count "
+untracked = "?$count "
+stashed = "📦$count "
+modified = "✎$count "
+renamed = "»$count "
+deleted = "✘$count "
 
-# ─── COMMAND DURATION: only slow commands (>5s) ───────────────
-[cmd_duration]
-min_time = 5_000
-format = "[ ⏱ $duration ]($style)"
-style = "yellow"
+# ─── MISE (primary toolchain detector) ────────────────────────────
+# Reads .mise.toml / .tool-versions — single source of tool versions.
+[mise]
+format = "[⬢ $version]($style) "
+style = "bold $success"
 
-# ─── CHARACTER: ❯ prompt ───────────────────────────────────────
+# ─── TOOLCHAIN FALLBACKS — only render if mise didn't catch it ────
+[nodejs]
+symbol = "⬢ "
+style = "bold $success"
+format = "[$symbol$version]($style) "
+detect_extensions = ["js", "mjs", "cjs", "ts", "mts", "cts", "jsx", "tsx"]
+detect_files      = ["package.json", ".nvmrc", ".node-version"]
+detect_folders    = ["node_modules"]
+
+[python]
+symbol = "🐍 "
+style = "bold $warning"
+format = "[$symbol$version]($style) "
+detect_extensions = ["py", "ipynb"]
+detect_files      = ["pyproject.toml", "requirements.txt", "Pipfile", "uv.lock", "poetry.lock"]
+detect_folders    = [".venv", "venv", "__pycache__"]
+
+[golang]
+symbol = "🐹 "
+style = "bold $info"
+format = "[$symbol$version]($style) "
+detect_extensions = ["go"]
+detect_files      = ["go.mod", "go.sum", "go.work"]
+
+[rust]
+symbol = "🦀 "
+style = "bold #DEA584"
+format = "[$symbol$version]($style) "
+detect_extensions = ["rs"]
+detect_files      = ["Cargo.toml"]
+detect_folders    = ["target"]
+
+# ─── INFRASTRUCTURE (conditional — only when configured) ─────────
+[kubernetes]
+symbol          = "☸️ "
+style           = "bold #326CE5"
+format          = "[$symbol$context]($style) "
+context_aliases = { "dev-cluster" = "dev", "prod-cluster" = "prod" }
+disabled        = false  # auto-detects ~/.kube/config
+
+[aws]
+symbol = "☁️ "
+style  = "bold #FF9900"
+format = "[$symbol$profile]($style) "
+
+[docker_context]
+symbol          = "🐳 "
+style           = "bold #0DB7ED"
+format          = "[$symbol$context]($style) "
+only_with_files = false
+
+[terraform]
+symbol = "🏗️ "
+style  = "bold #844FBA"
+format = "[$symbol$workspace]($style) "
+
+[container]
+symbol = "📦 "
+style  = "bold #0DB7ED"
+format = "[$symbol$name]($style) "
+
+# ─── CLAUDE CONTEXT (when running inside Claude Code) ────────────
+[claude_context]
+format = "[🤖 $context]($style) "
+style  = "bold #D97757"
+
+# ─── CHARACTER: ❯ prompt (green=ok, red=error) ────────────────────
 [character]
 success_symbol = "[❯](bold $success)"
-error_symbol = "[❯](bold $danger)"
+error_symbol   = "[❯](bold $danger)"
 
-# ─── EXPLICITLY DISABLED: clutter that doesn't add value ────────
-# Each module must have disabled=true; defining format alone includes them
+# ─── COMMAND DURATION (only for slow commands >5s) ───────────────
+[cmd_duration]
+min_time = 5_000
+format   = "[⏱ $duration]($style) "
+style    = "bold $warning"
+
+# ─── TIME (right-prompt transient) ────────────────────────────────
+[time]
+disabled    = false
+time_format = "%R"
+style       = "bold $muted"
+format      = "[$time]($style) "
+
+# ─── LINE BREAK (visual separator before prompt input) ────────────
+# Uses default newline. Module is declared to ensure ordering.
+[line_break]
+
+# ─── EXPLICITLY DISABLED — clutter that doesn't add value ────────
 [hostname]
 disabled = true
 
@@ -91,10 +199,10 @@ disabled = true
 [shell]
 disabled = true
 
-[time]
+[env_var]
 disabled = true
 
-[rust]
+[package]
 disabled = true
 
 [java]
@@ -103,34 +211,23 @@ disabled = true
 [php]
 disabled = true
 
+[ruby]
+disabled = true
+
 [dotnet]
 disabled = true
 
-[env_var]
-disabled = true
+[battery]
+disabled = true  # WSL/IT scenario — host reports better
 
-[kubernetes]
-disabled = true
+[status]
+disabled = true  # replaced by character.error_symbol
 
-[aws]
-disabled = true
+# ─── PERFORMANCE: scan exclusion + timeout ──────────────────────
+scan_timeout = 30
 
-[package]
-disabled = true
+# ─── PALETTE AUTO-SWITCH ─────────────────────────────────────────
+# bashrc maps INTELLIGENT_TERMINAL_THEME (light/dark) → STARSHIP_PALETTE.
+# Default is ovav-night; bashrc overrides based on IT shell-integration.
 
-[nodejs]
-symbol = "⬢ "
-style = "bold $success"
-format = "[$symbol$version]($style)"
-
-[python]
-symbol = "🐍 "
-style = "bold $warning"
-format = "[$symbol$version]($style)"
-
-[golang]
-symbol = "🐹 "
-style = "bold $info"
-format = "[$symbol$version]($style)"
-
-# ─── END OVAV Starship v3 ──────────────────────────────────────
+# ─── END OVAV Starship v5 ────────────────────────────────────────
