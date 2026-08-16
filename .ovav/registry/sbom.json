@@ -4,7 +4,7 @@
   "project": "OVAV",
   "hash_algorithm": "sha256",
   "metadata": {
-    "git_identity": "62fce2e61df64d8d202dc854e1ff36aab7054d10f85f67cf021c5b6a73b7db4b"
+    "git_identity": "39839dd5c97f014dd9f12c27347c720379172a9ba9c4f4507f121f560efcda44"
   },
   "policy": {
     "version": "tracked-content-v1",
@@ -2884,7 +2884,7 @@
     "web/start.sh": "9aa5951e7d3451dab91f478078a6765f18391d8bb68dba56abecf54b5a6a68f6",
     "workstation/README.md": "faeefc5287c06fb379e773907c562962f19a661fee4e36f261fe93df55ad6b35",
     "workstation/configs/atuin/config.toml": "922d004ef72a26f150ef1a3ddb87589ef7cb3127b7945b7fefd7f779a2e5f427",
-    "workstation/configs/bashrc/ovav.bashrc": "5049a07904182b1aee481f8b2f8bf9bf8aa00b7a7ce871569ae3dee5bc2f47dc",
+    "workstation/configs/bashrc/ovav.bashrc": "0cf2f3b268339212aaecd7bb6984cf552f379430ec13922b30cc53b0e09cb6ee",
     "workstation/configs/inputrc/DEPLOY_LOG.md": "465acf6d5022c35add74b3014fd83c7d39f7007cb505adb70dc7ebcc21ae30b0",
     "workstation/configs/inputrc/ovav.inputrc": "e62d77237e83aae084e1db65ef6e41bb56b7a36b61cc8f27ae97441f6ac28e9e",
     "workstation/configs/intelligent-terminal/DEPLOY_LOG.md": "e5385a486b50e9e603407b25c47ae3e89eb724aacde0be15f3aee1ad4c3981f4",
