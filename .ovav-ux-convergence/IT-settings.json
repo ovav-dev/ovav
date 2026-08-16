@@ -1,6 +1,7 @@
 {
     "$help": "https://aka.ms/intelligent-terminal-docs",
     "$schema": "https://aka.ms/terminal-profiles-schema",
+    "autoReloadSettings": true,
     "actions":
     [
         {
@@ -66,80 +67,32 @@
     "keybindings":
     [
         {
-            "id": "Terminal.PrevTab",
-            "keys": "ctrl+shift+tab"
-        },
-        {
-            "id": "Terminal.CopyToClipboard",
-            "keys": "ctrl+c"
-        },
-        {
-            "id": "Terminal.PasteFromClipboard",
-            "keys": "ctrl+shift+v"
-        },
-        {
-            "id": "Terminal.OpenNewTab",
-            "keys": "ctrl+t"
-        },
-        {
-            "id": "Terminal.OpenSettingsFile",
-            "keys": "ctrl+comma"
-        },
-        {
-            "id": "Terminal.FindText",
-            "keys": "ctrl+shift+f"
-        },
-        {
-            "id": "Terminal.PasteFromClipboard",
-            "keys": "ctrl+v"
-        },
-        {
-            "id": "Terminal.MovePaneRight",
-            "keys": "alt+shift+right"
-        },
-        {
-            "id": "Terminal.CopyToClipboard",
-            "keys": "ctrl+shift+c"
-        },
-        {
-            "id": "Terminal.PasteFromClipboard",
-            "keys": "shift+insert"
-        },
-        {
-            "id": "Terminal.CopyToClipboard",
-            "keys": "ctrl+insert"
-        },
-        {
-            "id": "User.switchToTab.ED268D78",
-            "keys": "ctrl+9"
-        },
-        {
-            "id": "Terminal.PasteFromClipboard",
-            "keys": "ctrl+shift+insert"
-        },
-        {
-            "id": "Terminal.CopyToClipboard",
-            "keys": "ctrl+alt+shift+c"
-        },
-        {
             "id": "Terminal.OpenNewTab",
             "keys": "ctrl+shift+t"
         },
         {
-            "id": "Terminal.MoveFocusDown",
-            "keys": "alt+down"
+            "id": "Terminal.OpenNewTabDropdown",
+            "keys": "ctrl+shift+n"
+        },
+        {
+            "id": "Terminal.DuplicateTab",
+            "keys": "ctrl+shift+d"
         },
         {
             "id": "User.closeTab.0",
-            "keys": "ctrl+w"
+            "keys": "ctrl+shift+w"
+        },
+        {
+            "id": "Terminal.ClosePane",
+            "keys": "ctrl+shift+x"
+        },
+        {
+            "id": "Terminal.PrevTab",
+            "keys": "ctrl+shift+tab"
         },
         {
             "id": "Terminal.NextTab",
             "keys": "ctrl+tab"
-        },
-        {
-            "id": "Terminal.MovePaneDown",
-            "keys": "alt+shift+down"
         },
         {
             "id": "Terminal.SwitchToTab0",
@@ -148,10 +101,6 @@
         {
             "id": "Terminal.SwitchToTab1",
             "keys": "ctrl+2"
-        },
-        {
-            "id": "Terminal.OpenSystemMenu",
-            "keys": "ctrl+alt+m"
         },
         {
             "id": "Terminal.SwitchToTab2",
@@ -170,18 +119,6 @@
             "keys": "ctrl+6"
         },
         {
-            "id": "Terminal.MovePaneLeft",
-            "keys": "alt+shift+left"
-        },
-        {
-            "id": "Terminal.IncreaseFontSize",
-            "keys": "ctrl+shift+plus"
-        },
-        {
-            "id": "Terminal.ResetFontSize",
-            "keys": "ctrl+shift+0"
-        },
-        {
             "id": "Terminal.SwitchToTab6",
             "keys": "ctrl+7"
         },
@@ -190,32 +127,16 @@
             "keys": "ctrl+8"
         },
         {
-            "id": "Terminal.ToggleCommandPalette",
-            "keys": "ctrl+shift+p"
-        },
-        {
-            "id": "Terminal.SplitPaneDown",
-            "keys": "alt+shift+d"
-        },
-        {
-            "id": "Terminal.IncreaseFontSize",
-            "keys": "ctrl+plus"
-        },
-        {
-            "id": "Terminal.DecreaseFontSize",
-            "keys": "ctrl+minus"
+            "id": "User.switchToTab.ED268D78",
+            "keys": "ctrl+9"
         },
         {
             "id": "Terminal.SplitPaneRight",
-            "keys": "alt+shift+r"
+            "keys": "alt+shift+plus"
         },
         {
-            "id": "Terminal.ClosePane",
-            "keys": "ctrl+shift+w"
-        },
-        {
-            "id": "Terminal.MoveFocusUp",
-            "keys": "alt+up"
+            "id": "Terminal.SplitPaneDown",
+            "keys": "alt+shift+minus"
         },
         {
             "id": "Terminal.MoveFocusLeft",
@@ -226,20 +147,80 @@
             "keys": "alt+right"
         },
         {
+            "id": "Terminal.MoveFocusUp",
+            "keys": "alt+up"
+        },
+        {
+            "id": "Terminal.MoveFocusDown",
+            "keys": "alt+down"
+        },
+        {
+            "id": "Terminal.MovePaneLeft",
+            "keys": "alt+shift+left"
+        },
+        {
+            "id": "Terminal.MovePaneRight",
+            "keys": "alt+shift+right"
+        },
+        {
             "id": "Terminal.MovePaneUp",
             "keys": "alt+shift+up"
         },
         {
-            "id": "Terminal.ResetFontSize",
-            "keys": "ctrl+0"
+            "id": "Terminal.MovePaneDown",
+            "keys": "alt+shift+down"
         },
         {
-            "id": "Terminal.PrevTab",
-            "keys": "ctrl+shift+comma"
+            "id": "Terminal.ResizePaneLeft",
+            "keys": "ctrl+alt+shift+left"
+        },
+        {
+            "id": "Terminal.ResizePaneRight",
+            "keys": "ctrl+alt+shift+right"
+        },
+        {
+            "id": "Terminal.ResizePaneUp",
+            "keys": "ctrl+alt+shift+up"
+        },
+        {
+            "id": "Terminal.ResizePaneDown",
+            "keys": "ctrl+alt+shift+down"
+        },
+        {
+            "id": "Terminal.CopyToClipboard",
+            "keys": "ctrl+insert"
+        },
+        {
+            "id": "Terminal.CopyToClipboard",
+            "keys": "ctrl+shift+c"
+        },
+        {
+            "id": "Terminal.PasteFromClipboard",
+            "keys": "shift+insert"
+        },
+        {
+            "id": "Terminal.PasteFromClipboard",
+            "keys": "ctrl+shift+v"
+        },
+        {
+            "id": "Terminal.SelectAll",
+            "keys": "ctrl+shift+a"
+        },
+        {
+            "id": "Terminal.FindText",
+            "keys": "ctrl+shift+f"
         },
         {
             "id": "Terminal.ToggleCommandPalette",
-            "keys": "ctrl+shift+space"
+            "keys": "ctrl+shift+p"
+        },
+        {
+            "id": "Terminal.OpenSettingsFile",
+            "keys": "ctrl+shift+comma"
+        },
+        {
+            "id": "Terminal.OpenSystemMenu",
+            "keys": "ctrl+shift+m"
         },
         {
             "id": "Terminal.ToggleFullscreen",
@@ -250,12 +231,20 @@
             "keys": "f11"
         },
         {
-            "id": "Terminal.NextTab",
-            "keys": "ctrl+shift+period"
+            "id": "Terminal.IncreaseFontSize",
+            "keys": "ctrl+plus"
         },
         {
-            "id": "Terminal.ReloadCommandPalette",
-            "keys": "ctrl+shift+r"
+            "id": "Terminal.IncreaseFontSize",
+            "keys": "ctrl+shift+plus"
+        },
+        {
+            "id": "Terminal.DecreaseFontSize",
+            "keys": "ctrl+minus"
+        },
+        {
+            "id": "Terminal.ResetFontSize",
+            "keys": "ctrl+0"
         }
     ],
     "newTabMenu":
@@ -294,27 +283,29 @@
             "colorScheme": "OVAV Day",
             "font":
             {
-                "face": "Cascadia Mono",
+                "face": "JetBrainsMono Nerd Font",
                 "size": 12
             }
         },
         "list":
         [
             {
+                "commandline": "wsl.exe -d Ubuntu-26.04",
                 "font":
                 {
-                    "face": "Cascadia Mono",
+                    "face": "JetBrainsMono Nerd Font",
                     "size": 12
                 },
                 "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
                 "hidden": false,
-                "name": "Command Prompt"
+                "name": "Command Prompt",
+                "startingDirectory": "//wsl.localhost/Ubuntu-26.04/home/braka"
             },
             {
                 "commandline": "wsl.exe -d Ubuntu-26.04",
                 "font":
                 {
-                    "face": "Cascadia Mono",
+                    "face": "JetBrainsMono Nerd Font",
                     "size": 12
                 },
                 "guid": "{29516ade-0377-5279-ada0-c37d2200eb7d}",
@@ -325,7 +316,7 @@
                 "commandline": "wsl.exe -d Ubuntu-26.04",
                 "font":
                 {
-                    "face": "Cascadia Mono",
+                    "face": "JetBrainsMono Nerd Font",
                     "size": 12
                 },
                 "guid": "{3effc6bf-75c0-5786-8d37-54b6f9707eb4}",
@@ -336,7 +327,7 @@
                 "commandline": "wsl.exe -d Ubuntu-26.04",
                 "font":
                 {
-                    "face": "Cascadia Mono",
+                    "face": "JetBrainsMono Nerd Font",
                     "size": 12
                 },
                 "guid": "{445f0540-815b-5751-9045-de7354bf23b5}",
@@ -344,31 +335,32 @@
                 "startingDirectory": "//wsl.localhost/Ubuntu-26.04/home/braka/.config"
             },
             {
+                "commandline": "wsl.exe -d Ubuntu-26.04",
                 "font":
                 {
-                    "face": "Cascadia Mono",
+                    "face": "JetBrainsMono Nerd Font",
                     "size": 12
                 },
                 "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
                 "hidden": false,
-                "name": "Windows PowerShell"
+                "name": "Windows PowerShell",
+                "startingDirectory": "//wsl.localhost/Ubuntu-26.04/home/braka/Systems"
             },
             {
                 "font":
                 {
-                    "face": "Cascadia Mono",
+                    "face": "JetBrainsMono Nerd Font",
                     "size": 12
                 },
                 "guid": "{b453ae62-4e3d-5e58-b989-0a998ec441b8}",
-                "hidden": false,
-                "name": "Azure Cloud Shell",
-                "source": "Windows.Terminal.Azure"
+                "hidden": true,
+                "name": "Azure Cloud Shell"
             },
             {
                 "commandline": "wsl.exe -d Ubuntu-26.04",
                 "font":
                 {
-                    "face": "Cascadia Mono",
+                    "face": "JetBrainsMono Nerd Font",
                     "size": 12
                 },
                 "guid": "{e3cb3da9-9980-5990-a951-339efdad913d}",

@@ -244,6 +244,36 @@ if [ -f "$HOME/.intelligent-terminal/shell-integration_v3.sh" ]; then
 fi
 
 # ─────────────────────────────────────────────────────────────
+#  PROMPT CHAIN — encadenar con IT shell-integration v3
+#  El IT shell-integration controla PROMPT_COMMAND via
+#  __it_shellinteg_prompt. Para que starship + tab title corran,
+#  los añadimos a __IT_SHELLINTEG_USER_PC (hook oficial de IT).
+#  Esto evita el "doble prompt": IT markers + bash default.
+# ─────────────────────────────────────────────────────────────
+_ovav_tab_title() {
+    local git_branch=""
+    if command -v git >/dev/null 2>&1; then
+        git_branch="$(git symbolic-ref --short HEAD 2>/dev/null || echo '')"
+    fi
+    local short_path="${PWD/#$HOME/~}"
+    local tab_text="⬢ INTELLIGENCE TERMINAL · ${short_path}"
+    if [[ -n "$git_branch" ]]; then
+        tab_text="${tab_text} · ${git_branch}"
+    fi
+    printf '\033]0;%s\007' "$tab_text"
+}
+if [ -n "${__IT_SHELLINTEG_USER_PC:-}" ]; then
+    # IT shell-integration v3 detected — chain via official hook
+    export __IT_SHELLINTEG_USER_PC="_ovav_tab_title;starship_precmd"
+elif [ -n "${__it_shellinteg_user_pc:-}" ]; then
+    # Lower-case variant (some versions)
+    export __it_shellinteg_user_pc="_ovav_tab_title;starship_precmd"
+else
+    # No IT shell-integration — direct PROMPT_COMMAND
+    PROMPT_COMMAND="_ovav_tab_title;starship_precmd"
+fi
+
+# ─────────────────────────────────────────────────────────────
 #  CLEANUP — REMOVED legacy MiMoCode artifact
 #  Was: export MIMOCODE_DANGEROUSLY_SKIP_PERMISSIONS=1
 #  Reason: MiMoCode is not OVAV. Dangerous bypass does not apply.
