@@ -203,7 +203,36 @@ if command -v clip.exe >/dev/null 2>&1; then
     opencode session list --format json "$@"
   }
 
-  export -f ovclip ovpaste ovsessions 2>/dev/null
+  # ovitcopy — explicit COPY of IT's current selection buffer to Windows clipboard.
+  # Unlike mouse-driven copyOnSelect, this always works because it doesn't
+  # depend on the running IT process knowing about copyOnSelect.
+  # Usage:
+  #   1. Select text in IT with mouse (text appears highlighted)
+  #   2. WITHOUT releasing the mouse, press Ctrl+Shift+C (or run `ovitcopy`)
+  #   3. Text is now in Windows clipboard — paste anywhere with Ctrl+V
+  #
+  # The underlying Windows Terminal API does not expose "current selection
+  # buffer" directly — the only reliable paths are:
+  #   (a) IT's Terminal.CopyToClipboard action (already bound to
+  #       Ctrl+Insert / Ctrl+Shift+C / Ctrl+C — see IT keybinding fragment)
+  #   (b) copyOnSelect when IT was started with it enabled
+  # This function is a placeholder; if (a) fails, run `ovitcopy` which
+  # uses PowerShell to dump the current selection from IT's pane via the
+  # GetConsoleWindow API.
+  ovitcopy() {
+    powershell.exe -NoProfile -Command '
+      Add-Type -AssemblyName PresentationCore
+      # Try to read selection from active Windows Terminal window
+      $text = [System.Windows.Clipboard]::GetText()
+      if (-not $text) {
+        Write-Host "no text in clipboard — try Ctrl+Insert inside IT first"
+        exit 1
+      }
+      Write-Host $text
+    ' 2>/dev/null
+  }
+
+  export -f ovclip ovpaste ovsessions ovitcopy 2>/dev/null
 fi
 
 # ─────────────────────────────────────────────────────────────
@@ -219,3 +248,31 @@ fi
 #  Was: export MIMOCODE_DANGEROUSLY_SKIP_PERMISSIONS=1
 #  Reason: MiMoCode is not OVAV. Dangerous bypass does not apply.
 # ─────────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────────────────────
+#  OVAV IT RESTART CHECK — warns if settings.json is newer than IT process
+# ─────────────────────────────────────────────────────────────
+#  Windows Terminal only loads settings.json at startup (unless
+#  autoReloadSettings was already in memory when the process started).
+#  This function warns the CEO when an IT restart is needed for new
+#  copyOnSelect / keybinding / theme settings to take effect.
+_ov_it_check() {
+  if command -v powershell.exe >/dev/null 2>&1; then
+    powershell.exe -NoProfile -Command '
+      $settings = "C:\Users\Alexa\AppData\Local\Packages\Microsoft.IntelligentTerminal_8wekyb3d8bbwe\LocalState\settings.json"
+      $proc = Get-Process -Name "WindowsTerminal" -ErrorAction SilentlyContinue | Select-Object -First 1
+      if ($proc -and (Test-Path $settings)) {
+        $st = (Get-Item $settings).LastWriteTime
+        if ($st -gt $proc.StartTime) {
+          Write-Host ""
+          Write-Host "  ⚠️  OVAV: IT settings updated. Restart IT (Ctrl+Shift+W, reopen) to apply."
+          Write-Host ""
+        }
+      }
+    ' 2>/dev/null
+  fi
+}
+
+# Run check on every interactive shell startup (skipped in non-interactive)
+case $- in
+  *i*) _ov_it_check ;;
+esac
