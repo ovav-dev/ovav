@@ -164,6 +164,49 @@ alias ocr='opencode --continue'
 alias ovproj='cd $OVAV_ROOT'
 
 # ─────────────────────────────────────────────────────────────
+#  CLIPBOARD BRIDGE — WSL ↔ Windows
+#  ─────────────────────────────────────────────────────────────
+#  Why this exists:
+#  Windows Terminal's `copyOnSelect: true` only triggers when the terminal
+#  receives a mouse-up event. TUI apps built on Bubble Tea (OpenCode, vim,
+#  htop, fzf in interactive mode) ENABLE MOUSE CAPTURE — they consume
+#  the mouse events themselves so the TUI sees them as clicks/selections.
+#  As a result, Windows Terminal NEVER sees the mouse-up event and never
+#  fires copyOnSelect.
+#
+#  Workaround inside a TUI: use EXPLICIT copy keybindings (Ctrl+Insert for
+#  copy, Shift+Insert for paste) — both already bound in the IT fragment.
+#
+#  Workaround between WSL processes: ovclip / ovpaste bridge to the
+#  Windows clipboard via clip.exe and PowerShell's Get-Clipboard.
+# ─────────────────────────────────────────────────────────────
+if command -v clip.exe >/dev/null 2>&1; then
+  # ovclip [text...] — copy text (or stdin) to Windows clipboard
+  ovclip() {
+    if [ $# -gt 0 ]; then
+      printf '%s\n' "$*" | clip.exe
+    else
+      clip.exe
+    fi
+  }
+
+  # ovpaste — print Windows clipboard content to stdout
+  ovpaste() {
+    powershell.exe -NoProfile -Command 'Get-Clipboard' 2>/dev/null
+  }
+
+  # ovsessions — print OVAV opencode sessions as JSON to stdout
+  # and (optionally) pipe to ovclip for one-shot clipboard copy:
+  #   ovsessions            → see in terminal
+  #   ovsessions | ovclip   → also copy to Windows clipboard
+  ovsessions() {
+    opencode session list --format json "$@"
+  }
+
+  export -f ovclip ovpaste ovsessions 2>/dev/null
+fi
+
+# ─────────────────────────────────────────────────────────────
 #  INTELLIGENT TERMINAL SHELL INTEGRATION (v3 — official)
 #  Sourced after all prompt hooks so OSC 133 has final word.
 # ─────────────────────────────────────────────────────────────
