@@ -1,432 +1,444 @@
 {
-  "_comment": "OVAV IT v0.5 fragment — BASH-OWNERSHIP AWARE. IT MUST NOT capture keys that bash owns (Ctrl+T/W/C/V/R) because ble.sh/Atuin/fzf wire those at readline level. IT captures only window-level navigation (Ctrl+Shift+T/W, Alt+arrows, Ctrl+Shift+F, etc). Removed: ctrl+t (FZF), ctrl+w (readline kill-word), ctrl+c (SIGINT), ctrl+v (readline insert). Kept: ctrl+shift+t/w (tab mgmt), ctrl+insert/shift+insert (clipboard IT-level), ctrl+shift+a (select all).",
-  "$schema": "https://aka.ms/terminal-profiles-schema",
-  "defaultProfile": "{e3cb3da9-9980-5990-a951-339efdad913d}",
-  "theme": "OVAV Day",
-  "autoReloadSettings": true,
-  "keybindings": [
-    {
-      "id": "Terminal.OpenNewTab",
-      "keys": "ctrl+shift+t"
-    },
-    {
-      "id": "User.closeTab.0",
-      "keys": "ctrl+shift+w"
-    },
-    {
-      "id": "Terminal.ClosePane",
-      "keys": "ctrl+shift+x"
-    },
-    {
-      "id": "Terminal.PasteFromClipboard",
-      "keys": "ctrl+shift+v"
-    },
-    {
-      "id": "Terminal.PasteFromClipboard",
-      "keys": "shift+insert"
-    },
-    {
-      "id": "Terminal.CopyToClipboard",
-      "keys": "ctrl+shift+c"
-    },
-    {
-      "id": "Terminal.CopyToClipboard",
-      "keys": "ctrl+shift+insert"
-    },
-    {
-      "id": "Terminal.CopyToClipboard",
-      "keys": "ctrl+insert"
-    },
-    {
-      "id": "Terminal.PrevTab",
-      "keys": "ctrl+shift+tab"
-    },
-    {
-      "id": "Terminal.NextTab",
-      "keys": "ctrl+tab"
-    },
-    {
-      "id": "Terminal.SwitchToTab0",
-      "keys": "ctrl+1"
-    },
-    {
-      "id": "Terminal.SwitchToTab1",
-      "keys": "ctrl+2"
-    },
-    {
-      "id": "Terminal.SwitchToTab2",
-      "keys": "ctrl+3"
-    },
-    {
-      "id": "Terminal.SwitchToTab3",
-      "keys": "ctrl+4"
-    },
-    {
-      "id": "Terminal.SwitchToTab4",
-      "keys": "ctrl+5"
-    },
-    {
-      "id": "Terminal.SwitchToTab5",
-      "keys": "ctrl+6"
-    },
-    {
-      "id": "Terminal.SwitchToTab6",
-      "keys": "ctrl+7"
-    },
-    {
-      "id": "Terminal.SwitchToTab7",
-      "keys": "ctrl+8"
-    },
-    {
-      "id": "User.switchToTab.ED268D78",
-      "keys": "ctrl+9"
-    },
-    {
-      "id": "Terminal.SplitPaneRight",
-      "keys": "alt+shift+plus"
-    },
-    {
-      "id": "Terminal.SplitPaneDown",
-      "keys": "alt+shift+minus"
-    },
-    {
-      "id": "Terminal.MoveFocusLeft",
-      "keys": "alt+left"
-    },
-    {
-      "id": "Terminal.MoveFocusRight",
-      "keys": "alt+right"
-    },
-    {
-      "id": "Terminal.MoveFocusUp",
-      "keys": "alt+up"
-    },
-    {
-      "id": "Terminal.MoveFocusDown",
-      "keys": "alt+down"
-    },
-    {
-      "id": "Terminal.MovePaneLeft",
-      "keys": "alt+shift+left"
-    },
-    {
-      "id": "Terminal.MovePaneRight",
-      "keys": "alt+shift+right"
-    },
-    {
-      "id": "Terminal.MovePaneUp",
-      "keys": "alt+shift+up"
-    },
-    {
-      "id": "Terminal.MovePaneDown",
-      "keys": "alt+shift+down"
-    },
-    {
-      "id": "Terminal.ResizePaneLeft",
-      "keys": "ctrl+alt+shift+left"
-    },
-    {
-      "id": "Terminal.ResizePaneRight",
-      "keys": "ctrl+alt+shift+right"
-    },
-    {
-      "id": "Terminal.ResizePaneUp",
-      "keys": "ctrl+alt+shift+up"
-    },
-    {
-      "id": "Terminal.ResizePaneDown",
-      "keys": "ctrl+alt+shift+down"
-    },
-    {
-      "id": "Terminal.SelectAll",
-      "keys": "ctrl+shift+a"
-    },
-    {
-      "id": "Terminal.FindText",
-      "keys": "ctrl+shift+f"
-    },
-    {
-      "id": "Terminal.ToggleCommandPalette",
-      "keys": "ctrl+shift+p"
-    },
-    {
-      "id": "Terminal.OpenSettingsFile",
-      "keys": "ctrl+shift+comma"
-    },
-    {
-      "id": "Terminal.OpenSystemMenu",
-      "keys": "ctrl+shift+m"
-    },
-    {
-      "id": "Terminal.ToggleFullscreen",
-      "keys": "alt+enter"
-    },
-    {
-      "id": "Terminal.ToggleFullscreen",
-      "keys": "f11"
-    },
-    {
-      "id": "Terminal.IncreaseFontSize",
-      "keys": "ctrl+shift+plus"
-    },
-    {
-      "id": "Terminal.DecreaseFontSize",
-      "keys": "ctrl+minus"
-    },
-    {
-      "id": "Terminal.IncreaseFontSize",
-      "keys": "ctrl+plus"
-    },
-    {
-      "id": "Terminal.DecreaseFontSize",
-      "keys": "ctrl+shift+minus"
-    },
-    {
-      "id": "Terminal.ResetFontSize",
-      "keys": "ctrl+shift+0"
-    },
-    {
-      "id": "Terminal.ResetFontSize",
-      "keys": "ctrl+0"
-    },
-    {
-      "id": "Terminal.ReloadCommandPalette",
-      "keys": "ctrl+shift+r"
-    }
-  ],
-  "newTabMenu": [
-    {
-      "icon": null,
-      "profile": "{e3cb3da9-9980-5990-a951-339efdad913d}",
-      "type": "profile"
-    },
-    {
-      "icon": null,
-      "profile": "{445f0540-815b-5751-9045-de7354bf23b5}",
-      "type": "profile"
-    },
-    {
-      "icon": null,
-      "profile": "{3effc6bf-75c0-5786-8d37-54b6f9707eb4}",
-      "type": "profile"
-    },
-    {
-      "icon": null,
-      "profile": "{29516ade-0377-5279-ada0-c37d2200eb7d}",
-      "type": "profile"
-    }
-  ],
-  "themes": [
-    {
-      "name": "OVAV Day",
-      "tabRow": {
-        "background": "#F6F8FAFF",
-        "unfocusedBackground": "#EAEEF2FF"
-      },
-      "window": {
-        "applicationTheme": "light",
-        "experimental.rainbowFrame": false,
-        "frame": "#F6F8FAFF",
-        "unfocusedFrame": null,
-        "useMica": false
-      }
-    },
-    {
-      "name": "OVAV Night",
-      "tabRow": {
-        "background": "#0D1117FF",
-        "unfocusedBackground": "#161B22FF"
-      },
-      "window": {
-        "applicationTheme": "dark",
-        "experimental.rainbowFrame": false,
-        "frame": "#0D1117FF",
-        "unfocusedFrame": null,
-        "useMica": false
-      }
-    }
-  ],
-  "profiles": {
-    "defaults": {
-      "colorScheme": "OVAV Day",
-      "copyOnSelect": true,
-      "font": {
-        "face": "JetBrainsMono Nerd Font",
-        "size": 12
-      }
-    },
-    "list": [
-      {
-        "commandline": "wsl.exe -d Ubuntu-26.04",
-        "font": {
-          "face": "JetBrainsMono Nerd Font",
-          "size": 12
+    "_comment": "OVAV IT v0.7 fragment \u2014 KEYBINDINGS NATIVE WINDOWS ONLY. Three clipboard bindings, no fallbacks: Ctrl+C=Copy, Ctrl+V=Paste, Ctrl+X=Cut. Plus the two X11-unix orthogonals: Ctrl+Insert=Copy, Shift+Insert=Paste. NO Ctrl+Shift+C/V/Insert (the CEO flagged those as 'fallback ruidoso'). Bash keeps Ctrl+R (Atuin) and Ctrl+T (fzf) at readline level \u2014 NOT bound at IT. Bash SIGINT fallback: Ctrl+\\\\ (Unix convention) \u2014 Ctrl+C no longer reaches bash. copyOnSelect=true + autoReloadSettings=true on all profiles.",
+    "$schema": "https://aka.ms/terminal-profiles-schema",
+    "defaultProfile": "{e3cb3da9-9980-5990-a951-339efdad913d}",
+    "theme": "OVAV Day",
+    "autoReloadSettings": true,
+    "keybindings": [
+        {
+            "id": "Terminal.CopyToClipboard",
+            "keys": "ctrl+c"
         },
-        "guid": "{e3cb3da9-9980-5990-a951-339efdad913d}",
-        "name": "OVAV",
-        "startingDirectory": "//wsl.localhost/Ubuntu-26.04/home/braka/Systems/ovav",
-        "copyOnSelect": true
-      },
-      {
-        "commandline": "wsl.exe -d Ubuntu-26.04",
-        "font": {
-          "face": "JetBrainsMono Nerd Font",
-          "size": 12
+        {
+            "id": "Terminal.PasteFromClipboard",
+            "keys": "ctrl+v"
         },
-        "guid": "{445f0540-815b-5751-9045-de7354bf23b5}",
-        "name": "SYS",
-        "startingDirectory": "//wsl.localhost/Ubuntu-26.04/home/braka/.config",
-        "copyOnSelect": true
-      },
-      {
-        "commandline": "wsl.exe -d Ubuntu-26.04",
-        "font": {
-          "face": "JetBrainsMono Nerd Font",
-          "size": 12
+        {
+            "id": "Terminal.CopyToClipboard",
+            "keys": "ctrl+x"
         },
-        "guid": "{3effc6bf-75c0-5786-8d37-54b6f9707eb4}",
-        "name": "HUB",
-        "startingDirectory": "//wsl.localhost/Ubuntu-26.04/home/braka/Systems",
-        "copyOnSelect": true
-      },
-      {
-        "commandline": "wsl.exe -d Ubuntu-26.04",
-        "font": {
-          "face": "JetBrainsMono Nerd Font",
-          "size": 12
+        {
+            "id": "Terminal.CopyToClipboard",
+            "keys": "ctrl+insert"
         },
-        "guid": "{29516ade-0377-5279-ada0-c37d2200eb7d}",
-        "name": "WIN",
-        "startingDirectory": "//wsl.localhost/Ubuntu-26.04/mnt/c/Users/Alexa",
-        "copyOnSelect": true
-      },
-      {
-        "font": {
-          "face": "JetBrainsMono Nerd Font",
-          "size": 12
+        {
+            "id": "Terminal.PasteFromClipboard",
+            "keys": "shift+insert"
         },
-        "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
-        "hidden": false,
-        "name": "Windows PowerShell"
-      },
-      {
-        "font": {
-          "face": "JetBrainsMono Nerd Font",
-          "size": 12
+        {
+            "id": "Terminal.OpenNewTab",
+            "keys": "ctrl+shift+t"
         },
-        "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
-        "hidden": false,
-        "name": "Command Prompt"
-      },
-      {
-        "font": {
-          "face": "JetBrainsMono Nerd Font",
-          "size": 12
+        {
+            "id": "User.closeTab.0",
+            "keys": "ctrl+shift+w"
         },
-        "guid": "{b453ae62-4e3d-5e58-b989-0a998ec441b8}",
-        "hidden": false,
-        "name": "Azure Cloud Shell",
-        "source": "Windows.Terminal.Azure"
-      }
+        {
+            "id": "Terminal.ClosePane",
+            "keys": "ctrl+shift+x"
+        },
+        {
+            "id": "Terminal.OpenNewTabDropdown",
+            "keys": "ctrl+shift+n"
+        },
+        {
+            "id": "Terminal.DuplicateTab",
+            "keys": "ctrl+shift+d"
+        },
+        {
+            "id": "Terminal.PrevTab",
+            "keys": "ctrl+shift+tab"
+        },
+        {
+            "id": "Terminal.NextTab",
+            "keys": "ctrl+tab"
+        },
+        {
+            "id": "Terminal.SwitchToTab0",
+            "keys": "ctrl+1"
+        },
+        {
+            "id": "Terminal.SwitchToTab1",
+            "keys": "ctrl+2"
+        },
+        {
+            "id": "Terminal.SwitchToTab2",
+            "keys": "ctrl+3"
+        },
+        {
+            "id": "Terminal.SwitchToTab3",
+            "keys": "ctrl+4"
+        },
+        {
+            "id": "Terminal.SwitchToTab4",
+            "keys": "ctrl+5"
+        },
+        {
+            "id": "Terminal.SwitchToTab5",
+            "keys": "ctrl+6"
+        },
+        {
+            "id": "Terminal.SwitchToTab6",
+            "keys": "ctrl+7"
+        },
+        {
+            "id": "Terminal.SwitchToTab7",
+            "keys": "ctrl+8"
+        },
+        {
+            "id": "User.switchToTab.ED268D78",
+            "keys": "ctrl+9"
+        },
+        {
+            "id": "Terminal.SplitPaneRight",
+            "keys": "alt+shift+plus"
+        },
+        {
+            "id": "Terminal.SplitPaneDown",
+            "keys": "alt+shift+minus"
+        },
+        {
+            "id": "Terminal.MoveFocusLeft",
+            "keys": "alt+left"
+        },
+        {
+            "id": "Terminal.MoveFocusRight",
+            "keys": "alt+right"
+        },
+        {
+            "id": "Terminal.MoveFocusUp",
+            "keys": "alt+up"
+        },
+        {
+            "id": "Terminal.MoveFocusDown",
+            "keys": "alt+down"
+        },
+        {
+            "id": "Terminal.MovePaneLeft",
+            "keys": "alt+shift+left"
+        },
+        {
+            "id": "Terminal.MovePaneRight",
+            "keys": "alt+shift+right"
+        },
+        {
+            "id": "Terminal.MovePaneUp",
+            "keys": "alt+shift+up"
+        },
+        {
+            "id": "Terminal.MovePaneDown",
+            "keys": "alt+shift+down"
+        },
+        {
+            "id": "Terminal.ResizePaneLeft",
+            "keys": "ctrl+alt+shift+left"
+        },
+        {
+            "id": "Terminal.ResizePaneRight",
+            "keys": "ctrl+alt+shift+right"
+        },
+        {
+            "id": "Terminal.ResizePaneUp",
+            "keys": "ctrl+alt+shift+up"
+        },
+        {
+            "id": "Terminal.ResizePaneDown",
+            "keys": "ctrl+alt+shift+down"
+        },
+        {
+            "id": "Terminal.TogglePaneZoom",
+            "keys": "ctrl+shift+z"
+        },
+        {
+            "id": "Terminal.SelectAll",
+            "keys": "ctrl+shift+a"
+        },
+        {
+            "id": "Terminal.FindText",
+            "keys": "ctrl+shift+f"
+        },
+        {
+            "id": "Terminal.ToggleCommandPalette",
+            "keys": "ctrl+shift+p"
+        },
+        {
+            "id": "Terminal.OpenSettingsFile",
+            "keys": "ctrl+shift+comma"
+        },
+        {
+            "id": "Terminal.OpenSystemMenu",
+            "keys": "ctrl+shift+m"
+        },
+        {
+            "id": "Terminal.ReloadCommandPalette",
+            "keys": "ctrl+shift+r"
+        },
+        {
+            "id": "Terminal.ToggleFullscreen",
+            "keys": "alt+enter"
+        },
+        {
+            "id": "Terminal.ToggleFullscreen",
+            "keys": "f11"
+        },
+        {
+            "id": "Terminal.IncreaseFontSize",
+            "keys": "ctrl+plus"
+        },
+        {
+            "id": "Terminal.IncreaseFontSize",
+            "keys": "ctrl+shift+plus"
+        },
+        {
+            "id": "Terminal.DecreaseFontSize",
+            "keys": "ctrl+minus"
+        },
+        {
+            "id": "Terminal.DecreaseFontSize",
+            "keys": "ctrl+shift+minus"
+        },
+        {
+            "id": "Terminal.ResetFontSize",
+            "keys": "ctrl+0"
+        },
+        {
+            "id": "Terminal.ResetFontSize",
+            "keys": "ctrl+shift+0"
+        }
+    ],
+    "newTabMenu": [
+        {
+            "icon": null,
+            "profile": "{e3cb3da9-9980-5990-a951-339efdad913d}",
+            "type": "profile"
+        },
+        {
+            "icon": null,
+            "profile": "{445f0540-815b-5751-9045-de7354bf23b5}",
+            "type": "profile"
+        },
+        {
+            "icon": null,
+            "profile": "{3effc6bf-75c0-5786-8d37-54b6f9707eb4}",
+            "type": "profile"
+        },
+        {
+            "icon": null,
+            "profile": "{29516ade-0377-5279-ada0-c37d2200eb7d}",
+            "type": "profile"
+        }
+    ],
+    "themes": [
+        {
+            "name": "OVAV Day",
+            "tabRow": {
+                "background": "#F6F8FAFF",
+                "unfocusedBackground": "#EAEEF2FF"
+            },
+            "window": {
+                "applicationTheme": "light",
+                "experimental.rainbowFrame": false,
+                "frame": "#F6F8FAFF",
+                "unfocusedFrame": null,
+                "useMica": false
+            }
+        },
+        {
+            "name": "OVAV Night",
+            "tabRow": {
+                "background": "#0D1117FF",
+                "unfocusedBackground": "#161B22FF"
+            },
+            "window": {
+                "applicationTheme": "dark",
+                "experimental.rainbowFrame": false,
+                "frame": "#0D1117FF",
+                "unfocusedFrame": null,
+                "useMica": false
+            }
+        }
+    ],
+    "profiles": {
+        "defaults": {
+            "colorScheme": "OVAV Day",
+            "copyOnSelect": true,
+            "font": {
+                "face": "JetBrainsMono Nerd Font",
+                "size": 12
+            }
+        },
+        "list": [
+            {
+                "commandline": "wsl.exe -d Ubuntu-26.04",
+                "font": {
+                    "face": "JetBrainsMono Nerd Font",
+                    "size": 12
+                },
+                "guid": "{e3cb3da9-9980-5990-a951-339efdad913d}",
+                "name": "OVAV",
+                "startingDirectory": "//wsl.localhost/Ubuntu-26.04/home/braka/Systems/ovav",
+                "copyOnSelect": true
+            },
+            {
+                "commandline": "wsl.exe -d Ubuntu-26.04",
+                "font": {
+                    "face": "JetBrainsMono Nerd Font",
+                    "size": 12
+                },
+                "guid": "{445f0540-815b-5751-9045-de7354bf23b5}",
+                "name": "SYS",
+                "startingDirectory": "//wsl.localhost/Ubuntu-26.04/home/braka/.config",
+                "copyOnSelect": true
+            },
+            {
+                "commandline": "wsl.exe -d Ubuntu-26.04",
+                "font": {
+                    "face": "JetBrainsMono Nerd Font",
+                    "size": 12
+                },
+                "guid": "{3effc6bf-75c0-5786-8d37-54b6f9707eb4}",
+                "name": "HUB",
+                "startingDirectory": "//wsl.localhost/Ubuntu-26.04/home/braka/Systems",
+                "copyOnSelect": true
+            },
+            {
+                "commandline": "wsl.exe -d Ubuntu-26.04",
+                "font": {
+                    "face": "JetBrainsMono Nerd Font",
+                    "size": 12
+                },
+                "guid": "{29516ade-0377-5279-ada0-c37d2200eb7d}",
+                "name": "WIN",
+                "startingDirectory": "//wsl.localhost/Ubuntu-26.04/mnt/c/Users/Alexa",
+                "copyOnSelect": true
+            },
+            {
+                "font": {
+                    "face": "JetBrainsMono Nerd Font",
+                    "size": 12
+                },
+                "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
+                "hidden": false,
+                "name": "Windows PowerShell"
+            },
+            {
+                "font": {
+                    "face": "JetBrainsMono Nerd Font",
+                    "size": 12
+                },
+                "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
+                "hidden": false,
+                "name": "Command Prompt"
+            },
+            {
+                "font": {
+                    "face": "JetBrainsMono Nerd Font",
+                    "size": 12
+                },
+                "guid": "{b453ae62-4e3d-5e58-b989-0a998ec441b8}",
+                "hidden": false,
+                "name": "Azure Cloud Shell",
+                "source": "Windows.Terminal.Azure"
+            }
+        ]
+    },
+    "schemes": [
+        {
+            "background": "#F7F9FC",
+            "black": "#1B2430",
+            "blue": "#2563EB",
+            "brightBlack": "#475569",
+            "brightBlue": "#1D4ED8",
+            "brightCyan": "#0E7490",
+            "brightGreen": "#15803D",
+            "brightPurple": "#6D28D9",
+            "brightRed": "#E11D48",
+            "brightWhite": "#0F172A",
+            "brightYellow": "#A16207",
+            "cursorColor": "#0F766E",
+            "cyan": "#0F766E",
+            "foreground": "#1B2430",
+            "green": "#1F7A4C",
+            "name": "OVAV Day",
+            "purple": "#7C3AED",
+            "red": "#C24156",
+            "selectionBackground": "#BFDBFE",
+            "white": "#E2E8F0",
+            "yellow": "#8A5A00"
+        },
+        {
+            "background": "#0B1020",
+            "black": "#1A2233",
+            "blue": "#6EA8FE",
+            "brightBlack": "#4A5568",
+            "brightBlue": "#8FBEFF",
+            "brightCyan": "#80F0DE",
+            "brightGreen": "#9FF1A1",
+            "brightPurple": "#D4B5FF",
+            "brightRed": "#FF8FA3",
+            "brightWhite": "#E8EEF8",
+            "brightYellow": "#F5D88A",
+            "cursorColor": "#5EEAD4",
+            "cyan": "#5EEAD4",
+            "foreground": "#D8E1F0",
+            "green": "#7EE787",
+            "name": "OVAV Night",
+            "purple": "#C099FF",
+            "red": "#FF6B81",
+            "selectionBackground": "#2A3A5C",
+            "white": "#C9D1E0",
+            "yellow": "#F2CC60"
+        }
+    ],
+    "actions": [
+        {
+            "command": {
+                "action": "newTab",
+                "profile": "OVAV"
+            },
+            "id": "OVAV.tab"
+        },
+        {
+            "command": {
+                "action": "newTab",
+                "profile": "SYS"
+            },
+            "id": "SYS.tab"
+        },
+        {
+            "command": {
+                "action": "newTab",
+                "profile": "HUB"
+            },
+            "id": "HUB.tab"
+        },
+        {
+            "command": {
+                "action": "newTab",
+                "profile": "WIN"
+            },
+            "id": "WIN.tab"
+        },
+        {
+            "command": "closeOtherTabs",
+            "id": "OVAV.close-others"
+        },
+        {
+            "command": "openSystemMenu",
+            "id": "OVAV.menu"
+        },
+        {
+            "command": {
+                "action": "closeTab"
+            },
+            "id": "User.closeTab.0"
+        },
+        {
+            "command": {
+                "action": "switchToTab",
+                "index": 8
+            },
+            "id": "User.switchToTab.ED268D78"
+        }
     ]
-  },
-  "schemes": [
-    {
-      "background": "#F7F9FC",
-      "black": "#1B2430",
-      "blue": "#2563EB",
-      "brightBlack": "#475569",
-      "brightBlue": "#1D4ED8",
-      "brightCyan": "#0E7490",
-      "brightGreen": "#15803D",
-      "brightPurple": "#6D28D9",
-      "brightRed": "#E11D48",
-      "brightWhite": "#0F172A",
-      "brightYellow": "#A16207",
-      "cursorColor": "#0F766E",
-      "cyan": "#0F766E",
-      "foreground": "#1B2430",
-      "green": "#1F7A4C",
-      "name": "OVAV Day",
-      "purple": "#7C3AED",
-      "red": "#C24156",
-      "selectionBackground": "#BFDBFE",
-      "white": "#E2E8F0",
-      "yellow": "#8A5A00"
-    },
-    {
-      "background": "#0B1020",
-      "black": "#1A2233",
-      "blue": "#6EA8FE",
-      "brightBlack": "#4A5568",
-      "brightBlue": "#8FBEFF",
-      "brightCyan": "#80F0DE",
-      "brightGreen": "#9FF1A1",
-      "brightPurple": "#D4B5FF",
-      "brightRed": "#FF8FA3",
-      "brightWhite": "#E8EEF8",
-      "brightYellow": "#F5D88A",
-      "cursorColor": "#5EEAD4",
-      "cyan": "#5EEAD4",
-      "foreground": "#D8E1F0",
-      "green": "#7EE787",
-      "name": "OVAV Night",
-      "purple": "#C099FF",
-      "red": "#FF6B81",
-      "selectionBackground": "#2A3A5C",
-      "white": "#C9D1E0",
-      "yellow": "#F2CC60"
-    }
-  ],
-  "actions": [
-    {
-      "command": {
-        "action": "newTab",
-        "profile": "OVAV"
-      },
-      "id": "OVAV.tab"
-    },
-    {
-      "command": {
-        "action": "newTab",
-        "profile": "SYS"
-      },
-      "id": "SYS.tab"
-    },
-    {
-      "command": {
-        "action": "newTab",
-        "profile": "HUB"
-      },
-      "id": "HUB.tab"
-    },
-    {
-      "command": {
-        "action": "newTab",
-        "profile": "WIN"
-      },
-      "id": "WIN.tab"
-    },
-    {
-      "command": "closeOtherTabs",
-      "id": "OVAV.close-others"
-    },
-    {
-      "command": "openSystemMenu",
-      "id": "OVAV.menu"
-    },
-    {
-      "command": {
-        "action": "closeTab"
-      },
-      "id": "User.closeTab.0"
-    },
-    {
-      "command": {
-        "action": "switchToTab",
-        "index": 8
-      },
-      "id": "User.switchToTab.ED268D78"
-    }
-  ]
 }
