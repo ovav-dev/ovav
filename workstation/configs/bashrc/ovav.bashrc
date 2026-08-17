@@ -12,10 +12,14 @@ export OVAV_WORKSTATION="${OVAV_ROOT}/workstation"
 #  PATH (canonical Linux install per rule #11, #33)
 #  Includes /usr/local/bin, OpenCode, Atuin, OVAV locals
 # ─────────────────────────────────────────────────────────────
-case ":$PATH:" in
-  *":$HOME/.local/bin:"*) ;;
-  *) export PATH="$PATH:$HOME/.local/bin" ;;
-esac
+# Add all OVAV tool paths to PATH — atuin lives in .atuin/bin, not .local/bin
+for _ovav_path in "$HOME/.local/bin" "$HOME/.atuin/bin" "$HOME/.opencode/bin" "$HOME/.local/share/mise/shims"; do
+    case ":$PATH:" in
+        *":$_ovav_path:"*) ;;
+        *) export PATH="$PATH:$_ovav_path" ;;
+    esac
+done
+unset _ovav_path
 
 # Clear bash command hash — login shells cache negative lookups for
 # binaries that aren't in PATH at first check (e.g. starship before PATH
