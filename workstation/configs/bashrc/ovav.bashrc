@@ -120,7 +120,16 @@ if command -v atuin >/dev/null 2>&1; then
     export __atuin_bind_ctrl_r=false
     export __atuin_bind_up_arrow=false
     # Load Atuin init (defines __atuin_widget_run, Atuin preexec, etc.)
-    eval "$(atuin init bash --disable-up-arrow 2>/dev/null)"
+    # When ble.sh is active, the bind -x and macro chain calls in atuin's
+    # init script will be rejected by ble.sh with 'unsupported readline
+    # function' warnings. Capture stderr to /dev/null to suppress them.
+    if [ "$_BLE_LOADED" = "yes" ]; then
+        _ovav_atuin_init="$(atuin init bash --disable-up-arrow 2>/dev/null)"
+        eval "$_ovav_atuin_init"
+        unset _ovav_atuin_init
+    else
+        eval "$(atuin init bash --disable-up-arrow 2>/dev/null)"
+    fi
     # Wire Ctrl+R → Atuin search (widget 0 in emacs keymap)
     if type __atuin_widget_run >/dev/null 2>&1; then
         _ovav_bind_key 'C-r' '__atuin_widget_run 0'
@@ -133,7 +142,6 @@ fi
 #     Atuin owns Ctrl+R — we explicitly unbind it after fzf init.
 # ───────────────────────────────────────────────────────────────────────
 if command -v fzf >/dev/null 2>&1; then
-    eval "$(fzf --bash 2>/dev/null)"
     export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git 2>/dev/null || find . -type f -not -path "*/\.git/*"'
     export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
     export FZF_ALT_C_COMMAND="$FZF_DEFAULT_COMMAND"
@@ -144,6 +152,29 @@ if command -v fzf >/dev/null 2>&1; then
       --color=marker:#7EE787,fg+:#E8EEF8,prompt:#6EA8FE,hl+:#F5D88A \
       --color=selected-bg:#2A3A5C,border:#4A5568 \
       --no-bold --layout=reverse --height=60%"
+if [ "$_BLE_LOADED" = "yes" ]; then
+        # ble.sh path: fzf's --bash emits readline bind calls that ble.sh
+        # rejects with 'unsupported readline function' warnings. Skip the
+        # eval and define lightweight widgets that ble.sh can dispatch
+        # directly. Suppress stderr from fzf --bash by routing through a
+        # variable to avoid the bleed of 'ble.sh (bind)' messages.
+        if type fzf &>/dev/null; then
+            # Inline fzf file-widget — uses fzf binary directly
+            fzf-file-widget() {
+                local selected
+                selected="$(eval "$FZF_CTRL_T_COMMAND" | fzf --height 60% --layout reverse --no-bold --color 'bg+:#2A3A5C,spinner:#5EEAD4,hl:#F2CC60,fg:#C9D1E0,header:#4A5568,info:#C099FF,pointer:#5EEAD4,marker:#7EE787,fg+:#E8EEF8,prompt:#6EA8FE,hl+:#F5D88A' || true)"
+                printf '%s' "$selected"
+            }
+            fzf-cd-widget() {
+                local dir
+                dir="$(eval "$FZF_ALT_C_COMMAND" | fzf --height 60% --layout reverse --no-bold --color 'bg+:#2A3A5C,spinner:#5EEAD4,hl:#F2CC60,fg:#C9D1E0,header:#4A5568,info:#C099FF,pointer:#5EEAD4,marker:#7EE787,fg+:#E8EEF8,prompt:#6EA8FE,hl+:#F5D88A' || true)"
+                [ -n "$dir" ] && cd "$dir" && printf '\033[1m~%s\033[0m\n' "$dir"
+            }
+        fi
+    else
+        # Plain bash path: load fzf's --bash for full readline integration
+        eval "$(fzf --bash 2>/dev/null)"
+    fi
     # Wire Ctrl+T → fzf-file-widget (file picker)
     if type fzf-file-widget >/dev/null 2>&1; then
         _ovav_bind_key 'C-t' 'fzf-file-widget'

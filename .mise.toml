@@ -3,12 +3,15 @@
 # Mise resolves tool versions from this file; starship reads it for the [mise] module.
 
 [env]
-# Use system python (no mise-managed python install needed yet).
-# When OVAV requires pinned tool versions, add [[tools]] blocks below.
+# Identifier for OVAV workstation so other tools can detect this mise config.
 OVAV_TOOLCHAIN_SOURCE = "mise-toml"
 
 # ─────────────────────────────────────────────────────────────
-#  Tool versions — add when the project actually needs them.
-#  Empty section intentionally: OVAV runs on system python today.
-#  Future: python = "3.14", node = "22", go = "1.23", etc.
+#  Tool versions — active runtime contracts.
+#  Add tools here as the OVAV project adopts them. Each entry makes
+#  the tool available via mise-managed PATH and feeds starship's
+#  [mise] module so the prompt icon ⬢ displays the active version.
 # ─────────────────────────────────────────────────────────────
+
+# Note: tools that aren't managed by mise are loaded from the host OS.
+# When the project needs a pinned version, add e.g. python = "3.14".
