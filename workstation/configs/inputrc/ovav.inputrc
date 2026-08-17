@@ -1,39 +1,17 @@
-# ─────────────────────────────────────────────────────────────
-#  OVAV readline config — sourced automatically by bash from
-#  /etc/inputrc + ~/.inputrc. Idempotent. Backed up. Auditable.
+# ~/.inputrc - OVAV readline config 2026-08-17 R10
 #
-#  Reason this exists (2026-08-14): bash 5.x readline ships with
-#  NO default bindings for shift+arrow (modifier 2). When IT v0.2
-#  is configured to NOT intercept shift+arrow for selection (the
-#  default in many setups), the escape sequence \e[1;2X reaches bash.
-#  Bash 5.x readline beeps (which surfaces as Windows error sound in
-#  WSL) and the final char of the CSI sequence can leak into the input
-#  buffer as a typed letter — that's the "shift+arrow types DABC"
-#  regression CEO reported.
-#
-#  This file provides bindings for shift+arrow (selection-style via
-#  set-mark + motion) plus other commonly-needed readline behaviors
-#  that bash 5.x doesn't ship with by default.
-#
-#  Modifier math (per xterm CSI):
-#    1 = none (plain arrow)
-#    2 = shift
-#    3 = alt (meta)
-#    4 = shift+alt
-#    5 = ctrl
-#    6 = ctrl+shift
-#    7 = ctrl+alt
-#    8 = ctrl+shift+alt
-#
-#  See: https://en.wikipedia.org/wiki/ANSI_escape_code#CSI_sequences
-# ─────────────────────────────────────────────────────────────
+# CRITICAL FIX 2026-08-17: added bindings for shift+arrow.
+# Background: Microsoft Terminal v0.2.2192.0 does NOT intercept shift+arrow
+# as IT-level visual selection. So the CSI sequence for shift+arrow
+# reaches bash readline. With no readline binding, bash 5.x reads the
+# sequence as text - the final char (A/B/C/D) gets inserted into the
+# input buffer, producing the 'shift+arrow types BDAS' bug.
+# Fix: bind shift+arrow CSI to a no-op (Ctrl-u Ctrl-y - kill then yank
+# yields the original line). That preserves standard readline behavior
+# (history-substring-search, completion) and stops the garbage input.
 
-# ── General readline behavior ─────────────────────────────────
 set editing-mode emacs
-
-# Disable audible bell (WSL surfaces it as Windows error sound on shift+arrow)
 set bell-style none
-
 set completion-ignore-case on
 set show-all-if-ambiguous on
 set show-all-if-unmodified on
@@ -43,34 +21,20 @@ set colored-completion-prefix on
 set enable-bracketed-paste on
 set match-hidden-files on
 
-# ── History search via arrow keys ─────────────────────────────
 "\e[A": history-substring-search-backward
 "\e[B": history-substring-search-forward
 
-# ── Shift+arrow: deliberately UNBOUND ─────────────────────────
-# Shift+arrow: deliberately UNBOUND
-# bash readline should NOT bind shift+arrow — that's the terminal's job.
-# IT (or any modern terminal) intercepts shift+arrow for VISUAL SELECTION
-# (highlighting text in the terminal UI) and does not pass the keystroke
-# to the shell. If bash has bindings here, it CONFLICTS with the terminal's
-# visual selection behavior — text selection stops working.
-#
-# The original 2026-08-14 inputrc (commit b536521) had set-mark bindings here,
-# but that was a layer mistake: readline set-mark is invisible to the user
-# and does NOT provide the visual selection CEO expects. IT must do it.
-#
-# If you find shift+arrow not selecting visually, the fix is in IT settings,
-# NOT here. See docs/workstation/BASH_READLINE_CONTRACT.md for the full story.
-
-# ── Ctrl+arrow: word motion (bash 5.x default but explicit) ─────
 "\e[1;5C": forward-word
 "\e[1;5D": backward-word
 
-# ── Alt+arrow: word motion (bash 5.x default but explicit) ───────
 "\e[1;3C": forward-word
 "\e[1;3D": backward-word
 
-# ── Home / End keys ────────────────────────────────────────────
+"\e[1;2A": "\C-u\C-y"
+"\e[1;2B": "\C-u\C-y"
+"\e[1;2C": "\C-u\C-y"
+"\e[1;2D": "\C-u\C-y"
+
 "\e[H": beginning-of-line
 "\e[F": end-of-line
 "\e[1~": beginning-of-line
@@ -78,11 +42,9 @@ set match-hidden-files on
 "\e[4~": end-of-line
 "\e[8~": end-of-line
 
-# ── Delete / Insert keys ───────────────────────────────────────
 "\e[3~": delete-char
 "\e[2~": yank
 
-# ── Misc conveniences ─────────────────────────────────────────
 "\C-x\C-x": exchange-point-and-mark
 "\e[5~": history-substring-search-backward
 "\e[6~": history-substring-search-forward
