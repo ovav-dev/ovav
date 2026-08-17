@@ -116,9 +116,14 @@ _ovav_bind_key() {
 #     is active, those binds are ignored. We disable Atuin's internal bind
 #     and wire Ctrl+R ourselves via ble-bind (or readline bind when no ble).
 # ───────────────────────────────────────────────────────────────────────
-# Kill any lingering atuin pty-proxy from a prior session — it spawns a
-# long-lived child process that can swallow keystrokes on new tabs.
-pkill -f "atuin pty-proxy" 2>/dev/null || true
+# NOTE on lingering atuin pty-proxy:
+#   The bashrc used to `pkill -f atuin pty-proxy` here as a safety net.
+#   Removed because pkill -f matches against the full process command,
+#   and a parallel interactive session that legitimately depends on
+#   atuin (e.g. OpenCode-TUI driven atuin history) could be killed
+#   transitively. If you suspect a stale pty-proxy is swallowing
+#   keystrokes, run `pgrep -af "atuin pty-proxy"` from another tab
+#   and `kill <pid>` manually.
 
 if command -v atuin >/dev/null 2>&1; then
     # Disable Atuin's readline bind for Ctrl+R — we handle it below
