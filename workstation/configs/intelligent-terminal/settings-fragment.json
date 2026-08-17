@@ -1,5 +1,5 @@
 {
-    "_comment": "OVAV IT v0.7 fragment \u2014 KEYBINDINGS NATIVE WINDOWS ONLY. Three clipboard bindings, no fallbacks: Ctrl+C=Copy, Ctrl+V=Paste, Ctrl+X=Cut. Plus the two X11-unix orthogonals: Ctrl+Insert=Copy, Shift+Insert=Paste. NO Ctrl+Shift+C/V/Insert (the CEO flagged those as 'fallback ruidoso'). Bash keeps Ctrl+R (Atuin) and Ctrl+T (fzf) at readline level \u2014 NOT bound at IT. Bash SIGINT fallback: Ctrl+\\\\ (Unix convention) \u2014 Ctrl+C no longer reaches bash. copyOnSelect=true + autoReloadSettings=true on all profiles.",
+    "_comment": "OVAV IT v0.8 fragment \u2014 THEME-OPACITY FIX + keybindings + copy. Background: OVAV IT v0.8 sets backgroundImage=null, opacity=1, useAcrylic=false on every profile. Resolves the 'tablas transparentes' regression the CEO reported 2026-08-17. Copy/paste: ctrl+c=Copy, ctrl+v=Paste, ctrl+x=removed (IT has no Cut action), ctrl+insert=Copy, shift+insert=Paste. copyOnSelect=true + autoReloadSettings=true. Bash keeps ctrl+r (Atuin) and ctrl+t (fzf) at readline level.",
     "$schema": "https://aka.ms/terminal-profiles-schema",
     "defaultProfile": "{e3cb3da9-9980-5990-a951-339efdad913d}",
     "theme": "OVAV Day",
@@ -265,7 +265,16 @@
             "font": {
                 "face": "JetBrainsMono Nerd Font",
                 "size": 12
-            }
+            },
+            "backgroundImage": null,
+            "backgroundImageOpacity": 1,
+            "backgroundImageAlignment": "bottomRight",
+            "backgroundImageStretchMode": "none",
+            "useAcrylic": false,
+            "acrylicOpacity": 1,
+            "padding": "4, 4, 4, 4",
+            "wordSelection": false,
+            "copyFormatting": false
         },
         "list": [
             {
@@ -277,7 +286,9 @@
                 "guid": "{e3cb3da9-9980-5990-a951-339efdad913d}",
                 "name": "OVAV",
                 "startingDirectory": "//wsl.localhost/Ubuntu-26.04/home/braka/Systems/ovav",
-                "copyOnSelect": true
+                "copyOnSelect": true,
+                "useAcrylic": false,
+                "acrylicOpacity": 1
             },
             {
                 "commandline": "wsl.exe -d Ubuntu-26.04",
@@ -288,7 +299,9 @@
                 "guid": "{445f0540-815b-5751-9045-de7354bf23b5}",
                 "name": "SYS",
                 "startingDirectory": "//wsl.localhost/Ubuntu-26.04/home/braka/.config",
-                "copyOnSelect": true
+                "copyOnSelect": true,
+                "useAcrylic": false,
+                "acrylicOpacity": 1
             },
             {
                 "commandline": "wsl.exe -d Ubuntu-26.04",
@@ -299,7 +312,9 @@
                 "guid": "{3effc6bf-75c0-5786-8d37-54b6f9707eb4}",
                 "name": "HUB",
                 "startingDirectory": "//wsl.localhost/Ubuntu-26.04/home/braka/Systems",
-                "copyOnSelect": true
+                "copyOnSelect": true,
+                "useAcrylic": false,
+                "acrylicOpacity": 1
             },
             {
                 "commandline": "wsl.exe -d Ubuntu-26.04",
@@ -310,7 +325,9 @@
                 "guid": "{29516ade-0377-5279-ada0-c37d2200eb7d}",
                 "name": "WIN",
                 "startingDirectory": "//wsl.localhost/Ubuntu-26.04/mnt/c/Users/Alexa",
-                "copyOnSelect": true
+                "copyOnSelect": true,
+                "useAcrylic": false,
+                "acrylicOpacity": 1
             },
             {
                 "font": {
@@ -319,7 +336,9 @@
                 },
                 "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
                 "hidden": false,
-                "name": "Windows PowerShell"
+                "name": "Windows PowerShell",
+                "useAcrylic": false,
+                "acrylicOpacity": 1
             },
             {
                 "font": {
@@ -328,7 +347,9 @@
                 },
                 "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
                 "hidden": false,
-                "name": "Command Prompt"
+                "name": "Command Prompt",
+                "useAcrylic": false,
+                "acrylicOpacity": 1
             },
             {
                 "font": {
@@ -338,7 +359,9 @@
                 "guid": "{b453ae62-4e3d-5e58-b989-0a998ec441b8}",
                 "hidden": false,
                 "name": "Azure Cloud Shell",
-                "source": "Windows.Terminal.Azure"
+                "source": "Windows.Terminal.Azure",
+                "useAcrylic": false,
+                "acrylicOpacity": 1
             }
         ]
     },
