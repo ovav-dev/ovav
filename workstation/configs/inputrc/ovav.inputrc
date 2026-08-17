@@ -1,54 +1,21 @@
-# ~/.inputrc - OVAV readline config 2026-08-17 R10
-#
-# Stops bash inserting ASCII letters when shift+arrow is pressed.
-# Microsoft Terminal v0.2.2192.0 does NOT intercept shift+arrow as
-# IT-level visual selection. Without these bindings, bash 5.x readline
-# receives the CSI \e[1;2A and inserts the final char (A/B/C/D) into
-# the input buffer - the "shift+arrow types BDAS" regression.
-# R10 fix: bind each shift+arrow CSI to no-op "\C-u\C-y".
-# For visual selection, use mouse drag (IT copyOnSelect=true).
-#
-# Also: unbind Ctrl+C as SIGINT inside readline so IT can capture it
-# for Windows-native copy. Bash's tty INTR char is also cleared via
-# `stty intr undef` in bashrc.
-
 set editing-mode emacs
 set bell-style none
 set completion-ignore-case on
 set show-all-if-ambiguous on
-set show-all-if-unmodified on
-set page-completions off
-set colored-stats on
-set colored-completion-prefix on
-set enable-bracketed-paste on
-set match-hidden-files on
-
-bind -r "\C-c"
-
 "\e[A": history-substring-search-backward
 "\e[B": history-substring-search-forward
-
 "\e[1;5C": forward-word
 "\e[1;5D": backward-word
-
 "\e[1;3C": forward-word
 "\e[1;3D": backward-word
-
-"\e[1;2A": "\C-u\C-y"
-"\e[1;2B": "\C-u\C-y"
-"\e[1;2C": "\C-u\C-y"
-"\e[1;2D": "\C-u\C-y"
-
 "\e[H": beginning-of-line
 "\e[F": end-of-line
 "\e[1~": beginning-of-line
 "\e[7~": beginning-of-line
 "\e[4~": end-of-line
 "\e[8~": end-of-line
-
 "\e[3~": delete-char
 "\e[2~": yank
-
 "\C-x\C-x": exchange-point-and-mark
 "\e[5~": history-substring-search-backward
 "\e[6~": history-substring-search-forward
