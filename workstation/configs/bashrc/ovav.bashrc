@@ -79,15 +79,15 @@ export COLORTERM=truecolor
 export TERM=xterm-256color
 
 # ───────────────────────────────────────────────────────────────────────
-#  3. BLE.SH FIRST — line editor of record (when present)
+#  3. BLE.SH (opt-in via OVAV_USE_BLE) — advanced line editor.
 #     ble.sh REPLACES readline; subsequent `bind` calls are ignored
-#     unless wrapped in ble-bind. We load it FIRST so all keybindings
-#     after this point can detect BLE_ATTACHED and adapt.
+#     unless wrapped in ble-bind. Disabled by default because it has
+#     been the cause of 'no se ve lo que escribo' regressions on this
+#     workstation — the CEO can opt back in once the bashrc interactions
+#     with ble.sh are verified safe. Set OVAV_USE_BLE=1 to enable.
 # ───────────────────────────────────────────────────────────────────────
 _BLE_LOADED=""
-if [ -f "$HOME/.local/share/blesh/ble.sh" ]; then
-    # ble.sh refuses to load in subshells (e.g., bash -c, non-tty stdin).
-    # We guard with [ -t 0 ] && [ -t 1 ] to ensure we have a real terminal.
+if [ "${OVAV_USE_BLE:-0}" = "1" ] && [ -f "$HOME/.local/share/blesh/ble.sh" ]; then
     if [ -t 0 ] && [ -t 1 ]; then
         source "$HOME/.local/share/blesh/ble.sh" 2>/dev/null && _BLE_LOADED="yes"
         [ -f "$HOME/.blerc" ] && source "$HOME/.blerc" 2>/dev/null || true
@@ -111,18 +111,23 @@ _ovav_bind_key() {
 
 # ───────────────────────────────────────────────────────────────────────
 #  4. ATUIN — history search (Ctrl+R)
+#     Per OVAV workstation rule #15: NO pty-proxy (inmaduro <30d).
 #     Atuin's `init bash` uses readline `bind` to wire Ctrl+R. When ble.sh
 #     is active, those binds are ignored. We disable Atuin's internal bind
-#     and wire Ctrl+R ourselves via ble-bind.
+#     and wire Ctrl+R ourselves via ble-bind (or readline bind when no ble).
 # ───────────────────────────────────────────────────────────────────────
+# Kill any lingering atuin pty-proxy from a prior session — it spawns a
+# long-lived child process that can swallow keystrokes on new tabs.
+pkill -f "atuin pty-proxy" 2>/dev/null || true
+
 if command -v atuin >/dev/null 2>&1; then
     # Disable Atuin's readline bind for Ctrl+R — we handle it below
     export __atuin_bind_ctrl_r=false
     export __atuin_bind_up_arrow=false
     # Load Atuin init (defines __atuin_widget_run, Atuin preexec, etc.)
-    # When ble.sh is active, the bind -x and macro chain calls in atuin's
-    # init script will be rejected by ble.sh with 'unsupported readline
-    # function' warnings. Capture stderr to /dev/null to suppress them.
+    # Suppress ble.sh 'unsupported readline function' warnings when ble.sh
+    # is up — the function definitions are still useful, just the bind
+    # noise is silenced.
     if [ "$_BLE_LOADED" = "yes" ]; then
         _ovav_atuin_init="$(atuin init bash --disable-up-arrow 2>/dev/null)"
         eval "$_ovav_atuin_init"
