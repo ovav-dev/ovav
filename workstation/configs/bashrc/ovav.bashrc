@@ -312,16 +312,32 @@ if [ -f "$HOME/.intelligent-terminal/shell-integration_v3.sh" ]; then
 fi
 
 # ───────────────────────────────────────────────────────────────────────
-#  11. PROMPT CHAIN — starship_precmd via IT user-PC hook
+#  11. PROMPT CHAIN — theme watcher + starship_precmd via IT user-PC hook
 #  Tab title is set statically per profile via IT settings.json
 #  (profile.tabTitle = profile name). No dynamic template injection.
+#  The theme watcher polls IT settings.json every prompt (cheap) so that
+#  when the CEO flips colorScheme in the IT UI, the bashrc detects it on
+#  the next Enter and re-syncs OpenCode tui.json + starship palette.
 # ───────────────────────────────────────────────────────────────────────
+_ovav_prompt_theme_watch() {
+    # Only poll if IT context is present (no point in non-IT shells).
+    [ -z "${WT_PROFILE_ID:-}" ] && [ -z "${INTELLIGENT_TERMINAL:-}" ] && return 0
+    # Fast path: skip if last check was <2s ago (debounce).
+    local now=$(date +%s)
+    [ -n "${_OVAV_THEME_LAST:-}" ] && [ $((now - _OVAV_THEME_LAST)) -lt 2 ] && return 0
+    _OVAV_THEME_LAST=$now
+    local new_theme
+    new_theme="$(_ovav_theme_resolve 2>/dev/null)" || return 0
+    if [ "$new_theme" != "${OVAV_THEME:-}" ]; then
+        _ovav_theme_apply "$new_theme"
+    fi
+}
 if [ -n "${__IT_SHELLINTEG_USER_PC:-}" ]; then
-    export __IT_SHELLINTEG_USER_PC="starship_precmd"
+    export __IT_SHELLINTEG_USER_PC="_ovav_prompt_theme_watch;starship_precmd"
 elif [ -n "${__it_shellinteg_user_pc:-}" ]; then
-    export __it_shellinteg_user_pc="starship_precmd"
+    export __it_shellinteg_user_pc="_ovav_prompt_theme_watch;starship_precmd"
 else
-    PROMPT_COMMAND="starship_precmd"
+    PROMPT_COMMAND="_ovav_prompt_theme_watch;starship_precmd"
 fi
 
 # ───────────────────────────────────────────────────────────────────────
@@ -337,7 +353,12 @@ if command -v eza &>/dev/null; then
     alias la='eza -a --icons --group-directories-first'
     alias l='eza --icons --group-directories-first'
 fi
-command -v bat &>/dev/null && alias cat='bat --style=numbers,changes,header --theme=Tokyo-Night'
+# bat — no explicit --theme (rely on terminal palette for day/night).
+# Previously used --theme=Tokyo-Night which is a 3rd-party duplicate;
+# CEO directive 2026-08-17: only OVAV Day/Night native themes.
+# bat's default theme adapts well; if a custom OVAV theme is needed later,
+# drop it in ~/.config/bat/themes/ and set BAT_THEME here.
+command -v bat &>/dev/null && alias cat='bat --style=numbers,changes,header'
 command -v fd &>/dev/null && alias find='fd'
 command -v btop &>/dev/null && alias top='btop'
 command -v nvim &>/dev/null && alias vim='nvim'
