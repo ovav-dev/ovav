@@ -3,6 +3,11 @@
     "$schema": "https://aka.ms/terminal-profiles-schema",
     "defaultProfile": "{e3cb3da9-9980-5990-a951-339efdad913d}",
     "theme": "OVAV Day",
+    "profiles": {
+        "defaults": {
+            "colorScheme": "OVAV Night"
+        }
+    },
     "autoReloadSettings": true,
     "keybindings": [
         {
