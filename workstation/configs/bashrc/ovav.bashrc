@@ -268,12 +268,15 @@ fi
 # ───────────────────────────────────────────────────────────────────────
 #  12. ALIASES, CLIPBOARD BRIDGE, IT RESTART CHECK
 # ───────────────────────────────────────────────────────────────────────
-# Modern tool aliases (only when modern tool is installed)
+#  Modern tool aliases (only when modern tool is installed)
+#  CRITICAL: alias `ls` itself to eza so the user gets icons + colors
+#  by default (the CEO complained that bare `ls` shows crude text).
 if command -v eza &>/dev/null; then
-    alias ll='eza -la --icons --git'
+    alias ls='eza --icons --group-directories-first --color=auto --time-style=long-iso'
+    alias ll='eza -la --icons --git --group-directories-first --time-style=long-iso'
     alias lt='eza --tree --level=2 --icons'
-    alias la='eza -a --icons'
-    alias l='eza --icons'
+    alias la='eza -a --icons --group-directories-first'
+    alias l='eza --icons --group-directories-first'
 fi
 command -v bat &>/dev/null && alias cat='bat --style=numbers,changes,header --theme=Tokyo-Night'
 command -v fd &>/dev/null && alias find='fd'
@@ -284,6 +287,28 @@ command -v codium &>/dev/null && alias code='codium'
 # Editor — prefer Neovim when available
 export EDITOR='nvim'
 export VISUAL='nvim'
+
+# ───────────────────────────────────────────────────────────────────────
+#  R10 (2026-08-17): Ctrl+C must NOT signal bash - IT must capture it
+#  for the Windows-native copy behavior. Without this, bash would
+#  interpret Ctrl+C as SIGINT, cancel the current input line, and show
+#  a new prompt - which is what the CEO called "corta el prompt o lo
+#  cancela y me envia a otro prompt nuevo". We unbind SIGINT (Ctrl+C)
+#  from the tty line discipline; IT then receives the keystroke and
+#  triggers Terminal.CopyToClipboard.
+#
+#  Other signals stay intact:
+#    Ctrl+Z  -> SIGTSTP (suspend)         [stty susp ^Z, default]
+#    Ctrl+\  -> SIGQUIT (core dump)       [stty quit ^\, default]
+#    Ctrl+Y  -> SIGDSUSP  (delayed stop)  [stty dsusp ^Y, default]
+#
+#  To kill a hung process: use kill -SIGINT <pid> from another shell,
+#  or press Ctrl+\ in the offending pane.
+# ───────────────────────────────────────────────────────────────────────
+if [ -t 0 ] && [ -t 1 ]; then
+    # Unbind the tty INTR character (default: Ctrl+C). IT captures ^C.
+    stty intr undef 2>/dev/null || true
+fi
 
 # Productivity aliases
 alias gs='git status'
