@@ -199,13 +199,82 @@ unset -f _ovav_bind_key
 # ───────────────────────────────────────────────────────────────────────
 #  6. STARSHIP — premium minimal prompt (must come BEFORE mise so its
 #     precmd hook is available when IT shell-integration captures it)
+#  + OVAV_THEME sync (IT profile → bash → starship → opencode tui.json)
 # ───────────────────────────────────────────────────────────────────────
+# _ovav_theme_resolve: maps IT theme to OVAV_THEME (day|night).
+# Resolution order:
+#   (a) $INTELLIGENT_TERMINAL_THEME  (light/dark) — IT shell-integration v3
+#   (b) $WT_PROFILE_ID → settings.json colorScheme lookup (OVAV Night=night)
+#   (c) default: night
+_ovav_theme_resolve() {
+    local _t="${INTELLIGENT_TERMINAL_THEME:-}"
+    if [ -z "$_t" ] && [ -n "${WT_PROFILE_ID:-}" ] && [ -n "${OVAV_ROOT:-}" ]; then
+        local _settings="/mnt/c/Users/Alexa/AppData/Local/Packages/Microsoft.IntelligentTerminal_8wekyb3d8bbwe/LocalState/settings.json"
+        if [ -f "$_settings" ]; then
+            _t="$(python3 -c "
+import json,sys
+try:
+    s=json.load(open(r'$_settings'))
+    for p in s.get('profiles',{}).get('list',[]):
+        if p.get('guid')==r'${WT_PROFILE_ID}' or p.get('name')==r'${WT_PROFILE_ID}':
+            cs=p.get('colorScheme') or s.get('profiles',{}).get('defaults',{}).get('colorScheme','')
+            print('light' if 'Day' in cs else 'dark')
+            sys.exit(0)
+    print('dark')
+except Exception:
+    print('dark')
+" 2>/dev/null)"
+        fi
+    fi
+    case "$_t" in
+        light|day)  echo "day" ;;
+        *)          echo "night" ;;
+    esac
+}
+# _ovav_theme_apply: sets OVAV_THEME, STARSHIP_PALETTE, and syncs
+# ~/.config/opencode/tui.json theme field to match.
+_ovav_theme_apply() {
+    local new_theme="$1"
+    if [ "$new_theme" = "$OVAV_THEME" ] && [ -n "${OVAV_THEME:-}" ]; then
+        return 0
+    fi
+    export OVAV_THEME="$new_theme"
+    case "$new_theme" in
+        day)  export STARSHIP_PALETTE="ovav-day" ;;
+        *)    export STARSHIP_PALETTE="ovav-night" ;;
+    esac
+    # Sync OpenCode tui.json — only if it exists, is valid JSON, and the
+    # theme field is one of the two OVAV themes (skip if user pinned custom).
+    local _tui="${XDG_CONFIG_HOME:-$HOME/.config}/opencode/tui.json"
+    if [ -f "$_tui" ] && command -v python3 >/dev/null 2>&1; then
+        OVAV_THEME="$new_theme" python3 -c "
+import json,os,sys
+p=os.environ.get('_tui') or '$_tui'
+new=os.environ.get('OVAV_THEME','night')
+try:
+    s=json.load(open(p))
+except Exception:
+    sys.exit(0)
+cur=s.get('theme','')
+# Only sync if current is empty or one of the OVAV pair (don't clobber custom)
+if cur in ('','ovav-day','ovav-night','daylight','tokyo-neon','system','dark','light'):
+    target='ovav-'+new
+    if s.get('theme')!=target:
+        s['theme']=target
+        json.dump(s,open(p,'w'),indent=2)
+except Exception:
+    pass
+" 2>/dev/null
+    fi
+}
+# Apply at startup
+_ovav_theme_apply "$(_ovav_theme_resolve)"
+# Stash resolver for the precmd hook (re-checks on every prompt so live
+# theme switches from IT pick up automatically).
+export -f _ovav_theme_resolve _ovav_theme_apply 2>/dev/null || true
+
 if [ -x "$HOME/.local/bin/starship" ] || type starship >/dev/null 2>&1; then
     export STARSHIP_CONFIG="${OVAV_WORKSTATION:-$HOME/.config}/configs/starship/starship.toml"
-    case "${INTELLIGENT_TERMINAL_THEME:-}" in
-        light) export STARSHIP_PALETTE="ovav-day" ;;
-        *)     export STARSHIP_PALETTE="ovav-night" ;;
-    esac
     eval "$(starship init bash 2>/dev/null)"
 fi
 
@@ -243,26 +312,16 @@ if [ -f "$HOME/.intelligent-terminal/shell-integration_v3.sh" ]; then
 fi
 
 # ───────────────────────────────────────────────────────────────────────
-#  11. PROMPT CHAIN — tab title + starship_precmd via IT user-PC hook
+#  11. PROMPT CHAIN — starship_precmd via IT user-PC hook
+#  Tab title is set statically per profile via IT settings.json
+#  (profile.tabTitle = profile name). No dynamic template injection.
 # ───────────────────────────────────────────────────────────────────────
-_ovav_tab_title() {
-    local git_branch=""
-    if command -v git >/dev/null 2>&1; then
-        git_branch="$(git symbolic-ref --short HEAD 2>/dev/null || echo '')"
-    fi
-    local short_path="${PWD/#$HOME/~}"
-    local tab_text="⬢ OVAV · ${short_path}"
-    if [[ -n "$git_branch" ]]; then
-        tab_text="${tab_text} · ${git_branch}"
-    fi
-    printf '\033]0;%s\007' "$tab_text"
-}
 if [ -n "${__IT_SHELLINTEG_USER_PC:-}" ]; then
-    export __IT_SHELLINTEG_USER_PC="_ovav_tab_title;starship_precmd"
+    export __IT_SHELLINTEG_USER_PC="starship_precmd"
 elif [ -n "${__it_shellinteg_user_pc:-}" ]; then
-    export __it_shellinteg_user_pc="_ovav_tab_title;starship_precmd"
+    export __it_shellinteg_user_pc="starship_precmd"
 else
-    PROMPT_COMMAND="_ovav_tab_title;starship_precmd"
+    PROMPT_COMMAND="starship_precmd"
 fi
 
 # ───────────────────────────────────────────────────────────────────────
