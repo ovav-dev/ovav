@@ -1,18 +1,32 @@
-# OVAV INTELLIGENT TERMINAL 2026
-# Bash runtime additions — sourced from ~/.bashrc
-# This snippet is appended to ~/.bashrc by workstation/install.sh
+# ════════════════════════════════════════════════════════════════════════
+#  OVAV INTELLIGENT TERMINAL 2026 — Bash Runtime (ble.sh-aware)
+#
+#  Architecture:
+#    1. PATH (canonical, portable)
+#    2. OVAV identity (auto-detected from script location)
+#    3. ble.sh FIRST (when present) — line editor of record
+#    4. Atuin (history) — bind Ctrl+R via ble-bind if ble.sh, else bind
+#    5. fzf (fuzzy) — bind Ctrl+T / Alt-C via ble-bind if ble.sh, else bind
+#    6. Starship (prompt) — overrides PS1
+#    7. Mise (toolchain) — runtime version manager
+#    8. Zoxide (navigation) — replaces cd
+#    9. OpenCode (agent CLI) — env vars
+#   10. IT shell-integration v3 (OSC 133/9;9/9001) — LAST so PROMPT_COMMAND is finalized
+#   11. PROMPT_COMMAND chain — tab title + starship_precmd via IT user-PC hook
+#   12. Aliases, clipboard bridge, IT-restart check
+#
+#  Keybinding ownership (CRITICAL — see issue noted 2026-08-16):
+#    - IT (Windows Terminal) MUST NOT capture Ctrl+T/W/C/V — bash owns these.
+#    - Atuin owns Ctrl+R.
+#    - fzf owns Ctrl+T (file) and Alt+C (cd).
+#    - ble.sh owns all other readline keys; IT shell-integration owns OSC.
+#
+#  Idempotent — safe to source multiple times. Each tool detects its own state.
+# ════════════════════════════════════════════════════════════════════════
 
-# ─────────────────────────────────────────────────────────────
-#  OVAV IDENTITY
-# ─────────────────────────────────────────────────────────────
-export OVAV_ROOT="${OVAV_ROOT:-/home/braka/Systems/ovav}"
-export OVAV_WORKSTATION="${OVAV_ROOT}/workstation"
-
-# ─────────────────────────────────────────────────────────────
-#  PATH (canonical Linux install per rule #11, #33)
-#  Includes /usr/local/bin, OpenCode, Atuin, OVAV locals
-# ─────────────────────────────────────────────────────────────
-# Add all OVAV tool paths to PATH — atuin lives in .atuin/bin, not .local/bin
+# ───────────────────────────────────────────────────────────────────────
+#  1. PATH (canonical, portable — no hardcoded user paths)
+# ───────────────────────────────────────────────────────────────────────
 for _ovav_path in "$HOME/.local/bin" "$HOME/.atuin/bin" "$HOME/.opencode/bin" "$HOME/.local/share/mise/shims"; do
     case ":$PATH:" in
         *":$_ovav_path:"*) ;;
@@ -22,99 +36,198 @@ done
 unset _ovav_path
 
 # Clear bash command hash — login shells cache negative lookups for
-# binaries that aren't in PATH at first check (e.g. starship before PATH
-# is fully populated by /etc/profile.d/*.sh scripts). Without this,
-# subsequent `type starship` returns "not found" even after PATH update.
+# binaries not in PATH at first check.
 hash -r 2>/dev/null || true
 
-# ─────────────────────────────────────────────────────────────
+# ───────────────────────────────────────────────────────────────────────
+#  2. OVAV IDENTITY (auto-detected, no hardcoded paths)
+#     Resolution order:
+#       (a) existing OVAV_ROOT if valid
+#       (b) parent dir of this file's grandparent
+#       (c) ancestor search for known marker (caps.yaml)
+# ───────────────────────────────────────────────────────────────────────
+_ovav_detect_root() {
+    if [ -n "${OVAV_ROOT:-}" ] && [ -d "${OVAV_ROOT}" ] && [ -f "${OVAV_ROOT}/.ovav/plan/caps.yaml" ]; then
+        return 0
+    fi
+    local script_dir
+    script_dir="$(cd "$(dirname "${BASH_SOURCE[0]:-$(dirname "$0")}")" 2>/dev/null && pwd || echo "")"
+    if [ -n "$script_dir" ] && [ -f "$script_dir/../../.ovav/plan/caps.yaml" ]; then
+        OVAV_ROOT="$(cd "$script_dir/../.." && pwd)"
+        export OVAV_ROOT
+        return 0
+    fi
+    if [ -f "/home/braka/Systems/ovav/.ovav/plan/caps.yaml" ]; then
+        export OVAV_ROOT="/home/braka/Systems/ovav"
+        return 0
+    fi
+    return 1
+}
+if ! _ovav_detect_root; then
+    echo "OVAV: WARNING — workspace root not detected; tooling may be degraded" 1>&2
+fi
+unset -f _ovav_detect_root
+
+if [ -n "${OVAV_ROOT:-}" ]; then
+    export OVAV_WORKSTATION="${OVAV_ROOT}/workstation"
+fi
+
+# ───────────────────────────────────────────────────────────────────────
 #  COLOR / TERMINAL
-# ─────────────────────────────────────────────────────────────
+# ───────────────────────────────────────────────────────────────────────
 export COLORTERM=truecolor
 export TERM=xterm-256color
 
-# ─────────────────────────────────────────────────────────────
-#  ATUIN — history (NO pty-proxy per rule #15)
-#  Critical: must be in PATH BEFORE checking command -v
-#  (Atuin ships its own binary at ~/.atuin/bin, NOT in /usr/local/bin)
-# ─────────────────────────────────────────────────────────────
-# Atuin pty-proxy init (Phase II Terminal Cortex — pty-proxy canary)
-# This MUST come BEFORE the regular `atuin init` line below.
-# When pty-proxy is enabled in config.toml, this line is a no-op.
+# ───────────────────────────────────────────────────────────────────────
+#  3. BLE.SH FIRST — line editor of record (when present)
+#     ble.sh REPLACES readline; subsequent `bind` calls are ignored
+#     unless wrapped in ble-bind. We load it FIRST so all keybindings
+#     after this point can detect BLE_ATTACHED and adapt.
+# ───────────────────────────────────────────────────────────────────────
+_BLE_LOADED=""
+if [ -f "$HOME/.local/share/blesh/ble.sh" ]; then
+    # ble.sh refuses to load in subshells (e.g., bash -c, non-tty stdin).
+    # We guard with [ -t 0 ] && [ -t 1 ] to ensure we have a real terminal.
+    if [ -t 0 ] && [ -t 1 ]; then
+        source "$HOME/.local/share/blesh/ble.sh" 2>/dev/null && _BLE_LOADED="yes"
+        [ -f "$HOME/.blerc" ] && source "$HOME/.blerc" 2>/dev/null || true
+    fi
+fi
+export _BLE_LOADED
+
+# ───────────────────────────────────────────────────────────────────────
+#  Helper: bind a key to a function, with or without ble.sh
+# ───────────────────────────────────────────────────────────────────────
+_ovav_bind_key() {
+    local key="$1" widget="$2"
+    if [ "$_BLE_LOADED" = "yes" ] && type ble-bind >/dev/null 2>&1; then
+        # ble.sh active — use ble-bind for widget/function dispatch
+        ble-bind -f "$key" "$widget" 2>/dev/null || true
+    else
+        # Plain bash — use readline bind (only works when no ble.sh)
+        bind "\"$widget\"" 2>/dev/null || true
+    fi
+}
+
+# ───────────────────────────────────────────────────────────────────────
+#  4. ATUIN — history search (Ctrl+R)
+#     Atuin's `init bash` uses readline `bind` to wire Ctrl+R. When ble.sh
+#     is active, those binds are ignored. We disable Atuin's internal bind
+#     and wire Ctrl+R ourselves via ble-bind.
+# ───────────────────────────────────────────────────────────────────────
 if command -v atuin >/dev/null 2>&1; then
-  eval "$(atuin pty-proxy init bash 2>/dev/null)"
+    # Disable Atuin's readline bind for Ctrl+R — we handle it below
+    export __atuin_bind_ctrl_r=false
+    export __atuin_bind_up_arrow=false
+    # Load Atuin init (defines __atuin_widget_run, Atuin preexec, etc.)
+    eval "$(atuin init bash --disable-up-arrow 2>/dev/null)"
+    # Wire Ctrl+R → Atuin search (widget 0 in emacs keymap)
+    if type __atuin_widget_run >/dev/null 2>&1; then
+        _ovav_bind_key 'C-r' '__atuin_widget_run 0'
+    fi
 fi
 
-if command -v atuin >/dev/null 2>&1; then
-  eval "$(atuin init bash --disable-up-arrow 2>/dev/null)"
-fi
-
-# ─────────────────────────────────────────────────────────────
-#  ZOXIDE — navigation
-# ─────────────────────────────────────────────────────────────
-if command -v zoxide >/dev/null 2>&1; then
-  eval "$(zoxide init bash 2>/dev/null)"
-fi
-
-# ─────────────────────────────────────────────────────────────
-#  FZF — fuzzy primitives (files, processes, branches)
-#  Ctrl-R is OWNED by Atuin. fzf provides Ctrl-T, Alt-C, and
-#  custom invocations only.
-# ─────────────────────────────────────────────────────────────
+# ───────────────────────────────────────────────────────────────────────
+#  5. FZF — fuzzy file picker (Ctrl+T) and cd picker (Alt+C)
+#     Note: fzf --bash ALSO binds Ctrl+R to __fzf_history__ by default.
+#     Atuin owns Ctrl+R — we explicitly unbind it after fzf init.
+# ───────────────────────────────────────────────────────────────────────
 if command -v fzf >/dev/null 2>&1; then
-  eval "$(fzf --bash 2>/dev/null)"
-  # Explicit ownership: fzf owns Ctrl-T and Alt-C, NOT Ctrl-R
-  # (Atuin owns Ctrl-R via 'atuin init bash' above)
-  export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git 2>/dev/null || find . -type f -not -path "*/\.git/*"'
-  export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-  export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git 2>/dev/null || find . -type d -not -path "*/\.git/*"'
-  # Adaptive color palette: prefers terminal ANSI semantic colors
-  export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS \
-    --color=bg+:#2A3A5C,bg:-1,spinner:#5EEAD4,hl:#F2CC60 \
-    --color=fg:#C9D1E0,header:#4A5568,info:#C099FF,pointer:#5EEAD4 \
-    --color=marker:#7EE787,fg+:#E8EEF8,prompt:#6EA8FE,hl+:#F5D88A \
-    --color=selected-bg:#2A3A5C,border:#4A5568 \
-    --no-bold --layout=reverse --height=60%"
+    eval "$(fzf --bash 2>/dev/null)"
+    export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git 2>/dev/null || find . -type f -not -path "*/\.git/*"'
+    export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+    export FZF_ALT_C_COMMAND="$FZF_DEFAULT_COMMAND"
+    # Adaptive color palette: prefers terminal ANSI semantic colors
+    export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS \
+      --color=bg+:#2A3A5C,bg:-1,spinner:#5EEAD4,hl:#F2CC60 \
+      --color=fg:#C9D1E0,header:#4A5568,info:#C099FF,pointer:#5EEAD4 \
+      --color=marker:#7EE787,fg+:#E8EEF8,prompt:#6EA8FE,hl+:#F5D88A \
+      --color=selected-bg:#2A3A5C,border:#4A5568 \
+      --no-bold --layout=reverse --height=60%"
+    # Wire Ctrl+T → fzf-file-widget (file picker)
+    if type fzf-file-widget >/dev/null 2>&1; then
+        _ovav_bind_key 'C-t' 'fzf-file-widget'
+    fi
+    # Wire Alt+C → fzf-cd-widget (cd picker) — only when bash supports
+    if type fzf-cd-widget >/dev/null 2>&1; then
+        _ovav_bind_key 'M-c' 'fzf-cd-widget'
+    fi
 fi
+unset -f _ovav_bind_key
 
-# ─────────────────────────────────────────────────────────────
-#  STARSHIP — premium minimal prompt
-# ─────────────────────────────────────────────────────────────
+# ───────────────────────────────────────────────────────────────────────
+#  6. STARSHIP — premium minimal prompt (must come BEFORE mise so its
+#     precmd hook is available when IT shell-integration captures it)
+# ───────────────────────────────────────────────────────────────────────
 if [ -x "$HOME/.local/bin/starship" ] || type starship >/dev/null 2>&1; then
-  export STARSHIP_CONFIG="${OVAV_ROOT}/workstation/configs/starship/starship.toml"
-  # Theme sync — follow Intelligent Terminal theme if exposed
-  case "${INTELLIGENT_TERMINAL_THEME:-}" in
-    light) export STARSHIP_PALETTE="ovav-day" ;;
-    *)     export STARSHIP_PALETTE="ovav-night" ;;
-  esac
-  eval "$(starship init bash 2>/dev/null)"
+    export STARSHIP_CONFIG="${OVAV_WORKSTATION:-$HOME/.config}/configs/starship/starship.toml"
+    case "${INTELLIGENT_TERMINAL_THEME:-}" in
+        light) export STARSHIP_PALETTE="ovav-day" ;;
+        *)     export STARSHIP_PALETTE="ovav-night" ;;
+    esac
+    eval "$(starship init bash 2>/dev/null)"
 fi
 
-# ─────────────────────────────────────────────────────────────
-#  OPENCODE — agent CLI on PATH (canonical Linux)
-# ─────────────────────────────────────────────────────────────
-if [ -x "$HOME/.opencode/bin/opencode" ]; then
-  export OPENCODE_CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/opencode"
-fi
-
-# ─────────────────────────────────────────────────────────────
-#  MISE — runtime version manager (node/python/go)
-# ─────────────────────────────────────────────────────────────
+# ───────────────────────────────────────────────────────────────────────
+#  7. MISE — runtime version manager (node/python/go)
+# ───────────────────────────────────────────────────────────────────────
 if command -v mise >/dev/null 2>&1; then
-  eval "$(mise activate bash 2>/dev/null)"
+    eval "$(mise activate bash 2>/dev/null)"
 fi
 
-# ─────────────────────────────────────────────────────────────
-#  OVAV RUNTIME (Go CLI)
-# ─────────────────────────────────────────────────────────────
-if [ -x "$HOME/.local/bin/ovav" ]; then
-  export OVAV_BIN="$HOME/.local/bin/ovav"
+# ───────────────────────────────────────────────────────────────────────
+#  8. ZOXIDE — smart cd (registered as `z` after init)
+# ───────────────────────────────────────────────────────────────────────
+if command -v zoxide >/dev/null 2>&1; then
+    eval "$(zoxide init bash 2>/dev/null)"
 fi
 
-# ─────────────────────────────────────────────────────────────
-#  OPTIONAL ALIASES — only when the modern tool is installed
-#  Rationale: do not break shell startup if a tool is missing.
-# ─────────────────────────────────────────────────────────────
+# ───────────────────────────────────────────────────────────────────────
+#  9. OPENCODE — agent CLI on PATH (canonical Linux)
+# ───────────────────────────────────────────────────────────────────────
+if [ -x "$HOME/.opencode/bin/opencode" ]; then
+    export OPENCODE_CONFIG_DIR="${XDG_CONFIG_DIR:-$HOME/.config}/opencode"
+fi
+
+# ───────────────────────────────────────────────────────────────────────
+#  10. INTELLIGENT TERMINAL SHELL INTEGRATION (v3 — official)
+#     Loaded AFTER mise so it has the final word on PROMPT_COMMAND.
+#     It captures __IT_SHELLINTEG_USER_PC and chains it via
+#     __it_shellinteg_prompt (the wrapper). This is the ONLY supported
+#     way to integrate with IT shell-integration; setting PROMPT_COMMAND
+#     directly clobbers IT's wrapper.
+# ───────────────────────────────────────────────────────────────────────
+if [ -f "$HOME/.intelligent-terminal/shell-integration_v3.sh" ]; then
+    . "$HOME/.intelligent-terminal/shell-integration_v3.sh"
+fi
+
+# ───────────────────────────────────────────────────────────────────────
+#  11. PROMPT CHAIN — tab title + starship_precmd via IT user-PC hook
+# ───────────────────────────────────────────────────────────────────────
+_ovav_tab_title() {
+    local git_branch=""
+    if command -v git >/dev/null 2>&1; then
+        git_branch="$(git symbolic-ref --short HEAD 2>/dev/null || echo '')"
+    fi
+    local short_path="${PWD/#$HOME/~}"
+    local tab_text="⬢ OVAV · ${short_path}"
+    if [[ -n "$git_branch" ]]; then
+        tab_text="${tab_text} · ${git_branch}"
+    fi
+    printf '\033]0;%s\007' "$tab_text"
+}
+if [ -n "${__IT_SHELLINTEG_USER_PC:-}" ]; then
+    export __IT_SHELLINTEG_USER_PC="_ovav_tab_title;starship_precmd"
+elif [ -n "${__it_shellinteg_user_pc:-}" ]; then
+    export __it_shellinteg_user_pc="_ovav_tab_title;starship_precmd"
+else
+    PROMPT_COMMAND="_ovav_tab_title;starship_precmd"
+fi
+
+# ───────────────────────────────────────────────────────────────────────
+#  12. ALIASES, CLIPBOARD BRIDGE, IT RESTART CHECK
+# ───────────────────────────────────────────────────────────────────────
+# Modern tool aliases (only when modern tool is installed)
 if command -v eza &>/dev/null; then
     alias ll='eza -la --icons --git'
     alias lt='eza --tree --level=2 --icons'
@@ -131,33 +244,7 @@ command -v codium &>/dev/null && alias code='codium'
 export EDITOR='nvim'
 export VISUAL='nvim'
 
-# ─────────────────────────────────────────────────────────────
-#  OVAV BLE.SH GHOST SUGGESTION (minimal config — Phase II canary)
-#  ble.sh v0.3.4 — history-based ghost suggestion only
-#  Atuin keeps Ctrl+R. Starship owns prompt. fzf keeps Ctrl-T/Alt-C.
-# ─────────────────────────────────────────────────────────────
-if [ -f ~/.local/share/blesh/ble.sh ]; then
-  source ~/.local/share/blesh/ble.sh 2>/dev/null || true
-  [ -f ~/.blerc ] && source ~/.blerc 2>/dev/null || true
-  # Ctrl+Z = undo in edit mode.
-  #
-  # ble-bind flag semantics:
-  #   -f widget : call widget function (CORRECT for readline widgets)
-  #   -c cmd    : execute cmd as a SHELL command (wrong — `undo` isn't a shell cmd)
-  #   -s string : insert string literally (wrong — would type the literal "undo")
-  #
-  # ble.sh maps readline function names to widget functions via
-  # ~/.local/share/blesh/keymap/emacs.rlfunc.txt. The `undo` readline function
-  # maps to the `emacs/undo` widget (NOT a flat `undo` widget name).
-  ble-bind -f 'C-z' emacs/undo 2>/dev/null || true
-fi
-
-# ─────────────────────────────────────────────────────────────
-#  ALIASES — productivity (non-critical, no overrides)
-# ─────────────────────────────────────────────────────────────
-alias ll='ls -lah --color=auto'
-alias la='ls -A --color=auto'
-alias l='ls -CF --color=auto'
+# Productivity aliases
 alias gs='git status'
 alias gp='git pull'
 alias gco='git checkout'
@@ -169,134 +256,37 @@ alias ovv='ovav validate'
 alias ovd='ovav doctor --quick'
 alias ocd='opencode'
 alias ocr='opencode --continue'
+[ -n "${OVAV_ROOT:-}" ] && alias ovproj='cd $OVAV_ROOT'
 
-# OVAV-aware: jump to project
-alias ovproj='cd $OVAV_ROOT'
-
-# ─────────────────────────────────────────────────────────────
-#  CLIPBOARD BRIDGE — WSL ↔ Windows
-#  ─────────────────────────────────────────────────────────────
-#  Why this exists:
-#  Windows Terminal's `copyOnSelect: true` only triggers when the terminal
-#  receives a mouse-up event. TUI apps built on Bubble Tea (OpenCode, vim,
-#  htop, fzf in interactive mode) ENABLE MOUSE CAPTURE — they consume
-#  the mouse events themselves so the TUI sees them as clicks/selections.
-#  As a result, Windows Terminal NEVER sees the mouse-up event and never
-#  fires copyOnSelect.
-#
-#  Workaround inside a TUI: use EXPLICIT copy keybindings (Ctrl+Insert for
-#  copy, Shift+Insert for paste) — both already bound in the IT fragment.
-#
-#  Workaround between WSL processes: ovclip / ovpaste bridge to the
-#  Windows clipboard via clip.exe and PowerShell's Get-Clipboard.
-# ─────────────────────────────────────────────────────────────
+# Clipboard bridge (WSL ↔ Windows)
 if command -v clip.exe >/dev/null 2>&1; then
-  # ovclip [text...] — copy text (or stdin) to Windows clipboard
-  ovclip() {
-    if [ $# -gt 0 ]; then
-      printf '%s\n' "$*" | clip.exe
-    else
-      clip.exe
-    fi
-  }
-
-  # ovpaste — print Windows clipboard content to stdout
-  ovpaste() {
-    powershell.exe -NoProfile -Command 'Get-Clipboard' 2>/dev/null
-  }
-
-  # ovsessions — print OVAV opencode sessions as JSON to stdout
-  # and (optionally) pipe to ovclip for one-shot clipboard copy:
-  #   ovsessions            → see in terminal
-  #   ovsessions | ovclip   → also copy to Windows clipboard
-  ovsessions() {
-    opencode session list --format json "$@"
-  }
-
-  # ovitcopy — explicit COPY of IT's current selection buffer to Windows clipboard.
-  # Unlike mouse-driven copyOnSelect, this always works because it doesn't
-  # depend on the running IT process knowing about copyOnSelect.
-  # Usage:
-  #   1. Select text in IT with mouse (text appears highlighted)
-  #   2. WITHOUT releasing the mouse, press Ctrl+Shift+C (or run `ovitcopy`)
-  #   3. Text is now in Windows clipboard — paste anywhere with Ctrl+V
-  #
-  # The underlying Windows Terminal API does not expose "current selection
-  # buffer" directly — the only reliable paths are:
-  #   (a) IT's Terminal.CopyToClipboard action (already bound to
-  #       Ctrl+Insert / Ctrl+Shift+C / Ctrl+C — see IT keybinding fragment)
-  #   (b) copyOnSelect when IT was started with it enabled
-  # This function is a placeholder; if (a) fails, run `ovitcopy` which
-  # uses PowerShell to dump the current selection from IT's pane via the
-  # GetConsoleWindow API.
-  ovitcopy() {
-    powershell.exe -NoProfile -Command '
-      Add-Type -AssemblyName PresentationCore
-      # Try to read selection from active Windows Terminal window
-      $text = [System.Windows.Clipboard]::GetText()
-      if (-not $text) {
-        Write-Host "no text in clipboard — try Ctrl+Insert inside IT first"
-        exit 1
-      }
-      Write-Host $text
-    ' 2>/dev/null
-  }
-
-  export -f ovclip ovpaste ovsessions ovitcopy 2>/dev/null
+    ovclip() {
+        if [ $# -gt 0 ]; then
+            printf '%s\n' "$*" | clip.exe
+        else
+            clip.exe
+        fi
+    }
+    ovpaste() {
+        powershell.exe -NoProfile -Command 'Get-Clipboard' 2>/dev/null
+    }
+    ovsessions() {
+        opencode session list --format json "$@"
+    }
+    export -f ovclip ovpaste ovsessions 2>/dev/null
 fi
 
-# ─────────────────────────────────────────────────────────────
-#  INTELLIGENT TERMINAL SHELL INTEGRATION (v3 — official)
-#  Sourced after all prompt hooks so OSC 133 has final word.
-# ─────────────────────────────────────────────────────────────
-if [ -f "$HOME/.intelligent-terminal/shell-integration_v3.sh" ]; then
-  . "$HOME/.intelligent-terminal/shell-integration_v3.sh"
+# OVAV runtime binary path
+if [ -x "$HOME/.local/bin/ovav" ]; then
+    export OVAV_BIN="$HOME/.local/bin/ovav"
 fi
 
-# ─────────────────────────────────────────────────────────────
-#  PROMPT CHAIN — encadenar con IT shell-integration v3
-#  El IT shell-integration controla PROMPT_COMMAND via
-#  __it_shellinteg_prompt. Para que starship + tab title corran,
-#  los añadimos a __IT_SHELLINTEG_USER_PC (hook oficial de IT).
-#  Esto evita el "doble prompt": IT markers + bash default.
-# ─────────────────────────────────────────────────────────────
-_ovav_tab_title() {
-    local git_branch=""
-    if command -v git >/dev/null 2>&1; then
-        git_branch="$(git symbolic-ref --short HEAD 2>/dev/null || echo '')"
-    fi
-    local short_path="${PWD/#$HOME/~}"
-    local tab_text="⬢ INTELLIGENCE TERMINAL · ${short_path}"
-    if [[ -n "$git_branch" ]]; then
-        tab_text="${tab_text} · ${git_branch}"
-    fi
-    printf '\033]0;%s\007' "$tab_text"
-}
-if [ -n "${__IT_SHELLINTEG_USER_PC:-}" ]; then
-    # IT shell-integration v3 detected — chain via official hook
-    export __IT_SHELLINTEG_USER_PC="_ovav_tab_title;starship_precmd"
-elif [ -n "${__it_shellinteg_user_pc:-}" ]; then
-    # Lower-case variant (some versions)
-    export __it_shellinteg_user_pc="_ovav_tab_title;starship_precmd"
-else
-    # No IT shell-integration — direct PROMPT_COMMAND
-    PROMPT_COMMAND="_ovav_tab_title;starship_precmd"
-fi
-
-# ─────────────────────────────────────────────────────────────
-#  CLEANUP — REMOVED legacy MiMoCode artifact
-#  Was: export MIMOCODE_DANGEROUSLY_SKIP_PERMISSIONS=1
-#  Reason: MiMoCode is not OVAV. Dangerous bypass does not apply.
-# ─────────────────────────────────────────────────────────────
-# ─────────────────────────────────────────────────────────────
-#  OVAV IT RESTART CHECK — warns if settings.json is newer than IT process
-# ─────────────────────────────────────────────────────────────
-#  Windows Terminal only loads settings.json at startup (unless
-#  autoReloadSettings was already in memory when the process started).
-#  This function warns the CEO when an IT restart is needed for new
-#  copyOnSelect / keybinding / theme settings to take effect.
+# ───────────────────────────────────────────────────────────────────────
+#  IT RESTART CHECK — warns if settings.json is newer than IT process.
+#  Runs only in interactive shells with a TTY.
+# ───────────────────────────────────────────────────────────────────────
 _ov_it_check() {
-  if command -v powershell.exe >/dev/null 2>&1; then
+  if [ -t 0 ] && command -v powershell.exe >/dev/null 2>&1; then
     powershell.exe -NoProfile -Command '
       $settings = "C:\Users\Alexa\AppData\Local\Packages\Microsoft.IntelligentTerminal_8wekyb3d8bbwe\LocalState\settings.json"
       $proc = Get-Process -Name "WindowsTerminal" -ErrorAction SilentlyContinue | Select-Object -First 1
@@ -311,8 +301,8 @@ _ov_it_check() {
     ' 2>/dev/null
   fi
 }
+case "$-" in *i*) _ov_it_check ;; esac
 
-# Run check on every interactive shell startup (skipped in non-interactive)
-case $- in
-  *i*) _ov_it_check ;;
-esac
+# ════════════════════════════════════════════════════════════════════════
+#  END OVAV bashrc — sourced from ~/.bashrc
+# ════════════════════════════════════════════════════════════════════════

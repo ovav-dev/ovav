@@ -1,5 +1,5 @@
 {
-  "_comment": "OVAV IT v0.4 fragment \u2014 STABLE. copyOnSelect per-profile (not just defaults) + autoReloadSettings.",
+  "_comment": "OVAV IT v0.5 fragment — BASH-OWNERSHIP AWARE. IT MUST NOT capture keys that bash owns (Ctrl+T/W/C/V/R) because ble.sh/Atuin/fzf wire those at readline level. IT captures only window-level navigation (Ctrl+Shift+T/W, Alt+arrows, Ctrl+Shift+F, etc). Removed: ctrl+t (FZF), ctrl+w (readline kill-word), ctrl+c (SIGINT), ctrl+v (readline insert). Kept: ctrl+shift+t/w (tab mgmt), ctrl+insert/shift+insert (clipboard IT-level), ctrl+shift+a (select all).",
   "$schema": "https://aka.ms/terminal-profiles-schema",
   "defaultProfile": "{e3cb3da9-9980-5990-a951-339efdad913d}",
   "theme": "OVAV Day",
@@ -7,7 +7,15 @@
   "keybindings": [
     {
       "id": "Terminal.OpenNewTab",
-      "keys": "ctrl+t"
+      "keys": "ctrl+shift+t"
+    },
+    {
+      "id": "User.closeTab.0",
+      "keys": "ctrl+shift+w"
+    },
+    {
+      "id": "Terminal.ClosePane",
+      "keys": "ctrl+shift+x"
     },
     {
       "id": "Terminal.PasteFromClipboard",
@@ -15,63 +23,23 @@
     },
     {
       "id": "Terminal.PasteFromClipboard",
-      "keys": "ctrl+v"
-    },
-    {
-      "id": "Terminal.PrevTab",
-      "keys": "ctrl+shift+tab"
-    },
-    {
-      "id": "Terminal.CopyToClipboard",
-      "keys": "ctrl+c"
-    },
-    {
-      "id": "Terminal.PasteFromClipboard",
       "keys": "shift+insert"
-    },
-    {
-      "id": "Terminal.ClosePane",
-      "keys": "alt+x"
     },
     {
       "id": "Terminal.CopyToClipboard",
       "keys": "ctrl+shift+c"
     },
     {
-      "id": "User.switchToTab.ED268D78",
-      "keys": "ctrl+9"
+      "id": "Terminal.CopyToClipboard",
+      "keys": "ctrl+shift+insert"
     },
     {
       "id": "Terminal.CopyToClipboard",
       "keys": "ctrl+insert"
     },
     {
-      "id": "Terminal.PasteFromClipboard",
-      "keys": "ctrl+shift+insert"
-    },
-    {
-      "id": "Terminal.CopyToClipboard",
-      "keys": "ctrl+alt+shift+c"
-    },
-    {
-      "id": "Terminal.MoveFocusDown",
-      "keys": "alt+down"
-    },
-    {
-      "id": "Terminal.OpenNewTab",
-      "keys": "ctrl+shift+t"
-    },
-    {
-      "id": "User.closeTab.0",
-      "keys": "ctrl+w"
-    },
-    {
-      "id": "Terminal.MovePaneRight",
-      "keys": "alt+shift+right"
-    },
-    {
-      "id": "Terminal.MovePaneDown",
-      "keys": "alt+shift+down"
+      "id": "Terminal.PrevTab",
+      "keys": "ctrl+shift+tab"
     },
     {
       "id": "Terminal.NextTab",
@@ -80,10 +48,6 @@
     {
       "id": "Terminal.SwitchToTab0",
       "keys": "ctrl+1"
-    },
-    {
-      "id": "Terminal.OpenSystemMenu",
-      "keys": "ctrl+alt+m"
     },
     {
       "id": "Terminal.SwitchToTab1",
@@ -102,18 +66,6 @@
       "keys": "ctrl+5"
     },
     {
-      "id": "Terminal.ResetFontSize",
-      "keys": "ctrl+shift+0"
-    },
-    {
-      "id": "Terminal.IncreaseFontSize",
-      "keys": "ctrl+shift+plus"
-    },
-    {
-      "id": "Terminal.MovePaneLeft",
-      "keys": "alt+shift+left"
-    },
-    {
       "id": "Terminal.SwitchToTab5",
       "keys": "ctrl+6"
     },
@@ -122,36 +74,20 @@
       "keys": "ctrl+7"
     },
     {
-      "id": "Terminal.ToggleCommandPalette",
-      "keys": "ctrl+shift+p"
-    },
-    {
       "id": "Terminal.SwitchToTab7",
       "keys": "ctrl+8"
     },
     {
-      "id": "Terminal.DecreaseFontSize",
-      "keys": "ctrl+minus"
-    },
-    {
-      "id": "Terminal.IncreaseFontSize",
-      "keys": "ctrl+plus"
-    },
-    {
-      "id": "Terminal.SplitPaneDown",
-      "keys": "alt+a"
+      "id": "User.switchToTab.ED268D78",
+      "keys": "ctrl+9"
     },
     {
       "id": "Terminal.SplitPaneRight",
-      "keys": "alt+shift+a"
+      "keys": "alt+shift+plus"
     },
     {
-      "id": "Terminal.TogglePaneZoom",
-      "keys": "ctrl+shift+z"
-    },
-    {
-      "id": "Terminal.MoveFocusUp",
-      "keys": "alt+up"
+      "id": "Terminal.SplitPaneDown",
+      "keys": "alt+shift+minus"
     },
     {
       "id": "Terminal.MoveFocusLeft",
@@ -162,40 +98,96 @@
       "keys": "alt+right"
     },
     {
+      "id": "Terminal.MoveFocusUp",
+      "keys": "alt+up"
+    },
+    {
+      "id": "Terminal.MoveFocusDown",
+      "keys": "alt+down"
+    },
+    {
+      "id": "Terminal.MovePaneLeft",
+      "keys": "alt+shift+left"
+    },
+    {
+      "id": "Terminal.MovePaneRight",
+      "keys": "alt+shift+right"
+    },
+    {
       "id": "Terminal.MovePaneUp",
       "keys": "alt+shift+up"
     },
     {
-      "id": "Terminal.PrevTab",
-      "keys": "ctrl+shift+comma"
+      "id": "Terminal.MovePaneDown",
+      "keys": "alt+shift+down"
     },
     {
-      "id": "Terminal.ResetFontSize",
-      "keys": "ctrl+0"
+      "id": "Terminal.ResizePaneLeft",
+      "keys": "ctrl+alt+shift+left"
+    },
+    {
+      "id": "Terminal.ResizePaneRight",
+      "keys": "ctrl+alt+shift+right"
+    },
+    {
+      "id": "Terminal.ResizePaneUp",
+      "keys": "ctrl+alt+shift+up"
+    },
+    {
+      "id": "Terminal.ResizePaneDown",
+      "keys": "ctrl+alt+shift+down"
+    },
+    {
+      "id": "Terminal.SelectAll",
+      "keys": "ctrl+shift+a"
     },
     {
       "id": "Terminal.FindText",
       "keys": "ctrl+shift+f"
     },
     {
-      "id": "Terminal.OpenSettingsFile",
-      "keys": "ctrl+comma"
+      "id": "Terminal.ToggleCommandPalette",
+      "keys": "ctrl+shift+p"
     },
     {
-      "id": "Terminal.ToggleCommandPalette",
-      "keys": "ctrl+shift+space"
+      "id": "Terminal.OpenSettingsFile",
+      "keys": "ctrl+shift+comma"
+    },
+    {
+      "id": "Terminal.OpenSystemMenu",
+      "keys": "ctrl+shift+m"
     },
     {
       "id": "Terminal.ToggleFullscreen",
       "keys": "alt+enter"
     },
     {
-      "id": "Terminal.NextTab",
-      "keys": "ctrl+shift+period"
-    },
-    {
       "id": "Terminal.ToggleFullscreen",
       "keys": "f11"
+    },
+    {
+      "id": "Terminal.IncreaseFontSize",
+      "keys": "ctrl+shift+plus"
+    },
+    {
+      "id": "Terminal.DecreaseFontSize",
+      "keys": "ctrl+minus"
+    },
+    {
+      "id": "Terminal.IncreaseFontSize",
+      "keys": "ctrl+plus"
+    },
+    {
+      "id": "Terminal.DecreaseFontSize",
+      "keys": "ctrl+shift+minus"
+    },
+    {
+      "id": "Terminal.ResetFontSize",
+      "keys": "ctrl+shift+0"
+    },
+    {
+      "id": "Terminal.ResetFontSize",
+      "keys": "ctrl+0"
     },
     {
       "id": "Terminal.ReloadCommandPalette",
@@ -259,7 +251,7 @@
       "colorScheme": "OVAV Day",
       "copyOnSelect": true,
       "font": {
-        "face": "Cascadia Mono",
+        "face": "JetBrainsMono Nerd Font",
         "size": 12
       }
     },
@@ -267,7 +259,7 @@
       {
         "commandline": "wsl.exe -d Ubuntu-26.04",
         "font": {
-          "face": "Cascadia Mono",
+          "face": "JetBrainsMono Nerd Font",
           "size": 12
         },
         "guid": "{e3cb3da9-9980-5990-a951-339efdad913d}",
@@ -278,7 +270,7 @@
       {
         "commandline": "wsl.exe -d Ubuntu-26.04",
         "font": {
-          "face": "Cascadia Mono",
+          "face": "JetBrainsMono Nerd Font",
           "size": 12
         },
         "guid": "{445f0540-815b-5751-9045-de7354bf23b5}",
@@ -289,7 +281,7 @@
       {
         "commandline": "wsl.exe -d Ubuntu-26.04",
         "font": {
-          "face": "Cascadia Mono",
+          "face": "JetBrainsMono Nerd Font",
           "size": 12
         },
         "guid": "{3effc6bf-75c0-5786-8d37-54b6f9707eb4}",
@@ -300,7 +292,7 @@
       {
         "commandline": "wsl.exe -d Ubuntu-26.04",
         "font": {
-          "face": "Cascadia Mono",
+          "face": "JetBrainsMono Nerd Font",
           "size": 12
         },
         "guid": "{29516ade-0377-5279-ada0-c37d2200eb7d}",
@@ -310,7 +302,7 @@
       },
       {
         "font": {
-          "face": "Cascadia Mono",
+          "face": "JetBrainsMono Nerd Font",
           "size": 12
         },
         "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
@@ -319,7 +311,7 @@
       },
       {
         "font": {
-          "face": "Cascadia Mono",
+          "face": "JetBrainsMono Nerd Font",
           "size": 12
         },
         "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
@@ -328,7 +320,7 @@
       },
       {
         "font": {
-          "face": "Cascadia Mono",
+          "face": "JetBrainsMono Nerd Font",
           "size": 12
         },
         "guid": "{b453ae62-4e3d-5e58-b989-0a998ec441b8}",
@@ -416,9 +408,7 @@
       "id": "WIN.tab"
     },
     {
-      "command": {
-        "action": "closeOtherTabs"
-      },
+      "command": "closeOtherTabs",
       "id": "OVAV.close-others"
     },
     {
