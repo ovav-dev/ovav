@@ -409,3 +409,11 @@ clients/crush/config/setup_minimax_direct.sh
 
 # ── Local binaries (gitignored, never commit binaries) ──
 bin/
+
+# ── OVAV UX Convergence workdir — transient artifacts only ──
+# Tracked: scripts, IT-settings.json, audit logs (57 files committed by regression-fix session)
+# Untracked & gitignored: heavy downloads + ad-hoc backups created during live testing
+.ovav-ux-convergence/downloads/
+.ovav-ux-convergence/backups/*.bak-*
+# Redirect-file artifact (e.g. accidental `> =1` in bash)
+/=1
