@@ -13,9 +13,15 @@ export OVAV_WORKSTATION="${OVAV_ROOT}/workstation"
 #  Includes /usr/local/bin, OpenCode, Atuin, OVAV locals
 # ─────────────────────────────────────────────────────────────
 case ":$PATH:" in
-  *":/usr/local/bin:"*) ;;
-  *) export PATH="/usr/local/bin:/home/braka/.opencode/bin:/home/braka/.atuin/bin:$HOME/.local/bin:$PATH" ;;
+  *":$HOME/.local/bin:"*) ;;
+  *) export PATH="$PATH:$HOME/.local/bin" ;;
 esac
+
+# Clear bash command hash — login shells cache negative lookups for
+# binaries that aren't in PATH at first check (e.g. starship before PATH
+# is fully populated by /etc/profile.d/*.sh scripts). Without this,
+# subsequent `type starship` returns "not found" even after PATH update.
+hash -r 2>/dev/null || true
 
 # ─────────────────────────────────────────────────────────────
 #  COLOR / TERMINAL
@@ -70,7 +76,7 @@ fi
 # ─────────────────────────────────────────────────────────────
 #  STARSHIP — premium minimal prompt
 # ─────────────────────────────────────────────────────────────
-if command -v starship >/dev/null 2>&1; then
+if [ -x "$HOME/.local/bin/starship" ] || type starship >/dev/null 2>&1; then
   export STARSHIP_CONFIG="${OVAV_ROOT}/workstation/configs/starship/starship.toml"
   # Theme sync — follow Intelligent Terminal theme if exposed
   case "${INTELLIGENT_TERMINAL_THEME:-}" in
@@ -127,8 +133,8 @@ export VISUAL='nvim'
 #  Atuin keeps Ctrl+R. Starship owns prompt. fzf keeps Ctrl-T/Alt-C.
 # ─────────────────────────────────────────────────────────────
 if [ -f ~/.local/share/blesh/ble.sh ]; then
-  source ~/.local/share/blesh/ble.sh
-  [ -f ~/.blerc ] && source ~/.blerc
+  source ~/.local/share/blesh/ble.sh 2>/dev/null || true
+  [ -f ~/.blerc ] && source ~/.blerc 2>/dev/null || true
   # Ctrl+Z = undo in edit mode.
   #
   # ble-bind flag semantics:
