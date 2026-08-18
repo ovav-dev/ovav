@@ -1854,25 +1854,37 @@ func TestToolConfigProfiles_MissingFiles(t *testing.T) {
 		}
 	})
 
-	t.Run("ValidRegistryAndCLI", func(t *testing.T) {
+	t.Run("ValidRegistryOnly", func(t *testing.T) {
+		// Post-Python→Go-migration: validator only requires tool_configs.yaml.
+		// bin/ovav (build artifact) and tools/cli/ovav_tool_configs.py (Python helper,
+		// removed) are intentionally not checked.
 		dir := t.TempDir()
-		// Create all 3 required files with correct tokens
 		registryDir := filepath.Join(dir, ".ovav", "registry")
 		os.MkdirAll(registryDir, 0755)
 		os.WriteFile(filepath.Join(registryDir, "tool_configs.yaml"), []byte("tool_config_profiles:\n  wezterm_workspace_isolation:\n    category: terminal\n    ovav_tailor: true\n    ovav tools wezterm plan: true\n    ovav tools wezterm verify: true\n    ovav_installs_wezterm: false\n    writes_user_home_now: false\n    launches_real_wezterm_now: false"), 0644)
 
-		cliDir := filepath.Join(dir, "tools", "cli")
-		os.MkdirAll(cliDir, 0755)
-		os.WriteFile(filepath.Join(cliDir, "ovav_tool_configs.py"), []byte("# OVAV Tool Config Profiles\n# WEZTERM_HELPER\n# ovav.tool_config_profile_action.v1\n# Real WezTerm config apply is blocked\n# writes_performed\nimport shutil\nshutil.which(\"wezterm\")"), 0644)
+		v := NewToolConfigProfiles()
+		result := v.Validate(context.Background(), dir)
+		if result.Status != "pass" {
+			t.Errorf("expected pass with valid registry, got %s: %v", result.Status, result.Issues)
+		}
+	})
 
-		binDir := filepath.Join(dir, "bin")
-		os.MkdirAll(binDir, 0755)
-		os.WriteFile(filepath.Join(binDir, "ovav"), []byte("ovav tools wezterm plan\novav_tool_configs.py"), 0644)
+	t.Run("MissingBinIsOK", func(t *testing.T) {
+		// Regression: bin/ovav used to be required (legacy Python source file).
+		// After Python→Go migration, bin/ovav is a gitignored build artifact and
+		// must NOT cause this validator to fail. Build artifacts are validated by
+		// make test / make vet, not here.
+		dir := t.TempDir()
+		registryDir := filepath.Join(dir, ".ovav", "registry")
+		os.MkdirAll(registryDir, 0755)
+		os.WriteFile(filepath.Join(registryDir, "tool_configs.yaml"), []byte("tool_config_profiles:\n  wezterm_workspace_isolation:\n    category: terminal\n    ovav_tailor: true\n    ovav tools wezterm plan: true\n    ovav tools wezterm verify: true\n    ovav_installs_wezterm: false\n    writes_user_home_now: false\n    launches_real_wezterm_now: false"), 0644)
+		// Intentionally do NOT create bin/ovav — this must not fail.
 
 		v := NewToolConfigProfiles()
 		result := v.Validate(context.Background(), dir)
 		if result.Status != "pass" {
-			t.Errorf("expected pass with valid config, got %s: %v", result.Status, result.Issues)
+			t.Errorf("expected pass even without bin/ovav, got %s: %v", result.Status, result.Issues)
 		}
 	})
 
@@ -1890,14 +1902,6 @@ func TestToolConfigProfiles_MissingFiles(t *testing.T) {
 		registryDir := filepath.Join(dir, ".ovav", "registry")
 		os.MkdirAll(registryDir, 0755)
 		os.WriteFile(filepath.Join(registryDir, "tool_configs.yaml"), []byte("tool_config_profiles:\n  some_other_tool: true"), 0644)
-
-		cliDir := filepath.Join(dir, "tools", "cli")
-		os.MkdirAll(cliDir, 0755)
-		os.WriteFile(filepath.Join(cliDir, "ovav_tool_configs.py"), []byte("# OVAV Tool Config Profiles\n# WEZTERM_HELPER\n# ovav.tool_config_profile_action.v1\n# Real WezTerm config apply is blocked\nimport shutil\nshutil.which(\"wezterm\")"), 0644)
-
-		binDir := filepath.Join(dir, "bin")
-		os.MkdirAll(binDir, 0755)
-		os.WriteFile(filepath.Join(binDir, "ovav"), []byte("ovav tools wezterm plan\novav_tool_configs.py"), 0644)
 
 		v := NewToolConfigProfiles()
 		result := v.Validate(context.Background(), dir)

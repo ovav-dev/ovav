@@ -11,6 +11,12 @@ import (
 
 // ToolConfigProfiles validates the tool_configs.yaml registry and CLI surface files.
 // Replaces: check_tool_config_profiles.py
+//
+// Migration note (2026-08): Python CLI helper (tools/cli/ovav_tool_configs.py) and
+// Python source bin/ovav were removed in the Python→Go migration. The validator now
+// focuses on the tool_configs.yaml registry schema only. Build artifacts
+// (go-runtime/build/ovav) are validated by `make test` + `make vet`, not here.
+// bin/ovav is intentionally gitignored — see .gitignore.
 type ToolConfigProfiles struct{}
 
 func NewToolConfigProfiles() *ToolConfigProfiles { return &ToolConfigProfiles{} }
@@ -18,7 +24,7 @@ func NewToolConfigProfiles() *ToolConfigProfiles { return &ToolConfigProfiles{} 
 func (t *ToolConfigProfiles) ID() string   { return "tool_config_profiles" }
 func (t *ToolConfigProfiles) Name() string { return "Tool Config Profiles Validator" }
 func (t *ToolConfigProfiles) Description() string {
-	return "Validates tool_configs.yaml registry, CLI tool, and bin/ovav consistency"
+	return "Validates tool_configs.yaml registry schema (build artifacts checked by make test/vet)"
 }
 func (t *ToolConfigProfiles) Weight() int { return 6 }
 
@@ -34,20 +40,6 @@ var toolConfigRequiredTokens = []string{
 	"launches_real_wezterm_now: false",
 }
 
-var toolConfigCLITokens = []string{
-	"OVAV Tool Config Profiles",
-	"WEZTERM_HELPER",
-	"ovav.tool_config_profile_action.v1",
-	"Real WezTerm config apply is blocked",
-	"writes_performed",
-	`shutil.which("wezterm")`,
-}
-
-var toolConfigBinTokens = []string{
-	"ovav tools wezterm plan",
-	"ovav_tool_configs.py",
-}
-
 var toolConfigBlockedTokens = []string{
 	"write_text(",
 	`subprocess.run(["wezterm"`,
@@ -59,46 +51,29 @@ func (t *ToolConfigProfiles) Validate(ctx context.Context, root string) Result {
 	start := time.Now()
 	var issues []string
 
-	// 1. Check source files exist
-	// Note: tools/cli/ovav_tool_configs.py is deprecated (Go-native only)
-	for _, p := range []struct{ path, name string }{
-		{".ovav/registry/tool_configs.yaml", "registry"},
-		{"bin/ovav", "bin_ovav"},
-	} {
-		fullPath := filepath.Join(root, p.path)
-		if _, err := os.Stat(fullPath); os.IsNotExist(err) {
-			issues = append(issues, fmt.Sprintf("missing %s: %s", p.name, p.path))
-		}
-	}
-
-	if len(issues) > 0 {
+	// 1. Check that the tool_configs.yaml registry exists.
+	// bin/ovav is intentionally gitignored (Go build artifact) and not checked here.
+	registryPath := filepath.Join(root, ".ovav/registry/tool_configs.yaml")
+	if _, err := os.Stat(registryPath); os.IsNotExist(err) {
 		return Result{ID: t.ID(), Name: t.Name(), Status: "fail", Weight: t.Weight(),
-			Message: fmt.Sprintf("FAIL — %d missing source file(s)", len(issues)),
-			Issues:  issues, Duration: time.Since(start)}
+			Message:    "FAIL — missing registry: .ovav/registry/tool_configs.yaml",
+			Issues:     []string{"missing registry: .ovav/registry/tool_configs.yaml"},
+			Duration:   time.Since(start)}
 	}
 
-	// 2. Read files
-	readFile := func(rel string) string {
-		data, err := os.ReadFile(filepath.Join(root, rel))
-		if err != nil {
-			return ""
-		}
-		return string(data)
+	// 2. Read registry and verify required schema tokens.
+	registryBytes, err := os.ReadFile(registryPath)
+	if err != nil {
+		return Result{ID: t.ID(), Name: t.Name(), Status: "fail", Weight: t.Weight(),
+			Message:    fmt.Sprintf("FAIL — cannot read registry: %v", err),
+			Issues:     []string{fmt.Sprintf("registry read error: %v", err)},
+			Duration:   time.Since(start)}
 	}
-	registry := readFile(".ovav/registry/tool_configs.yaml")
-	binText := readFile("bin/ovav")
+	registry := string(registryBytes)
 
-	// 3. Check registry tokens
 	for _, token := range toolConfigRequiredTokens {
 		if !strings.Contains(registry, token) {
 			issues = append(issues, fmt.Sprintf("registry missing token: %s", token))
-		}
-	}
-
-	// 4. Check bin tokens
-	for _, token := range toolConfigBinTokens {
-		if !strings.Contains(binText, token) {
-			issues = append(issues, fmt.Sprintf("bin/ovav missing token: %s", token))
 		}
 	}
 
