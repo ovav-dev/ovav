@@ -37,17 +37,6 @@
     "opencode_AGENTS.md"
   ],
   "mcp": {
-    "ovav-browser": {
-      "command": [
-        "go",
-        "run",
-        "-C",
-        "go-runtime",
-        "./cmd/browser_server"
-      ],
-      "enabled": true,
-      "type": "local"
-    },
     "ovav-budget": {
       "enabled": false
     },
@@ -73,6 +62,14 @@
     },
     "ovav-sqlite": {
       "enabled": false
+    },
+    "ovav-playwright": {
+      "command": [
+        "npx",
+        "@playwright/mcp@latest"
+      ],
+      "type": "stdio",
+      "enabled": true
     },
     "atuin": {
       "command": [
