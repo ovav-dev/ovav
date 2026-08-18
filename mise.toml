@@ -1,0 +1,69 @@
+# OVAV Project — Pinned Toolchain
+# Canonical tool versions for OVAV development.
+# Any developer who clones this repo gets the same toolchain via `mise use`.
+# Managed by: Platform Engineering (Thavren)
+# Last updated: 2026-08-17
+
+[env]
+# Disable mise-managed auto-install in CI; explicit in dev
+MISE_NODE_VERIFY = "1"
+
+[tools]
+# Go runtime — required by go-runtime/ (CAPA 9.5)
+go = "1.24.13"
+
+# Node LTS — required by tools/cpanel/ (React/TypeScript)
+node = "22.23.2"
+
+# uv — Python package manager (replaces pip3)
+# Not pinned by version: uv self-updates. We rely on `uv` binary.
+
+# Optional but recommended:
+# rust = "1.81.0"  # uncomment when cargo needed
+
+# ── Tasks (mise-native automation) ────────────────────────────────────────────
+# Usage: mise run <task>
+
+[tasks.go-build]
+description = "Build OVAV CLI + cockpit TUI"
+run = "cd go-runtime && make build-current && make build-cockpit"
+
+[tasks.go-test]
+description = "Run Go test suite"
+run = "cd go-runtime && make test"
+
+[tasks.go-install]
+description = "Install ovav + cockpit to ~/.local/bin/"
+run = "cd go-runtime && make install"
+
+[tasks.validate]
+description = "Run OVAV validators"
+run = "ovav validate"
+
+[tasks.status]
+description = "OVAV status snapshot"
+run = "ovav status"
+
+[tasks.fmt]
+description = "Format Go code with gofumpt"
+run = "cd go-runtime && gofumpt -l -w ."
+
+[tasks.lint]
+description = "Run golangci-lint"
+run = "cd go-runtime && golangci-lint run ./..."
+
+[tasks.cpanel-dev]
+description = "Start cpanel dev server"
+run = "cd tools/cpanel && npm run dev"
+
+[tasks.cpanel-install]
+description = "Install cpanel dependencies"
+run = "cd tools/cpanel && npm install"
+
+[tasks.full-setup]
+description = "Full dev environment bootstrap"
+run = [
+  "mise install",
+  "cd go-runtime && make install",
+  "go install mvdan.cc/gofumpt@latest",
+]
