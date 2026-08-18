@@ -49,17 +49,6 @@
     "ovav-git": {
       "enabled": false
     },
-    "ovav-memory": {
-      "command": [
-        "go",
-        "run",
-        "-C",
-        "go-runtime",
-        "./cmd/memory-mcp"
-      ],
-      "enabled": true,
-      "type": "local"
-    },
     "ovav-sqlite": {
       "enabled": false
     },
