@@ -35,24 +35,6 @@ runtime:
         websearch: true
         doom_loop: true
 mcp:
-  ovav-browser:
-    type: local
-    command:
-    - go
-    - run
-    - -C
-    - go-runtime
-    - ./cmd/browser_server
-    enabled: true
-  ovav-memory:
-    type: local
-    command:
-    - go
-    - run
-    - -C
-    - go-runtime
-    - ./cmd/memory-mcp
-    enabled: true
   # NOTE: ovav-budget, ovav-design-system, ovav-figma, ovav-git, ovav-sqlite
   # are declared but disabled — no binary exists yet in go-runtime/cmd/.
   # They will be enabled when their respective Go binaries are implemented.
@@ -66,8 +48,24 @@ mcp:
     enabled: false
   ovav-sqlite:
     enabled: false
+  # Browser automation: Microsoft Playwright MCP (replaces ovav-browser
+  # which was a Go facade eliminated Aug 2026).
+  ovav-playwright:
+    type: local
+    command:
+    - npx
+    - '@playwright/mcp@latest'
+    enabled: true
+  # Atuin shell history MCP (separate tool, not OVAV-owned).
+  atuin:
+    type: local
+    command:
+    - atuin
+    - mcp
+    enabled: true
 plugins:
 - .opencode/plugins/ovav-monitor.js
+- .opencode/plugins/ovav-atuin-bridge.js
 providers:
   openai:
     options:
