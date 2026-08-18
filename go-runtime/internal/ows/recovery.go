@@ -232,8 +232,7 @@ func Verify(repoRoot string, changedFiles []string, quick ...bool) (*VerifyResul
 			goRoot := filepath.Join(repoRoot, goDir)
 
 			// 1a. go vet
-			vetCmd := exec.Command("go", "vet", "./...")
-			vetCmd.Dir = goRoot
+			vetCmd := goCmd(goRoot, "vet", "./...")
 			if out, err := vetCmd.CombinedOutput(); err != nil {
 				r.GoVetPass = false
 				issues = append(issues, fmt.Sprintf("go vet FAILED in %s: %s", goDir, truncateOutput(string(out), 200)))
@@ -282,8 +281,7 @@ func Verify(repoRoot string, changedFiles []string, quick ...bool) (*VerifyResul
 				if len(testArgs) == 2 {
 					testArgs = append(testArgs, "./...")
 				}
-				testCmd := exec.Command("go", testArgs...)
-				testCmd.Dir = goRoot
+				testCmd := goCmd(goRoot, testArgs...)
 				if out, err := testCmd.CombinedOutput(); err != nil {
 					r.GoTestPass = false
 					issues = append(issues, fmt.Sprintf("go test FAILED in %s: %s", goDir, truncateOutput(string(out), 200)))
@@ -295,11 +293,9 @@ func Verify(repoRoot string, changedFiles []string, quick ...bool) (*VerifyResul
 			// 1d. Coverage gate (strict+ only)
 			if verifyLevel >= VerifyStrict {
 				coverFile := filepath.Join(os.TempDir(), "ovav-owv-coverage.out")
-				coverCmd := exec.Command("go", "test", "-count=1", "-coverprofile="+coverFile, "./...")
-				coverCmd.Dir = goRoot
+				coverCmd := goCmd(goRoot, "test", "-count=1", "-coverprofile="+coverFile, "./...")
 				if _, err := coverCmd.CombinedOutput(); err == nil {
-					totalCmd := exec.Command("go", "tool", "cover", "-func="+coverFile)
-					totalCmd.Dir = goRoot
+					totalCmd := goCmd(goRoot, "tool", "cover", "-func="+coverFile)
 					if totalOut, err := totalCmd.Output(); err == nil {
 						lines := strings.Split(strings.TrimSpace(string(totalOut)), "\n")
 						if len(lines) > 0 {
@@ -339,8 +335,7 @@ func Verify(repoRoot string, changedFiles []string, quick ...bool) (*VerifyResul
 			valArgs = append(valArgs, "--changed-files", strings.Join(changedFiles, ","))
 			valArgs = append(valArgs, "--root", repoRoot)
 		}
-		valCmd := exec.Command("go", valArgs...)
-		valCmd.Dir = validateDir
+		valCmd := goCmd(validateDir, valArgs...)
 		valOut, _ := valCmd.CombinedOutput()
 		r.ValidateRan = true
 		r.ValidatePass, r.ValidateFail = parseValidateOutput(string(valOut))

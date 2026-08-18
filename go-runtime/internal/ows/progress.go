@@ -135,8 +135,7 @@ func VerifyPhases(repoRoot string, changedFiles []string) ([]PhaseResult, error)
 			valArgs = append(valArgs, "--changed-files", strings.Join(changedFiles, ","))
 			valArgs = append(valArgs, "--root", repoRoot)
 		}
-		valCmd := exec.Command("go", valArgs...)
-		valCmd.Dir = validateDir
+		valCmd := goCmd(validateDir, valArgs...)
 		valOut, _ := valCmd.CombinedOutput()
 		_, fail := parseValidateOutput(string(valOut))
 		valIssues := []string{}
@@ -177,8 +176,7 @@ func runGoVerification(goRoot string, phaseCount int) []PhaseResult {
 	go func() {
 		defer wg.Done()
 		start := time.Now()
-		vetCmd := exec.Command("go", "vet", "./...")
-		vetCmd.Dir = goRoot
+		vetCmd := goCmd(goRoot, "vet", "./...")
 		out, err := vetCmd.CombinedOutput()
 		pass := true
 		issues := []string{}
@@ -212,8 +210,7 @@ func runGoVerification(goRoot string, phaseCount int) []PhaseResult {
 	// Phase 3: go test
 	fmt.Printf("\n  ⏳ go test running (this may take a moment)...\n")
 	startTest := time.Now()
-	testCmd := exec.Command("go", "test", "-count=1", "./...")
-	testCmd.Dir = goRoot
+	testCmd := goCmd(goRoot, "test", "-count=1", "./...")
 	out, err := testCmd.CombinedOutput()
 	testIssues := []string{}
 	testPass := true
