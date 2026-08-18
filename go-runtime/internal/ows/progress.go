@@ -10,6 +10,23 @@ import (
 )
 
 // ProgressTracker manages animated progress reporting.
+
+// collectIssueLines extracts up to maxLines trimmed, non-empty lines from command
+// output. Guards against slice out-of-bounds when output is empty or shorter
+// than maxLines (replaces the repeated buggy [:5] pattern).
+func collectIssueLines(out string, maxLines int) []string {
+	var lines []string
+	for _, l := range strings.Split(strings.TrimSpace(out), "\n") {
+		if t := strings.TrimSpace(l); t != "" {
+			lines = append(lines, t)
+			if len(lines) >= maxLines {
+				break
+			}
+		}
+	}
+	return lines
+}
+
 type ProgressTracker struct {
 	label   string
 	total   int
@@ -229,7 +246,12 @@ func runNodeJSVerification(nodeRoot string, phaseCount int) []PhaseResult {
 		pass := err == nil
 		issues := []string{}
 		if !pass {
-			for _, l := range strings.Split(strings.TrimSpace(string(out)), "\n")[:5] {
+			lines := strings.Split(strings.TrimSpace(string(out)), "\n")
+			limit := 5
+			if len(lines) < limit {
+				limit = len(lines)
+			}
+			for _, l := range lines[:limit] {
 				if t := strings.TrimSpace(l); t != "" {
 					issues = append(issues, t)
 				}
@@ -245,7 +267,13 @@ func runNodeJSVerification(nodeRoot string, phaseCount int) []PhaseResult {
 		out, err := cmd.CombinedOutput()
 		issues := []string{}
 		if err != nil {
-			for _, l := range strings.Split(strings.TrimSpace(string(out)), "\n")[:5] {
+			lines := strings.Split(strings.TrimSpace(string(out)), "\n")
+			// Cap to 5 lines but guard against short/empty output to avoid slice OOB panic.
+			limit := 5
+			if len(lines) < limit {
+				limit = len(lines)
+			}
+			for _, l := range lines[:limit] {
 				if t := strings.TrimSpace(l); t != "" {
 					issues = append(issues, t)
 				}
@@ -262,7 +290,7 @@ func runNodeJSVerification(nodeRoot string, phaseCount int) []PhaseResult {
 	out, err := cmd.CombinedOutput()
 	issues := []string{}
 	if err != nil {
-		for _, l := range strings.Split(strings.TrimSpace(string(out)), "\n")[:5] {
+		for _, l := range collectIssueLines(string(out), 5) {
 			if t := strings.TrimSpace(l); t != "" {
 				issues = append(issues, t)
 			}
@@ -292,7 +320,7 @@ func runPythonVerification(pythonRoot string, phaseCount int) []PhaseResult {
 		out, err := cmd.CombinedOutput()
 		issues := []string{}
 		if err != nil {
-			for _, l := range strings.Split(strings.TrimSpace(string(out)), "\n")[:5] {
+			for _, l := range collectIssueLines(string(out), 5) {
 				if t := strings.TrimSpace(l); t != "" {
 					issues = append(issues, t)
 				}
@@ -309,7 +337,7 @@ func runPythonVerification(pythonRoot string, phaseCount int) []PhaseResult {
 	out, err := cmd.CombinedOutput()
 	issues := []string{}
 	if err != nil {
-		for _, l := range strings.Split(strings.TrimSpace(string(out)), "\n")[:5] {
+		for _, l := range collectIssueLines(string(out), 5) {
 			if t := strings.TrimSpace(l); t != "" {
 				issues = append(issues, t)
 			}
@@ -333,7 +361,7 @@ func runRustVerification(rustRoot string, phaseCount int) []PhaseResult {
 	out, err := cmd.CombinedOutput()
 	issues := []string{}
 	if err != nil {
-		for _, l := range strings.Split(strings.TrimSpace(string(out)), "\n")[:5] {
+		for _, l := range collectIssueLines(string(out), 5) {
 			if t := strings.TrimSpace(l); t != "" {
 				issues = append(issues, t)
 			}
@@ -349,7 +377,7 @@ func runRustVerification(rustRoot string, phaseCount int) []PhaseResult {
 	out, err = cmd.CombinedOutput()
 	issues = []string{}
 	if err != nil {
-		for _, l := range strings.Split(strings.TrimSpace(string(out)), "\n")[:5] {
+		for _, l := range collectIssueLines(string(out), 5) {
 			if t := strings.TrimSpace(l); t != "" {
 				issues = append(issues, t)
 			}
@@ -365,7 +393,7 @@ func runRustVerification(rustRoot string, phaseCount int) []PhaseResult {
 	out, err = cmd.CombinedOutput()
 	issues = []string{}
 	if err != nil {
-		for _, l := range strings.Split(strings.TrimSpace(string(out)), "\n")[:5] {
+		for _, l := range collectIssueLines(string(out), 5) {
 			if t := strings.TrimSpace(l); t != "" {
 				issues = append(issues, t)
 			}
@@ -382,7 +410,7 @@ func runRustVerification(rustRoot string, phaseCount int) []PhaseResult {
 		out, err = cmd.CombinedOutput()
 		issues = []string{}
 		if err != nil {
-			for _, l := range strings.Split(strings.TrimSpace(string(out)), "\n")[:5] {
+			for _, l := range collectIssueLines(string(out), 5) {
 				if t := strings.TrimSpace(l); t != "" {
 					issues = append(issues, t)
 				}

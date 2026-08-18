@@ -56,18 +56,18 @@ func (t *ToolConfigProfiles) Validate(ctx context.Context, root string) Result {
 	registryPath := filepath.Join(root, ".ovav/registry/tool_configs.yaml")
 	if _, err := os.Stat(registryPath); os.IsNotExist(err) {
 		return Result{ID: t.ID(), Name: t.Name(), Status: "fail", Weight: t.Weight(),
-			Message:    "FAIL — missing registry: .ovav/registry/tool_configs.yaml",
-			Issues:     []string{"missing registry: .ovav/registry/tool_configs.yaml"},
-			Duration:   time.Since(start)}
+			Message:  "FAIL — missing registry: .ovav/registry/tool_configs.yaml",
+			Issues:   []string{"missing registry: .ovav/registry/tool_configs.yaml"},
+			Duration: time.Since(start)}
 	}
 
 	// 2. Read registry and verify required schema tokens.
 	registryBytes, err := os.ReadFile(registryPath)
 	if err != nil {
 		return Result{ID: t.ID(), Name: t.Name(), Status: "fail", Weight: t.Weight(),
-			Message:    fmt.Sprintf("FAIL — cannot read registry: %v", err),
-			Issues:     []string{fmt.Sprintf("registry read error: %v", err)},
-			Duration:   time.Since(start)}
+			Message:  fmt.Sprintf("FAIL — cannot read registry: %v", err),
+			Issues:   []string{fmt.Sprintf("registry read error: %v", err)},
+			Duration: time.Since(start)}
 	}
 	registry := string(registryBytes)
 
