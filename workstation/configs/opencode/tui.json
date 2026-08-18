@@ -1,5 +1,23 @@
 {
   "$schema": "https://opencode.ai/config.json",
+  "_ovav_cleanup": {
+    "version": "2026.08.18.2",
+    "rationale": "Remove local hardcoded model/agent shortcuts that bypass OVAV canonical routing. All model selection and agent dispatch must flow through ~/.config/opencode/opencode.json (symlinked to OVAV canonical) and the agent library at ~/.config/opencode/agents/.",
+    "removed": [
+      "top-level model: 'openai/gpt-5' (was overriding workspace default)",
+      "agent.primary with hardcoded model + FAST semantic label",
+      "agent.deep with hardcoded model + DEEP semantic label",
+      "command.issue with hardcoded model (FAST issues override)",
+      "default_agent 'primary' (local shortcut → switched to OVAV canonical 'default')"
+    ],
+    "kept": [
+      "theme (visual layer — Warp-coupled)",
+      "provider openai (informational, no override)",
+      "mcp structure (preserved for inheritance)",
+      "keybinds (visual — Warp-coupled)",
+      "experimental.acp (acp protocol enable)"
+    ]
+  },
   "theme": "system",
   "provider": {
     "openai": {
@@ -7,23 +25,6 @@
       "name": "OpenAI",
       "options": {},
       "models": {}
-    }
-  },
-  "model": "openai/gpt-5",
-  "agent": {
-    "primary": {
-      "model": "openai/gpt-5",
-      "description": "FAST — shell, autofix, quick questions"
-    },
-    "deep": {
-      "model": "openai/gpt-5",
-      "description": "DEEP — architecture, refactoring, OVAV reasoning"
-    }
-  },
-  "command": {
-    "issue": {
-      "model": "openai/gpt-5",
-      "description": "FAST issues"
     }
   },
   "mcp": {
@@ -35,5 +36,17 @@
   },
   "share": "manual",
   "autoupdate": true,
-  "default_agent": "primary"
+  "default_agent": "default",
+  "keybinds": {
+    "input_paste": {
+      "key": "ctrl+v",
+      "preventDefault": false
+    },
+    "input_undo": "ctrl+z,ctrl+-,super+z",
+    "terminal_suspend": "none",
+    "leader": "ctrl+x",
+    "app_exit": "alt+x",
+    "session_sidebar_toggle": "ctrl+b"
+  },
+  "leader_timeout": 2000
 }
