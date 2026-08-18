@@ -7,6 +7,6 @@
     "AGENTS.md": "eb9a794656e9be6ad3e86d3123080138ef949e78996523650f6b3cb8ab7357d3",
     "go-runtime/go.mod": "599b88657887000354a47351a0555ddb5b7a0c67ea022dc33f692a56af9f9bd8",
     "go-runtime/internal/validators/cmd/validate/main.go": "8acb76e3f95573fd4a950dbd695f65e2336317987f192bccd6a452b5a62606b0",
-    "opencode.json": "82a6469c235965ad969d99640bfe6286354b73e61c3c2a99611953a7967b023b"
+    "opencode.json": "577ad7ba0bdcd05eb77d504b2363a50db6f63abf2caedcf20a648905b4b677da"
   }
 }
