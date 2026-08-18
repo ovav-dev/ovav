@@ -82,19 +82,26 @@ func resolveGoBinary() string {
 }
 
 // goCmd returns an *exec.Cmd for the `go` binary with the given args,
-// automatically resolving the binary path via resolveGoBinary().
+// automatically resolving the binary path via resolveGoBinary() and
+// setting Dir so the command runs in the correct module context.
 //
 // If go cannot be found, returns a Cmd that will fail with a clear error
 // message rather than the ambiguous "executable file not found".
 func goCmd(dir string, args ...string) *exec.Cmd {
 	bin := resolveGoBinary()
+	var cmd *exec.Cmd
 	if bin == "" {
 		// Return a cmd that will fail loudly. We use the literal "go"
 		// so exec surfaces its own diagnostic; the caller already wraps
 		// the error in a validator-style message.
-		return exec.Command("go", args...)
+		cmd = exec.Command("go", args...)
+	} else {
+		cmd = exec.Command(bin, args...)
 	}
-	return exec.Command(bin, args...)
+	if dir != "" {
+		cmd.Dir = dir
+	}
+	return cmd
 }
 
 // GoBinaryPath returns the resolved go binary path, or empty string if not found.
