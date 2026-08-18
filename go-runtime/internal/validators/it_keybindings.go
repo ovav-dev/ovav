@@ -95,6 +95,17 @@ var itBuiltinActions = map[string]bool{
 	"Terminal.ScrollPageDown": true,
 	"Terminal.ScrollToTop":    true,
 	"Terminal.ScrollToBottom": true,
+	// Resize panes (alt+ctrl+shift+arrows)
+	"Terminal.ResizePaneLeft":  true,
+	"Terminal.ResizePaneRight": true,
+	"Terminal.ResizePaneUp":    true,
+	"Terminal.ResizePaneDown":  true,
+	// Open new tab with named profile (alt+1..4)
+	"Terminal.OpenNewTabProfile": true,
+	// Generic split pane (alt+a variants)
+	"Terminal.SplitPane": true,
+	// Duplicate tab (ctrl+shift+d)
+	"Terminal.DuplicateTab": true,
 	// Font
 	"Terminal.IncreaseFontSize": true,
 	"Terminal.DecreaseFontSize": true,
