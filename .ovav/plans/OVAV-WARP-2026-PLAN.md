@@ -385,7 +385,7 @@ All 47 checkboxes from master plan §42 marked complete with evidence.
 | Phase | Status | Commit | Safe Stop |
 |---|---|---|---|
 | P0 | ✅ Complete | `fc72591` | PARTIAL |
-| P1 | ⏳ Pending | — | — |
+| P1 | ✅ Complete | `ed4e3c1` | VERIFICATION_COMPLETE |
 | P2 | ⏳ Pending | — | — |
 | P3 | ⏳ Pending | — | — |
 | P4 | ⏳ Pending | — | — |
@@ -396,6 +396,45 @@ All 47 checkboxes from master plan §42 marked complete with evidence.
 | P9 | ⏳ Pending | — | — |
 | P10 | ⏳ Pending | — | — |
 | P11 | ⏳ Pending | — | — |
+
+---
+
+## P1 — Warp × WSL2 × Fish stability ✅ VERIFICATION_COMPLETE
+
+**Goal:** Verify existing connection stack without modification.
+
+### Verified facts
+
+| Check | Evidence |
+|---|---|
+| Warp Stable installed | `/mnt/c/Program Files/Warp/` exists |
+| WSL2 distro = Ubuntu-26.04 | `/etc/os-release` → `Ubuntu 26.04 LTS` |
+| Fish is login shell | `getent passwd braka` → `/usr/bin/fish` |
+| `[session] wsl = "Ubuntu-26.04"` present | settings.toml line 158 |
+| `[session.new_session_shell_override]` present | settings.toml line 161 (gap: plan says remove) |
+| Warp settings.toml size | 169 lines |
+
+### Settings snapshot captured
+
+- `.ovav/snapshots/2026-08-18-pre-warp-plan/warp-settings.toml.baseline` (full TOML)
+- `.ovav/snapshots/2026-08-18-pre-warp-plan/warp-runtime-baseline.txt` (findings)
+
+### 100% criterion: ✅ VERIFICATION_COMPLETE
+
+P1 is read-only. No mutations to Warp settings applied. All gaps
+discovered are catalogued for P2-P10 resolution.
+
+### Gaps catalogued for downstream phases
+
+See `warp-runtime-baseline.txt` for full list. Key items:
+
+- P2: `show_warning_before_quitting=false`, `show_panel_in_restored_windows=false`, `input_box_type_setting=universal`
+- P5: denylist rebuild (broad shells → granular patterns + git worktree block)
+- P5: 4 execution profiles (only "Default" exists)
+- P6: 9 Warp Workflows missing
+- P7: `base_model=auto-genius` must become MiniMax-M3
+- P7: MiniMax custom endpoint not configured
+- P8: `@warp-dot-dev/opencode-warp` plugin missing
 
 ---
 
