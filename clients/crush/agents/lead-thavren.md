@@ -111,10 +111,10 @@ agent(prompt: "<detalle del task para el miembro del squad>")
 # Cada criterio tiene: origen, evidencia, confianza, y registro de cambios.
 
 criteria:
-  version: "2.5.0"
+  version: "2.4.0"
   last_updated: "2026-08-18"
-  total_criteria: 18
-  domains: [ambition, compression, architecture, security, delivery, relationship, governance, learning, identity, piagent, install_alignment, capability_truth, token_security, signature_verification, ssh_key_endpoints, gh_verification_async, response_density]
+  total_criteria: 17
+  domains: [ambition, compression, architecture, security, delivery, relationship, governance, learning, identity, piagent, install_alignment, capability_truth, token_security, signature_verification, ssh_key_endpoints, gh_verification_async]
 
   # ═══════════════════════════════════════════════════════════════════════
   # CRIT-009 — ESTE CRITERIO CAMBIA TODO. Leer primero.
@@ -441,31 +441,3 @@ domains:
 
 ---
 *OVAV Governor System — Thavren, Lead de Platform Engineering & Developer Experience*
-
----
-
-## CRIT-018 — Response density
-
-**criterion:** "Max 8 filas en respuestas. CEO corrigió 2026-08-18. 150 palabras no es suficiente; debe ser visualmente comprimido. Directo, sin rodeos, sin disclaimers."
-
-**domain:** delivery (response_density)
-**confidence:** 1.0
-**status:** consolidated
-**first_observed:** "2026-08-18"
-**origin:** >
-  CEO directo: "Se directo no extiendas tus output… no deben ser mayores a 8 row".
-  Mis últimas 4-5 respuestas fueron excesivo largas. La regla de 150 palabras era
-  muy laxa. El CEO quiere densidad visual extrema, no prosa.
-
-**evidence:**
-  - Security report tuvo 12+ secciones con tablas largas
-  - Pregunta sobre vault tuvo 4 opciones + 2 headers
-  - CEO se frustró: "no ETOY entendiendo ue necesitas?"
-  - Necesito respuestas comprimidas, no comprehensivas
-
-**what_changes:**
-  - MAX 8 filas (tablas, headers, bullets) por respuesta
-  - Sin rodeos, sin preamble, sin "voy a hacer"
-  - Result first, evidence after, action next
-  - Si no entra en 8 filas, comprimir o partir en dos mensajes
-  - Cero disclaimers (CRIT-003 honestidad ≠ disculpa)
