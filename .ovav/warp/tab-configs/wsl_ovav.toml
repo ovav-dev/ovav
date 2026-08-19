@@ -1,0 +1,15 @@
+name = "WSL · OVAV"
+color = "blue"
+title = "WSL · {{workdir}}"
+
+[params.workdir]
+type = "text"
+description = "Working directory path (e.g., /home/braka/Systems/ovav)"
+default = "/home/braka/Systems/ovav"
+
+[[panes]]
+id = "ovav_main"
+type = "terminal"
+directory = "{{workdir}}"
+is_focused = true
+commands = []
