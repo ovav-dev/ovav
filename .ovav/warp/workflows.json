@@ -10,6 +10,19 @@
     "feature", "refactor", "docs", "spike", "research",
     "migration", "enterprise", "hotfix", "release", "patch", "emergency"
   ],
+  "shared_input_profiles_descriptions": {
+    "feature": "New feature work (default)",
+    "refactor": "Code refactor without behavior change",
+    "docs": "Documentation only",
+    "spike": "Time-boxed experimentation (1-3 days)",
+    "research": "Investigation work (no code)",
+    "migration": "Migration between systems/versions",
+    "enterprise": "Customer-facing enterprise work",
+    "hotfix": "Urgent production fix (small, focused)",
+    "release": "Release preparation (versioning, tagging)",
+    "patch": "Small bug fix",
+    "emergency": "Critical hotfix (requires CEO waiver)"
+  },
   "workflows": [
     {
       "id": "ovav.create-worktree",
@@ -21,11 +34,12 @@
         {"name": "profile", "type": "enum", "required": true, "options": [
           "feature", "refactor", "docs", "spike", "research",
           "migration", "enterprise", "hotfix", "release", "patch", "emergency"
-        ]}
+        ], "description": "OWS profile — see shared_input_profiles_descriptions"}
       ],
       "working_directory": "current",
       "shell": "fish",
-      "category": "OVAV"
+      "category": "OVAV",
+      "icon": "🚧"
     },
     {
       "id": "ovav.status",
@@ -35,7 +49,8 @@
       "inputs": [],
       "working_directory": "current",
       "shell": "fish",
-      "category": "OVAV"
+      "category": "OVAV",
+      "icon": "📊"
     },
     {
       "id": "ovav.visual-status",
@@ -45,7 +60,8 @@
       "inputs": [],
       "working_directory": "current",
       "shell": "fish",
-      "category": "OVAV"
+      "category": "OVAV",
+      "icon": "🎨"
     },
     {
       "id": "ovav.verify",
@@ -56,7 +72,8 @@
       "working_directory": "current",
       "shell": "fish",
       "category": "OVAV",
-      "long_running": true
+      "long_running": true,
+      "icon": "✅"
     },
     {
       "id": "ovav.update",
@@ -66,7 +83,8 @@
       "inputs": [],
       "working_directory": "current",
       "shell": "fish",
-      "category": "OVAV"
+      "category": "OVAV",
+      "icon": "⬇️"
     },
     {
       "id": "ovav.done",
@@ -79,7 +97,10 @@
       "category": "OVAV",
       "long_running": true,
       "destructive": true,
-      "warning": "Merges feature branch to develop. Cannot be undone."
+      "warning": "Merges feature branch to develop. Cannot be undone.",
+      "confirm": true,
+      "requires_code_review": true,
+      "icon": "🚀"
     },
     {
       "id": "ovav.route-commit",
@@ -91,7 +112,8 @@
       ],
       "working_directory": "current",
       "shell": "fish",
-      "category": "OVAV"
+      "category": "OVAV",
+      "icon": "🚚"
     },
     {
       "id": "ovav.cleanup-preview",
@@ -101,7 +123,8 @@
       "inputs": [],
       "working_directory": "current",
       "shell": "fish",
-      "category": "OVAV"
+      "category": "OVAV",
+      "icon": "🧹"
     },
     {
       "id": "ovav.sync",
@@ -112,22 +135,37 @@
       "working_directory": "current",
       "shell": "fish",
       "category": "OVAV",
-      "long_running": true
+      "long_running": true,
+      "icon": "🔄"
+    },
+    {
+      "id": "ovav.abort",
+      "name": "OVAV · Abort",
+      "description": "Rollback current in-progress operation",
+      "command": "ovav worktree owa",
+      "inputs": [],
+      "working_directory": "current",
+      "shell": "fish",
+      "category": "OVAV",
+      "destructive": true,
+      "warning": "Aborts current in-progress worktree operation.",
+      "confirm": true,
+      "icon": "⛔"
     }
   ],
   "tab_groups": [
     {
-      "name": "📌 OVAV CORE",
+      "name": "OVAV CORE",
       "tabs": ["main", "develop", "system", "tests"],
       "color": "blue"
     },
     {
-      "name": "🤖 ACTIVE AGENTS",
+      "name": "ACTIVE AGENTS",
       "tabs": ["AUTH/OpenCode", "API/OpenCode", "REVIEW/Crush"],
       "color": "purple"
     },
     {
-      "name": "🧪 DEV",
+      "name": "DEV",
       "tabs": ["backend", "frontend", "logs"],
       "color": "green"
     }
@@ -135,8 +173,13 @@
   "code_review_gate": {
     "enabled": true,
     "trigger": "before owd",
-    "command": "ovav worktree owd",
     "prerequisite": "Warp Code Review approval",
-    "description": "Code Review is part of the gate. Never bypassed."
+    "sentinel": "<gate:owd>",
+    "description": "Code Review is part of the gate. Never bypassed. Workflows requiring review are flagged with requires_code_review: true."
+  },
+  "dependencies": {
+    "shell": "fish 4.x",
+    "rationale": "All workflows use fish for deterministic quoting. Bash wrapper would re-introduce OWS-launched-shell anti-pattern (plan §2).",
+    "docs": ".ovav/warp/README.md (TODO)"
   }
 }
