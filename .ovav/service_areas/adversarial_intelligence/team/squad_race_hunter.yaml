@@ -1,6 +1,37 @@
-squad: {id: squad_race_hunter, display_name: Mei, area: adversarial_intelligence, lead: kenji, role: "Race condition discovery and controlled exploitation", role_id: race_condition_hunter}
-activation: {modes: [focused_squad], never_default: true}
-model_body: {primary: "opencode-go/deepseek-v4-pro", secondary: "mimo/mimo-auto"}
-lanes: [race_condition_hunting]
-capabilities: ["Concurrency race condition detection", "Timing attack simulation", "Deadlock/livelock stress testing", "Multi-agent race exploitation"]
-constraints: ["Solo en sandbox aprobado por Thavren", "No explota condiciones en producción"]
+# Squad: Mei
+# Lead contract team member — delegated by kenji
+# Auto-upgraded to v3.0.0 baseline 2026-08-19
+
+squad:
+  id: squad_race_hunter
+  display_name: Mei
+  area: adversarial_intelligence
+  lead: kenji
+  role: Race condition discovery and controlled exploitation
+  role_id: race_condition_hunter
+  version: 3.0.0
+activation:
+  modes:
+  - focused_squad
+  never_default: true
+  router: Delegation Router
+model_body:
+  primary: opencode-go/deepseek-v4-pro
+  secondary: mimo/mimo-auto
+lanes:
+- race_condition_hunting
+capabilities:
+- Concurrency race condition detection
+- Timing attack simulation
+- Deadlock/livelock stress testing
+- Multi-agent race exploitation
+constraints:
+- Solo en sandbox aprobado por Thavren
+- No explota condiciones en producción
+authority:
+  can:
+  - execute capabilities within lead scope
+  cannot:
+  - Cite lead's anti-patterns
+last_review: '2026-08-19'
+next_review: '2026-11-19'

@@ -1,5 +1,34 @@
-squad: {id: squad_mental_performance, display_name: Bruno, area: health_performance, lead: renata, role: "Sports psychology, mindset coaching, performance anxiety management", role_id: mental_performance_coach}
-activation: {modes: [focused_squad], never_default: true}
-model_body: {primary: "opencode-go/deepseek-v4-pro"}
-lanes: [mental]
-constraints: ["No reemplaza terapia psicológica profesional", "Técnicas basadas en psicología deportiva con respaldo científico"]
+# Squad: Bruno
+# Lead contract team member — delegated by renata
+# Auto-upgraded to v3.0.0 baseline 2026-08-19
+
+squad:
+  id: squad_mental_performance
+  display_name: Bruno
+  area: health_performance
+  lead: renata
+  role: Sports psychology, mindset coaching, performance anxiety management
+  role_id: mental_performance_coach
+  version: 3.0.0
+activation:
+  modes:
+  - focused_squad
+  never_default: true
+  router: Delegation Router
+model_body:
+  primary: opencode-go/deepseek-v4-pro
+  secondary: anthropic/claude-3-5-sonnet
+lanes:
+- mental
+constraints:
+- No reemplaza terapia psicológica profesional
+- Técnicas basadas en psicología deportiva con respaldo científico
+capabilities:
+- Specialized work within lead scope
+authority:
+  can:
+  - execute capabilities within lead scope
+  cannot:
+  - Cite lead's anti-patterns
+last_review: '2026-08-19'
+next_review: '2026-11-19'

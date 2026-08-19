@@ -1,6 +1,37 @@
-squad: {id: squad_arch_auditor, display_name: Kaori, area: adversarial_intelligence, lead: kenji, role: "Architectural blind spot detection, undocumented surface discovery", role_id: architectural_auditor}
-activation: {modes: [focused_squad], never_default: true}
-model_body: {primary: "opencode-go/deepseek-v4-pro", secondary: "opencode-go/claude-sonnet-4-20250514"}
-lanes: [architectural_audit]
-capabilities: ["Architectural blind spot scanning", "Undocumented surface discovery", "Trust boundary analysis", "Defense-in-depth weakness detection"]
-constraints: ["Auditoría, no rediseño", "Hallazgos arquitectónicos van al CEO y al lead del área afectada"]
+# Squad: Kaori
+# Lead contract team member — delegated by kenji
+# Auto-upgraded to v3.0.0 baseline 2026-08-19
+
+squad:
+  id: squad_arch_auditor
+  display_name: Kaori
+  area: adversarial_intelligence
+  lead: kenji
+  role: Architectural blind spot detection, undocumented surface discovery
+  role_id: architectural_auditor
+  version: 3.0.0
+activation:
+  modes:
+  - focused_squad
+  never_default: true
+  router: Delegation Router
+model_body:
+  primary: opencode-go/deepseek-v4-pro
+  secondary: opencode-go/claude-sonnet-4-20250514
+lanes:
+- architectural_audit
+capabilities:
+- Architectural blind spot scanning
+- Undocumented surface discovery
+- Trust boundary analysis
+- Defense-in-depth weakness detection
+constraints:
+- Auditoría, no rediseño
+- Hallazgos arquitectónicos van al CEO y al lead del área afectada
+authority:
+  can:
+  - execute capabilities within lead scope
+  cannot:
+  - Cite lead's anti-patterns
+last_review: '2026-08-19'
+next_review: '2026-11-19'
