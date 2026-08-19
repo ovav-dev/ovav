@@ -1,15 +1,15 @@
 name = "WSL · .config"
 color = "cyan"
-title = "WSL · {{workdir}}"
+title = "WSL · {{cfg_dir}}"
 
-[params.workdir]
+[params.cfg_dir]
 type = "text"
-description = "Working directory path (e.g., /home/braka/.config)"
+description = ".config working directory"
 default = "/home/braka/.config"
 
 [[panes]]
 id = "config_main"
 type = "terminal"
-directory = "{{workdir}}"
+directory = "{{cfg_dir}}"
 is_focused = true
 commands = []
