@@ -18,7 +18,7 @@ identities:
       email: alexander@ovav.dev
       role: ceo
       level: 10
-      key_hash: "0291a44088c3d2a0e6065e3ff197b2bbaa56177f23dda87bfc75594ae151cc4e"
+      key_hash: "a14dfeadc2ea8b88a6e52e30f0973af4235a47b4a1c62d75a909a380b860ec7c"
       permissions:
         - full_system
         - deploy
@@ -90,5 +90,5 @@ roles:
 signature:
     algorithm: HMAC-SHA256-V2
     signed_by: ceo-alexander
-    signed_at: "2026-08-15T14:12:24.007135845Z"
-    value: "b2ebe6b86e5d241ed1cf2d820210845a790707608a370eb8b2fd2b6dc6db1c01"
+    signed_at: "2026-08-19T20:13:45.273606676Z"
+    value: "78293a549bb6b80e2c11f35d730e553d193713994296b2a9e1fe25f52aa51e46"
