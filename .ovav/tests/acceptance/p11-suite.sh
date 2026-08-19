@@ -193,8 +193,12 @@ else
 fi
 
 # ── P11: ovav build OK ───────────────────────────────────────────────────
-cd "$REPO_ROOT" && ovav worktree owl >/dev/null 2>&1
-check "43" "OVAV build (owl reachable)" "PASS"
+OWL_OUT=$(ovav worktree owl 2>&1)
+if [[ -n "$OWL_OUT" ]] && [[ "$OWL_OUT" != *"Error"* ]] && [[ "$OWL_OUT" != *"unknown command"* ]]; then
+  check "43" "OVAV build (owl reachable)" "PASS"
+else
+  check "43" "OVAV build (owl reachable)" "FAIL" "owl output: $OWL_OUT"
+fi
 
 # ── P11: ovav tests OK ───────────────────────────────────────────────────
 if PATH="/home/braka/.local/share/mise/installs/go/1.24.13/bin:$PATH" go -C "$REPO_ROOT/go-runtime" test ./internal/validators -count=1 -timeout 60s >/dev/null 2>&1; then
