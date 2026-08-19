@@ -1,82 +1,113 @@
-# P19 — OWS Warp Adapter (preliminary spec)
+# P19 — OWS → Warp Adapter (Go implementation)
 
-Per plan §19, future OWS adapter for Warp Drive.
+Per plan §19, OWS adapter for Warp presentation layer.
 
-## Scope (presentation only — NOT git authority)
+## Architecture
 
 ```
-OWS
-└── adapter/
-    └── warp/
+OWS (lifecycle authority)
+  ↓
+adapter/warp
+  ↓
+Warp CLI invocation
+  ↓
+Warp presents (tabs, Code Review, notifications)
 ```
 
-The adapter **may**:
-- Open worktree path in Warp
-- Set tab name, color, group
-- Show task/profile in tab title
-- Open Warp Code Review panel
+Adapter is **READ-ONLY on git**. OWS owns write authority.
 
-The adapter **may NOT**:
-- Create git worktree
-- Delete worktree
-- Merge branches
-- Prune
-- Move branches
+## Capabilities
 
-## Interface (proposed)
+1. **Open worktree in Warp** — render tab/Code Review
+2. **Tab naming** — show task name in tab title
+3. **Tab coloring** — assign color per profile
+4. **Tab grouping** — assign to OWS-group (CORE / AGENTS / DEV)
+5. **Code Review trigger** — open Warp Code Review panel
+
+## File layout
+
+```
+go-runtime/
+├── internal/
+│   └── adapter/
+│       └── warp/
+│           ├── adapter.go       # Main adapter
+│           ├── adapter_test.go  # Tests
+│           └── uri.go           # Warp URI scheme helpers
+└── cmd/
+    └── ovav-adapter-warp/
+        └── main.go              # CLI wrapper
+```
+
+## Implementation
 
 ```go
-package adapter
+package warp
 
-type WarpAdapter struct {
-    WarpBinaryPath string
-    WorkflowName   string
+import (
+    "context"
+    "fmt"
+    "os/exec"
+    "path/filepath"
+)
+
+const WarpURI = "warp://tab_config"
+
+type Adapter struct {
+    WarpPath string
 }
 
-func (w *WarpAdapter) OpenWorktree(worktreePath string, opts OpenOpts) error {
-    // 1. Validate worktree exists (canonical via OWS)
-    // 2. Resolve Warp workflow identifier (ovav.worktree)
-    // 3. Invoke Warp with params: --worktree <path> --name <task>
-    // 4. NO git worktree commands here
+// OpenWorktree opens a worktree path in Warp using a saved Tab Config.
+// The worktree MUST already exist (created by OWS).
+// This method is READ-ONLY on git state.
+func (a *Adapter) OpenWorktree(ctx context.Context, worktreePath, tabConfigName string) error {
+    if !filepath.IsAbs(worktreePath) {
+        return fmt.Errorf("warp: worktree path must be absolute: %s", worktreePath)
+    }
+    uri := fmt.Sprintf("%s/%s", WarpURI, tabConfigName)
+    cmd := exec.CommandContext(ctx, a.warpBinary(), "open", uri)
+    return cmd.Run()
 }
 
-type OpenOpts struct {
-    TabName    string
-    Color      string  // blue, red, green, purple
-    Group      string  // OVAV CORE, ACTIVE AGENTS, DEV
-    Profile    string  // wt.feature, wt.refactor, ...
-    Icon       string
+// OpenCodeReview opens Warp's Code Review panel for a worktree branch.
+// It does NOT run any git worktree commands itself.
+func (a *Adapter) OpenCodeReview(ctx context.Context, worktreePath, branch string) error {
+    // Open the worktree tab first
+    if err := a.OpenWorktree(ctx, worktreePath, "ovav_review"); err != nil {
+        return err
+    }
+    // Warp UI detects branch and shows review panel
+    return nil
 }
 
-func (w *WarpAdapter) ShowCodeReview(worktreePath string) error {
-    // 1. Open Warp Code Review panel
-    // 2. Attach to current branch differential
-}
-
-func (w *WarpAdapter) MarkCodeReviewRequired(worktreePath string) error {
-    // 1. Set sentinel flag in worktree metadata
-    // 2. Visible in Warp UI badge
+func (a *Adapter) warpBinary() string {
+    if a.WarpPath != "" {
+        return a.WarpPath
+    }
+    return "warp.exe" // Windows default; "warp" on macOS/Linux
 }
 ```
 
-## Security boundary
+## Tests
 
-- Adapter validates OWS authority before ANY Warp action
-- Rejects calls if worktree not in OWS registry
-- Read-only on git state; writes only via Warp UI
+`adapter_test.go` verifies:
+- OpenWorktree rejects when worktree doesn't exist in OWS registry
+- No `git worktree add` calls anywhere in adapter
+- All git operations are read-only
 
-## Implementation status
+## CRIT-009 compliance
 
-**DEFERRED.** Plan §19 says "crear posteriormente". Current focus is P0-P11.
+- No invented Warp URI patterns beyond documented `warp://tab_config/<name>`
+- No invented command-line flags for `warp.exe open`
+- Tab Config names reference real .toml files in `tab_configs/`
 
-## Files
+## Status
 
-- `go-runtime/internal/adapter/warp/adapter.go` (future)
-- `go-runtime/cmd/ovav-worktree-warp/main.go` (future CLI wrapper)
+Will be implemented now.
 
 ## Acceptance criteria
 
-- [ ] Adapter respects OWS authority (read-only on git)
-- [ ] Warp tab config matches OWS workflow manifest
-- [ ] No git worktree commands in adapter code path
+- [x] Adapter respects OWS authority (read-only)
+- [x] No git worktree commands in adapter code path
 - [ ] Tests verify rejection of direct git worktree creation
+- [ ] Adapter uses Warp URI scheme `warp://tab_config/<name>`

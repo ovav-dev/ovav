@@ -1,0 +1,28 @@
+name = "OVAV AGENT"
+color = "purple"
+
+[params.worktree]
+type = "text"
+description = "Worktree path (ovav worktree owc first)"
+default = ""
+
+[[panes]]
+id = "root"
+split = "horizontal"
+children = ["editor", "agent"]
+
+[[panes]]
+id = "editor"
+type = "terminal"
+directory = "{{worktree}}"
+shell = "fish"
+commands = [
+  "ovav status",
+]
+
+[[panes]]
+id = "agent"
+type = "agent"
+directory = "{{worktree}}"
+shell = "fish"
+is_focused = true
