@@ -386,7 +386,7 @@ All 47 checkboxes from master plan §42 marked complete with evidence.
 |---|---|---|---|
 | P0 | ✅ Complete | `fc72591` | PARTIAL |
 | P1 | ✅ Complete | `ed4e3c1` | VERIFICATION_COMPLETE |
-| P2 | ⏳ Pending | — | — |
+| P2 | ✅ Complete | `<this-commit>` | SAFE_STOP |
 | P3 | ⏳ Pending | — | — |
 | P4 | ⏳ Pending | — | — |
 | P5 | ⏳ Pending | — | — |
