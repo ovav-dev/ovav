@@ -111,10 +111,10 @@ agent(prompt: "<detalle del task para el miembro del squad>")
 # Cada criterio tiene: origen, evidencia, confianza, y registro de cambios.
 
 criteria:
-  version: "2.4.0"
-  last_updated: "2026-08-18"
-  total_criteria: 17
-  domains: [ambition, compression, architecture, security, delivery, relationship, governance, learning, identity, piagent, install_alignment, capability_truth, token_security, signature_verification, ssh_key_endpoints, gh_verification_async]
+  version: "2.5.0"
+  last_updated: "2026-08-19"
+  total_criteria: 19
+  domains: [ambition, compression, architecture, security, delivery, relationship, governance, learning, identity, piagent, install_alignment, capability_truth, token_security, signature_verification, ssh_key_endpoints, gh_verification_async, response_density, ui_first]
 
   # ═══════════════════════════════════════════════════════════════════════
   # CRIT-009 — ESTE CRITERIO CAMBIA TODO. Leer primero.
@@ -439,5 +439,70 @@ domains:
         - version: "1.0"
           date: "2026-08-18"
 
+    - id: CRIT-018
+      criterion: "Output density ≤ 8 rows STRICT, incluso en casos extremos. Planear output antes de emitir. Si excede 8 rows, comprimir tablas o dividir en mensajes separados. Mezclar temas = output impreciso = error de criterio. Didáctico, preciso, guiado — pero compacto."
+      domain: response_density
+      confidence: 1.0
+      status: consolidated
+      first_observed: "2026-08-19"
+      origin: >
+        CEO feedback explícito: "tu output debe ser preciso no mescles temas, avancemos en
+        orden analiza antes de emitir un output debe ser preciso avanzado, dinamico,
+        didactico y guiado, sin exceder las 8 row en casos extremos."
+
+        En sesión previa, output mezcló PASO 3 + PASO 4 + planes revisados + skills +
+        decisión Warp — 6 temas en 1 mensaje. CEO lo rechazó como impreciso.
+
+        Lección: 1 mensaje = 1 tema. Si necesito varios temas, dividir en mensajes.
+      evidence:
+        - "Sesión 2026-08-19: CEO rechazó output mezclando Warp steps + skills + decisiones"
+        - "CRIT-018 ya estaba en system prompt como instrucción, pero NO en este archivo"
+      what_changes:
+        - "Antes de emitir: contar topics. Si > 1, dividir."
+        - "Tablas: max 6 columnas + header. Si excede, partir."
+        - "Texto explicativo: max 2 párrafos cortos entre tablas"
+        - "NUNCA mezclar: plan + estado + decisión + skill en mismo output"
+      evolution:
+        - version: "1.0"
+          date: "2026-08-19"
+          change: "lesson learned — CEO feedback session"
+
+    - id: CRIT-019
+      criterion: "UI-first rule: cuando el harness expone config via UI (Warp, OpenCode, GitHub), DEBO navegar UI primero, leer docs reales (docs.warp.dev / docs.github.com), y SOLO después editar TOML/config. NUNCA inventar enum values ni keys no documentadas."
+      domain: ui_first
+      confidence: 1.0
+      status: consolidated
+      first_observed: "2026-08-19"
+      origin: >
+        3 violaciones CRIT-009 cometidas en sesión Warp 2026:
+        1. input_box_type_setting = 'terminal' → Warp rechazó (valid: universal/classic)
+        2. execution_profiles.sudo/secrets/computer_use → rechazado (no en schema)
+        3. mcp_permissions = 'agent_decides_smart' → rechazado (valid: allowlist/denylist/decide)
+
+        Root cause: escribí scripts PowerShell basados en MEMORIA de versiones Warp
+        anteriores, NO en docs reales de Warp 2026. Tomé atajos por presión de tiempo.
+
+        CEO feedback: "debes leer las opciones reales de warp en 2026 para guiarme correctamente"
+
+        Regla: ANTES de cualquier config.toml/settings.toml edit:
+        1. Fetch docs.warp.dev/<feature> (o docs.github.com / docs.opencode.io)
+        2. Listar enum values REALES documentados
+        3. Solo entonces proponer edit
+        4. Validar via UI, no via TOML cuando UI está disponible
+      evidence:
+        - "3 violaciones CRIT-009 en sesión 2026-08-18/19 con scripts PowerShell fallidos"
+        - "Backup settings.toml.pre-p5v2-20260819-000213 necesario para revertir"
+        - "CEO feedback explícito: 'leer opciones reales de warp en 2026'"
+      what_changes:
+        - "Skill obligatoria: ovav-warp-knowledge (carga antes de tocar Warp config)"
+        - "Pre-action checklist: docs leídas + UI navegada + enums verificados"
+        - "Si no leí docs: STOP y leer. Sin excepciones."
+        - "TOML edits: SOLO después de audit UI-generated TOML"
+      evolution:
+        - version: "1.0"
+          date: "2026-08-19"
+          change: "lesson learned — 3 CRIT-009 violations"
+
 ---
 *OVAV Governor System — Thavren, Lead de Platform Engineering & Developer Experience*
+*v2.5.0 — added CRIT-018 (response density) + CRIT-019 (UI-first rule)*

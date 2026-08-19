@@ -391,7 +391,10 @@ bin/ovav-mcp-memory
 go-runtime/cmd/ovav/.mimocode/
 
 # OVAV memory governor runtime state files
-.ovav/memory/
+.ovav/memory/*
+!.ovav/memory/MEMORY.md
+!.ovav/memory/checkpoint.md
+!.ovav/memory/notes.md
 .ovav/tasks/
 
 # Crush config - secrets (API keys in plaintext)
