@@ -413,6 +413,9 @@ clients/crush/config/setup_minimax_direct.sh
 # ── Local binaries (gitignored, never commit binaries) ──
 bin/
 
+# OVAV auth wrapper scripts (checked in — must track)
+!bin/auth/
+
 # ── OVAV UX Convergence workdir — transient artifacts only ──
 # Tracked: scripts, IT-settings.json, audit logs (57 files committed by regression-fix session)
 # Untracked & gitignored: heavy downloads + ad-hoc backups created during live testing

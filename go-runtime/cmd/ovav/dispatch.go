@@ -68,8 +68,10 @@ func routeCommand(cmd string, args []string) int {
 		return cmdHook(args)
 	case "infra":
 		return cmdInfra(args)
-	case "login", "signin", "auth":
+	case "login", "signin":
 		return cmdLogin(args)
+	case "auth":
+		return cmdAuth(args)
 	case "whoami", "identity":
 		return cmdWhoami(args)
 	case "logout", "signout":
