@@ -1,0 +1,39 @@
+name = "Windows Root"
+color = "magenta"
+title = "Windows · C:\\Users\\Alexa"
+
+[[panes]]
+id = "root"
+split = "horizontal"
+children = ["wsl_view", "wsl_explore"]
+
+[[panes]]
+id = "wsl_view"
+type = "terminal"
+directory = "/mnt/c/Users/Alexa"
+shell = "fish"
+commands = [
+  "clear",
+  "echo '=== Windows via WSL ==='",
+  "pwd",
+  "echo ''",
+  "echo '=== WSL mount point ==='",
+  "df -h /mnt/c | tail -1",
+  "echo ''",
+  "ls -la /mnt/c/Users/Alexa | head -15",
+]
+is_focused = true
+
+[[panes]]
+id = "wsl_explore"
+type = "terminal"
+directory = "/mnt/c/Users/Alexa"
+shell = "fish"
+commands = [
+  "clear",
+  "echo '=== /mnt/c top-level ==='",
+  "ls /mnt/c/ | head -20",
+  "echo ''",
+  "echo '=== Disk usage ==='",
+  "du -sh /mnt/c/Users 2>/dev/null | head -5",
+]

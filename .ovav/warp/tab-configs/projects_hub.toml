@@ -1,0 +1,71 @@
+name = "Projects Hub"
+color = "green"
+title = "Projects · /home/braka/Systems"
+
+[[panes]]
+id = "root"
+split = "vertical"
+children = ["top", "middle", "bottom"]
+
+[[panes]]
+id = "top"
+type = "terminal"
+directory = "/home/braka/Systems"
+shell = "fish"
+commands = [
+  "clear",
+  "echo '=== Projects Hub ==='",
+  "echo 'Working dir: /home/braka/Systems'",
+  "echo ''",
+  "echo '=== All projects ==='",
+  "for d in /home/braka/Systems/*/; do",
+  "  name=$(basename \"$d\")",
+  "  if [ -d \"$d/.git\" ]; then",
+  "    branch=$(git -C \"$d\" branch --show-current 2>/dev/null)",
+  "    echo \"  [GIT] $name @ $branch\"",
+  "  else",
+  "    echo \"  [DIR] $name\"",
+  "  fi",
+  "done",
+]
+is_focused = true
+
+[[panes]]
+id = "middle"
+type = "terminal"
+directory = "/home/braka/Systems/ovav"
+shell = "fish"
+commands = [
+  "clear",
+  "echo '=== OVAV (primary) ==='",
+  "git status",
+  "echo ''",
+  "git log --oneline -3",
+]
+
+[[panes]]
+id = "bottom"
+split = "horizontal"
+children = ["work", "learning"]
+
+[[panes]]
+id = "work"
+type = "terminal"
+directory = "/home/braka/Systems/work"
+shell = "fish"
+commands = [
+  "clear",
+  "echo '=== Work projects ==='",
+  "ls -la /home/braka/Systems/work 2>/dev/null || echo 'no work dir'",
+]
+
+[[panes]]
+id = "learning"
+type = "terminal"
+directory = "/home/braka/Systems/learning"
+shell = "fish"
+commands = [
+  "clear",
+  "echo '=== Learning projects ==='",
+  "ls -la /home/braka/Systems/learning 2>/dev/null || echo 'no learning dir'",
+]

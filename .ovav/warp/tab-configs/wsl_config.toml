@@ -1,0 +1,55 @@
+name = "WSL Config"
+color = "cyan"
+title = "WSL · ~/.config"
+
+[[panes]]
+id = "root"
+split = "vertical"
+children = ["list", "fish_cfg", "ovav_cfg"]
+
+[[panes]]
+id = "list"
+type = "terminal"
+directory = "/home/braka/.config"
+shell = "fish"
+commands = [
+  "clear",
+  "echo '=== ~/.config contents ==='",
+  "ls -la /home/braka/.config",
+  "echo ''",
+  "echo '=== Tool configs ==='",
+  "for d in /home/braka/.config/*/; do",
+  "  name=$(basename \"$d\")",
+  "  files=$(find \"$d\" -maxdepth 1 -type f 2>/dev/null | wc -l)",
+  "  echo \"  $name: $files top-level files\"",
+  "done",
+]
+is_focused = true
+
+[[panes]]
+id = "fish_cfg"
+type = "terminal"
+directory = "/home/braka/.config/fish"
+shell = "fish"
+commands = [
+  "clear",
+  "echo '=== Fish shell config ==='",
+  "ls -la /home/braka/.config/fish",
+  "echo ''",
+  "echo '=== fish_variables (functions) ==='",
+  "fish -c 'functions -c' 2>/dev/null | head -20 || echo 'no custom functions'",
+]
+
+[[panes]]
+id = "ovav_cfg"
+type = "terminal"
+directory = "/home/braka/.config/ovav"
+shell = "fish"
+commands = [
+  "clear",
+  "echo '=== OVAV config ==='",
+  "ls -la /home/braka/.config/ovav 2>/dev/null || echo 'no ovav config dir'",
+  "echo ''",
+  "echo '=== StarShip config ==='",
+  "ls -la /home/braka/.config/starship.toml 2>/dev/null || echo 'no starship config'",
+]
