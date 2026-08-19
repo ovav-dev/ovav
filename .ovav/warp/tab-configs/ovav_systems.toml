@@ -1,0 +1,19 @@
+name = "OVAV SYSTEMS"
+color = "red"
+
+[params.worktree]
+type = "text"
+description = "Worktree path (ovav worktree owc first)"
+default = ""
+
+[[panes]]
+id = "main"
+type = "terminal"
+directory = "{{worktree}}"
+shell = "fish"
+commands = [
+  "ovav doctor",
+  "ovav status",
+  "ovav worktree owl",
+]
+is_focused = true
