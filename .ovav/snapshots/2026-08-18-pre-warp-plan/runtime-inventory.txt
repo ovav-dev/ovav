@@ -1,0 +1,51 @@
+===OVAV CONFIG===
+OVAV Config — Go Runtime
+===================================================
+   Go version:   go1.26.0
+   OS/Arch:      linux/amd64
+   Version:      0.0.0-dev
+
+
+   Configuración gestionada por OVAV Go Runtime.
+===OVAV STATUS===
+── Economy ───────────────────────────────────────
+  economy: no data
+
+── System Status ─────────────────────────────────
+  Governor:   🟢 OVAV configurado
+  Integrity:  ✅ Integrity: 100%
+  Branch:     ⎇ unknown
+  Memory:     ⚫ Memory: —
+  Tokens:     0 total (0 in / 0 out)
+  Engine:     Go 2.0.0-go (zero Python)
+
+✓ OVAV 3.4.0 — CAPA 9 — Go Runtime. Go go1.26.0 linux/amd64. Branch: feature/feat-warp-2026-master-plan, clean. Status: active.
+===TAILOR===
+Plan: Core | 2 tools · 1 roles
+  [✓] OpenCode     governed AI workspace
+  [✓] Git          safe versioning
+  [ ] Neovim       technical editing
+  [ ] Zellij       live sessions
+  [ ] Fish         productive shell
+  [✓] Platform Engineering     systems, CLI and runtime
+  [ ] Research Intelligence    evidence and benchmarks
+  [ ] Security Architecture    risk, permissions and safety
+
+Use 'ovav tailor select|toggle|preview|apply' for one-shot commands.
+===RUNTIMES===
+2026.8.5 linux-x64 (2026-08-12)
+mise WARN  mise version 2026.8.8 available
+mise WARN  To update, run mise self-update
+v24.19.0
+/usr/bin/bash: line 6: go: command not found
+go not in PATH
+Python 3.14.4
+1.18.18
+===WORKTREES===
+OVAV Worktree System — run 'ovav worktree --help' or 'ovav worktree <command> --help'
+===BRANCH===
+feature/feat-warp-2026-master-plan
+===HEAD===
+fc72591
+===COMMITS AHEAD===
+2
