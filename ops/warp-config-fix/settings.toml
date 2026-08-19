@@ -1,0 +1,173 @@
+# ─────────────────────────────────────────────────────────────
+# Warp settings.toml — OVAV-fixed baseline (2026-08-19)
+# Validator: docs.warp.dev/terminal/settings/all-settings
+# Author: thavren (lead Platform Engineering) | CRIT-019 audited
+# Apply path: %LOCALAPPDATA%\warp\Warp\config\settings.toml
+# ─────────────────────────────────────────────────────────────
+# CRITICAL: only fields confirmed by docs.warp.dev are present.
+# Fields rejected by the schema validator in previous attempts
+# have been removed (see CHANGELOG.md for full audit).
+# Backup before applying: copy your current settings.toml to
+#   %LOCALAPPDATA%\warp\Warp\config\backups\settings.toml.<timestamp>
+# ─────────────────────────────────────────────────────────────
+
+[appearance]
+spacing = "compact"
+
+[appearance.themes]
+system_theme = false
+theme = "dracula"
+selected_system_themes = { dark = "cyber_wave", light = "light" }
+
+[appearance.vertical_tabs]
+enabled = true
+show_panel_in_restored_windows = true
+display_granularity = "panes"
+view_mode = "compact"
+primary_info = "branch"
+compact_subtitle = "command"
+
+[appearance.cursor]
+cursor_display_type = "bar"
+
+[appearance.text]
+notebook_font_size = 15.0
+font_size = 14.0
+font_name = "CaskaydiaCove Nerd Font Mono"
+ai_font_name = "CaskaydiaCove Nerd Font Mono"
+match_ai_font = true
+ligature_rendering_enabled = true
+
+[appearance.panes]
+should_dim_inactive_panes = false
+
+[appearance.window]
+zoom_level = 125
+
+[appearance.input]
+input_mode = "pinned_to_bottom"
+
+[terminal]
+osc52_clipboard_access = "write_only"
+use_audible_bell = false
+
+[terminal.input]
+input_box_type_setting = "universal"
+honor_ps1 = false
+
+[privacy]
+crash_reporting_enabled = true
+telemetry_enabled = true
+
+[privacy.secret_redaction]
+enabled = true
+hide_secrets_in_block_list = true
+secret_display_mode_setting = "asterisks"
+
+# ─────────────────────────────────────────────────────────────
+# SESSION — KEY FIX (CRIT-019)
+# Docs: type "string, object, or null"; values:
+#   "system_default" | { executable = "/path" } | { custom = "command" }
+# Was: { w_s_l = "Ubuntu-26.04" }  ← INVALID (claves inventadas)
+# Now: { custom = "wsl.exe -d Ubuntu-26.04" }
+# ─────────────────────────────────────────────────────────────
+[general]
+show_warning_before_quitting = true
+default_session_mode = "tab_config"
+default_tab_config_path = 'C:\Users\Alexa\AppData\Roaming\warp\Warp\data\tab_configs\wsl_ovav.toml'
+
+[session]
+new_session_shell_override = { custom = "wsl.exe -d Ubuntu-26.04" }
+
+# ─────────────────────────────────────────────────────────────
+# AGENTS — warp_agent boolean toggles (docs-confirmed)
+# ─────────────────────────────────────────────────────────────
+[agents]
+cloud_conversation_storage_enabled = true
+
+[agents.warp_agent]
+is_any_ai_enabled = true
+
+[agents.warp_agent.input]
+nld_in_terminal_enabled = true
+ai_auto_detection_enabled = true
+ai_command_denylist = ""
+
+[agents.warp_agent.other]
+show_agent_notifications = true
+show_conversation_history = true
+
+# ─────────────────────────────────────────────────────────────
+# EXECUTION PROFILES — DEFAULT (YOLO mode)
+# UI path: Settings → Agents → Profiles → Default
+# Docs say: "edit it through the UI rather than by hand"
+# This hand-edited version is the MINIMUM SCHEMA-VALID subset
+# for users who want the same effect without UI access.
+# All 5 permissions = Always allow | ask_questions = never_ask
+# ─────────────────────────────────────────────────────────────
+[agents.execution_profiles]
+
+[agents.execution_profiles.default]
+name = "Default"
+base_model = "90bab844-11d5-4736-9f51-60b9740085f2"
+apply_code_diffs = "always_allow"
+read_files = "always_allow"
+create_plans = "always_allow"
+execute_commands = "always_allow"
+interact_with_running_commands = "always_allow"
+ask_questions = "never_ask"
+command_allowlist = []
+command_denylist = []
+
+# ─────────────────────────────────────────────────────────────
+# FIELDS REMOVED (rejected by schema or unverified):
+# ─ ask_user_question        → real key is `ask_questions`
+# ─ mcp_permissions          → UI-only control ("allowlist"/"denylist"/"decide")
+# ─ autosync_plans_to_warp_drive → not in docs public schema
+# ─ cli_agent_model          → not in docs public schema
+# ─ directory_allowlist      → not in docs public schema
+# ─ web_search_enabled       → not in docs public schema
+# ─ write_to_pty             → not in docs public schema
+# ─ computer_use             → configured under Profile in UI, not TOML
+#
+# custom_secret_regex_list block (with PAT-regexes) was REMOVED
+# to eliminate the risk of leaking the GitHub PAT into logs.
+# Re-add it ONLY if you need a custom regex; never paste tokens.
+# ─────────────────────────────────────────────────────────────
+
+[agents.third_party]
+should_render_cli_agent_toolbar = true
+
+[agents.voice]
+voice_input_toggle_key = "alt_right"
+voice_input_language = "es"
+
+[account]
+is_settings_sync_enabled = true
+
+[code]
+
+[code.editor]
+show_code_review_button = true
+show_project_explorer = true
+show_global_search = true
+open_file_editor = "warp"
+auto_save = true
+
+[code.indexing]
+agent_mode_codebase_context_auto_indexing = true
+
+[warp_drive]
+enabled = true
+
+[notifications]
+toast_duration_secs = 8
+
+[notifications.preferences]
+is_agent_task_completed_enabled = true
+is_long_running_enabled = true
+is_needs_attention_enabled = true
+is_password_prompt_enabled = true
+long_running_threshold = 30
+mode = "enabled"
+play_notification_sound = true
