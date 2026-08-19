@@ -1,0 +1,142 @@
+{
+  "schema": "ovav.warp.workflows.v1",
+  "owner": "thavren",
+  "owner_team": "platform-engineering",
+  "version": "2026-08-18",
+  "authority": "WARPS workflows call OWS — never git worktree directly",
+  "source": "OVAV × WARP 2026 master plan §17",
+  "import_method": "Warp Drive → Workflows → New → import JSON or manual",
+  "shared_input_profiles": [
+    "feature", "refactor", "docs", "spike", "research",
+    "migration", "enterprise", "hotfix", "release", "patch", "emergency"
+  ],
+  "workflows": [
+    {
+      "id": "ovav.create-worktree",
+      "name": "OVAV · Create Worktree",
+      "description": "Create isolated worktree via OWS with profile selection",
+      "command": "ovav worktree owc {{task}} --profile {{profile}}",
+      "inputs": [
+        {"name": "task", "type": "text", "required": true, "description": "Short feature name (e.g., feat-minimax-endpoints)"},
+        {"name": "profile", "type": "enum", "required": true, "options": [
+          "feature", "refactor", "docs", "spike", "research",
+          "migration", "enterprise", "hotfix", "release", "patch", "emergency"
+        ]}
+      ],
+      "working_directory": "current",
+      "shell": "fish",
+      "category": "OVAV"
+    },
+    {
+      "id": "ovav.status",
+      "name": "OVAV · Status",
+      "description": "List all worktrees with conflict predictions",
+      "command": "ovav worktree owl",
+      "inputs": [],
+      "working_directory": "current",
+      "shell": "fish",
+      "category": "OVAV"
+    },
+    {
+      "id": "ovav.visual-status",
+      "name": "OVAV · Visual Status",
+      "description": "Visual status with HP colors and OVAV branding",
+      "command": "ovav worktree owlsv",
+      "inputs": [],
+      "working_directory": "current",
+      "shell": "fish",
+      "category": "OVAV"
+    },
+    {
+      "id": "ovav.verify",
+      "name": "OVAV · Verify",
+      "description": "Run full validation pipeline (tests + lint + security)",
+      "command": "ovav worktree owv",
+      "inputs": [],
+      "working_directory": "current",
+      "shell": "fish",
+      "category": "OVAV",
+      "long_running": true
+    },
+    {
+      "id": "ovav.update",
+      "name": "OVAV · Update",
+      "description": "Fetch + rebase worktree onto base branch",
+      "command": "ovav worktree owu",
+      "inputs": [],
+      "working_directory": "current",
+      "shell": "fish",
+      "category": "OVAV"
+    },
+    {
+      "id": "ovav.done",
+      "name": "OVAV · Done",
+      "description": "Verify → merge → push → cleanup worktree",
+      "command": "ovav worktree owd",
+      "inputs": [],
+      "working_directory": "current",
+      "shell": "fish",
+      "category": "OVAV",
+      "long_running": true,
+      "destructive": true,
+      "warning": "Merges feature branch to develop. Cannot be undone."
+    },
+    {
+      "id": "ovav.route-commit",
+      "name": "OVAV · Route Commit",
+      "description": "Cherry-pick commit to target branch",
+      "command": "ovav worktree owx cherry-pick {{commit}}",
+      "inputs": [
+        {"name": "commit", "type": "text", "required": true, "description": "Commit SHA to cherry-pick"}
+      ],
+      "working_directory": "current",
+      "shell": "fish",
+      "category": "OVAV"
+    },
+    {
+      "id": "ovav.cleanup-preview",
+      "name": "OVAV · Cleanup Preview",
+      "description": "Dry run of worktree cleanup",
+      "command": "ovav worktree owclean --dry-run",
+      "inputs": [],
+      "working_directory": "current",
+      "shell": "fish",
+      "category": "OVAV"
+    },
+    {
+      "id": "ovav.sync",
+      "name": "OVAV · Sync",
+      "description": "Sync remotes + maintenance + prune stale worktrees",
+      "command": "ovav worktree ows",
+      "inputs": [],
+      "working_directory": "current",
+      "shell": "fish",
+      "category": "OVAV",
+      "long_running": true
+    }
+  ],
+  "tab_groups": [
+    {
+      "name": "📌 OVAV CORE",
+      "tabs": ["main", "develop", "system", "tests"],
+      "color": "blue"
+    },
+    {
+      "name": "🤖 ACTIVE AGENTS",
+      "tabs": ["AUTH/OpenCode", "API/OpenCode", "REVIEW/Crush"],
+      "color": "purple"
+    },
+    {
+      "name": "🧪 DEV",
+      "tabs": ["backend", "frontend", "logs"],
+      "color": "green"
+    }
+  ],
+  "code_review_gate": {
+    "enabled": true,
+    "trigger": "before owd",
+    "command": "ovav worktree owd",
+    "prerequisite": "Warp Code Review approval",
+    "description": "Code Review is part of the gate. Never bypassed."
+  }
+}
