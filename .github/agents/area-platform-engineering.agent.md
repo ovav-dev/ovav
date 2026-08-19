@@ -7,12 +7,12 @@ target: vscode
 permission:
   edit: "allow"
   bash:
-    ovav_health: "allow"
-    ovav_monitor: "allow"
     ovav_status: "allow"
     ovav_dashboard: "allow"
     go: "allow"
     python3: "allow"
+    ovav_health: "allow"
+    ovav_monitor: "allow"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->
