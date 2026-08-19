@@ -354,7 +354,57 @@ npm run test    # Vitest
 - `.ovav/service_areas/` — Domain-specific configurations
 - `tools/cpanel/src/App.tsx` — Control panel main component
 - `bin/ovav` — Native Go binary; worktree system lives at `ovav worktree <cmd>` (owc/owd/owl absorbed into the runtime as of v3.x)
+- `.ovav/memory/MEMORY.md` — In-repo canonical memory (rules, state, decisions)
 
 ---
 
-*OVAV Product v1.1 — Generated 2026-07-18*
+## Warp 2026 — Lessons Learned (CRIT-019)
+
+### Rule: UI-first, docs-first, NEVER invent enum values
+
+When configuring Warp 2026 (terminal, agents, profiles, sessions):
+
+| Step | Action | Why |
+|---|---|---|
+| 1 | Read `docs.warp.dev` for the feature | Enum values are validated server-side; invented values cause rejections |
+| 2 | Navigate Warp UI to the setting | UI shows only valid enum options |
+| 3 | Make change via UI | Warp writes TOML correctly |
+| 4 | Audit generated TOML | Confirm value matches docs |
+| 5 | Commit TOML only after audit | Never bypass UI for TOML edits |
+
+### Real permissions (verified 2026-08-19)
+
+| Feature | Real path in UI | Real enum values |
+|---|---|---|
+| Default session mode | Settings → Features → General | `Terminal` / `Agent` |
+| Profile permissions | Settings → Agents → Profiles | `Apply diffs`, `Read files`, `Create plans`, `Execute commands`, `Interact running`, `Ask questions` |
+| Permission levels | (per permission above) | `Agent decides`, `Always ask`, `Always allow`, `Never` |
+| Ask questions levels | (Ask questions only) | `Never ask`, `Ask unless auto-approve`, `Always ask` |
+| Custom inference | Settings → Agents → Inference endpoint | Schema: `OpenAI Chat Completions` |
+| Tab Configs | URI `warp://import_tab_config/<path>` | TOML files in `%APPDATA%\warp\Warp\data\tab_configs\` |
+
+### YOLO mode (default profile)
+
+For full autonomy without prompts:
+- All permissions → `Always allow`
+- Ask clarifying questions → `Never ask`
+- Trigger: `Ctrl+Shift+I` (Run until completion)
+
+### CRIT-009 violations to AVOID (history 2026-08-18/19)
+
+| Violation | What I invented | Warp response |
+|---|---|---|
+| 1 | `input_box_type_setting = "terminal"` | Rejected (valid: `universal`/`classic`) |
+| 2 | `execution_profiles` block with `sudo`, `secrets`, `computer_use` | Rejected (not valid schema) |
+| 3 | `mcp_permissions` with values like `agent_decides_smart` | Rejected (valid: allowlist/denylist/decide) |
+
+### MiniMax Subscription Key
+
+- Stored in OVAV vault as `minimax_api_key`
+- API endpoint: `https://api.minimax.io/v1`
+- Model: `MiniMax-M3`
+- Warp stores in OS keychain (Windows Credential Manager), NEVER in TOML
+
+---
+
+*OVAV Product v1.1 — Generated 2026-07-18, updated 2026-08-19 (CRIT-019 Warp UI-first rule)*
