@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+# ═══════════════════════════════════════════════════════════════════
+# ovav-auth-install — Install ovav-local/ovav-web/ovav-stale-lock-purge
+# commands into ~/.local/bin (or other PATH directory) for global use.
+# ═══════════════════════════════════════════════════════════════════
+#
+# Single-shot bootstrap. Idempotent — safe to re-run.
+# Place:  bin/auth/ovav-auth-install  (this script)
+# Run:    bash bin/auth/ovav-auth-install   (from repo root)
+set -eu
+
+REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+SRC="$REPO_ROOT/bin/auth"
+
+DEST_DIR="${OVAV_INSTALL_DEST:-$HOME/.local/bin}"
+mkdir -p "$DEST_DIR"
+
+C_OK=$'\033[32m'; C_OFF=$'\033[0m'
+ok()  { printf "${C_OK}✅${C_OFF} %s\n" "$1"; }
+say() { printf "   %s\n" "$1"; }
+
+echo "📦 ovav-auth-install"
+echo "   src: $SRC"
+echo "   dst: $DEST_DIR"
+echo
+
+# ─── check source exists ────────────────────────────────────────────────
+[ -d "$SRC" ] || { echo "❌ Source dir not found: $SRC" >&2; exit 1; }
+
+# ─── install each script (copy mode by default; symlink if --symlink) ───
+mode="copy"
+[ "${1:-}" = "--symlink" ] && mode="symlink"
+
+for script in ovav-local ovav-web ovav-stale-lock-purge; do
+  src="$SRC/$script"
+  dst="$DEST_DIR/$script"
+  [ -f "$src" ] || { echo "❌ Missing source: $src" >&2; exit 1; }
+
+  if [ "$mode" = "symlink" ]; then
+    [ -e "$dst" ] && rm -f "$dst"
+    ln -s "$src" "$dst"
+    say "  symlinked: $dst → $src"
+  else
+    [ -e "$dst" ] && mv "$dst" "${dst}.bak_$(date +%Y%m%d_%H%M%S)"
+    install -m 0755 "$src" "$dst"
+    say "  copied:    $dst"
+  fi
+done
+
+echo
+ok "Auth scripts installed"
+
+# ─── verify they're in PATH ─────────────────────────────────────────────
+IFS=: read -ra PATH_DIRS <<< "$PATH"
+in_path=0
+for d in "${PATH_DIRS[@]}"; do
+  [ "$d" = "$DEST_DIR" ] && in_path=1
+done
+if [ "$in_path" -eq 0 ]; then
+  echo
+  echo "⚠️  $DEST_DIR is NOT in PATH"
+  echo "   Add it:  echo 'export PATH=\"$DEST_DIR:\$PATH\"' >> ~/.bashrc"
+fi
+
+echo
+echo "Verify:"
+echo "  which ovav-local ovav-web ovav-stale-lock-purge"
+echo
+echo "Test:"
+echo "  ovav-stale-lock-purge   # should report 0 locks"
+echo "  ovav-web --check        # preflight probe of backend"

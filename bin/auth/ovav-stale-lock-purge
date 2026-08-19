@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+# ═══════════════════════════════════════════════════════════════════
+# ovav-stale-lock-purge — clean up dead PID locks in OVAV registry
+# Run periodically (or before any recovery) to avoid "transaction is locked"
+# ═══════════════════════════════════════════════════════════════════
+#
+set -u
+
+REPO_ROOT="${OVAV_REPO_ROOT:-/home/braka/Systems/ovav}"
+
+if [ -t 1 ]; then
+  C_OK=$'\033[32m'; C_DN=$'\033[31m'; C_IN=$'\033[36m'; C_YL=$'\033[33m'; C_OFF=$'\033[0m'
+else
+  C_OK=''; C_DN=''; C_IN=''; C_YL=''; C_OFF=''
+fi
+
+log_ok()   { printf "  ${C_OK}✅ %s${C_OFF}\n" "$1"; }
+log_warn() { printf "  ${C_YL}⚠️  %s${C_OFF}\n" "$1"; }
+log_die()  { printf "  ${C_DN}❌ %s${C_OFF}\n" "$1" >&2; exit 1; }
+
+# ─── find all OVAV lock files in the registry ───────────────────────────
+LOCK_FILES=$(find "$REPO_ROOT/.ovav" -name "*.lock" -type f 2>/dev/null || true)
+
+if [ -z "$LOCK_FILES" ]; then
+  log_ok "No lock files in $REPO_ROOT/.ovav"
+  exit 0
+fi
+
+PURGED=0
+HELD=0
+echo "🔓 ${C_IN}ovav-stale-lock-purge${C_OFF}"
+echo
+
+for lock in $LOCK_FILES; do
+  rel="${lock#$REPO_ROOT/}"
+  pid=$(awk 'NR==1{print; exit}' "$lock" 2>/dev/null)
+  if [ -z "$pid" ]; then
+    log_warn "[$rel] no PID in lock → purging"
+    rm -f "$lock"
+    PURGED=$((PURGED+1)); continue
+  fi
+  if kill -0 "$pid" 2>/dev/null; then
+    log_warn "[$rel] held by ALIVE PID $pid (keeping)"
+    HELD=$((HELD+1))
+  else
+    log_warn "[$rel] held by DEAD PID $pid → purging"
+    rm -f "$lock"
+    PURGED=$((PURGED+1))
+  fi
+done
+
+echo
+log_ok "Purged: $PURGED   Held (alive): $HELD"
+exit 0
