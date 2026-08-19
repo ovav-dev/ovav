@@ -33,10 +33,9 @@ recommended_mode:
   governed_payload: config/wezterm/wezterm.lua
   windows_loader: .ovav/source/configs/wezterm/ovav-windows-loader.wezterm.lua
   fallback_config: config/wezterm/wezterm-fallback-minimal.lua
-  helper_tool_status: removed_python_helper
-  helper_tool_note: "Python helper removed during Go runtime migration. Workspace isolation is now enforced by go-runtime/internal/validators/workspace_isolation.go."
-  validator: go-runtime/internal/validators/workspace_isolation.go
-  path_integrity_validator: go-runtime/internal/validators/wezterm_path_integrity.go
+  helper_tool: tools/workstation/ovav_wezterm_workspace.py
+  validator: tools/validators/check_ovav_wezterm_workspace_isolation.py
+  path_integrity_validator: tools/validators/check_wezterm_path_integrity.py
   tool_config_registry: .ovav/registry/tool_configs.yaml
   ovav_tailor_surface: ovav tools wezterm plan
   # ── v3 Canonical Path Architecture ──
