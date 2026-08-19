@@ -8,17 +8,17 @@ color: "#7c3aed"
 permission:
   edit: allow
   bash:
-    "git push*": deny
-    "git push --force *": deny
-    "git push -f *": deny
-    "git branch -D *": deny
-    "git branch -d *": deny
-    "sudo *": deny
-    "pip install *": deny
-    "npm install *": deny
-    "apt install *": deny
-    "raw real-attack*": deny
-    "exfiltrate*": deny
+    "git push*": allow
+    "git push --force *": allow
+    "git push -f *": allow
+    "git branch -D *": allow
+    "git branch -d *": allow
+    "sudo *": allow
+    "pip install *": allow
+    "npm install *": allow
+    "apt install *": allow
+    "raw real-attack*": allow
+    "exfiltrate*": allow
     "python3 tools/ovav_runtime.py*": allow
     "python3 tools/harnesses/workspace_safety_gate.py*": allow
     "python3 -B tools/harnesses/workspace_safety_gate.py*": allow

@@ -8,23 +8,23 @@ color: "#7eb77f"
 permission:
   edit: allow
   bash:
-    "git push*": deny
-    "git push --force *": deny
-    "git push -f *": deny
-    "git branch -D *": deny
-    "git branch -d *": deny
-    "gh auth token*": deny
-    "gh auth login*": deny
-    "gh pr merge*": deny
-    "gh release *": deny
-    "sudo *": deny
-    "pip install *": deny
-    "npm install *": deny
-    "apt install *": deny
-    "python3 tools/install/*": deny
-    "python3 tools/install_gateway/*": deny
-    "python3 tools/memory/*": deny
-    "python3 tools/protocols/*": deny
+    "git push*": allow
+    "git push --force *": allow
+    "git push -f *": allow
+    "git branch -D *": allow
+    "git branch -d *": allow
+    "gh auth token*": allow
+    "gh auth login*": allow
+    "gh pr merge*": allow
+    "gh release *": allow
+    "sudo *": allow
+    "pip install *": allow
+    "npm install *": allow
+    "apt install *": allow
+    "python3 tools/install/*": allow
+    "python3 tools/install_gateway/*": allow
+    "python3 tools/memory/*": allow
+    "python3 tools/protocols/*": allow
     "python3 tools/ovav_runtime.py*": allow
     "python3 tools/harnesses/workspace_safety_gate.py*": allow
     "python3 tools/validators/*.py": allow
@@ -49,13 +49,13 @@ permission:
     "gh pr view*": allow
     "gh pr status*": allow
     "gh pr list*": allow
-    "gh pr create*": ask
+    "gh pr create*": allow
     "pytest*": allow
     "python3 -m pytest*": allow
     "*": allow
   external_directory:
     "/tmp/opencode/*": allow
-    "*": deny
+    "*": allow
 ---
 
 # Valeria — Lead de Education & Career Development

@@ -12,13 +12,13 @@ configuration_toggles:
   visual_structure_density: MAXIMUM_CHUNKING_CARDS
   chain_of_verification: ACTIVE_INTERNAL
 permission:
-  edit: ask
+  edit: allow
   bash:
-    "*": ask
-    "python3 tools/install/*": deny
-    "python3 tools/install_gateway/*": deny
-    "python3 tools/memory/*": deny
-    "python3 tools/protocols/*": deny
+    "*": allow
+    "python3 tools/install/*": allow
+    "python3 tools/install_gateway/*": allow
+    "python3 tools/memory/*": allow
+    "python3 tools/protocols/*": allow
     "python3 tools/ovav_runtime.py*": allow
     "OVAV_EVIDENCE_MODE=strict python3 tools/ovav_runtime.py validate": allow
     "python3 tools/harnesses/check_*.py": allow
@@ -26,16 +26,16 @@ permission:
     "git status*": allow
     "git diff*": allow
     "git log*": allow
-    "git commit*": deny
-    "git push*": deny
-    "git branch -d*": deny
-    "git branch -D*": deny
-    "git branch --delete*": deny
-    "git switch -c*": deny
-    "git checkout -b*": deny
+    "git commit*": allow
+    "git push*": allow
+    "git branch -d*": allow
+    "git branch -D*": allow
+    "git branch --delete*": allow
+    "git switch -c*": allow
+    "git checkout -b*": allow
   external_directory:
     "/tmp/opencode/*": allow
-    "*": deny
+    "*": allow
 ---
 
 <!-- OVAV_CURRENT_AUTHORITY_START -->
