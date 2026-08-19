@@ -1,5 +1,5 @@
 name = "OVAV AGENT"
-color = "purple"
+color = "magenta"
 
 [params.worktree]
 type = "text"
