@@ -141,6 +141,12 @@ func cmdLogin(args []string) int {
 				fmt.Printf("🟢 Session active (%s ago)\n", humanDuration(age))
 				fmt.Printf("   Machine: %s\n", sess.MachineID[:16]+"...")
 				fmt.Printf("   Enter seed to re-verify or 'ovav logout' to close.\n")
+			} else {
+				// FIX-1: explicit notice + self-heal path
+				// Session expired by TTL but seed may still match — let validation decide.
+				// This prevents the "5th time" re-login loop: expired session auto-refreshes
+				// if user re-enters same seed, instead of forcing them through --recover-ceo.
+				fmt.Printf("⚠️  Session expired (%s ago). Re-validating with seed...\n", humanDuration(age))
 			}
 		}
 	}
@@ -168,10 +174,31 @@ func cmdLogin(args []string) int {
 		if sess, ok := loadSession(); ok {
 			vaultKeyHash := sha256Hex(vaultKey)
 			if !strings.EqualFold(vaultKeyHash, sess.VaultKeyHash) {
+				// FIX-2: self-heal path — seed may have been re-issued by CEO recovery.
+				// If the seed doesn't match but produces a valid new identity in the
+				// registry, accept it and overwrite. Otherwise fall back to --force.
+				repoRoot, _ := cli.FindRepoRoot()
+				if repoRoot != "" {
+					reg, regErr := identity.LoadRegistry(repoRoot)
+					if regErr == nil {
+						if id, findErr := identity.FindIdentity(reg, vaultKeyHash); findErr == nil {
+							fmt.Printf("🔄 Seed re-issued (identity %s). Auto-healing session...\n", id.Name)
+							sess.VaultKeyHash = vaultKeyHash
+							sess.IdentityID = id.ID
+							sess.Role = id.Role
+							sess.Level = id.Level
+							sess.Name = id.Name
+							sess.Email = id.Email
+							sess.CreatedAt = time.Now().UTC().Format(time.RFC3339)
+							goto identityVerified
+						}
+					}
+				}
 				fmt.Fprintln(os.Stderr, "❌ Seed does not match stored identity.")
 				fmt.Fprintln(os.Stderr, "   Use 'ovav login --force' to re-initialize.")
 				return 1
 			}
+		identityVerified:
 			// Identity re-verified — show stored identity info
 			if sess.Name != "" {
 				fmt.Printf("✅ Identity verified: %s [%s · Level %d]\n",
@@ -961,17 +988,26 @@ func exportVaultKey(key []byte, seed string) {
 	home, _ := os.UserHomeDir()
 	dir := filepath.Join(home, sessionDir)
 
-	// Write vault key export
+	// Ensure session directory exists with strict perms
+	if err := os.MkdirAll(dir, 0o700); err != nil {
+		fmt.Fprintf(os.Stderr, "⚠️  Could not create session dir: %v\n", err)
+		return
+	}
+
+	// Write vault key export atomically (FIX-3 — was os.WriteFile, not atomic)
+	// Without atomic write, a crash mid-write leaves the file empty, causing
+	// the next login to fail with "Identity not recognized" and forcing the
+	// user through --recover-ceo. This was the root cause of "5th time" loop.
 	keyPath := filepath.Join(dir, "vault_key_export")
-	if err := os.WriteFile(keyPath, []byte(hexKey+"\n"), 0600); err != nil {
+	if err := atomicWriteFile(keyPath, []byte(hexKey+"\n"), 0o600); err != nil {
 		fmt.Fprintf(os.Stderr, "⚠️  Could not write vault key: %v\n", err)
 	} else {
 		fmt.Println("   Vault key:   " + keyPath)
 	}
 
-	// Write seed export (needed for cross-device sync, not just local vault)
+	// Write seed export atomically (needed for cross-device sync)
 	seedPath := filepath.Join(dir, "seed_export")
-	if err := os.WriteFile(seedPath, []byte(seed+"\n"), 0600); err != nil {
+	if err := atomicWriteFile(seedPath, []byte(seed+"\n"), 0o600); err != nil {
 		fmt.Fprintf(os.Stderr, "⚠️  Could not write seed: %v\n", err)
 	} else {
 		fmt.Println("   Seed:        " + seedPath)
@@ -985,6 +1021,46 @@ func exportVaultKey(key []byte, seed string) {
 		fmt.Printf("export OVAV_VAULT_KEY=$(cat %s) OVAV_SEED=$(cat %s); rm %s %s\n",
 			keyPath, seedPath, keyPath, seedPath)
 	}
+}
+
+// atomicWriteFile writes data to a temp file in the same directory, fsyncs,
+// then renames into place. Atomic on POSIX — readers see old or new, never
+// partial. FIX-3 helper for vault_key_export and seed_export.
+func atomicWriteFile(path string, data []byte, mode os.FileMode) error {
+	dir := filepath.Dir(path)
+	tmp, err := os.CreateTemp(dir, ".ovav-tmp-*")
+	if err != nil {
+		return fmt.Errorf("create temp: %w", err)
+	}
+	tmpPath := tmp.Name()
+	defer func() {
+		if _, statErr := os.Stat(tmpPath); statErr == nil {
+			_ = os.Remove(tmpPath)
+		}
+	}()
+
+	if _, err := tmp.Write(data); err != nil {
+		tmp.Close()
+		return fmt.Errorf("write temp: %w", err)
+	}
+	if err := tmp.Sync(); err != nil {
+		tmp.Close()
+		return fmt.Errorf("fsync temp: %w", err)
+	}
+	if err := tmp.Close(); err != nil {
+		return fmt.Errorf("close temp: %w", err)
+	}
+	if err := os.Chmod(tmpPath, mode); err != nil {
+		return fmt.Errorf("chmod temp: %w", err)
+	}
+	if err := os.Rename(tmpPath, path); err != nil {
+		return fmt.Errorf("rename temp: %w", err)
+	}
+	if f, err := os.Open(dir); err == nil {
+		_ = f.Sync()
+		f.Close()
+	}
+	return nil
 }
 
 func isFish() bool {
