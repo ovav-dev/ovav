@@ -1,0 +1,53 @@
+name = "Projects Hub"
+color = "green"
+title = "Projects → {{project}}"
+
+[params.project]
+type = "text"
+description = "Project path under /home/braka/Systems/"
+default = "/home/braka/Systems/ovav"
+
+[params.base_branch]
+type = "branch"
+description = "Base branch"
+default = "main"
+
+[[panes]]
+id = "root"
+split = "vertical"
+children = ["top", "bottom"]
+
+[[panes]]
+id = "top"
+type = "terminal"
+directory = "/home/braka/Systems"
+shell = "fish"
+commands = [
+  "ls -la /home/braka/Systems",
+  "tree -L 2 -d /home/braka/Systems 2>/dev/null || ls /home/braka/Systems",
+]
+is_focused = true
+
+[[panes]]
+id = "bottom"
+split = "horizontal"
+children = ["project", "git"]
+
+[[panes]]
+id = "project"
+type = "terminal"
+directory = "{{project}}"
+shell = "fish"
+commands = [
+  "cd {{project}} && ls -la",
+]
+
+[[panes]]
+id = "git"
+type = "terminal"
+directory = "{{project}}"
+shell = "fish"
+commands = [
+  "cd {{project}} && git status",
+  "cd {{project}} && git log --oneline -5",
+]

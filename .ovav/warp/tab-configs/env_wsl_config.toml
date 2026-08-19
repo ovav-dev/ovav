@@ -1,0 +1,47 @@
+name = "WSL Config"
+color = "cyan"
+title = ".config/{{scope}}"
+
+[params.scope]
+type = "text"
+description = "Config scope (e.g., fish, opencode, ovav, mise)"
+default = "fish"
+
+[[panes]]
+id = "root"
+split = "vertical"
+children = ["configview", "edit"]
+
+[[panes]]
+id = "configview"
+type = "terminal"
+directory = "/home/braka/.config"
+shell = "fish"
+commands = [
+  "ls -la /home/braka/.config/{{scope}}",
+  "tree -L 2 /home/braka/.config/{{scope}} 2>/dev/null || ls -la /home/braka/.config/{{scope}}",
+]
+is_focused = true
+
+[[panes]]
+id = "edit"
+split = "horizontal"
+children = ["shell", "config"]
+
+[[panes]]
+id = "shell"
+type = "terminal"
+directory = "/home/braka/.config/{{scope}}"
+shell = "fish"
+commands = [
+  "cd /home/braka/.config/{{scope}}",
+]
+
+[[panes]]
+id = "config"
+type = "terminal"
+directory = "/home/braka/.config/{{scope}}"
+shell = "fish"
+commands = [
+  "cd /home/braka/.config/{{scope}} && ls -la *.toml *.yaml *.yml *.json 2>/dev/null | head -10",
+]
