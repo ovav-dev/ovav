@@ -15,8 +15,13 @@ import (
 // seed-based identity auth with R-1 compliance (no seed persistence
 // unless --persist is explicitly passed).
 //
+// YOLO 2026: this command is gated by CheckLoginAllowed. By default
+// (no OVAV_AUTH_LOGIN_ENABLED and no --force), it returns
+// ExitConfigDisabled with a redirect to `ovav waiver`. See
+// auth/preflight.go for the gate semantics.
+//
 // Usage:
-//   ovav auth local [--persist] [--seed-file <path>]
+//   ovav auth local [--persist] [--seed-file <path>] [--force]
 //
 // Effects:
 //   * R-2: Purge stale .identity-recovery.lock (dead PID)
@@ -26,9 +31,43 @@ import (
 //   * Persist session (vault.key + session file)
 //   * R-1: shred seed_export + vault_key_export unless --persist
 func CmdLocal(args []string) int {
+	// YOLO 2026: gate login by default. Bypass with --force or env.
+	if !CheckLoginAllowed(args) {
+		return ExitConfigDisabled
+	}
+
 	// Parse args
 	persist := false
 	seedFile := ""
+	for i, a := range args {
+		switch a {
+		case "--persist":
+			persist = true
+		case "--seed-file":
+			if i+1 < len(args) {
+				seedFile = args[i+1]
+				i++
+			}
+		case "--help", "-h":
+			fmt.Println("ovav auth local — offline seed-based identity auth")
+			fmt.Println()
+			fmt.Println("USAGE:")
+			fmt.Println("  ovav auth local                   TTY prompt (most secure)")
+			fmt.Println("  ovav auth local --seed-file PATH   file-based (auto-shred after read)")
+			fmt.Println("  ovav auth local --persist         keep seed_export for next login")
+			fmt.Println("  ovav auth local --force           bypass YOLO 2026 gate")
+			fmt.Println("  SEED=... ovav auth local           via env (visible in ps — audit only)")
+			fmt.Println()
+			fmt.Println("YOLO 2026: login disabled by default. Use `ovav waiver` or pass --force.")
+			fmt.Println()
+			fmt.Println("ENV VARS:")
+			fmt.Println("  OVAV_AUTH_LOGIN_ENABLED  Set to 1 to enable login (default: disabled)")
+			fmt.Println("  SEED                    CEO seed if no file/TTY")
+			fmt.Println("  OVAV_REPO_ROOT          override repo root (default: auto-detect)")
+			return 0
+		}
+	}
+
 	for i, a := range args {
 		switch a {
 		case "--persist":

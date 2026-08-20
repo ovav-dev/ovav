@@ -194,3 +194,41 @@ bin/auth/ovav-auth-install         # one-shot installer (copy or symlink)
 - [ ] Web preflight fails fast with clear error
 - [ ] Smoke tests for all subcommands pass
 - [ ] Coverage > 80% on `cmd/ovav/auth/`
+
+---
+
+## Update 2026-08-19 — YOLO 2026 login deactivation
+
+### Status: applied (PR-equivalent: commit pending)
+
+Three login entry points were disabled by default in the YOLO 2026 baseline:
+
+| Command | Default behavior | Bypass |
+|---|---|---|
+| `ovav login` | exits 78 (EX_CONFIG), prints banner, redirects to `ovav waiver` | `--force` or `OVAV_AUTH_LOGIN_ENABLED=1` |
+| `ovav auth local` | exits 78, banner, redirect | `--force` / env |
+| `ovav auth web` | exits 78, banner, redirect | `--force` / env |
+
+### Why
+
+1. **R-1 risk**: every successful `ovav login` writes `seed_export` and `vault_key_export` to `~/.local/share/ovav/` before the auth package can shred them (CRIT-014 — plaintext window).
+2. **R-3 broken**: `ovav auth web` always fails at preflight because Cloudflare Access blocks `/api/v1/auth/*` with a 302 to `ovav.cloudflareaccess.com`. The web backend would need a server-side fix to function.
+3. **Canonical alternative**: `ovav waiver permission-ceo` is already the operational auth surface — login was dead code in this environment.
+
+### Implementation
+
+- New gate helpers in `go-runtime/cmd/ovav/auth/preflight.go`:
+  - `LoginDisabled()` — default true (YOLO 2026)
+  - `HasForceArg(args)` — detects `--force` / `--enable-login`
+  - `CheckLoginAllowed(args)` — single guard, prints banner, returns decision
+  - `ExitConfigDisabled = 78` — sysexits `EX_CONFIG`
+- All three command entry points call `CheckLoginAllowed` as their first action.
+- Help text in each command documents the new default and bypass.
+- Imports: `cmd/ovav/login.go` gained `"github.com/ovav/ovav/cmd/ovav/auth"` for the gate symbol.
+
+### Future work (deferred)
+
+- [ ] Move seed-export logic OUT of `cmdLogin` entirely (R-1 permanent fix).
+- [ ] Replace `ovav auth web` server-side block (R-3).
+- [ ] Add `caps.yaml` `auth.login_command_enabled` capability flag (currently env-based; canonical source-of-truth still missing).
+- [ ] Coverage test for `CheckLoginAllowed` (env=false, env=true, --force, --enable-login combinations).

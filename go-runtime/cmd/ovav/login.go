@@ -30,6 +30,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/ovav/ovav/cmd/ovav/auth"
 	"github.com/ovav/ovav/internal/cli"
 	"github.com/ovav/ovav/internal/identity"
 	"github.com/ovav/ovav/internal/infra"
@@ -105,6 +106,13 @@ func parseLoginOptions(args []string) (loginOptions, error) {
 // ── Login command ─────────────────────────────────────────────────────────────
 
 func cmdLogin(args []string) int {
+	// YOLO 2026: gate login by default. Bypass with --force or env.
+	// Mirrors the gate in auth.CmdLocal and auth.CmdWeb — all three
+	// entry points share the same semantics via auth.CheckLoginAllowed.
+	if !auth.CheckLoginAllowed(args) {
+		return auth.ExitConfigDisabled
+	}
+
 	options, err := parseLoginOptions(args)
 	if err != nil {
 		if err.Error() != "help requested" {

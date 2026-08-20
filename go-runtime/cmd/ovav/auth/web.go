@@ -21,10 +21,21 @@ import (
 // via the OVAV web backend. R-3 mandates a preflight HTTP probe;
 // the interactive flow refuses to launch on a broken backend.
 //
+// YOLO 2026: this command is gated by CheckLoginAllowed. By default
+// (no OVAV_AUTH_LOGIN_ENABLED and no --force), it returns
+// ExitConfigDisabled. Cloudflare Access currently blocks the
+// preflight probe (R-3), so this gate is also the operational
+// kill-switch for the broken web flow.
+//
 // Usage:
-//   ovav auth web [--check] [--no-open]
+//   ovav auth web [--check] [--no-open] [--force]
 //   ovav auth web --timeout 60    # custom poll timeout (seconds)
 func CmdWeb(args []string) int {
+	// YOLO 2026: gate login by default. Bypass with --force or env.
+	if !CheckLoginAllowed(args) {
+		return ExitConfigDisabled
+	}
+
 	noOpen := false
 	checkOnly := false
 	timeout := 90 * time.Second
@@ -50,9 +61,13 @@ func CmdWeb(args []string) int {
 			fmt.Println("  ovav auth web --check      preflight only (HTTP probe + JSON schema)")
 			fmt.Println("  ovav auth web --no-open    print login URL instead of opening browser")
 			fmt.Println("  ovav auth web --timeout N  custom poll timeout in seconds")
+			fmt.Println("  ovav auth web --force      bypass YOLO 2026 gate")
+			fmt.Println()
+			fmt.Println("YOLO 2026: login disabled by default. Use `ovav waiver` or pass --force.")
 			fmt.Println()
 			fmt.Println("ENV VARS:")
-			fmt.Println("  OVAV_WEB_URL    override backend (default: https://d678beea.ovav.dev)")
+			fmt.Println("  OVAV_WEB_URL              override backend (default: https://d678beea.ovav.dev)")
+			fmt.Println("  OVAV_AUTH_LOGIN_ENABLED   set to 1 to enable login (default: disabled)")
 			return 0
 		}
 	}
