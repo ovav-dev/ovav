@@ -4,7 +4,7 @@ description: "Benchmark Analyst — análisis competitivo, comparativas técnica
 mode: subagent
 hidden: true
 model:
-  id: "opencode-go/qwen3.7-plus"
+  id: "openai/gpt-5.6-luna"
 steps: 10
 permissions:
   - action: "file.edit"

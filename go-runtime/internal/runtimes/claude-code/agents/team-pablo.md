@@ -1,7 +1,7 @@
 ---
 name: "pablo"
 description: "Valido cada commit antes de que llegue a la rama principal — reviso patrones, consistencia, y adherence a los estándares de código de OVAV."
-model: opencode-go/qwen3.7-max
+model: openai/gpt-5.6-luna
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

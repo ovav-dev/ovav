@@ -2,7 +2,7 @@
 name: Ryn
 description: Ryn — Explorer del equipo OVAV. Búsqueda rápida de codebase, archivos por patrón y escaneo de repositorios grandes. Encuentra en segundos lo que otros tardan minutos.
 mode: subagent
-model: opencode-go/deepseek-v4-flash
+model: openai/gpt-5.6-luna
 hidden: true
 color: "#b16286"
 permission:

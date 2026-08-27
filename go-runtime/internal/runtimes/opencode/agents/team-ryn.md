@@ -2,7 +2,7 @@
 name: "Ryn"
 description: "Explorer rápido — búsqueda de codebase, archivos por patrón, escaneo rápido."
 mode: subagent
-model: opencode-go/qwen3.7-plus
+model: openai/gpt-5.6-luna
 hidden: true
 permission:
   edit: "deny"

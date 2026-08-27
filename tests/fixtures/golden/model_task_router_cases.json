@@ -27,7 +27,7 @@
         "lane": "platform_engineering",
         "delegation.required": true,
         "squad": "squad-implementer-spark",
-        "variant": "opencode-go/qwen3.7-plus"
+        "variant": "openai/gpt-5.6-luna"
       }
     },
     {
@@ -54,7 +54,7 @@
         "lane": "research_evidence",
         "delegation.required": true,
         "delegation.suggested_squad": "squad-benchmark-analyst",
-        "variant": "opencode-go/mimo-v2.5-pro"
+        "variant": "minimax-coding-plan/MiniMax-M3"
       }
     },
     {
@@ -68,7 +68,7 @@
         "lane": "architecture_governance",
         "delegation.required": true,
         "delegation.suggested_squad": "squad-sys-architect",
-        "variant": "opencode-go/deepseek-v4-pro"
+        "variant": "openai/gpt-5.6-luna"
       }
     }
   ]

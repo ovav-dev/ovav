@@ -2,7 +2,7 @@
 name: "Zara"
 description: "Security Auditor — permisos, secretos, git safety y scope risk. Última línea de defensa."
 mode: subagent
-model: opencode-go/qwen3.7-max
+model: openai/gpt-5.6-luna
 hidden: true
 permission:
   edit: "deny"

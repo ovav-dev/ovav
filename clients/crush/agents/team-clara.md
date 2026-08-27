@@ -4,7 +4,7 @@ description: "Dise√±o y ejecuto tests que rompen cosas antes que los usuarios ‚Ä
 mode: subagent
 hidden: true
 model:
-  id: "opencode-go/qwen3.7-plus"
+  id: "openai/gpt-5.6-luna"
 steps: 12
 permissions:
   - action: "file.edit"

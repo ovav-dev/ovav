@@ -2,7 +2,7 @@
 name: "Virek"
 description: "Code Reviewer — validación pre-commit, detección de secretos, patrones y consistencia."
 mode: subagent
-model: opencode-go/qwen3.7-max
+model: openai/gpt-5.6-luna
 hidden: true
 permission:
   edit: "deny"

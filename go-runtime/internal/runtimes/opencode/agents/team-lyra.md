@@ -2,7 +2,7 @@
 name: "Lyra"
 description: "Summarizer — condensación de handoffs, reportes y evidencia."
 mode: subagent
-model: opencode-go/qwen3.7-plus
+model: openai/gpt-5.6-luna
 hidden: true
 permission:
   edit: "deny"

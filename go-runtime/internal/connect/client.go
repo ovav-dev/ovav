@@ -46,7 +46,7 @@ type Config struct {
 func LoadConfig() *Config {
 	cfg := &Config{
 		Provider:   ProviderOpenAI,
-		Model:      getEnv("OVAV_MODEL", "gpt-4o"),
+		Model:      getEnv("OVAV_MODEL", "openai/gpt-5.6-luna"),
 		MaxTokens:  4096,
 		TimeoutSec: 120,
 	}
@@ -83,7 +83,7 @@ func LoadConfig() *Config {
 		cfg.Provider = ProviderMiniMax
 		cfg.APIKey = key
 		cfg.BaseURL = getEnv("MINIMAX_BASE_URL", "https://api.minimaxi.chat/v1")
-		cfg.Model = getEnv("MINIMAX_MODEL", "MiniMax-Text-01")
+		cfg.Model = getEnv("MINIMAX_MODEL", "minimax-coding-plan/MiniMax-M3")
 	} else if key := os.Getenv("OPENAI_API_KEY"); key != "" {
 		cfg.Provider = ProviderOpenAI
 		cfg.APIKey = key
@@ -95,7 +95,7 @@ func LoadConfig() *Config {
 			cfg.Provider = ProviderMiniMax
 			cfg.APIKey = key
 			cfg.BaseURL = getEnv("ANTHROPIC_API_ENDPOINT", "https://api.minimax.io/anthropic")
-			cfg.Model = getEnv("ANTHROPIC_MODEL", "minimax/MiniMax-M2.7")
+			cfg.Model = getEnv("ANTHROPIC_MODEL", "minimax-coding-plan/MiniMax-M3")
 		} else {
 			cfg.Provider = ProviderAnthropic
 			cfg.APIKey = key

@@ -2,7 +2,7 @@
 name: Lyra
 description: Lyra — Summarizer del equipo OVAV. Condensación de handoffs, reportes y evidencia. Si no puede explicarlo en tres líneas, no lo entendió.
 mode: subagent
-model: opencode-go/qwen3.6-plus
+model: openai/gpt-5.6-luna
 hidden: true
 color: "#928374"
 permission:

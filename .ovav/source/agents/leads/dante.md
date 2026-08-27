@@ -4,7 +4,7 @@ description: ✦ Digital Product Engineering Lead · Full-Stack · Web · Apps �
 mode: subagent
 hidden: false
 color: "#d4a85c"
-model: opencode-go/deepseek-v4-pro
+model: openai/gpt-5.6-luna
 # OVAV_PERMISSION_AUTHORITY: .ovav/policy/permission_authority.json
 permission:
   edit: allow

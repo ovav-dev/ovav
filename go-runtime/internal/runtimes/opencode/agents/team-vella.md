@@ -2,7 +2,7 @@
 name: "Vella"
 description: "Testing & QA Engineer — ejecuta tests, detecta regresiones, cubre edge cases."
 mode: subagent
-model: opencode-go/qwen3.7-max
+model: openai/gpt-5.6-luna
 hidden: true
 permission:
   edit: "allow"

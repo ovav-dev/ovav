@@ -1070,7 +1070,7 @@ func TestThoughtFirewall_ProtectedBranch(t *testing.T) {
 
 func TestModelPolicy_Clean(t *testing.T) {
 	dir := t.TempDir()
-	os.WriteFile(filepath.Join(dir, "opencode.json"), []byte(`{"model": "opencode-go/deepseek-v4-pro", "agent": {"test": {"model": "opencode-go/qwen3.7-plus"}}}`), 0644)
+	os.WriteFile(filepath.Join(dir, "opencode.json"), []byte(`{"model": "openai/gpt-5.6-luna", "agent": {"test": {"model": "minimax-coding-plan/MiniMax-M3"}}}`), 0644)
 
 	v := NewModelPolicy()
 	result := v.Validate(context.Background(), dir)
@@ -3492,7 +3492,7 @@ func TestCredentialGovernance_Valid(t *testing.T) {
 	}`), 0644)
 
 	// Create opencode.json with provider reference
-	os.WriteFile(filepath.Join(dir, "opencode.json"), []byte(`{"model": "opencode-go/deepseek-v4-pro", "providers": {"deepseek": {}}}`), 0644)
+	os.WriteFile(filepath.Join(dir, "opencode.json"), []byte(`{"model": "openai/gpt-5.6-luna", "providers": {"openai": {}}}`), 0644)
 
 	// Create caps.yaml with product scope
 	os.MkdirAll(filepath.Join(dir, ".ovav", "plan"), 0755)
@@ -4972,13 +4972,13 @@ func TestGateSelfProtection(t *testing.T) {
 func TestModelPolicy(t *testing.T) {
 	t.Run("parse frontmatter model", func(t *testing.T) {
 		dir := t.TempDir()
-		content := "---\nmodel: opencode-go/deepseek-v4-pro\n---\n# Agent"
+		content := "---\nmodel: openai/gpt-5.6-luna\n---\n# Agent"
 		os.WriteFile(filepath.Join(dir, "agent.md"), []byte(content), 0644)
 
 		v := NewModelPolicy()
 		model := v.parseFrontmatterModel(filepath.Join(dir, "agent.md"))
-		if model != "opencode-go/deepseek-v4-pro" {
-			t.Errorf("expected model 'opencode-go/deepseek-v4-pro', got %q", model)
+		if model != "openai/gpt-5.6-luna" {
+			t.Errorf("expected model 'openai/gpt-5.6-luna', got %q", model)
 		}
 	})
 
@@ -5009,13 +5009,13 @@ func TestModelPolicy(t *testing.T) {
 	t.Run("authorized model passes", func(t *testing.T) {
 		dir := t.TempDir()
 		os.WriteFile(filepath.Join(dir, "opencode.json"),
-			[]byte(`{"model": "opencode-go/deepseek-v4-pro"}`), 0644)
-		writeTestFile(t, dir, ".ovav/policy/permission_authority.json", `{"model_groups":{"legacy_fixture":{"models":["opencode-go/deepseek-v4-pro"]}}}`)
+			[]byte(`{"model": "openai/gpt-5.6-luna"}`), 0644)
+		writeTestFile(t, dir, ".ovav/policy/permission_authority.json", `{"model_groups":{"canonical_fixture":{"models":["openai/gpt-5.6-luna"]}}}`)
 		// Create model_body_ladder.yaml at expected path
 		ladderDir := filepath.Join(dir, ".ovav", "service_areas", "platform_engineering")
 		os.MkdirAll(ladderDir, 0755)
 		os.WriteFile(filepath.Join(ladderDir, "model_body_ladder.yaml"),
-			[]byte("model_body_ladder:\n  thavren:\n    primary: opencode-go/deepseek-v4-pro\n"), 0644)
+			[]byte("model_body_ladder:\n  thavren:\n    primary: openai/gpt-5.6-luna\n"), 0644)
 
 		v := NewModelPolicy()
 		result := v.Validate(context.Background(), dir)

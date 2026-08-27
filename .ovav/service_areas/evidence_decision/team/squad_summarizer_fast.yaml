@@ -16,9 +16,9 @@ activation:
   router: Delegation Router
 
 model_body:
-  primary: "opencode-go/qwen3.6-plus"
-  secondary: "opencode-go/deepseek-v4-flash-free"
-  emergency: "opencode-go/deepseek-v4-flash-free"
+  primary: "openai/gpt-5.6-luna"
+  secondary: "minimax-coding-plan/MiniMax-M3"
+  emergency: "minimax-coding-plan/MiniMax-M3"
 
 lanes:
   - continuity_synthesis

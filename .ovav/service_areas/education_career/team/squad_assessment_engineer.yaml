@@ -16,8 +16,8 @@ activation:
   never_default: true
   router: Delegation Router
 model_body:
-  primary: opencode-go/mimo-v2.5-pro
-  secondary: opencode-go/deepseek-v4-pro
+  primary: openai/gpt-5.6-luna
+  secondary: minimax-coding-plan/MiniMax-M3
 lanes:
 - assessment_certification
 capabilities:

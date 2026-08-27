@@ -2,7 +2,7 @@
 name: "Kael"
 description: "Implementador Junior — parches pequeños, fixtures y ediciones determinísticas."
 mode: subagent
-model: opencode-go/qwen3.7-max
+model: openai/gpt-5.6-luna
 hidden: true
 permission:
   edit: "allow"

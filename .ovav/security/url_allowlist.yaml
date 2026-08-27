@@ -18,7 +18,7 @@ allowlist:
     added: 2026-07-16
     added_by: thavren
 
-  # ─── Opencode (full proxy via opencode-go) ────────────────────────────
+  # ─── OpenCode (official configuration and documentation) ─────────────
   - url: https://opencode.ai/
     rationale: Official opencode docs / config
     added: 2026-07-16

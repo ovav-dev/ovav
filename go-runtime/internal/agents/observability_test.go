@@ -303,7 +303,7 @@ func validTraceEventInput() TraceEventInput {
 		ContextDecisions:   []string{"source-local"},
 		ToolCalls:          []string{"go-test"},
 		Handoffs:           []string{},
-		ModelUsed:          "openai/gpt-5.6-sol",
+		ModelUsed:          "openai/gpt-5.6-luna",
 		TokenUsageEstimate: 1200,
 		CostEstimate:       0.02,
 		EvalsPassed:        []string{"tool_capability_boundary", "delivery_contract_match"},

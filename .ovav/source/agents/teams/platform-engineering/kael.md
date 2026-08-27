@@ -2,7 +2,7 @@
 name: Kael
 description: Kael — Implementador Junior del equipo OVAV. Parches pequeños, fixtures y ediciones determinísticas. Aprende de Soren, construye con cuidado.
 mode: subagent
-model: opencode-go/qwen3.7-plus
+model: openai/gpt-5.6-luna
 hidden: true
 color: "#fabd2f"
 permission:

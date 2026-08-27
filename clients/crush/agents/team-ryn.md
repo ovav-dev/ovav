@@ -4,7 +4,7 @@ description: "Explorer rápido — búsqueda de codebase, archivos por patrón, 
 mode: subagent
 hidden: true
 model:
-  id: "opencode-go/qwen3.7-plus"
+  id: "openai/gpt-5.6-luna"
 steps: 8
 permissions:
   - action: "file.edit"

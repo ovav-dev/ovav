@@ -98,8 +98,8 @@ OpenCode discovers agents from `CWD/.opencode/agents/*.md`. No registry, no pack
 ```json
 {
   "default_agent": "Platform Engineering",
-  "model": "opencode-go/deepseek-v4-pro",
-  "small_model": "opencode-go/deepseek-v4-flash",
+  "model": "openai/gpt-5.6-luna",
+  "small_model": "minimax-coding-plan/MiniMax-M3",
   "instructions": ["opencode_AGENTS.md"]
 }
 ```

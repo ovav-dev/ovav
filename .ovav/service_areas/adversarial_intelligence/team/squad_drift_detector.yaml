@@ -16,7 +16,7 @@ activation:
   never_default: true
   router: Delegation Router
 model_body:
-  primary: opencode-go/deepseek-v4-pro
+  primary: openai/gpt-5.6-luna
   secondary: minimax-coding-plan/MiniMax-M3
 lanes:
 - drift_detection

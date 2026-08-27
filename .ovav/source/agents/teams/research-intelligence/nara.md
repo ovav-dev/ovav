@@ -2,7 +2,7 @@
 name: Nara
 description: Nara — Benchmark Analyst del equipo OVAV. Análisis competitivo, comparativas técnicas y briefs de decisión basados en evidencia.
 mode: subagent
-model: opencode-go/mimo-v2.5-pro
+model: openai/gpt-5.6-luna
 hidden: true
 color: "#689d6a"
 permission:

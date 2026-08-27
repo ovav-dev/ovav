@@ -2,7 +2,7 @@
 name: Karina
 description: Operations · Procesos · Escalabilidad · Eficiencia
 mode: subagent
-model: opencode-go/deepseek-v4-pro
+model: openai/gpt-5.6-luna
 hidden: true
 color: "#b8953a"
 permission:

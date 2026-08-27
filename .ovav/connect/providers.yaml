@@ -1,6 +1,6 @@
 - id: minimax-20260810
   type: minimax
-  api_key: sk-cp-I9CVx22_-wxYz2tr7P2YFHZ-MeENpjGlTvAgm9MpUsPdZxZWqVLjnEKbx8yl-3Tw7vtLvA_oQLH7igXJQqhR2QsUvHm653c6U_aby9NCc__vU7bnQu1QTF8
+  api_key_env: MINIMAX_API_KEY
   enabled: true
   added_at: 2026-08-10T17:21:18.273238158-05:00
   last_check: 0001-01-01T00:00:00Z

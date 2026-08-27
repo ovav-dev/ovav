@@ -14,27 +14,34 @@ harness:
   isolated: true  # This config does not leak to other harnesses
 
 # ── Provider Configuration ────────────────────────────────────────────────────
-# Priority: MINIMAX_API_KEY > OVAV_* env vars > default
+# Active route: GPT via API/browser; MiniMax is the subscription fallback/small model.
 
 provider:
-  default: "minimax"  # Use MiniMax as default for OVAV
+  default: "openai"  # GPT is the default provider for OVAV
+
+  openai:
+    provider: "openai"
+    model: "openai/gpt-5.6-luna"
+    api_key_env: "OPENAI_API_KEY"
+    api_endpoint: "https://api.openai.com/v1"
+    color: "#10A37F"
   
   minimax:
     env_var: "MINIMAX_API_KEY"
     base_url: "https://api.minimaxi.chat/v1"
-    model: "MiniMax-Text-01"
+    model: "minimax-coding-plan/MiniMax-M3"
     color: "#FF6B35"
     auth_header: "Bearer"
     direct_api_key_env: "ANTHROPIC_API_KEY"
     direct_api_endpoint_env: "ANTHROPIC_API_ENDPOINT"
     direct_endpoint: "https://api.minimax.io/anthropic/v1"
     direct_provider: "minimax"
-    direct_model: "minimax/MiniMax-M2.7"
+    direct_model: "minimax-coding-plan/MiniMax-M3"
 
   # Direct MiniMax subscription (uses YOUR subscription, NOT hypercredits)
   minimax_direct:
     provider: "minimax"
-    model: "minimax/MiniMax-M2.7"
+    model: "minimax-coding-plan/MiniMax-M3"
     api_key_env: "ANTHROPIC_API_KEY"
     api_endpoint_env: "ANTHROPIC_API_ENDPOINT"
     api_endpoint: "https://api.minimax.io/anthropic/v1"
@@ -42,13 +49,9 @@ provider:
   
   # Fallback providers (in order of priority)
   fallbacks:
-    - provider: "aihubmix"
-      model: "aihubmix/coding-minimax-m3"
+    - provider: "minimax-coding-plan"
+      model: "minimax-coding-plan/MiniMax-M3"
       color: "#FF8C42"
-    
-    - provider: "hyper"
-      model: "deepseek-v4-flash"
-      color: "#7B68EE"
 
 # ── OVAV System Integration ─────────────────────────────────────────────────
 

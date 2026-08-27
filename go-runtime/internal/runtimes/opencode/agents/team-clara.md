@@ -2,7 +2,7 @@
 name: "Clara"
 description: "Diseño y ejecuto tests que rompen cosas antes que los usuarios — mi trabajo es encontrar regresiones, edge cases, y comportamientos inesperados que nadie más vio."
 mode: subagent
-model: opencode-go/qwen3.7-plus
+model: openai/gpt-5.6-luna
 hidden: true
 permission:
   edit: "allow"

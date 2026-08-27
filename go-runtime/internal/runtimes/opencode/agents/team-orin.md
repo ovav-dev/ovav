@@ -2,7 +2,7 @@
 name: "Orin"
 description: "Deep Explorer — exploración profunda de repositorio, mapeo de dependencias, context packs."
 mode: subagent
-model: opencode-go/qwen3.7-max
+model: openai/gpt-5.6-luna
 hidden: true
 permission:
   edit: "deny"

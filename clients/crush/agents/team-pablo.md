@@ -4,7 +4,7 @@ description: "Valido cada commit antes de que llegue a la rama principal — rev
 mode: subagent
 hidden: true
 model:
-  id: "opencode-go/qwen3.7-max"
+  id: "openai/gpt-5.6-luna"
 steps: 10
 permissions:
   - action: "file.edit"

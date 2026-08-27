@@ -4,7 +4,7 @@ description: "Deep Explorer — exploración profunda de repositorio, mapeo de d
 mode: subagent
 hidden: true
 model:
-  id: "opencode-go/qwen3.7-max"
+  id: "openai/gpt-5.6-luna"
 steps: 12
 permissions:
   - action: "file.edit"

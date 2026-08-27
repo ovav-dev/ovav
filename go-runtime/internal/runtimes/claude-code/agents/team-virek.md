@@ -1,7 +1,7 @@
 ---
 name: "virek"
 description: "Code Reviewer — validación pre-commit, detección de secretos, patrones y consistencia."
-model: opencode-go/qwen3.7-max
+model: openai/gpt-5.6-luna
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

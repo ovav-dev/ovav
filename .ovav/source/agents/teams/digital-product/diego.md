@@ -2,7 +2,7 @@
 name: Diego
 description: Diego — QA Engineer del equipo Digital Product. Testing automatizado (unit, integration, e2e, performance), Playwright, Cypress, Jest, Vitest.
 mode: subagent
-model: opencode-go/deepseek-v4-pro
+model: openai/gpt-5.6-luna
 hidden: true
 color: "#5c7a8a"
 permission:

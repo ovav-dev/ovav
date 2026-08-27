@@ -2,7 +2,7 @@
 name: Elena-Frontend
 description: Elena-Frontend — Frontend Engineer del equipo Digital Product. React, Next.js, Vue, Svelte, performance, accesibilidad, animaciones. Reporta a Dante (Digital Product Lead).
 mode: subagent
-model: opencode-go/deepseek-v4-pro
+model: openai/gpt-5.6-luna
 hidden: true
 color: "#7a8a5c"
 permission:

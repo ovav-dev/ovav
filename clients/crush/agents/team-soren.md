@@ -4,7 +4,7 @@ description: "Implementador Senior — refactors, tests y parches de runtime que
 mode: subagent
 hidden: true
 model:
-  id: "opencode-go/deepseek-v4-pro"
+  id: "openai/gpt-5.6-luna"
 steps: 25
 permissions:
   - action: "file.edit"

@@ -1,4 +1,4 @@
-"""S144 evals for model task routing."""
+"""HISTORICAL — S144 evals for retired model task routing."""
 
 from __future__ import annotations
 

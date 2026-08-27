@@ -1,7 +1,7 @@
 ---
 name: "zara"
 description: "Security Auditor — permisos, secretos, git safety y scope risk. Última línea de defensa."
-model: opencode-go/qwen3.7-max
+model: openai/gpt-5.6-luna
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

@@ -103,34 +103,45 @@ func providers(tk *tracker.Tracker) {
 	fmt.Fprintf(w, "ID\tType\tAPI Key\tEnabled\n")
 	fmt.Fprintf(w, "--\t----\t-------\t-------\n")
 	for _, p := range providers {
-		apiKey := p.APIKey
-		if len(apiKey) > 8 {
-			apiKey = "..." + apiKey[len(apiKey)-8:]
+		keyRef := p.APIKeyEnv
+		if keyRef == "" {
+			keyRef = "legacy-inline"
+		}
+		keyStatus := "unset"
+		if p.ResolveAPIKey() != "" {
+			keyStatus = "set"
 		}
 		enabled := "✓"
 		if !p.Enabled {
 			enabled = "✗"
 		}
-		fmt.Fprintf(w, "%s\t%s\t%s\t%s\n", p.ID, p.Type, apiKey, enabled)
+		fmt.Fprintf(w, "%s\t%s\t%s (%s)\t%s\n", p.ID, p.Type, keyRef, keyStatus, enabled)
 	}
 	w.Flush()
 }
 
 func add(tk *tracker.Tracker, args []string) {
-	if len(args) < 2 {
-		fmt.Fprintln(os.Stderr, "Usage: ovav connect add <type> <api_key>")
-		fmt.Fprintln(os.Stderr, "  types: openai, anthropic, openrouter")
+	if len(args) < 1 {
+		fmt.Fprintln(os.Stderr, "Usage: ovav connect add <type> [api_key_env]")
+		fmt.Fprintln(os.Stderr, "  API keys must be provided through environment variables")
 		os.Exit(1)
 	}
 
 	providerType := args[0]
-	apiKey := args[1]
+	apiKeyEnv := providerAPIKeyEnv(providerType)
+	if len(args) > 1 {
+		apiKeyEnv = args[1]
+	}
+	if apiKeyEnv == "" || os.Getenv(apiKeyEnv) == "" {
+		fmt.Fprintf(os.Stderr, "API key environment variable not set: %s\n", apiKeyEnv)
+		os.Exit(1)
+	}
 
 	provider := &tracker.TrackedProvider{
-		ID:      providerType + "-" + time.Now().Format("20060102"),
-		Type:    providerType,
-		APIKey:  apiKey,
-		Enabled: true,
+		ID:        providerType + "-" + time.Now().Format("20060102"),
+		Type:      providerType,
+		APIKeyEnv: apiKeyEnv,
+		Enabled:   true,
 	}
 
 	if err := tk.AddProvider(provider); err != nil {
@@ -139,6 +150,21 @@ func add(tk *tracker.Tracker, args []string) {
 	}
 
 	fmt.Printf("✅ Added provider: %s (%s)\n", provider.ID, provider.Type)
+}
+
+func providerAPIKeyEnv(providerType string) string {
+	switch providerType {
+	case "minimax":
+		return "MINIMAX_API_KEY"
+	case "openai":
+		return "OPENAI_API_KEY"
+	case "anthropic":
+		return "ANTHROPIC_API_KEY"
+	case "openrouter":
+		return "OPENROUTER_API_KEY"
+	default:
+		return ""
+	}
 }
 
 func remove(tk *tracker.Tracker, args []string) {
@@ -321,7 +347,7 @@ Usage:
 Commands:
   status      Show connection status and today's usage
   providers   List all configured providers
-  add         Add a new provider
+  add         Add a new provider using an environment variable
   remove      Remove a provider
   history     Show usage history
   report      Generate usage report
@@ -329,8 +355,9 @@ Commands:
 
 Examples:
   ovav connect status              # Check status
-  ovav connect add openai sk-...   # Add OpenAI
-  ovav connect add anthropic sk-.. # Add Anthropic
+  ovav connect add openai          # Uses OPENAI_API_KEY
+  ovav connect add anthropic       # Uses ANTHROPIC_API_KEY
+  ovav connect add minimax         # Uses MINIMAX_API_KEY
   ovav connect history --days 30    # Last 30 days
   ovav connect report              # Monthly report
   ovav connect optimize            # Get AI optimization tips

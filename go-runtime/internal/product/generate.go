@@ -282,8 +282,8 @@ func generateMimocodeConfig(path string) error {
 		"\n    \"AGENTS.md\"" +
 		"\n  ]," +
 		"\n  \"mcp\": {}," +
-		"\n  \"model\": \"mimo/mimo-auto\"," +
-		"\n  \"small_model\": \"opencode-go/deepseek-v4-flash\"," +
+		"\n  \"model\": \"openai/gpt-5.6-luna\"," +
+		"\n  \"small_model\": \"minimax-coding-plan/MiniMax-M3\"," +
 		"\n  \"permission\": {" +
 		"\n    \"bash\": {" +
 		"\n      \"*\": \"allow\"," +
@@ -299,13 +299,8 @@ func generateMimocodeConfig(path string) error {
 		"\n  \"plugin\": []," +
 		"\n  \"model_routing\": {" +
 		"\n    \"description\": \"Smart model distribution — auto-routes by task type\"," +
-		"\n    \"default\": \"mimo/mimo-auto\"," +
-		"\n    \"coding\": \"opencode-go/deepseek-v4-pro\"," +
-		"\n    \"review\": \"opencode-go/claude-sonnet-4-20250514\"," +
-		"\n    \"architecture\": \"opencode-go/gpt-5.5\"," +
-		"\n    \"quick\": \"opencode-go/claude-haiku-3-5\"," +
-		"\n    \"bulk\": \"opencode-go/deepseek-v4-flash\"," +
-		"\n    \"matrix\": \"opencode-go/qwen3.5-plus\"" +
+		"\n    \"default\": \"openai/gpt-5.6-luna\"," +
+		"\n    \"fallback\": \"minimax-coding-plan/MiniMax-M3\"" +
 		"\n  }," +
 		"\n  \"provider\": {" +
 		"\n    \"openai\": {" +

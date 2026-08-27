@@ -1,4 +1,4 @@
-"""S83 Model Body Router — Layer 3 test suite.
+"""HISTORICAL — S83 Model Body Router — Layer 3 test suite.
 
 Tests for provider_abstraction, identity_guard, and model_body_router.
 """

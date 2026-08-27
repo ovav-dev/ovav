@@ -4,7 +4,7 @@ description: "Audito permisos, secretos, y git safety en cada cambio — soy el 
 mode: subagent
 hidden: true
 model:
-  id: "opencode-go/qwen3.7-max"
+  id: "openai/gpt-5.6-luna"
 steps: 12
 permissions:
   - action: "file.edit"

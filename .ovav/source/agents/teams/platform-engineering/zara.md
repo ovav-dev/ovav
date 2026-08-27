@@ -2,7 +2,7 @@
 name: Zara
 description: Zara — Security Auditor del equipo OVAV. Permisos, secretos, git safety y scope risk. La última línea de defensa antes del push.
 mode: subagent
-model: opencode-go/glm-5.1
+model: openai/gpt-5.6-luna
 hidden: true
 color: "#cc241d"
 permission:

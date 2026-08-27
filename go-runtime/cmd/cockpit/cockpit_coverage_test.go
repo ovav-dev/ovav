@@ -54,9 +54,9 @@ func TestGetConfigMaxCursor(t *testing.T) {
 		expected int
 	}{
 		{SectionOverview, 4},
-		{SectionModels, 6},
+		{SectionModels, 1},
 		{SectionSecurity, 5},
-		{SectionProviders, 3},
+		{SectionProviders, 1},
 	}
 	for _, tt := range tests {
 		t.Run(fmt.Sprintf("section_%d", tt.section), func(t *testing.T) {
@@ -363,12 +363,12 @@ func TestRenderModelsSection(t *testing.T) {
 	if output == "" {
 		t.Error("expected non-empty models section")
 	}
-	if !containsAny(output, []string{"Model Routing", "mimo-auto", "deepseek-v4-pro"}) {
+	if !containsAny(output, []string{"Model Routing", "openai/gpt-5.6-luna", "minimax-coding-plan/MiniMax-M3"}) {
 		t.Error("models section missing expected content")
 	}
 	// Test selected model shows description
 	output2 := m.renderModelsSection(1)
-	if !containsAny(output2, []string{"Go implementation"}) {
+	if !containsAny(output2, []string{"Fallback"}) {
 		t.Error("selected model should show description")
 	}
 }
@@ -407,12 +407,12 @@ func TestRenderProvidersSection(t *testing.T) {
 	if output == "" {
 		t.Error("expected non-empty providers section")
 	}
-	if !containsAny(output, []string{"AI Providers", "Xiaomi"}) {
+	if !containsAny(output, []string{"AI Providers", "OpenAI", "openai/gpt-5.6-luna"}) {
 		t.Error("providers section missing expected content")
 	}
 	// Selected provider shows models
 	output2 := m.renderProvidersSection(0)
-	if !containsAny(output2, []string{"mimo-auto"}) {
+	if !containsAny(output2, []string{"openai/gpt-5.6-luna"}) {
 		t.Error("selected provider should show models")
 	}
 }

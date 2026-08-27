@@ -46,7 +46,7 @@ var ProviderConfigs = map[string]struct {
 	},
 	"minimax_direct": {
 		Provider:  "minimax",
-		Model:     "minimax/MiniMax-M2.7",
+		Model:     "minimax-coding-plan/MiniMax-M3",
 		APIKeyEnv: "ANTHROPIC_API_KEY",
 		Endpoint:  "https://api.minimax.io/anthropic/v1",
 		Help:      "Use your MiniMax monthly subscription (sk-cp-* key)",
@@ -60,7 +60,7 @@ var ProviderConfigs = map[string]struct {
 	},
 	"openai": {
 		Provider:  "openai",
-		Model:     "gpt-4o",
+		Model:     "openai/gpt-5.6-luna",
 		APIKeyEnv: "OPENAI_API_KEY",
 		Endpoint:  "https://api.openai.com/v1",
 		Help:      "Use OpenAI Direct API",

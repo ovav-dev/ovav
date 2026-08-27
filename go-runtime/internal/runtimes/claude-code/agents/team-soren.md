@@ -1,7 +1,7 @@
 ---
 name: "soren"
 description: "Implementador Senior — refactors, tests y parches de runtime que duran."
-model: opencode-go/deepseek-v4-pro
+model: openai/gpt-5.6-luna
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

@@ -2,7 +2,7 @@
 name: Rosa
 description: Rosa — Project Manager del equipo Digital Product. Planificación, milestones, tracking, gestión de riesgos, delivery.
 mode: subagent
-model: opencode-go/deepseek-v4-pro
+model: openai/gpt-5.6-luna
 hidden: true
 color: "#7a5c8a"
 permission:

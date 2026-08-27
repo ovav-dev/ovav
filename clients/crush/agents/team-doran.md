@@ -4,7 +4,7 @@ description: "Install Engineer — planificación de instalación, backup/rollba
 mode: subagent
 hidden: true
 model:
-  id: "opencode-go/qwen3.7-max"
+  id: "openai/gpt-5.6-luna"
 steps: 15
 permissions:
   - action: "file.edit"

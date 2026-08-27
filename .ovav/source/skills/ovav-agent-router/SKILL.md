@@ -91,7 +91,7 @@ workflow({
     export const meta = { name: "delegate-to-squad" };
     const result = await agent("Task description", {
       subagent_type: "TEAM_ID",  // e.g., "team-clara", "team-carmen"
-      model: "opencode-go/deepseek-v4-pro",
+       model: "openai/gpt-5.6-luna",
     });
     return result;
   `

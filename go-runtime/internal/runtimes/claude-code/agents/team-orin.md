@@ -1,7 +1,7 @@
 ---
 name: "orin"
 description: "Deep Explorer — exploración profunda de repositorio, mapeo de dependencias, context packs."
-model: opencode-go/qwen3.7-max
+model: openai/gpt-5.6-luna
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

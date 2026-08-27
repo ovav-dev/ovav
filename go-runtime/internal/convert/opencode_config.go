@@ -326,7 +326,7 @@ func checkUnsupportedTopLevelFields(config map[string]any) []ConfigIssue {
 }
 
 var supportedOpenCodeModels = map[string]struct{}{
-	"openai/gpt-5.6-sol":             {},
+	"openai/gpt-5.6-luna":            {},
 	"minimax-coding-plan/MiniMax-M3": {},
 }
 
@@ -384,9 +384,10 @@ type canonicalRuntime struct {
 }
 
 type canonicalMCPServer struct {
-	Type    string   `yaml:"type"`
-	Command []string `yaml:"command"`
-	Enabled bool     `yaml:"enabled"`
+	Type        string            `yaml:"type"`
+	Command     []string          `yaml:"command"`
+	Enabled     bool              `yaml:"enabled"`
+	Environment map[string]string `yaml:"environment"`
 }
 
 type canonicalProvider struct {
@@ -483,11 +484,15 @@ func GenerateOpenCodeConfig(root string) error {
 				mcp[name] = map[string]any{"enabled": false}
 				continue
 			}
-			mcp[name] = map[string]any{
+			mcpEntry := map[string]any{
 				"type":    server.Type,
 				"command": server.Command,
 				"enabled": server.Enabled,
 			}
+			if len(server.Environment) > 0 {
+				mcpEntry["environment"] = server.Environment
+			}
+			mcp[name] = mcpEntry
 		}
 		config["mcp"] = mcp
 	}

@@ -2,7 +2,7 @@
 name: "Soren"
 description: "Implementador Senior — refactors, tests y parches de runtime que duran."
 mode: subagent
-model: opencode-go/deepseek-v4-pro
+model: openai/gpt-5.6-luna
 hidden: true
 permission:
   edit: "allow"

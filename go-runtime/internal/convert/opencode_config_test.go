@@ -14,7 +14,7 @@ func TestValidateOpenCodeConfig_ValidConfig(t *testing.T) {
 	dir := t.TempDir()
 	config := map[string]any{
 		"$schema":       "https://opencode.ai/config.json",
-		"model":         "openai/gpt-5.6-sol",
+		"model":         "openai/gpt-5.6-luna",
 		"instructions":  []string{"AGENTS.md"},
 		"default_agent": "Platform Engineering",
 		"agent":         map[string]any{},
@@ -43,7 +43,7 @@ func TestValidateOpenCodeConfig_LegacyMCPFormat(t *testing.T) {
 	dir := t.TempDir()
 	config := map[string]any{
 		"$schema":      "https://opencode.ai/config.json",
-		"model":        "openai/gpt-5.6-sol",
+		"model":        "openai/gpt-5.6-luna",
 		"instructions": []string{"AGENTS.md"},
 		"agent":        map[string]any{},
 		"mcp": map[string]any{
@@ -79,7 +79,7 @@ func TestValidateOpenCodeConfig_AgentSectionHasOVAVAgent(t *testing.T) {
 	dir := t.TempDir()
 	config := map[string]any{
 		"$schema":      "https://opencode.ai/config.json",
-		"model":        "openai/gpt-5.6-sol",
+		"model":        "openai/gpt-5.6-luna",
 		"instructions": []string{"AGENTS.md"},
 		"agent": map[string]any{
 			"Platform Engineering": map[string]any{
@@ -108,7 +108,7 @@ func TestValidateOpenCodeConfig_AgentSectionHasOVAVAgent(t *testing.T) {
 func TestValidateOpenCodeConfig_MissingSchema(t *testing.T) {
 	dir := t.TempDir()
 	config := map[string]any{
-		"model":        "openai/gpt-5.6-sol",
+		"model":        "openai/gpt-5.6-luna",
 		"instructions": []string{"AGENTS.md"},
 	}
 	writeJSON(t, filepath.Join(dir, "opencode.json"), config)
@@ -133,7 +133,7 @@ func TestSyncOpenCodeConfig_LegacyFix(t *testing.T) {
 	dir := t.TempDir()
 	config := map[string]any{
 		"$schema":      "https://opencode.ai/config.json",
-		"model":        "openai/gpt-5.6-sol",
+		"model":        "openai/gpt-5.6-luna",
 		"instructions": []string{"AGENTS.md"},
 		"mcp": map[string]any{
 			"ovav-budget": map[string]any{
@@ -196,7 +196,7 @@ func TestSyncOpenCodeConfig_AlreadyValid(t *testing.T) {
 	dir := t.TempDir()
 	config := map[string]any{
 		"$schema":      "https://opencode.ai/config.json",
-		"model":        "openai/gpt-5.6-sol",
+		"model":        "openai/gpt-5.6-luna",
 		"instructions": []string{"AGENTS.md"},
 		"mcp": map[string]any{
 			"ovav-budget": map[string]any{
@@ -221,7 +221,7 @@ func TestValidateOpenCodeConfig_NoMCP(t *testing.T) {
 	dir := t.TempDir()
 	config := map[string]any{
 		"$schema":      "https://opencode.ai/config.json",
-		"model":        "openai/gpt-5.6-sol",
+		"model":        "openai/gpt-5.6-luna",
 		"instructions": []string{"AGENTS.md"},
 	}
 	writeJSON(t, filepath.Join(dir, "opencode.json"), config)
@@ -312,7 +312,7 @@ func TestGenerateOpenCodeConfig_FullGeneration(t *testing.T) {
 	canonical := `version: "1.0"
 schema: "https://opencode.ai/config.json"
 runtime:
-  model: "openai/gpt-5.6-sol"
+  model: "openai/gpt-5.6-luna"
   small_model: "minimax-coding-plan/MiniMax-M3"
   default_agent: "Platform Engineering"
   instructions:
@@ -371,7 +371,7 @@ user:
 	if config["$schema"] != "https://opencode.ai/config.json" {
 		t.Errorf("schema mismatch: %v", config["$schema"])
 	}
-	if config["model"] != "openai/gpt-5.6-sol" {
+	if config["model"] != "openai/gpt-5.6-luna" {
 		t.Errorf("model mismatch")
 	}
 	if config["username"] != "Test User" {
@@ -399,7 +399,7 @@ func TestGenerateOpenCodeConfig_OverwriteIdempotent(t *testing.T) {
 	canonical := `version: "1.0"
 schema: "https://opencode.ai/config.json"
 runtime:
-  model: "openai/gpt-5.6-sol"
+  model: "openai/gpt-5.6-luna"
   small_model: "minimax-coding-plan/MiniMax-M3"
   default_agent: "Test"
   instructions: ["TEST.md"]
@@ -435,7 +435,7 @@ user:
 	if err := json.Unmarshal(data, &config); err != nil {
 		t.Fatalf("parse after overwrite: %v", err)
 	}
-	if config["model"] != "openai/gpt-5.6-sol" {
+	if config["model"] != "openai/gpt-5.6-luna" {
 		t.Errorf("model lost after overwrite: %v", config["model"])
 	}
 }
@@ -472,7 +472,7 @@ func TestGenerateOpenCodeConfig_UsesSupportedSchemaSurface(t *testing.T) {
 	canonical := `version: "1.0"
 schema: "https://opencode.ai/config.json"
 runtime:
-  model: "openai/gpt-5.6-sol"
+  model: "openai/gpt-5.6-luna"
   small_model: "minimax-coding-plan/MiniMax-M3"
   default_agent: "Platform Engineering"
   instructions: ["AGENTS.md"]
@@ -507,8 +507,8 @@ permissions:
 	if _, exists := config["theme"]; exists {
 		t.Error("generated config contains unsupported top-level theme")
 	}
-	if config["model"] != "openai/gpt-5.6-sol" {
-		t.Errorf("model = %v, want openai/gpt-5.6-sol", config["model"])
+	if config["model"] != "openai/gpt-5.6-luna" {
+		t.Errorf("model = %v, want openai/gpt-5.6-luna", config["model"])
 	}
 	if config["small_model"] != "minimax-coding-plan/MiniMax-M3" {
 		t.Errorf("small_model = %v, want minimax-coding-plan/MiniMax-M3", config["small_model"])
@@ -532,7 +532,7 @@ func TestValidateOpenCodeConfig_RejectsUnsupportedTopLevelTheme(t *testing.T) {
 	dir := t.TempDir()
 	writeJSON(t, filepath.Join(dir, "opencode.json"), map[string]any{
 		"$schema":      "https://opencode.ai/config.json",
-		"model":        "openai/gpt-5.6-sol",
+		"model":        "openai/gpt-5.6-luna",
 		"instructions": []string{"AGENTS.md"},
 		"theme": map[string]any{
 			"name": "ovav",
@@ -558,8 +558,8 @@ func TestValidateOpenCodeConfig_RejectsUnavailableModels(t *testing.T) {
 		field string
 		model string
 	}{
-		{name: "retired primary", field: "model", model: "opencode-go/deepseek-v4-pro"},
-		{name: "retired small", field: "small_model", model: "opencode-go/deepseek-v4-flash"},
+		{name: "unsupported primary", field: "model", model: "openai/retired-model"},
+		{name: "unsupported small", field: "small_model", model: "minimax-coding-plan/retired-model"},
 	}
 
 	for _, tt := range tests {
@@ -567,7 +567,7 @@ func TestValidateOpenCodeConfig_RejectsUnavailableModels(t *testing.T) {
 			dir := t.TempDir()
 			config := map[string]any{
 				"$schema":      "https://opencode.ai/config.json",
-				"model":        "openai/gpt-5.6-sol",
+				"model":        "openai/gpt-5.6-luna",
 				"small_model":  "minimax-coding-plan/MiniMax-M3",
 				"instructions": []string{"AGENTS.md"},
 			}

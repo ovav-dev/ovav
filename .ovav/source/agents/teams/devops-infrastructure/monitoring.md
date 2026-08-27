@@ -2,7 +2,7 @@
 name: Uriel-Monitoring
 description: Monitoring Engineer — Observability, alerting, dashboards, log aggregation
 mode: subagent
-model: opencode-go/qwen3.7-max
+model: openai/gpt-5.6-luna
 hidden: true
 color: "#427b58"
 permission:

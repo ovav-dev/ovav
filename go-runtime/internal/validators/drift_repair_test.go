@@ -21,7 +21,7 @@ func TestModelPolicyUsesCanonicalModelGroups(t *testing.T) {
 		model  string
 		status string
 	}{
-		{name: "OpenAI allowed", model: "openai/gpt-5.6-sol", status: "pass"},
+		{name: "OpenAI allowed", model: "openai/gpt-5.6-luna", status: "pass"},
 		{name: "MiniMax allowed", model: "minimax-coding-plan/MiniMax-M3", status: "pass"},
 		{name: "unknown denied", model: "unknown/retired-model", status: "fail"},
 	}
@@ -29,7 +29,7 @@ func TestModelPolicyUsesCanonicalModelGroups(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			root := tempRepoWithFiles(t, map[string]string{
-				".ovav/policy/permission_authority.json": `{"model_groups":{"standard":{"models":["openai/gpt-5.6-sol","minimax-coding-plan/MiniMax-M3"]}}}`,
+				".ovav/policy/permission_authority.json": `{"model_groups":{"standard":{"models":["openai/gpt-5.6-luna","minimax-coding-plan/MiniMax-M3"]}}}`,
 				"opencode.json":                          `{"model":"` + test.model + `","small_model":"` + test.model + `","agent":{"worker":{"model":"` + test.model + `"}}}`,
 			})
 

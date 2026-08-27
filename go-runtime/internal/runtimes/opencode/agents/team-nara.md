@@ -2,7 +2,7 @@
 name: "Nara"
 description: "Benchmark Analyst — análisis competitivo, comparativas técnicas y briefs de decisión."
 mode: subagent
-model: opencode-go/qwen3.7-plus
+model: openai/gpt-5.6-luna
 hidden: true
 permission:
   edit: "deny"
