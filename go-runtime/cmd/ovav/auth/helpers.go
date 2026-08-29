@@ -36,7 +36,7 @@ func RepoRootFromCwd() string {
 }
 
 // PrintOK / PrintWarn / PrintErr — single-line status with optional prefix.
-func PrintOK(msg string)  { fmt.Printf("  \033[32m✅ %s\033[0m\n", msg) }
+func PrintOK(msg string)   { fmt.Printf("  \033[32m✅ %s\033[0m\n", msg) }
 func PrintWarn(msg string) { fmt.Printf("  \033[33m⚠️  %s\033[0m\n", msg) }
 func PrintErr(msg string)  { fmt.Fprintf(os.Stderr, "  \033[31m❌ %s\033[0m\n", msg) }
 

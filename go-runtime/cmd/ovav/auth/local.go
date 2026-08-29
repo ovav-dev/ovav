@@ -21,15 +21,16 @@ import (
 // auth/preflight.go for the gate semantics.
 //
 // Usage:
-//   ovav auth local [--persist] [--seed-file <path>] [--force]
+//
+//	ovav auth local [--persist] [--seed-file <path>] [--force]
 //
 // Effects:
-//   * R-2: Purge stale .identity-recovery.lock (dead PID)
-//   * R-4: Acquire seed (SEED env | --seed-file | TTY prompt)
-//   * Derive vault_key via SHA256(seed || machine_id)
-//   * R-5: Resolve identity by key_hash in identities.yaml
-//   * Persist session (vault.key + session file)
-//   * R-1: shred seed_export + vault_key_export unless --persist
+//   - R-2: Purge stale .identity-recovery.lock (dead PID)
+//   - R-4: Acquire seed (SEED env | --seed-file | TTY prompt)
+//   - Derive vault_key via SHA256(seed || machine_id)
+//   - R-5: Resolve identity by key_hash in identities.yaml
+//   - Persist session (vault.key + session file)
+//   - R-1: shred seed_export + vault_key_export unless --persist
 func CmdLocal(args []string) int {
 	// YOLO 2026: gate login by default. Bypass with --force or env.
 	if !CheckLoginAllowed(args) {

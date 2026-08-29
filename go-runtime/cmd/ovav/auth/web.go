@@ -28,8 +28,9 @@ import (
 // kill-switch for the broken web flow.
 //
 // Usage:
-//   ovav auth web [--check] [--no-open] [--force]
-//   ovav auth web --timeout 60    # custom poll timeout (seconds)
+//
+//	ovav auth web [--check] [--no-open] [--force]
+//	ovav auth web --timeout 60    # custom poll timeout (seconds)
 func CmdWeb(args []string) int {
 	// YOLO 2026: gate login by default. Bypass with --force or env.
 	if !CheckLoginAllowed(args) {
