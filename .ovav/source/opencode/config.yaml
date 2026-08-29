@@ -69,16 +69,8 @@ mcp:
   ovav-playwright:
     type: local
     command:
-    - npx
-    - -y
-    - '@playwright/mcp@latest'
-    - --headless
-    - --no-sandbox
-    - --executable-path
-    - /home/braka/.cache/ms-playwright/chromium-1228/chrome-linux64/chrome
+    - tools/mcp/consumer/bin/ovav-playwright-windows
     enabled: true
-    environment:
-      LD_LIBRARY_PATH: /home/braka/.cache/akrynt-playwright/lib/usr/lib/x86_64-linux-gnu
   # Atuin shell history MCP (separate tool, not OVAV-owned).
   atuin:
     type: local

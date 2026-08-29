@@ -77,19 +77,10 @@
     },
     "ovav-playwright": {
       "command": [
-        "npx",
-        "-y",
-        "@playwright/mcp@latest",
-        "--headless",
-        "--no-sandbox",
-        "--executable-path",
-        "/home/braka/.cache/ms-playwright/chromium-1228/chrome-linux64/chrome"
+        "tools/mcp/consumer/bin/ovav-playwright-windows"
       ],
       "enabled": true,
-      "type": "local",
-      "environment": {
-        "LD_LIBRARY_PATH": "/home/braka/.cache/akrynt-playwright/lib/usr/lib/x86_64-linux-gnu"
-      }
+      "type": "local"
     },
     "ovav-sqlite": {
       "enabled": false

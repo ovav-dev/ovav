@@ -4,7 +4,7 @@
   "description": "Local OVAV MCP Consumer Servers",
   "type": "module",
   "scripts": {
-    "test": "bash test/ovav-playwright-windows-helper_test.sh"
+    "test": "bash test/ovav-playwright-windows-helper_test.sh && bash test/ovav-playwright-windows_test.sh"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",

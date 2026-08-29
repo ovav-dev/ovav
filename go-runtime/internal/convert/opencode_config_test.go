@@ -272,6 +272,45 @@ func TestSyncOpenCodeConfig_InvalidJSON(t *testing.T) {
 	}
 }
 
+func TestRepositoryOpenCodeConfigUsesWindowsPlaywrightWrapper(t *testing.T) {
+	repoRoot := filepath.Clean(filepath.Join("..", "..", ".."))
+	data, err := os.ReadFile(filepath.Join(repoRoot, "opencode.json"))
+	if err != nil {
+		t.Fatalf("read repository opencode config: %v", err)
+	}
+
+	var config map[string]any
+	if err := json.Unmarshal(data, &config); err != nil {
+		t.Fatalf("parse repository opencode config: %v", err)
+	}
+	mcp, ok := config["mcp"].(map[string]any)
+	if !ok {
+		t.Fatal("repository opencode config has no MCP section")
+	}
+	playwright, ok := mcp["ovav-playwright"].(map[string]any)
+	if !ok {
+		t.Fatal("repository opencode config has no ovav-playwright entry")
+	}
+	wantCommand := []any{"tools/mcp/consumer/bin/ovav-playwright-windows"}
+	if got := playwright["command"]; !reflect.DeepEqual(got, wantCommand) {
+		t.Fatalf("ovav-playwright command = %#v, want %#v", got, wantCommand)
+	}
+	if _, exists := playwright["environment"]; exists {
+		t.Fatal("Windows Playwright wrapper must not inherit Linux browser libraries")
+	}
+
+	canonical, err := os.ReadFile(filepath.Join(repoRoot, ".ovav", "source", "opencode", "config.yaml"))
+	if err != nil {
+		t.Fatalf("read canonical opencode config: %v", err)
+	}
+	if !contains(string(canonical), "tools/mcp/consumer/bin/ovav-playwright-windows") {
+		t.Fatal("canonical opencode config does not reference the Windows Playwright wrapper")
+	}
+	if contains(string(canonical), "@playwright/mcp@latest") {
+		t.Fatal("canonical opencode config still references an unpinned Playwright MCP")
+	}
+}
+
 // ── Helpers ─────────────────────────────────────────────────────────────
 
 func writeJSON(t *testing.T, path string, v any) {
