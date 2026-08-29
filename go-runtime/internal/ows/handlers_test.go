@@ -2496,6 +2496,32 @@ func TestMakeVerifyHandler_FatalError_IncludesFix(t *testing.T) {
 	}
 }
 
+func TestMakeVerifyHandler_InvalidNodeManifestReturnsError(t *testing.T) {
+	dir := t.TempDir()
+	writeOWSTestFile(t, filepath.Join(dir, "package.json"), "{")
+	initOWSTestRepo(t, dir)
+
+	err := makeVerifyHandler(dir)(context.Background(), map[string]string{})
+	if err == nil || !strings.Contains(err.Error(), "verification phase") {
+		t.Fatalf("invalid Node manifest should fail owv, got %v", err)
+	}
+}
+
+func TestMakeVerifyHandler_ConfiguredNodeFailureReturnsError(t *testing.T) {
+	dir := t.TempDir()
+	binDir := t.TempDir()
+	writeOWSExecutable(t, filepath.Join(binDir, "npx"), "#!/bin/sh\necho typecheck-failed >&2\nexit 9\n")
+	t.Setenv("PATH", binDir+string(os.PathListSeparator)+os.Getenv("PATH"))
+	writeOWSTestFile(t, filepath.Join(dir, "package.json"), `{}`)
+	writeOWSTestFile(t, filepath.Join(dir, "tsconfig.json"), `{}`)
+	initOWSTestRepo(t, dir)
+
+	err := makeVerifyHandler(dir)(context.Background(), map[string]string{})
+	if err == nil || !strings.Contains(err.Error(), "verification phase") {
+		t.Fatalf("configured Node failure should fail owv, got %v", err)
+	}
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // OWS-GAP-08: owp — worktree prepare/sync with --rebase flag
 // ═══════════════════════════════════════════════════════════════════════════

@@ -3,6 +3,7 @@ package ows
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -111,6 +112,59 @@ func TestVerify_RepoWithHygieneIssues(t *testing.T) {
 	if result.HygieneIssues == 0 {
 		t.Error("should have hygiene issues")
 	}
+	if result.HygieneBlocking != 0 {
+		t.Fatalf("ordinary untracked file should be advisory, got %d blocking issues", result.HygieneBlocking)
+	}
+	if !result.Passed {
+		t.Errorf("advisory hygiene warning must not fail verification: %s", result.Detail)
+	}
+}
+
+func TestVerify_InvalidNodeManifestBlocks(t *testing.T) {
+	dir := t.TempDir()
+	writeOWSTestFile(t, filepath.Join(dir, "package.json"), "{")
+	initOWSTestRepo(t, dir)
+
+	result, err := Verify(dir, nil, true)
+	if err != nil {
+		t.Fatalf("Verify: %v", err)
+	}
+	if result.StackFailures != 1 || result.Passed {
+		t.Fatalf("invalid package manifest must block: %#v", result)
+	}
+}
+
+func TestVerify_ConfiguredNodeFailureBlocks(t *testing.T) {
+	dir := t.TempDir()
+	binDir := t.TempDir()
+	writeOWSExecutable(t, filepath.Join(binDir, "npx"), "#!/bin/sh\necho typecheck-failed >&2\nexit 9\n")
+	t.Setenv("PATH", binDir+string(os.PathListSeparator)+os.Getenv("PATH"))
+	writeOWSTestFile(t, filepath.Join(dir, "package.json"), `{}`)
+	writeOWSTestFile(t, filepath.Join(dir, "tsconfig.json"), `{}`)
+	initOWSTestRepo(t, dir)
+
+	result, err := Verify(dir, nil, true)
+	if err != nil {
+		t.Fatalf("Verify: %v", err)
+	}
+	if result.StackFailures != 1 || result.Passed {
+		t.Fatalf("configured Node failure must block: %#v", result)
+	}
+	if !strings.Contains(result.Detail, "typecheck-failed") {
+		t.Fatalf("missing Node failure detail: %s", result.Detail)
+	}
+}
+
+func initOWSTestRepo(t *testing.T, dir string) {
+	t.Helper()
+	runGitHygiene(dir, "init", "-b", "main")
+	runGitHygiene(dir, "config", "user.email", "test@test.com")
+	runGitHygiene(dir, "config", "user.name", "Test")
+	runGitHygiene(dir, "add", "package.json")
+	if _, err := os.Stat(filepath.Join(dir, "tsconfig.json")); err == nil {
+		runGitHygiene(dir, "add", "tsconfig.json")
+	}
+	runGitHygiene(dir, "commit", "-m", "init")
 }
 
 func TestVerify_InvalidRepoPath(t *testing.T) {
