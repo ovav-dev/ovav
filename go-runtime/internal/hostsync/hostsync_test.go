@@ -3,6 +3,7 @@
 package hostsync
 
 import (
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -24,7 +25,7 @@ const (
 
 func TestProfilesAreExact(t *testing.T) {
 	want := []Profile{
-		{Name: "opencode-bootstrap", SourceRelative: "ops/host-projections/opencode-bootstrap.json"},
+		{Name: "opencode-bootstrap", SourceRelative: "ops/host-projections/opencode-bootstrap.json", MigrationID: "opencode-bootstrap-symlink-v1"},
 		{Name: "wsl2-resource-policy", SourceRelative: "ops/host-projections/wsl2/.wslconfig", Windows: true},
 		{Name: "warp-wsl-tab", SourceRelative: "ops/host-projections/warp/ovav_wsl.toml", Windows: true},
 	}
@@ -197,6 +198,110 @@ func TestApplyAndRollbackUseTemporaryHomes(t *testing.T) {
 	}
 }
 
+func TestOpenCodeBootstrapMigratesCanonicalMainSymlink(t *testing.T) {
+	fixture := newOpenCodeMigrationFixture(t)
+	applied, err := Run(Request{
+		RepoRoot: fixture.worktree, Home: fixture.home, Profile: "opencode-bootstrap",
+		Apply: true, ApproveHostWrite: true, Now: time.Unix(7, 0),
+	})
+	if err != nil || !applied.Applied {
+		t.Fatalf("Run(apply) = %+v, %v", applied, err)
+	}
+	info, err := os.Lstat(fixture.destination)
+	if err != nil || !info.Mode().IsRegular() || info.Mode()&os.ModeSymlink != 0 {
+		t.Fatalf("destination = %v, %v; want regular bootstrap", info, err)
+	}
+	assertFileContent(t, fixture.destination, validOpenCode)
+	assertFileContent(t, fixture.target, "mutable main config remains unchanged")
+	if _, err := os.Lstat(applied.BackupPath); !os.IsNotExist(err) {
+		t.Fatalf("symlink migration created a target-content backup: %v", err)
+	}
+	if err := os.RemoveAll(fixture.worktree); err != nil {
+		t.Fatal(err)
+	}
+
+	rolled, err := Run(Request{
+		RepoRoot: fixture.main, Home: fixture.home,
+		RollbackJournal: applied.JournalPath, ApproveHostWrite: true,
+	})
+	if err != nil || !rolled.RolledBack {
+		t.Fatalf("Run(rollback) = %+v, %v", rolled, err)
+	}
+	linkText, err := os.Readlink(fixture.destination)
+	if err != nil || linkText != fixture.target {
+		t.Fatalf("restored symlink = %q, %v; want %q", linkText, err, fixture.target)
+	}
+	assertFileContent(t, fixture.target, "mutable main config remains unchanged")
+	again, err := Run(Request{
+		RepoRoot: fixture.main, Home: fixture.home,
+		RollbackJournal: applied.JournalPath, ApproveHostWrite: true,
+	})
+	if err != nil || !again.AlreadyComplete || again.WritesPerformed {
+		t.Fatalf("idempotent rollback = %+v, %v", again, err)
+	}
+}
+
+func TestOpenCodeBootstrapRejectsNonCanonicalSymlinks(t *testing.T) {
+	for _, test := range []struct {
+		name     string
+		linkText func(openCodeMigrationFixture) string
+	}{
+		{name: "relative", linkText: func(openCodeMigrationFixture) string { return "../../../repo/opencode.json" }},
+		{name: "mismatch", linkText: func(f openCodeMigrationFixture) string { return filepath.Join(filepath.Dir(f.main), "outside.json") }},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			fixture := newOpenCodeMigrationFixture(t)
+			if err := os.Remove(fixture.destination); err != nil {
+				t.Fatal(err)
+			}
+			if err := os.Symlink(test.linkText(fixture), fixture.destination); err != nil {
+				t.Fatal(err)
+			}
+			if _, err := Run(Request{RepoRoot: fixture.worktree, Home: fixture.home, Profile: "opencode-bootstrap"}); err == nil {
+				t.Fatal("Run(plan) accepted a non-canonical bootstrap symlink")
+			}
+		})
+	}
+}
+
+func TestOpenCodeBootstrapRejectsUnrelatedWorktreeMetadata(t *testing.T) {
+	fixture := newOpenCodeMigrationFixture(t)
+	data, err := os.ReadFile(filepath.Join(fixture.worktree, ".git"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	gitDir := strings.TrimSpace(strings.TrimPrefix(string(data), "gitdir: "))
+	if err := os.WriteFile(filepath.Join(gitDir, "gitdir"), []byte(filepath.Join(fixture.home, ".git")+"\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := Run(Request{RepoRoot: fixture.worktree, Home: fixture.home, Profile: "opencode-bootstrap"}); err == nil {
+		t.Fatal("Run(plan) accepted worktree metadata without an exact reciprocal backlink")
+	}
+}
+
+func TestWindowsProfilesCannotMigrateSymlinks(t *testing.T) {
+	for _, profile := range []string{"wsl2-resource-policy", "warp-wsl-tab"} {
+		t.Run(profile, func(t *testing.T) {
+			fixture := newHostFixture(t, profile)
+			target := filepath.Join(filepath.Dir(fixture.destination), "target")
+			if err := os.WriteFile(target, []byte("target"), 0o600); err != nil {
+				t.Fatal(err)
+			}
+			if err := os.Remove(fixture.destination); err != nil {
+				t.Fatal(err)
+			}
+			if err := os.Symlink(target, fixture.destination); err != nil {
+				t.Fatal(err)
+			}
+			if _, err := Run(Request{
+				RepoRoot: fixture.repo, Home: fixture.home, WindowsHome: fixture.windowsHome, Profile: profile,
+			}); err == nil {
+				t.Fatal("Run(plan) accepted symlink migration for a Windows profile")
+			}
+		})
+	}
+}
+
 func TestRollbackRejectsJournalSelectedAuthority(t *testing.T) {
 	fixture := newHostFixture(t, "opencode-bootstrap")
 	applied, err := Run(Request{
@@ -230,8 +335,72 @@ func TestRollbackRejectsJournalSelectedAuthority(t *testing.T) {
 	}
 }
 
+func TestLegacyV1RollbackSurvivesDeletedSourceRepository(t *testing.T) {
+	for index, profile := range []string{"wsl2-resource-policy", "warp-wsl-tab"} {
+		t.Run(profile, func(t *testing.T) {
+			fixture := newHostFixture(t, profile)
+			applied, err := Run(Request{
+				RepoRoot: fixture.repo, Home: fixture.home, WindowsHome: fixture.windowsHome, Profile: fixture.profile,
+				Apply: true, ApproveHostWrite: true, Now: time.Unix(16+int64(index), 0),
+			})
+			if err != nil {
+				t.Fatal(err)
+			}
+			rewriteHostJournalVersionOne(t, applied.JournalPath)
+			if err := os.RemoveAll(fixture.repo); err != nil {
+				t.Fatal(err)
+			}
+			rolled, err := Run(Request{
+				RepoRoot: fixture.repo, Home: fixture.home, WindowsHome: fixture.windowsHome,
+				RollbackJournal: applied.JournalPath, ApproveHostWrite: true,
+			})
+			if err != nil || !rolled.RolledBack || rolled.Profile != fixture.profile {
+				t.Fatalf("Run(v1 rollback after source deletion) = %+v, %v", rolled, err)
+			}
+			assertFileContent(t, fixture.destination, "original")
+		})
+	}
+}
+
 type hostFixture struct {
 	repo, home, windowsHome, profile, source, destination, sourceContent string
+}
+
+type openCodeMigrationFixture struct {
+	main, worktree, home, target, destination string
+}
+
+func newOpenCodeMigrationFixture(t *testing.T) openCodeMigrationFixture {
+	t.Helper()
+	base := t.TempDir()
+	fixture := openCodeMigrationFixture{
+		main: filepath.Join(base, "main"), worktree: filepath.Join(base, "worktree"), home: filepath.Join(base, "home"),
+	}
+	gitDir := filepath.Join(fixture.main, ".git", "worktrees", "feature")
+	for _, directory := range []string{gitDir, fixture.worktree, fixture.home} {
+		mustMkdirAll(t, directory, 0o755)
+	}
+	if err := os.WriteFile(filepath.Join(fixture.worktree, ".git"), []byte("gitdir: "+gitDir+"\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(gitDir, "gitdir"), []byte(filepath.Join(fixture.worktree, ".git")+"\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	fixture.target = filepath.Join(fixture.main, "opencode.json")
+	if err := os.WriteFile(fixture.target, []byte("mutable main config remains unchanged"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	source := filepath.Join(fixture.worktree, "ops", "host-projections", "opencode-bootstrap.json")
+	fixture.destination = filepath.Join(fixture.home, ".config", "opencode", "opencode.json")
+	mustMkdirAll(t, filepath.Dir(source), 0o755)
+	mustMkdirAll(t, filepath.Dir(fixture.destination), 0o755)
+	if err := os.WriteFile(source, []byte(validOpenCode), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Symlink(fixture.target, fixture.destination); err != nil {
+		t.Fatal(err)
+	}
+	return fixture
 }
 
 func newHostFixture(t *testing.T, profile string) hostFixture {
@@ -244,6 +413,7 @@ func newHostFixture(t *testing.T, profile string) hostFixture {
 	for _, directory := range []string{fixture.repo, fixture.home, fixture.windowsHome} {
 		mustMkdirAll(t, directory, 0o755)
 	}
+	mustMkdirAll(t, filepath.Join(fixture.repo, ".git"), 0o755)
 	switch profile {
 	case "opencode-bootstrap":
 		fixture.source = filepath.Join(fixture.repo, "ops", "host-projections", "opencode-bootstrap.json")
@@ -283,5 +453,31 @@ func assertFileContent(t *testing.T, path, want string) {
 	got, err := os.ReadFile(path)
 	if err != nil || string(got) != want {
 		t.Fatalf("%s = %q, %v; want %q", path, got, err, want)
+	}
+}
+
+func rewriteHostJournalVersionOne(t *testing.T, path string) {
+	t.Helper()
+	data, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var fields map[string]any
+	if err := json.Unmarshal(data, &fields); err != nil {
+		t.Fatal(err)
+	}
+	fields["version"] = float64(1)
+	for _, field := range []string{
+		"destination_kind", "profile_id", "migration_id", "original_link_text", "expected_link_target",
+		"marker_name", "marker_sha256", "marker_consumed", "marker_identity", "marker_temp_name", "marker_remove_name", "restore_temp_name",
+	} {
+		delete(fields, field)
+	}
+	rewritten, err := json.Marshal(fields)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(path, rewritten, 0o600); err != nil {
+		t.Fatal(err)
 	}
 }

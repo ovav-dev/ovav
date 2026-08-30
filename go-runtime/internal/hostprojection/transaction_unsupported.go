@@ -20,9 +20,22 @@ func Plan(source, destination, allowedRoot, backupRoot string, at time.Time) (*T
 	return planUnsupported(source, destination, allowedRoot, backupRoot, at, nil, false)
 }
 
+// PlanWithOptions returns a fail-closed non-mutating plan off Linux.
+func PlanWithOptions(source, destination, allowedRoot, backupRoot string, at time.Time, options PlanOptions) (*Transaction, error) {
+	return PlanValidatedWithOptions(source, destination, allowedRoot, backupRoot, at, nil, options)
+}
+
 // PlanValidated returns an inspectable non-mutating plan off Linux after
 // no-follow regular-file identity and source-content validation.
 func PlanValidated(source, destination, allowedRoot, backupRoot string, at time.Time, validate SourceValidator) (*Transaction, error) {
+	return planUnsupported(source, destination, allowedRoot, backupRoot, at, validate, true)
+}
+
+// PlanValidatedWithOptions rejects Linux-only symlink migration off Linux.
+func PlanValidatedWithOptions(source, destination, allowedRoot, backupRoot string, at time.Time, validate SourceValidator, options PlanOptions) (*Transaction, error) {
+	if options.ExactSymlinkMigration != nil {
+		return nil, ErrUnsupported
+	}
 	return planUnsupported(source, destination, allowedRoot, backupRoot, at, validate, true)
 }
 

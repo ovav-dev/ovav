@@ -3,6 +3,7 @@
 package hostprojection
 
 import (
+	"encoding/json"
 	"errors"
 	"os"
 	"path/filepath"
@@ -280,6 +281,467 @@ func TestApplyRollbackAndIdempotentRecovery(t *testing.T) {
 	}
 }
 
+func TestV1RegularJournalRecoveryCompatibility(t *testing.T) {
+	f := newFixture(t, true)
+	tx := f.plan(t)
+	if _, err := tx.Apply(); err != nil {
+		t.Fatal(err)
+	}
+	rewriteJournalVersionOne(t, tx.preview.JournalPath, nil)
+	recovered, err := Recover(tx.preview.JournalPath, f.root, f.backup)
+	if err != nil || !recovered.RolledBack || !recovered.Recovered {
+		t.Fatalf("Recover(v1) = %+v, %v", recovered, err)
+	}
+	assertContent(t, f.destination, "old content")
+
+	t.Run("rejects v2 symlink field", func(t *testing.T) {
+		other := newFixture(t, true)
+		otherTx := other.plan(t)
+		if _, err := otherTx.Apply(); err != nil {
+			t.Fatal(err)
+		}
+		rewriteJournalVersionOne(t, otherTx.preview.JournalPath, map[string]any{"original_link_text": "/tmp/forbidden"})
+		if _, err := InspectJournal(otherTx.preview.JournalPath, other.backup); err == nil {
+			t.Fatal("InspectJournal() accepted a v1 journal with a v2 symlink field")
+		}
+	})
+}
+
+func TestExactSymlinkMigrationApplyRollbackAndRecovery(t *testing.T) {
+	f := newFixture(t, false)
+	targetDir := filepath.Join(f.base, "main")
+	mustMkdir(t, targetDir, 0o755)
+	target := filepath.Join(targetDir, "opencode.json")
+	mustWrite(t, target, "main repository config", 0o600)
+	mustSymlink(t, target, f.destination)
+
+	tx, err := PlanWithOptions(f.source, f.destination, f.root, f.backup, time.Unix(4, 0), exactMigrationOptions(target))
+	if err != nil {
+		t.Fatalf("PlanWithOptions(): %v", err)
+	}
+	preview := tx.Preview()
+	if preview.DestinationKind != DestinationSymlink || preview.OriginalLinkText != target || preview.OriginalSHA256 != "" {
+		t.Fatalf("symlink preview = %+v", preview)
+	}
+	applied, err := tx.Apply()
+	if err != nil || !applied.Applied {
+		t.Fatalf("Apply() = %+v, %v", applied, err)
+	}
+	info, err := os.Lstat(f.destination)
+	if err != nil || !info.Mode().IsRegular() || info.Mode()&os.ModeSymlink != 0 {
+		t.Fatalf("applied destination = %v, %v; want regular file", info, err)
+	}
+	assertContent(t, f.destination, "new content")
+	assertContent(t, target, "main repository config")
+	assertMode(t, preview.MigrationMarker, 0o600)
+	assertOwner(t, preview.MigrationMarker)
+	journalData, err := os.ReadFile(preview.JournalPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	journalText := string(journalData)
+	if !strings.Contains(journalText, `"version":2`) ||
+		!strings.Contains(journalText, `"destination_kind":"symlink"`) ||
+		!strings.Contains(journalText, `"original_link_text":"`+target+`"`) ||
+		!strings.Contains(journalText, `"profile_id":"opencode-bootstrap"`) ||
+		!strings.Contains(journalText, `"migration_id":"opencode-bootstrap-symlink-v1"`) ||
+		!strings.Contains(journalText, `"marker_sha256":"`) {
+		t.Fatalf("journal does not preserve symlink authority: %s", journalText)
+	}
+	appliedPath := f.destination + ".applied"
+	if err := os.Rename(f.destination, appliedPath); err != nil {
+		t.Fatal(err)
+	}
+	mustSymlink(t, target, f.destination)
+	if _, err := PlanWithOptions(f.source, f.destination, f.root, f.backup, time.Unix(4, 1), exactMigrationOptions(target)); !errors.Is(err, ErrMigrationConsumed) {
+		t.Fatalf("consumed migration PlanWithOptions() error = %v, want ErrMigrationConsumed", err)
+	}
+	if err := os.Remove(f.destination); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Rename(appliedPath, f.destination); err != nil {
+		t.Fatal(err)
+	}
+
+	rolled, err := tx.Rollback()
+	if err != nil || !rolled.RolledBack {
+		t.Fatalf("Rollback() = %+v, %v", rolled, err)
+	}
+	linkText, err := os.Readlink(f.destination)
+	if err != nil || linkText != target {
+		t.Fatalf("restored symlink = %q, %v; want %q", linkText, err, target)
+	}
+	assertContent(t, target, "main repository config")
+	if _, err := os.Lstat(preview.MigrationMarker); !os.IsNotExist(err) {
+		t.Fatalf("rollback retained consumed migration marker: %v", err)
+	}
+	if _, err := PlanWithOptions(f.source, f.destination, f.root, f.backup, time.Unix(4, 2), exactMigrationOptions(target)); err != nil {
+		t.Fatalf("rollback did not reopen migration epoch: %v", err)
+	}
+	again, err := Recover(preview.JournalPath, f.root, f.backup)
+	if err != nil || !again.RolledBack || !again.AlreadyComplete {
+		t.Fatalf("idempotent Recover() = %+v, %v", again, err)
+	}
+}
+
+func TestExactSymlinkMigrationRejectsUntrustedTargets(t *testing.T) {
+	tests := []struct {
+		name  string
+		setup func(t *testing.T, f fixture) string
+	}{
+		{name: "relative link", setup: func(t *testing.T, f fixture) string {
+			target := filepath.Join(f.base, "target")
+			mustWrite(t, target, "target", 0o600)
+			mustSymlink(t, "../target", f.destination)
+			return target
+		}},
+		{name: "target mismatch", setup: func(t *testing.T, f fixture) string {
+			target := filepath.Join(f.base, "target")
+			other := filepath.Join(f.base, "other")
+			mustWrite(t, target, "target", 0o600)
+			mustWrite(t, other, "other", 0o600)
+			mustSymlink(t, other, f.destination)
+			return target
+		}},
+		{name: "target is symlink", setup: func(t *testing.T, f fixture) string {
+			realTarget := filepath.Join(f.base, "real-target")
+			target := filepath.Join(f.base, "target")
+			mustWrite(t, realTarget, "target", 0o600)
+			mustSymlink(t, realTarget, target)
+			mustSymlink(t, target, f.destination)
+			return target
+		}},
+		{name: "nested target symlink", setup: func(t *testing.T, f fixture) string {
+			realDir := filepath.Join(f.base, "real-main")
+			linkedDir := filepath.Join(f.base, "linked-main")
+			mustMkdir(t, realDir, 0o755)
+			mustWrite(t, filepath.Join(realDir, "opencode.json"), "target", 0o600)
+			mustSymlink(t, realDir, linkedDir)
+			target := filepath.Join(linkedDir, "opencode.json")
+			mustSymlink(t, target, f.destination)
+			return target
+		}},
+		{name: "directory target", setup: func(t *testing.T, f fixture) string {
+			target := filepath.Join(f.base, "target-dir")
+			mustMkdir(t, target, 0o755)
+			mustSymlink(t, target, f.destination)
+			return target
+		}},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			f := newFixture(t, false)
+			target := test.setup(t, f)
+			if _, err := PlanWithOptions(f.source, f.destination, f.root, f.backup, time.Unix(5, 0), exactMigrationOptions(target)); err == nil {
+				t.Fatal("PlanWithOptions() accepted an untrusted symlink target")
+			}
+		})
+	}
+}
+
+func TestExactSymlinkMigrationRejectsRacedSymlink(t *testing.T) {
+	f := newFixture(t, false)
+	target := filepath.Join(f.base, "opencode.json")
+	mustWrite(t, target, "main repository config", 0o600)
+	mustSymlink(t, target, f.destination)
+	tx, err := PlanWithOptions(f.source, f.destination, f.root, f.backup, time.Unix(6, 0), exactMigrationOptions(target))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Remove(f.destination); err != nil {
+		t.Fatal(err)
+	}
+	mustSymlink(t, target, f.destination)
+	if _, err := tx.Apply(); !errors.Is(err, ErrConcurrentChange) {
+		t.Fatalf("Apply() error = %v, want ErrConcurrentChange", err)
+	}
+	linkText, err := os.Readlink(f.destination)
+	if err != nil || linkText != target {
+		t.Fatalf("raced symlink was overwritten: %q, %v", linkText, err)
+	}
+	assertContent(t, target, "main repository config")
+}
+
+func TestMigrationMarkerRacesFailClosed(t *testing.T) {
+	t.Run("marker path becomes symlink", func(t *testing.T) {
+		f := newFixture(t, false)
+		target := filepath.Join(f.base, "opencode.json")
+		outside := filepath.Join(f.base, "outside-marker")
+		mustWrite(t, target, "main repository config", 0o600)
+		mustWrite(t, outside, "outside", 0o600)
+		mustSymlink(t, target, f.destination)
+		tx, err := PlanWithOptions(f.source, f.destination, f.root, f.backup, time.Unix(10, 1), exactMigrationOptions(target))
+		if err != nil {
+			t.Fatal(err)
+		}
+		mustSymlink(t, outside, tx.preview.MigrationMarker)
+		if _, err := tx.Apply(); err == nil {
+			t.Fatal("Apply() accepted a symlink migration marker")
+		}
+		if linkText, err := os.Readlink(f.destination); err != nil || linkText != target {
+			t.Fatalf("destination changed after marker symlink race: %q, %v", linkText, err)
+		}
+		assertContent(t, outside, "outside")
+	})
+
+	t.Run("marker appears before publish", func(t *testing.T) {
+		f := newFixture(t, false)
+		target := filepath.Join(f.base, "opencode.json")
+		mustWrite(t, target, "main repository config", 0o600)
+		mustSymlink(t, target, f.destination)
+		tx, err := PlanWithOptions(f.source, f.destination, f.root, f.backup, time.Unix(11, 0), exactMigrationOptions(target))
+		if err != nil {
+			t.Fatal(err)
+		}
+		tx.afterRename = func(string) error {
+			return os.WriteFile(tx.preview.MigrationMarker, tx.markerData, 0o600)
+		}
+		if _, err := tx.Apply(); !errors.Is(err, ErrMigrationConsumed) {
+			t.Fatalf("Apply() error = %v, want ErrMigrationConsumed", err)
+		}
+		if linkText, err := os.Readlink(f.destination); err != nil || linkText != target {
+			t.Fatalf("automatic rollback symlink = %q, %v", linkText, err)
+		}
+		assertContent(t, tx.preview.MigrationMarker, string(tx.markerData))
+	})
+
+	t.Run("marker identity changes before rollback", func(t *testing.T) {
+		f := newFixture(t, false)
+		target := filepath.Join(f.base, "opencode.json")
+		mustWrite(t, target, "main repository config", 0o600)
+		mustSymlink(t, target, f.destination)
+		tx, err := PlanWithOptions(f.source, f.destination, f.root, f.backup, time.Unix(12, 0), exactMigrationOptions(target))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if _, err := tx.Apply(); err != nil {
+			t.Fatal(err)
+		}
+		replacement := tx.preview.MigrationMarker + ".replacement"
+		mustWrite(t, replacement, string(tx.markerData), 0o600)
+		if err := os.Rename(replacement, tx.preview.MigrationMarker); err != nil {
+			t.Fatal(err)
+		}
+		if _, err := tx.Rollback(); !errors.Is(err, ErrConcurrentChange) {
+			t.Fatalf("Rollback() error = %v, want ErrConcurrentChange", err)
+		}
+		assertContent(t, f.destination, "new content")
+	})
+
+	t.Run("marker gains hard link before rollback", func(t *testing.T) {
+		f := newFixture(t, false)
+		target := filepath.Join(f.base, "opencode.json")
+		mustWrite(t, target, "main repository config", 0o600)
+		mustSymlink(t, target, f.destination)
+		tx, err := PlanWithOptions(f.source, f.destination, f.root, f.backup, time.Unix(13, 0), exactMigrationOptions(target))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if _, err := tx.Apply(); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.Link(tx.preview.MigrationMarker, tx.preview.MigrationMarker+".link"); err != nil {
+			t.Fatal(err)
+		}
+		if _, err := tx.Rollback(); err == nil {
+			t.Fatal("Rollback() accepted a multiply-linked migration marker")
+		}
+		assertContent(t, f.destination, "new content")
+	})
+}
+
+func TestRegularDestinationReapplyIgnoresConsumedMarker(t *testing.T) {
+	f := newFixture(t, false)
+	target := filepath.Join(f.base, "opencode.json")
+	mustWrite(t, target, "main repository config", 0o600)
+	mustSymlink(t, target, f.destination)
+	first, err := PlanWithOptions(f.source, f.destination, f.root, f.backup, time.Unix(14, 0), exactMigrationOptions(target))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := first.Apply(); err != nil {
+		t.Fatal(err)
+	}
+	markerBefore, err := os.Lstat(first.preview.MigrationMarker)
+	if err != nil {
+		t.Fatal(err)
+	}
+	second, err := PlanWithOptions(f.source, f.destination, f.root, f.backup, time.Unix(15, 0), exactMigrationOptions(target))
+	if err != nil {
+		t.Fatalf("regular destination reapply plan: %v", err)
+	}
+	if _, err := second.Apply(); err != nil {
+		t.Fatalf("regular destination reapply: %v", err)
+	}
+	markerAfter, err := os.Lstat(first.preview.MigrationMarker)
+	if err != nil || !os.SameFile(markerBefore, markerAfter) {
+		t.Fatalf("regular reapply changed consumed marker: %v, %v", markerAfter, err)
+	}
+}
+
+func TestExactSymlinkRollbackRejectsConcurrentRegularReplacement(t *testing.T) {
+	f := newFixture(t, false)
+	target := filepath.Join(f.base, "opencode.json")
+	mustWrite(t, target, "main repository config", 0o600)
+	mustSymlink(t, target, f.destination)
+	tx, err := PlanWithOptions(f.source, f.destination, f.root, f.backup, time.Unix(8, 0), exactMigrationOptions(target))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := tx.Apply(); err != nil {
+		t.Fatal(err)
+	}
+	markerBefore, err := os.Lstat(tx.preview.MigrationMarker)
+	if err != nil {
+		t.Fatal(err)
+	}
+	replacement := f.destination + ".external"
+	mustWrite(t, replacement, "new content", 0o600)
+	if err := os.Rename(replacement, f.destination); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := tx.Rollback(); !errors.Is(err, ErrConcurrentChange) {
+		t.Fatalf("Rollback() error = %v, want ErrConcurrentChange", err)
+	}
+	info, err := os.Lstat(f.destination)
+	if err != nil || !info.Mode().IsRegular() {
+		t.Fatalf("concurrent destination changed: %v, %v", info, err)
+	}
+	assertContent(t, f.destination, "new content")
+	assertContent(t, target, "main repository config")
+	markerAfter, err := os.Lstat(tx.preview.MigrationMarker)
+	if err != nil || !os.SameFile(markerBefore, markerAfter) {
+		t.Fatalf("concurrent destination mutation consumed rollback marker: %v, %v", markerAfter, err)
+	}
+}
+
+func TestRecoveryCompletesCrashAfterMarkerQuarantine(t *testing.T) {
+	f := newFixture(t, false)
+	target := filepath.Join(f.base, "opencode.json")
+	mustWrite(t, target, "main repository config", 0o600)
+	mustSymlink(t, target, f.destination)
+	tx, err := PlanWithOptions(f.source, f.destination, f.root, f.backup, time.Unix(18, 0), exactMigrationOptions(target))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := tx.Apply(); err != nil {
+		t.Fatal(err)
+	}
+	tx.afterMarkerRemoval = func(string) error { return errors.New("injected crash before destination rename") }
+	if _, err := tx.Rollback(); err == nil || !strings.Contains(err.Error(), "injected crash") {
+		t.Fatalf("Rollback() error = %v, want injected crash", err)
+	}
+	assertContent(t, f.destination, "new content")
+	if _, err := os.Lstat(tx.preview.MigrationMarker); !os.IsNotExist(err) {
+		t.Fatalf("consumed marker was not quarantined: %v", err)
+	}
+	inspection, err := InspectJournal(tx.preview.JournalPath, f.backup)
+	if err != nil {
+		t.Fatal(err)
+	}
+	backupDir, err := openBackupRoot(f.backup)
+	if err != nil {
+		t.Fatal(err)
+	}
+	j, _, err := loadJournal(backupDir, filepath.Base(tx.preview.JournalPath))
+	backupDir.Close()
+	if err != nil || j.State != "marker_quarantined" {
+		t.Fatalf("crash journal = %+v, %v", j, err)
+	}
+	if linkText, err := os.Readlink(filepath.Join(filepath.Dir(f.destination), j.RestoreTempName)); err != nil || linkText != target {
+		t.Fatalf("staged rollback symlink = %q, %v; want %q", linkText, err, target)
+	}
+	if inspection.Version() != 2 {
+		t.Fatalf("journal version = %d", inspection.Version())
+	}
+	recovered, err := Recover(tx.preview.JournalPath, f.root, f.backup)
+	if err != nil || !recovered.RolledBack || !recovered.Recovered {
+		t.Fatalf("Recover(marker_quarantined) = %+v, %v", recovered, err)
+	}
+	if linkText, err := os.Readlink(f.destination); err != nil || linkText != target {
+		t.Fatalf("recovered destination symlink = %q, %v", linkText, err)
+	}
+	if _, err := os.Lstat(filepath.Join(f.backup, j.MarkerRemoveName)); !os.IsNotExist(err) {
+		t.Fatalf("recovery retained quarantined marker: %v", err)
+	}
+}
+
+func TestSymlinkJournalRejectsEscapingRestoreTempName(t *testing.T) {
+	f := newFixture(t, false)
+	target := filepath.Join(f.base, "opencode.json")
+	mustWrite(t, target, "main repository config", 0o600)
+	mustSymlink(t, target, f.destination)
+	tx, err := PlanWithOptions(f.source, f.destination, f.root, f.backup, time.Unix(9, 0), exactMigrationOptions(target))
+	if err != nil {
+		t.Fatal(err)
+	}
+	j := tx.newJournal("rollback_ready")
+	j.RestoreTempName = "../outside"
+	if err := validateJournal(j, tx.preview.JournalPath, f.root, f.backup); err == nil {
+		t.Fatal("validateJournal() accepted an escaping restore temp name")
+	}
+}
+
+func TestExactSymlinkRecoveryResumesRollbackReady(t *testing.T) {
+	f := newFixture(t, false)
+	target := filepath.Join(f.base, "opencode.json")
+	mustWrite(t, target, "main repository config", 0o600)
+	mustSymlink(t, target, f.destination)
+	tx, err := PlanWithOptions(f.source, f.destination, f.root, f.backup, time.Unix(10, 0), exactMigrationOptions(target))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := tx.Apply(); err != nil {
+		t.Fatal(err)
+	}
+
+	backupDir, err := openBackupRoot(f.backup)
+	if err != nil {
+		t.Fatal(err)
+	}
+	j, journalHash, err := loadJournal(backupDir, filepath.Base(tx.preview.JournalPath))
+	if err != nil {
+		backupDir.Close()
+		t.Fatal(err)
+	}
+	root, destParent, _, err := openDestination(f.root, tx.destRel)
+	if err != nil {
+		backupDir.Close()
+		t.Fatal(err)
+	}
+	restoreName, restoreID, err := createSymlinkAt(destParent, ".hostprojection-restore-link-", target)
+	if err != nil {
+		root.Close()
+		destParent.Close()
+		backupDir.Close()
+		t.Fatal(err)
+	}
+	durability := durabilityTracker{level: j.Durability, detail: j.DurabilityDetail}
+	if err := durability.syncDir(destParent, f.destination); err != nil {
+		t.Fatal(err)
+	}
+	j.State, j.RestoreTempName, j.RestoreIdentity = "rollback_ready", restoreName, restoreID
+	if err := storeJournalStandalone(backupDir, &j, &journalHash, &durability); err != nil {
+		t.Fatal(err)
+	}
+	root.Close()
+	destParent.Close()
+	backupDir.Close()
+
+	recovered, err := Recover(tx.preview.JournalPath, f.root, f.backup)
+	if err != nil || !recovered.RolledBack || !recovered.Recovered {
+		t.Fatalf("Recover(rollback_ready) = %+v, %v", recovered, err)
+	}
+	linkText, err := os.Readlink(f.destination)
+	if err != nil || linkText != target {
+		t.Fatalf("recovered symlink = %q, %v; want %q", linkText, err, target)
+	}
+	again, err := Recover(tx.preview.JournalPath, f.root, f.backup)
+	if err != nil || !again.AlreadyComplete {
+		t.Fatalf("idempotent Recover() = %+v, %v", again, err)
+	}
+}
+
 func TestRollbackRejectsConcurrentDestinationMutation(t *testing.T) {
 	tests := []struct {
 		name   string
@@ -502,6 +964,42 @@ func mustWrite(t *testing.T, path, content string, mode os.FileMode) {
 func mustSymlink(t *testing.T, oldname, newname string) {
 	t.Helper()
 	if err := os.Symlink(oldname, newname); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func exactMigrationOptions(target string) PlanOptions {
+	return PlanOptions{
+		ProfileID: "opencode-bootstrap", MigrationID: "opencode-bootstrap-symlink-v1",
+		ExactSymlinkMigration: &ExactSymlinkMigration{ExpectedTarget: target},
+	}
+}
+
+func rewriteJournalVersionOne(t *testing.T, path string, additions map[string]any) {
+	t.Helper()
+	data, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var fields map[string]any
+	if err := json.Unmarshal(data, &fields); err != nil {
+		t.Fatal(err)
+	}
+	fields["version"] = float64(1)
+	for _, field := range []string{
+		"destination_kind", "profile_id", "migration_id", "original_link_text", "expected_link_target",
+		"marker_name", "marker_sha256", "marker_consumed", "marker_identity", "marker_temp_name", "marker_remove_name", "restore_temp_name",
+	} {
+		delete(fields, field)
+	}
+	for key, value := range additions {
+		fields[key] = value
+	}
+	rewritten, err := json.Marshal(fields)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(path, rewritten, 0o600); err != nil {
 		t.Fatal(err)
 	}
 }

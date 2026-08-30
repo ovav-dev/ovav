@@ -13,6 +13,8 @@ import (
 	"path/filepath"
 	"strings"
 	"syscall"
+
+	"golang.org/x/sys/unix"
 )
 
 const (
@@ -35,13 +37,15 @@ type fileIdentity struct {
 func (i fileIdentity) zero() bool { return i.Device == 0 && i.Inode == 0 }
 
 type snapshot struct {
-	data    []byte
-	mode    uint32
-	special uint32
-	links   uint64
-	owner   uint32
-	id      fileIdentity
-	hash    string
+	data     []byte
+	kind     DestinationKind
+	linkText string
+	mode     uint32
+	special  uint32
+	links    uint64
+	owner    uint32
+	id       fileIdentity
+	hash     string
 }
 
 type durabilityTracker struct {
@@ -228,10 +232,95 @@ func readRegularAtBounded(parent *os.File, name string, maximumBytes int64) (sna
 		return snapshot{}, fmt.Errorf("%w while reading %s", ErrConcurrentChange, name)
 	}
 	return snapshot{
-		data: data, mode: before.Mode & 0o777,
+		data: data, kind: DestinationRegular, mode: before.Mode & 0o777,
 		special: before.Mode & (syscall.S_ISUID | syscall.S_ISGID | syscall.S_ISVTX),
 		links:   uint64(before.Nlink), owner: before.Uid, id: beforeID, hash: digest(data),
 	}, nil
+}
+
+func readDestinationOptionalAt(parent *os.File, name, expectedTarget string) (snapshot, bool, error) {
+	var before unix.Stat_t
+	if err := unix.Fstatat(int(parent.Fd()), name, &before, unix.AT_SYMLINK_NOFOLLOW); err != nil {
+		if errors.Is(err, syscall.ENOENT) {
+			return snapshot{kind: DestinationAbsent}, false, nil
+		}
+		return snapshot{}, false, fmt.Errorf("lstat destination %s: %w", name, err)
+	}
+	switch before.Mode & syscall.S_IFMT {
+	case syscall.S_IFREG:
+		regular, err := readRegularAt(parent, name)
+		return regular, err == nil, err
+	case syscall.S_IFLNK:
+		if expectedTarget == "" {
+			return snapshot{}, false, fmt.Errorf("%s is a symlink; exact symlink migration is not enabled", name)
+		}
+		link, err := readExactSymlinkAt(parent, name, expectedTarget)
+		return link, err == nil, err
+	default:
+		return snapshot{}, false, fmt.Errorf("%s is not a regular file or permitted direct symlink", name)
+	}
+}
+
+func readExactSymlinkAt(parent *os.File, name, expectedTarget string) (snapshot, error) {
+	if !filepath.IsAbs(expectedTarget) || filepath.Clean(expectedTarget) != expectedTarget {
+		return snapshot{}, errors.New("expected symlink target must be absolute and traversal-free")
+	}
+	var before unix.Stat_t
+	if err := unix.Fstatat(int(parent.Fd()), name, &before, unix.AT_SYMLINK_NOFOLLOW); err != nil {
+		return snapshot{}, fmt.Errorf("lstat symlink %s: %w", name, err)
+	}
+	if before.Mode&syscall.S_IFMT != syscall.S_IFLNK {
+		return snapshot{}, fmt.Errorf("%s is not a direct symlink", name)
+	}
+	buffer := make([]byte, 64*1024)
+	length, err := unix.Readlinkat(int(parent.Fd()), name, buffer)
+	if err != nil {
+		return snapshot{}, fmt.Errorf("readlinkat %s: %w", name, err)
+	}
+	if length == len(buffer) {
+		return snapshot{}, fmt.Errorf("symlink %s exceeds maximum link-text size", name)
+	}
+	linkText := string(buffer[:length])
+	if !filepath.IsAbs(linkText) || filepath.Clean(linkText) != linkText {
+		return snapshot{}, fmt.Errorf("symlink %s must contain an absolute traversal-free target", name)
+	}
+	if linkText != expectedTarget {
+		return snapshot{}, fmt.Errorf("symlink %s target mismatch", name)
+	}
+	if err := validateRegularTargetNoFollow(expectedTarget); err != nil {
+		return snapshot{}, fmt.Errorf("validate symlink target: %w", err)
+	}
+	var after unix.Stat_t
+	if err := unix.Fstatat(int(parent.Fd()), name, &after, unix.AT_SYMLINK_NOFOLLOW); err != nil {
+		return snapshot{}, fmt.Errorf("re-lstat symlink %s: %w", name, err)
+	}
+	beforeID := fileIdentity{Device: uint64(before.Dev), Inode: before.Ino}
+	afterID := fileIdentity{Device: uint64(after.Dev), Inode: after.Ino}
+	if beforeID != afterID || before.Size != after.Size || before.Mtim != after.Mtim {
+		return snapshot{}, fmt.Errorf("%w while reading symlink %s", ErrConcurrentChange, name)
+	}
+	return snapshot{kind: DestinationSymlink, linkText: linkText, id: beforeID}, nil
+}
+
+func validateRegularTargetNoFollow(path string) error {
+	parent, name, err := openParentAbsolute(path)
+	if err != nil {
+		return err
+	}
+	defer parent.Close()
+	fd, err := syscall.Openat(int(parent.Fd()), name, syscall.O_RDONLY|syscall.O_NOFOLLOW|syscall.O_CLOEXEC, 0)
+	if err != nil {
+		return fmt.Errorf("open no-follow target %s: %w", name, err)
+	}
+	defer syscall.Close(fd)
+	var stat syscall.Stat_t
+	if err := syscall.Fstat(fd, &stat); err != nil {
+		return fmt.Errorf("fstat target %s: %w", name, err)
+	}
+	if stat.Mode&syscall.S_IFMT != syscall.S_IFREG {
+		return fmt.Errorf("target %s is not a regular file", name)
+	}
+	return nil
 }
 
 func readOptionalAt(parent *os.File, name string) (snapshot, bool, error) {
@@ -265,6 +354,35 @@ func createDestinationFileAt(parent *os.File, prefix string, data []byte, mode u
 	return createFileAtForPurpose(parent, prefix, data, mode, destinationArtifact, filesystemType, durability)
 }
 
+func createSymlinkAt(parent *os.File, prefix, target string) (string, fileIdentity, error) {
+	for range 16 {
+		name, err := randomEntryName(prefix)
+		if err != nil {
+			return "", fileIdentity{}, err
+		}
+		if err := unix.Symlinkat(target, int(parent.Fd()), name); errors.Is(err, syscall.EEXIST) {
+			continue
+		} else if err != nil {
+			return "", fileIdentity{}, fmt.Errorf("symlinkat %s: %w", name, err)
+		}
+		created, err := readExactSymlinkAt(parent, name, target)
+		if err != nil {
+			_ = syscall.Unlinkat(int(parent.Fd()), name)
+			return "", fileIdentity{}, fmt.Errorf("validate temporary symlink: %w", err)
+		}
+		return name, created.id, nil
+	}
+	return "", fileIdentity{}, errors.New("create temporary symlink: name collision limit reached")
+}
+
+func randomEntryName(prefix string) (string, error) {
+	var random [12]byte
+	if _, err := rand.Read(random[:]); err != nil {
+		return "", fmt.Errorf("generate temporary name: %w", err)
+	}
+	return prefix + hex.EncodeToString(random[:]), nil
+}
+
 func createFileAtForPurpose(
 	parent *os.File,
 	prefix string,
@@ -275,11 +393,10 @@ func createFileAtForPurpose(
 	durability *durabilityTracker,
 ) (*os.File, string, fileIdentity, error) {
 	for range 16 {
-		var random [12]byte
-		if _, err := rand.Read(random[:]); err != nil {
-			return nil, "", fileIdentity{}, fmt.Errorf("generate temporary name: %w", err)
+		name, err := randomEntryName(prefix)
+		if err != nil {
+			return nil, "", fileIdentity{}, err
 		}
-		name := prefix + hex.EncodeToString(random[:])
 		fd, err := syscall.Openat(int(parent.Fd()), name, syscall.O_RDWR|syscall.O_CREAT|syscall.O_EXCL|syscall.O_NOFOLLOW|syscall.O_CLOEXEC, mode)
 		if errors.Is(err, syscall.EEXIST) {
 			continue

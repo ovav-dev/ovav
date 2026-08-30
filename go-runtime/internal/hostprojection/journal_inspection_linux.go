@@ -53,12 +53,17 @@ func InspectJournal(journalPath, backupRoot string) (JournalInspection, error) {
 		backupRoot:  backupRoot,
 		lockPath:    j.LockPath,
 		digest:      file.hash,
+		version:     j.Version,
 	}, nil
 }
 
 // RecoverInspected recovers only when the trusted inspection token and caller-
 // supplied exact authority still match the journal reopened under its lock.
 func RecoverInspected(inspection JournalInspection, expected JournalAuthority) (Result, error) {
+	return recoverInspected(inspection, expected, nil)
+}
+
+func recoverInspected(inspection JournalInspection, expected JournalAuthority, afterMarkerRemoval func(string) error) (Result, error) {
 	if err := validateInspectionToken(inspection, expected); err != nil {
 		return Result{Operation: "recover"}, err
 	}
@@ -93,7 +98,7 @@ func RecoverInspected(inspection JournalInspection, expected JournalAuthority) (
 	}
 	durability := durabilityTracker{level: j.Durability, detail: j.DurabilityDetail}
 	journalHash := file.hash
-	result, err := rollbackJournal(backupDir, &j, &journalHash, &durability)
+	result, err := rollbackJournal(backupDir, &j, &journalHash, &durability, afterMarkerRemoval)
 	result.Recovered = true
 	return result, err
 }
@@ -116,5 +121,7 @@ func authorityFromJournal(j journal) JournalAuthority {
 	return JournalAuthority{
 		Source: j.Source, Destination: j.Destination,
 		AllowedRoot: j.AllowedRoot, BackupRoot: j.BackupRoot,
+		ExpectedDestinationTarget: j.ExpectedLinkTarget,
+		ProfileID:                 j.ProfileID, MigrationID: j.MigrationID,
 	}
 }

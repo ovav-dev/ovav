@@ -14,6 +14,7 @@ const resultSchema = "ovav.host_sync_result.v1"
 type Profile struct {
 	Name           string `json:"name"`
 	SourceRelative string `json:"source_relative"`
+	MigrationID    string `json:"migration_id,omitempty"`
 	Windows        bool   `json:"windows"`
 }
 

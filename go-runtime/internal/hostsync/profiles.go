@@ -8,9 +8,10 @@ import (
 )
 
 type profileDefinition struct {
-	profile  Profile
-	resolve  func(roots roots) (destination, allowedRoot string)
-	validate hostprojection.SourceValidator
+	profile       Profile
+	resolve       func(roots roots) (destination, allowedRoot string)
+	validate      hostprojection.SourceValidator
+	symlinkTarget func(roots roots) (string, error)
 }
 
 type roots struct {
@@ -21,12 +22,22 @@ type roots struct {
 
 var profileRegistry = []profileDefinition{
 	{
-		profile: Profile{Name: "opencode-bootstrap", SourceRelative: "ops/host-projections/opencode-bootstrap.json"},
+		profile: Profile{
+			Name: "opencode-bootstrap", SourceRelative: "ops/host-projections/opencode-bootstrap.json",
+			MigrationID: "opencode-bootstrap-symlink-v1",
+		},
 		resolve: func(roots roots) (string, string) {
 			root := filepath.Join(roots.home, ".config", "opencode")
 			return filepath.Join(root, "opencode.json"), root
 		},
 		validate: validateOpenCodeBootstrap,
+		symlinkTarget: func(roots roots) (string, error) {
+			mainRoot, err := canonicalMainRepoRoot(roots.repoRoot)
+			if err != nil {
+				return "", fmt.Errorf("derive canonical main repository root: %w", err)
+			}
+			return filepath.Join(mainRoot, "opencode.json"), nil
+		},
 	},
 	{
 		profile: Profile{Name: "wsl2-resource-policy", SourceRelative: "ops/host-projections/wsl2/.wslconfig", Windows: true},
@@ -76,6 +87,21 @@ func profileByName(name string) (profileDefinition, bool) {
 }
 
 func resolveDefinition(definition profileDefinition, resolved roots) (resolvedProfile, error) {
+	profile, err := resolveDestinationDefinition(definition, resolved)
+	if err != nil {
+		return resolvedProfile{}, err
+	}
+	profile.source = filepath.Join(resolved.repoRoot, filepath.FromSlash(definition.profile.SourceRelative))
+	if definition.symlinkTarget != nil {
+		profile.expectedSymlinkTarget, err = definition.symlinkTarget(resolved)
+		if err != nil {
+			return resolvedProfile{}, err
+		}
+	}
+	return profile, nil
+}
+
+func resolveDestinationDefinition(definition profileDefinition, resolved roots) (resolvedProfile, error) {
 	if definition.profile.Windows && resolved.windowsHome == "" {
 		return resolvedProfile{}, fmt.Errorf("profile %q requires an absolute Windows home", definition.profile.Name)
 	}
@@ -85,17 +111,31 @@ func resolveDefinition(definition profileDefinition, resolved roots) (resolvedPr
 	destination, allowedRoot := definition.resolve(resolved)
 	return resolvedProfile{
 		definition:  definition,
-		source:      filepath.Join(resolved.repoRoot, filepath.FromSlash(definition.profile.SourceRelative)),
 		destination: destination,
 		allowedRoot: allowedRoot,
 		backupRoot:  filepath.Join(resolved.home, ".local", "state", "ovav", "host-projection"),
 	}, nil
 }
 
+func resolveRecoveryDefinition(definition profileDefinition, resolved roots) (resolvedProfile, error) {
+	profile, err := resolveDestinationDefinition(definition, resolved)
+	if err != nil {
+		return resolvedProfile{}, err
+	}
+	if definition.symlinkTarget != nil {
+		profile.expectedSymlinkTarget, err = definition.symlinkTarget(resolved)
+		if err != nil {
+			return resolvedProfile{}, err
+		}
+	}
+	return profile, nil
+}
+
 type resolvedProfile struct {
-	definition  profileDefinition
-	source      string
-	destination string
-	allowedRoot string
-	backupRoot  string
+	definition            profileDefinition
+	source                string
+	destination           string
+	allowedRoot           string
+	backupRoot            string
+	expectedSymlinkTarget string
 }

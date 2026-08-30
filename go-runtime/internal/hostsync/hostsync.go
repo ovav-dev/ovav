@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/ovav/ovav/internal/hostprojection"
@@ -45,13 +46,20 @@ func Run(request Request) (Result, error) {
 	if at.IsZero() {
 		at = time.Now()
 	}
-	transaction, err := hostprojection.PlanValidated(
+	options := hostprojection.PlanOptions{
+		ProfileID: profile.definition.profile.Name, MigrationID: profile.definition.profile.MigrationID,
+	}
+	if profile.expectedSymlinkTarget != "" {
+		options.ExactSymlinkMigration = &hostprojection.ExactSymlinkMigration{ExpectedTarget: profile.expectedSymlinkTarget}
+	}
+	transaction, err := hostprojection.PlanValidatedWithOptions(
 		profile.source,
 		profile.destination,
 		profile.allowedRoot,
 		profile.backupRoot,
 		at,
 		profile.definition.validate,
+		options,
 	)
 	if err != nil {
 		return Result{}, fmt.Errorf("plan host profile %q: %w", request.Profile, err)
@@ -138,14 +146,11 @@ func rollback(request Request, resolvedRoots roots) (Result, error) {
 	if err != nil {
 		return Result{}, err
 	}
-	profile, err := matchJournalProfile(inspection.Authority(), resolvedRoots)
+	profile, err := matchJournalProfile(inspection, resolvedRoots)
 	if err != nil {
 		return Result{}, err
 	}
-	expected := hostprojection.JournalAuthority{
-		Source: profile.source, Destination: profile.destination,
-		AllowedRoot: profile.allowedRoot, BackupRoot: profile.backupRoot,
-	}
+	expected := inspection.Authority()
 	mutation, err := hostprojection.RecoverInspected(inspection, expected)
 	result := Result{
 		SchemaVersion: resultSchema, Operation: "rollback", Mode: "rollback", Profile: profile.definition.profile.Name,
@@ -160,7 +165,9 @@ func rollback(request Request, resolvedRoots roots) (Result, error) {
 	return result, nil
 }
 
-func matchJournalProfile(authority hostprojection.JournalAuthority, resolvedRoots roots) (resolvedProfile, error) {
+func matchJournalProfile(inspection hostprojection.JournalInspection, resolvedRoots roots) (resolvedProfile, error) {
+	authority := inspection.Authority()
+	var matches []resolvedProfile
 	for _, definition := range profileRegistry {
 		if definition.profile.Windows && resolvedRoots.windowsHome == "" {
 			continue
@@ -168,15 +175,36 @@ func matchJournalProfile(authority hostprojection.JournalAuthority, resolvedRoot
 		if !definition.profile.Windows && resolvedRoots.windowsHome != "" {
 			continue
 		}
-		candidate, err := resolveDefinition(definition, resolvedRoots)
+		candidate, err := resolveRecoveryDefinition(definition, resolvedRoots)
 		if err != nil {
 			continue
 		}
-		if authority.Source == candidate.source &&
-			authority.Destination == candidate.destination && authority.AllowedRoot == candidate.allowedRoot &&
-			authority.BackupRoot == candidate.backupRoot {
-			return candidate, nil
+		if authority.Destination != candidate.destination || authority.AllowedRoot != candidate.allowedRoot || authority.BackupRoot != candidate.backupRoot {
+			continue
 		}
+		if inspection.Version() == 2 {
+			if authority.ProfileID != definition.profile.Name || authority.MigrationID != definition.profile.MigrationID {
+				continue
+			}
+			if authority.ExpectedDestinationTarget != candidate.expectedSymlinkTarget {
+				continue
+			}
+		} else if !sourceHasRegisteredSuffix(authority.Source, definition.profile.SourceRelative) {
+			continue
+		}
+		candidate.source = authority.Source
+		matches = append(matches, candidate)
 	}
-	return resolvedProfile{}, errors.New("rollback journal does not match an exact allowlisted profile")
+	if len(matches) != 1 {
+		return resolvedProfile{}, errors.New("rollback journal does not uniquely match an exact allowlisted profile")
+	}
+	return matches[0], nil
+}
+
+func sourceHasRegisteredSuffix(source, sourceRelative string) bool {
+	if !filepath.IsAbs(source) || filepath.Clean(source) != source {
+		return false
+	}
+	suffix := filepath.FromSlash(sourceRelative)
+	return source != suffix && strings.HasSuffix(source, string(filepath.Separator)+suffix)
 }

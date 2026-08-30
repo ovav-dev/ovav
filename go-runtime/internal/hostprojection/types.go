@@ -13,6 +13,8 @@ var (
 	ErrLocked = errors.New("host projection transaction is locked")
 	// ErrConcurrentChange reports that a file no longer matches its planned identity and content.
 	ErrConcurrentChange = errors.New("host projection detected a concurrent change")
+	// ErrMigrationConsumed reports that a one-time symlink migration epoch has already succeeded.
+	ErrMigrationConsumed = errors.New("host projection symlink migration epoch is already consumed")
 )
 
 // DurabilityLevel describes whether file and directory fsync are fully supported.
@@ -23,6 +25,30 @@ const (
 	DurabilityDegraded    DurabilityLevel = "degraded"
 	DurabilityUnsupported DurabilityLevel = "unsupported"
 )
+
+// DestinationKind records the no-follow type observed at the destination.
+type DestinationKind string
+
+const (
+	DestinationAbsent  DestinationKind = "absent"
+	DestinationRegular DestinationKind = "regular"
+	DestinationSymlink DestinationKind = "symlink"
+)
+
+// ExactSymlinkMigration opts one transaction into replacing exactly one
+// absolute direct symlink. The expected target is validated without following
+// symlinks in any target path component.
+type ExactSymlinkMigration struct {
+	ExpectedTarget string
+}
+
+// PlanOptions contains explicit opt-ins that are disabled for Plan and
+// PlanValidated by default.
+type PlanOptions struct {
+	ProfileID             string
+	MigrationID           string
+	ExactSymlinkMigration *ExactSymlinkMigration
+}
 
 // Preview is immutable dry-run metadata. Plan performs no filesystem writes.
 type Preview struct {
@@ -36,6 +62,12 @@ type Preview struct {
 	PlannedAt          time.Time
 	SourceSHA256       string
 	OriginalSHA256     string
+	DestinationKind    DestinationKind
+	OriginalLinkText   string
+	ExpectedLinkTarget string
+	ProfileID          string
+	MigrationID        string
+	MigrationMarker    string
 	DestinationExisted bool
 	PlatformSupported  bool
 	Durability         DurabilityLevel
@@ -61,10 +93,13 @@ type SourceValidator func([]byte) error
 
 // JournalAuthority is the minimal path authority recorded by a journal.
 type JournalAuthority struct {
-	Source      string
-	Destination string
-	AllowedRoot string
-	BackupRoot  string
+	Source                    string
+	Destination               string
+	AllowedRoot               string
+	BackupRoot                string
+	ExpectedDestinationTarget string
+	ProfileID                 string
+	MigrationID               string
 }
 
 // JournalIdentity identifies the inspected journal inode without exposing a
@@ -83,6 +118,7 @@ type JournalInspection struct {
 	backupRoot  string
 	lockPath    string
 	digest      string
+	version     int
 }
 
 // Authority returns a copy of the inspected journal authority.
@@ -96,3 +132,6 @@ func (inspection JournalInspection) Digest() string { return inspection.digest }
 
 // JournalPath returns the exact inspected journal path.
 func (inspection JournalInspection) JournalPath() string { return inspection.journalPath }
+
+// Version returns the inspected journal schema version.
+func (inspection JournalInspection) Version() int { return inspection.version }
