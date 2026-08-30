@@ -1,13 +1,5 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "_ovav": {
-    "autonomous": true,
-    "managed_by": ".ovav/policy/permission_authority.json",
-    "policy": "yolo-trusted-domain",
-    "rationale": "OVAV TRUSTED DOMAIN — host does not re-ask when OVAV governor decides.",
-    "version": "yolo-2026-08-13",
-    "wildcard_global": true
-  },
   "agent": {
     "default": {
       "description": "OVAV default agent — delegates to Platform Engineering lead",
@@ -32,18 +24,12 @@
     }
   },
   "default_agent": "Platform Engineering",
-  "default_permission": "allow",
   "instructions": [
     "opencode_AGENTS.md"
   ],
   "mcp": {
     "atuin": {
-      "command": [
-        "atuin",
-        "mcp"
-      ],
-      "enabled": true,
-      "type": "local"
+      "enabled": false
     },
     "ovav-budget": {
       "enabled": false
@@ -52,13 +38,7 @@
       "enabled": false
     },
     "ovav-fetch": {
-      "command": [
-        "npx",
-        "-y",
-        "@modelcontextprotocol/server-fetch@latest"
-      ],
-      "enabled": true,
-      "type": "local"
+      "enabled": false
     },
     "ovav-figma": {
       "enabled": false
@@ -67,29 +47,14 @@
       "enabled": false
     },
     "ovav-memory": {
-      "command": [
-        "npx",
-        "-y",
-        "@modelcontextprotocol/server-memory@latest"
-      ],
       "enabled": true,
-      "type": "local"
+      "type": "remote",
+      "url": "http://127.0.0.1:8932/mcp"
     },
     "ovav-playwright": {
-      "command": [
-        "npx",
-        "-y",
-        "@playwright/mcp@latest",
-        "--headless",
-        "--no-sandbox",
-        "--executable-path",
-        "/home/braka/.cache/ms-playwright/chromium-1228/chrome-linux64/chrome"
-      ],
       "enabled": true,
-      "type": "local",
-      "environment": {
-        "LD_LIBRARY_PATH": "/home/braka/.cache/akrynt-playwright/lib/usr/lib/x86_64-linux-gnu"
-      }
+      "type": "remote",
+      "url": "http://127.0.0.1:8931/mcp"
     },
     "ovav-sqlite": {
       "enabled": false

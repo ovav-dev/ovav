@@ -272,6 +272,77 @@ func TestSyncOpenCodeConfig_InvalidJSON(t *testing.T) {
 	}
 }
 
+func TestRepositoryOpenCodeConfigUsesWindowsSingletonServices(t *testing.T) {
+	repoRoot := filepath.Clean(filepath.Join("..", "..", ".."))
+	data, err := os.ReadFile(filepath.Join(repoRoot, "opencode.json"))
+	if err != nil {
+		t.Fatalf("read repository opencode config: %v", err)
+	}
+
+	var config map[string]any
+	if err := json.Unmarshal(data, &config); err != nil {
+		t.Fatalf("parse repository opencode config: %v", err)
+	}
+	mcp, ok := config["mcp"].(map[string]any)
+	if !ok {
+		t.Fatal("repository opencode config has no MCP section")
+	}
+	tests := []struct {
+		name    string
+		url     string
+		enabled bool
+	}{
+		{name: "ovav-playwright", url: "http://127.0.0.1:8931/mcp", enabled: true},
+		{name: "ovav-memory", url: "http://127.0.0.1:8932/mcp", enabled: true},
+		{name: "ovav-fetch", enabled: false},
+		{name: "atuin", enabled: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			server, ok := mcp[tt.name].(map[string]any)
+			if !ok {
+				t.Fatalf("repository opencode config has no %s entry", tt.name)
+			}
+			if server["enabled"] != tt.enabled {
+				t.Fatalf("enabled = %v, want %v", server["enabled"], tt.enabled)
+			}
+			if !tt.enabled {
+				if len(server) != 1 {
+					t.Fatalf("disabled server = %#v, want enabled-only entry", server)
+				}
+				return
+			}
+			if server["type"] != "remote" || server["url"] != tt.url {
+				t.Fatalf("server = %#v, want remote %s", server, tt.url)
+			}
+			if _, exists := server["command"]; exists {
+				t.Fatal("remote Windows service must not contain a WSL command")
+			}
+		})
+	}
+	forbidden := []string{"npx", "chrome-linux", "LD_LIBRARY_PATH", "@modelcontextprotocol/server-fetch"}
+	for _, value := range forbidden {
+		if contains(string(data), value) {
+			t.Errorf("materialized config contains forbidden WSL MCP value %q", value)
+		}
+	}
+
+	canonical, err := os.ReadFile(filepath.Join(repoRoot, ".ovav", "source", "opencode", "config.yaml"))
+	if err != nil {
+		t.Fatalf("read canonical opencode config: %v", err)
+	}
+	for _, value := range []string{"http://127.0.0.1:8931/mcp", "http://127.0.0.1:8932/mcp"} {
+		if !contains(string(canonical), value) {
+			t.Errorf("canonical opencode config does not contain %q", value)
+		}
+	}
+	for _, value := range []string{"npx", "chrome-linux", "LD_LIBRARY_PATH"} {
+		if contains(string(canonical), value) {
+			t.Errorf("canonical config contains forbidden WSL MCP value %q", value)
+		}
+	}
+}
+
 // ── Helpers ─────────────────────────────────────────────────────────────
 
 func writeJSON(t *testing.T, path string, v any) {
@@ -320,8 +391,8 @@ runtime:
   agent: {}
 mcp:
   test-server:
-    type: local
-    command: ["python3", "test.py"]
+    type: remote
+    url: "http://127.0.0.1:8931/mcp"
     enabled: true
 plugins:
   - ".opencode/plugins/test.js"
@@ -380,11 +451,46 @@ user:
 
 	mcp := config["mcp"].(map[string]any)
 	server := mcp["test-server"].(map[string]any)
-	if server["type"] != "local" {
+	if server["type"] != "remote" {
 		t.Errorf("mcp type: %v", server["type"])
+	}
+	if server["url"] != "http://127.0.0.1:8931/mcp" {
+		t.Errorf("mcp url: %v", server["url"])
+	}
+	if _, exists := server["command"]; exists {
+		t.Errorf("remote MCP unexpectedly contains command: %#v", server["command"])
 	}
 	if server["enabled"] != true {
 		t.Errorf("mcp enabled: %v", server["enabled"])
+	}
+}
+
+func TestValidateCanonicalOpenCodeConfigMCPShape(t *testing.T) {
+	tests := []struct {
+		name    string
+		server  canonicalMCPServer
+		wantErr bool
+	}{
+		{name: "local command", server: canonicalMCPServer{Type: "local", Command: []string{"server"}, Enabled: true}},
+		{name: "remote URL", server: canonicalMCPServer{Type: "remote", URL: "http://127.0.0.1:8931/mcp", Enabled: true}},
+		{name: "remote missing URL", server: canonicalMCPServer{Type: "remote", Enabled: true}, wantErr: true},
+		{name: "remote command forbidden", server: canonicalMCPServer{Type: "remote", URL: "http://127.0.0.1:8931/mcp", Command: []string{"npx"}, Enabled: true}, wantErr: true},
+		{name: "local URL forbidden", server: canonicalMCPServer{Type: "local", URL: "http://127.0.0.1:8931/mcp", Command: []string{"server"}, Enabled: true}, wantErr: true},
+		{name: "disabled shape ignored", server: canonicalMCPServer{Enabled: false}},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			config := CanonicalOpenCodeConfig{
+				Schema:  "https://opencode.ai/config.json",
+				Runtime: canonicalRuntime{Model: "openai/gpt-5.6-luna"},
+				MCP:     map[string]canonicalMCPServer{"test": tt.server},
+			}
+			err := validateCanonicalOpenCodeConfig(config)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
 	}
 }
 

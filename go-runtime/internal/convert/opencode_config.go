@@ -190,27 +190,44 @@ func checkMCPFormat(config map[string]any) []ConfigIssue {
 			continue
 		}
 
-		// Validate current format
+		// Validate current format against the local/remote MCP union in
+		// https://opencode.ai/config.json.
 		stype, _ := server["type"].(string)
-		if stype != "local" {
+		if stype != "local" && stype != "remote" {
 			issues = append(issues, ConfigIssue{
 				Field: fmt.Sprintf("mcp.%s.type", name), Severity: "warning",
-				Message: fmt.Sprintf("type debe ser 'local' (es: %q)", stype),
+				Message: fmt.Sprintf("type debe ser 'local' o 'remote' (es: %q)", stype),
 			})
 		}
 
-		cmdArr, cmdIsArr := server["command"].([]any)
-		if !cmdIsArr {
-			issues = append(issues, ConfigIssue{
-				Field: fmt.Sprintf("mcp.%s.command", name), Severity: "critical",
-				Message: "'command' debe ser array",
-				Fix:     `"command": ["python3", "script.py", "arg"]`,
-			})
-		} else if len(cmdArr) == 0 {
-			issues = append(issues, ConfigIssue{
-				Field: fmt.Sprintf("mcp.%s.command", name), Severity: "critical",
-				Message: "'command' array vacío",
-			})
+		if stype == "remote" {
+			url, urlOK := server["url"].(string)
+			if !urlOK || url == "" {
+				issues = append(issues, ConfigIssue{
+					Field: fmt.Sprintf("mcp.%s.url", name), Severity: "critical",
+					Message: "'url' debe ser un string no vacío para MCP remoto",
+				})
+			}
+			if _, exists := server["command"]; exists {
+				issues = append(issues, ConfigIssue{
+					Field: fmt.Sprintf("mcp.%s.command", name), Severity: "critical",
+					Message: "MCP remoto no puede declarar 'command'",
+				})
+			}
+		} else {
+			cmdArr, cmdIsArr := server["command"].([]any)
+			if !cmdIsArr {
+				issues = append(issues, ConfigIssue{
+					Field: fmt.Sprintf("mcp.%s.command", name), Severity: "critical",
+					Message: "'command' debe ser array",
+					Fix:     `"command": ["python3", "script.py", "arg"]`,
+				})
+			} else if len(cmdArr) == 0 {
+				issues = append(issues, ConfigIssue{
+					Field: fmt.Sprintf("mcp.%s.command", name), Severity: "critical",
+					Message: "'command' array vacío",
+				})
+			}
 		}
 
 		if _, hasEnabled := server["enabled"]; !hasEnabled {
@@ -386,6 +403,7 @@ type canonicalRuntime struct {
 type canonicalMCPServer struct {
 	Type        string            `yaml:"type"`
 	Command     []string          `yaml:"command"`
+	URL         string            `yaml:"url"`
 	Enabled     bool              `yaml:"enabled"`
 	Environment map[string]string `yaml:"environment"`
 }
@@ -456,18 +474,10 @@ func GenerateOpenCodeConfig(root string) error {
 	// Schema
 	config["$schema"] = canonical.Schema
 
-	// OVAV marker (preserved through the projection)
-	if len(canonical.Ovav) > 0 {
-		config["_ovav"] = canonical.Ovav
-	}
-
 	// Runtime
 	config["model"] = canonical.Runtime.Model
 	config["small_model"] = canonical.Runtime.SmallModel
 	config["default_agent"] = canonical.Runtime.DefaultAgent
-	if canonical.Runtime.DefaultPermission != "" {
-		config["default_permission"] = canonical.Runtime.DefaultPermission
-	}
 	config["instructions"] = canonical.Runtime.Instructions
 	config["agent"] = canonical.Runtime.Agent
 
@@ -484,13 +494,15 @@ func GenerateOpenCodeConfig(root string) error {
 				mcp[name] = map[string]any{"enabled": false}
 				continue
 			}
-			mcpEntry := map[string]any{
-				"type":    server.Type,
-				"command": server.Command,
-				"enabled": server.Enabled,
-			}
-			if len(server.Environment) > 0 {
-				mcpEntry["environment"] = server.Environment
+			mcpEntry := map[string]any{"type": server.Type, "enabled": server.Enabled}
+			switch server.Type {
+			case "local":
+				mcpEntry["command"] = server.Command
+				if len(server.Environment) > 0 {
+					mcpEntry["environment"] = server.Environment
+				}
+			case "remote":
+				mcpEntry["url"] = server.URL
 			}
 			mcp[name] = mcpEntry
 		}
@@ -648,11 +660,23 @@ func validateCanonicalOpenCodeConfig(config CanonicalOpenCodeConfig) error {
 		if !server.Enabled {
 			continue
 		}
-		if server.Type != "local" {
-			return fmt.Errorf("mcp.%s.type must be local", name)
-		}
-		if len(server.Command) == 0 {
-			return fmt.Errorf("mcp.%s.command is required when enabled", name)
+		switch server.Type {
+		case "local":
+			if len(server.Command) == 0 {
+				return fmt.Errorf("mcp.%s.command is required when enabled", name)
+			}
+			if server.URL != "" {
+				return fmt.Errorf("mcp.%s.url is not valid for a local server", name)
+			}
+		case "remote":
+			if server.URL == "" {
+				return fmt.Errorf("mcp.%s.url is required when enabled", name)
+			}
+			if len(server.Command) > 0 || len(server.Environment) > 0 {
+				return fmt.Errorf("mcp.%s remote server cannot define command or environment", name)
+			}
+		default:
+			return fmt.Errorf("mcp.%s.type must be local or remote", name)
 		}
 	}
 	for pattern, decision := range config.Permissions.Bash {
