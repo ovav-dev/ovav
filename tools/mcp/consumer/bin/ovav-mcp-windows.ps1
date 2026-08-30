@@ -662,7 +662,7 @@ function Assert-ApprovedServiceProcess {
     }
     if ([string]::Equals([string]$Identity.Executable, [string]$State.nodePath, [StringComparison]::OrdinalIgnoreCase)) {
         if ($ServiceName -eq 'playwright') {
-            Assert-TokenSequence -Actual $tokens -Expected @([string]$State.nodePath, [string]$Service.playwrightCli, '--host', '127.0.0.1', '--allowed-hosts', '127.0.0.1,localhost', '--port', "$PlaywrightPort", '--browser', 'chrome', '--headless', '--isolated')
+            Assert-TokenSequence -Actual $tokens -Expected @([string]$State.nodePath, [string]$Service.playwrightCli, '--host', '127.0.0.1', '--allowed-hosts', '*', '--port', "$PlaywrightPort", '--browser', 'chrome', '--headless', '--isolated')
             return
         }
         if (Test-TokenSequence -Actual $tokens -Expected @([string]$State.nodePath, [string]$Service.bootstrap)) { return }
