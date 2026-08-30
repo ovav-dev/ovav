@@ -763,21 +763,32 @@ function Test-McpFunctionalHealth {
     param([Parameter(Mandatory = $true)][int]$Port)
     try {
         $uri = "http://127.0.0.1:$Port/mcp"
-        $initialize = [ordered]@{ jsonrpc = '2.0'; id = 1; method = 'initialize'; params = [ordered]@{ protocolVersion = '2025-03-26'; capabilities = @{}; clientInfo = [ordered]@{ name = 'ovav-manager'; version = $ManagerVersion } } }
-        $initResponse = Invoke-McpPost -Uri $uri -Payload $initialize
-        if ($initResponse.StatusCode -ne 200) { return $false }
-        $initPayload = Convert-McpResponseContent -Content $initResponse.Content
-        if ($null -eq $initPayload.result -or $initPayload.PSObject.Properties.Name -contains 'error') { return $false }
-        $sessionId = [string]$initResponse.Headers['Mcp-Session-Id']
-        $notification = [ordered]@{ jsonrpc = '2.0'; method = 'notifications/initialized'; params = @{} }
-        [void](Invoke-McpPost -Uri $uri -Payload $notification -SessionId $sessionId)
-        $toolsResponse = Invoke-McpPost -Uri $uri -Payload ([ordered]@{ jsonrpc = '2.0'; id = 2; method = 'tools/list'; params = @{} }) -SessionId $sessionId
-        if ($toolsResponse.StatusCode -ne 200) { return $false }
-        # Server is healthy if it responds to initialize and tools/list without error.
-        # Some MCP servers (e.g. playwright in isolated mode) may have 0 tools exposed.
-        $toolsPayload = Convert-McpResponseContent -Content $toolsResponse.Content
-        return $null -ne $toolsPayload.result -and -not ($toolsPayload.result.PSObject.Properties.Name -contains 'error')
+        # Use curl.exe for reliable HTTP POST - better SSE handling than Invoke-WebRequest
+        $body = (@{ jsonrpc = '2.0'; id = 1; method = 'initialize'; params = @{ protocolVersion = '2025-03-26'; capabilities = @{}; clientInfo = @{ name = 'ovav-manager'; version = $ManagerVersion } } } | ConvertTo-Json -Compress)
+        $curlExe = 'curl.exe'
+        $process = [Diagnostics.Process]::new()
+        $process.StartInfo.FileName = $curlExe
+        $process.StartInfo.Arguments = "-s --max-time 5 -X POST `"$uri`" -H `"Content-Type: application/json`" -H `"Accept: application/json, text/event-stream`" -d `"$body`""
+        $process.StartInfo.RedirectStandardOutput = $true
+        $process.StartInfo.RedirectStandardError = $true
+        $process.StartInfo.UseShellExecute = $false
+        $process.StartInfo.CreateNoWindow = $true
+        $process.StartInfo.StandardOutputEncoding = [Text.UTF8Encoding]::new($false)
+        $process.StartInfo.StandardErrorEncoding = [Text.UTF8Encoding]::new($false)
+        $process.Start() | Out-Null
+        $stdout = $process.StandardOutput.ReadToEnd()
+        $process.WaitForExit(6000)
+        if ($process.ExitCode -ne 0) { return $false }
+        # Parse SSE response: extract JSON from "data: {...}" lines
+        $jsonLine = ($stdout -split '\r?\n' | Where-Object { $_.StartsWith('data:') } | Select-Object -First 1)
+        if (-not $jsonLine) { return $false }
+        $jsonStr = $jsonLine.Substring(5).Trim()
+        $payload = $jsonStr | ConvertFrom-Json
+        if ($null -eq $payload.result) { return $false }
+        return $true
     }
+    catch { return $false }
+}
     catch { return $false }
 }
 
