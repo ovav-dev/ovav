@@ -181,6 +181,57 @@ func TestPrivateArtifactOwnershipHelper(t *testing.T) {
 	}
 }
 
+func TestDestinationModePolicy(t *testing.T) {
+	t.Parallel()
+	valid := syscall.Stat_t{
+		Mode:  syscall.S_IFREG | 0o777,
+		Nlink: 1,
+		Uid:   uint32(os.Geteuid()),
+	}
+	tests := []struct {
+		name           string
+		stat           syscall.Stat_t
+		purpose        createdFilePurpose
+		filesystemType int64
+		wantDegraded   bool
+		wantErr        bool
+	}{
+		{name: "strict ext4 match", stat: withMode(valid, 0o640), purpose: destinationArtifact, filesystemType: 0xEF53},
+		{name: "strict ext4 mismatch", stat: valid, purpose: destinationArtifact, filesystemType: 0xEF53, wantErr: true},
+		{name: "v9fs destination mismatch", stat: valid, purpose: destinationArtifact, filesystemType: v9fsMagic, wantDegraded: true},
+		{name: "v9fs private artifact mismatch", stat: valid, purpose: privateArtifact, filesystemType: v9fsMagic, wantErr: true},
+		{name: "v9fs non-regular", stat: withType(valid, syscall.S_IFDIR), purpose: destinationArtifact, filesystemType: v9fsMagic, wantErr: true},
+		{name: "v9fs multiple links", stat: withLinks(valid, 2), purpose: destinationArtifact, filesystemType: v9fsMagic, wantErr: true},
+		{name: "v9fs foreign owner", stat: withOwner(valid, valid.Uid+1), purpose: destinationArtifact, filesystemType: v9fsMagic, wantErr: true},
+		{name: "v9fs special mode", stat: withSpecial(valid, syscall.S_ISUID), purpose: destinationArtifact, filesystemType: v9fsMagic, wantErr: true},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			degraded, err := validateCreatedFile(test.stat, 0o640, test.purpose, test.filesystemType)
+			if (err != nil) != test.wantErr || degraded != test.wantDegraded {
+				t.Fatalf("validateCreatedFile() = (%v, %v), want degraded=%v err=%v", degraded, err, test.wantDegraded, test.wantErr)
+			}
+		})
+	}
+}
+
+func TestV9FSClassifierAndDegradedResultPropagation(t *testing.T) {
+	t.Parallel()
+	if !isV9FS(v9fsMagic) || isV9FS(0xEF53) {
+		t.Fatal("v9fs statfs classifier returned an unsafe result")
+	}
+	durability := newDurability()
+	durability.noteDestinationFilesystem(v9fsMagic)
+	if durability.level != DurabilityDegraded || durability.detail != destinationModeEnforcementUnsupported {
+		t.Fatalf("v9fs durability = %+v", durability)
+	}
+	tx := &Transaction{preview: Preview{Durability: DurabilityFull}}
+	result := tx.resultWithDurability("apply", "ready", durability)
+	if result.Durability != DurabilityDegraded || result.DurabilityDetail != destinationModeEnforcementUnsupported {
+		t.Fatalf("degraded result = %+v", result)
+	}
+}
+
 func TestApplyRollbackAndIdempotentRecovery(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -295,6 +346,29 @@ func TestApplyFailureAutomaticallyRollsBack(t *testing.T) {
 	if err != nil || !again.AlreadyComplete {
 		t.Fatalf("Recover() after automatic rollback = %+v, %v", again, err)
 	}
+}
+
+func TestPreexistingJournalIsRetainedForExplicitRecovery(t *testing.T) {
+	f := newFixture(t, true)
+	first := f.plan(t)
+	if _, err := first.Apply(); err != nil {
+		t.Fatalf("first Apply(): %v", err)
+	}
+	second, err := Plan(f.source, f.destination, f.root, f.backup, time.Unix(1, 2))
+	if err != nil {
+		t.Fatalf("second Plan(): %v", err)
+	}
+	if _, err := second.Apply(); err == nil || !strings.Contains(err.Error(), "journal already exists") {
+		t.Fatalf("second Apply() error = %v, want retained-journal rejection", err)
+	}
+	if _, err := os.Lstat(first.Preview().JournalPath); err != nil {
+		t.Fatalf("failed apply removed recoverable journal: %v", err)
+	}
+	recovered, err := Recover(first.Preview().JournalPath, f.root, f.backup)
+	if err != nil || !recovered.RolledBack || !recovered.Recovered {
+		t.Fatalf("Recover() = %+v, %v", recovered, err)
+	}
+	assertContent(t, f.destination, "old content")
 }
 
 func TestInspectJournalRejectsSymlinkAndOversize(t *testing.T) {
@@ -458,4 +532,29 @@ func assertOwner(t *testing.T, path string) {
 	if !ok || stat.Uid != uint32(os.Geteuid()) {
 		t.Fatalf("%s owner = %v; want effective uid %d", path, info.Sys(), os.Geteuid())
 	}
+}
+
+func withMode(stat syscall.Stat_t, mode uint32) syscall.Stat_t {
+	stat.Mode = stat.Mode&^0o777 | mode
+	return stat
+}
+
+func withType(stat syscall.Stat_t, fileType uint32) syscall.Stat_t {
+	stat.Mode = stat.Mode&^syscall.S_IFMT | fileType
+	return stat
+}
+
+func withLinks(stat syscall.Stat_t, links uint64) syscall.Stat_t {
+	stat.Nlink = links
+	return stat
+}
+
+func withOwner(stat syscall.Stat_t, owner uint32) syscall.Stat_t {
+	stat.Uid = owner
+	return stat
+}
+
+func withSpecial(stat syscall.Stat_t, special uint32) syscall.Stat_t {
+	stat.Mode |= special
+	return stat
 }

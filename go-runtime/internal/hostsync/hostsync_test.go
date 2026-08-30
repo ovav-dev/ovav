@@ -10,7 +10,11 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/ovav/ovav/internal/hostprojection"
 )
+
+const v9fsModeDegradation = "destination mode enforcement unsupported on v9fs"
 
 const (
 	validOpenCode = "{\n  \"$schema\": \"https://opencode.ai/config.json\"\n}\n"
@@ -72,6 +76,25 @@ func TestPlanIsNoWriteAndApprovalIsRequired(t *testing.T) {
 		t.Fatalf("unapproved apply error = %v", err)
 	}
 	assertFileContent(t, fixture.destination, "original")
+}
+
+func TestDurabilityDegradationPropagatesFromProjection(t *testing.T) {
+	t.Parallel()
+	profile := resolvedProfile{definition: profileDefinition{profile: Profile{Name: "test"}}}
+	result := resultFromPreview(profile, hostprojection.Preview{
+		Durability:       hostprojection.DurabilityDegraded,
+		DurabilityDetail: v9fsModeDegradation,
+	})
+	if result.Durability != hostprojection.DurabilityDegraded || result.DurabilityDetail != v9fsModeDegradation {
+		t.Fatalf("preview degradation = %+v", result)
+	}
+	result.mergeMutation(hostprojection.Result{
+		Durability:       hostprojection.DurabilityDegraded,
+		DurabilityDetail: v9fsModeDegradation,
+	})
+	if result.Durability != hostprojection.DurabilityDegraded || result.DurabilityDetail != v9fsModeDegradation {
+		t.Fatalf("mutation degradation = %+v", result)
+	}
 }
 
 func TestRunRejectsUnknownTraversalAndInvalidSource(t *testing.T) {

@@ -136,6 +136,11 @@ func PlanValidated(source, destination, allowedRoot, backupRoot string, at time.
 	}
 
 	durability := newDurability()
+	destinationFilesystem, err := descriptorFilesystemType(destParent)
+	if err != nil {
+		return nil, fmt.Errorf("identify destination filesystem: %w", err)
+	}
+	durability.noteDestinationFilesystem(destinationFilesystem)
 	if err := durability.syncDir(destParent, destination); err != nil {
 		return nil, fmt.Errorf("probe destination durability: %w", err)
 	}
@@ -233,7 +238,7 @@ func (t *Transaction) Apply() (Result, error) {
 	if j.DestinationExisted {
 		mode = t.original.mode
 	}
-	temp, tempName, pendingID, err := createFileAt(destParent, ".hostprojection-", t.source.data, mode)
+	temp, tempName, pendingID, err := createDestinationFileAt(destParent, ".hostprojection-", t.source.data, mode, &durability)
 	if err != nil {
 		return t.resultWithDurability("apply", j.State, durability), fmt.Errorf("stage destination: %w", err)
 	}
@@ -391,7 +396,7 @@ func rollbackJournal(backupDir *os.File, j *journal, journalHash *string, durabi
 		if backup.hash != j.OriginalSHA256 {
 			return resultFromJournal(*j, "rollback"), errors.New("verify rollback backup: SHA-256 mismatch")
 		}
-		temp, name, restoreID, err := createFileAt(destParent, ".hostprojection-restore-", backup.data, j.OriginalMode)
+		temp, name, restoreID, err := createDestinationFileAt(destParent, ".hostprojection-restore-", backup.data, j.OriginalMode, durability)
 		if err != nil {
 			return resultFromJournal(*j, "rollback"), err
 		}
@@ -755,6 +760,11 @@ func verifyBackupIfPresent(dir *os.File, j journal) error {
 	backup, exists, err := readOptionalAt(dir, filepath.Base(j.BackupPath))
 	if err != nil {
 		return fmt.Errorf("inspect recovery backup: %w", err)
+	}
+	if exists {
+		if err := verifyPrivateArtifact(backup, "recovery backup"); err != nil {
+			return err
+		}
 	}
 	if exists && backup.hash != j.OriginalSHA256 {
 		return errors.New("recovery backup hash mismatch")

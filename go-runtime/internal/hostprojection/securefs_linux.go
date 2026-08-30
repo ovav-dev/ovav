@@ -15,6 +15,18 @@ import (
 	"syscall"
 )
 
+const (
+	v9fsMagic                             = 0x01021997
+	destinationModeEnforcementUnsupported = "destination mode enforcement unsupported on v9fs"
+)
+
+type createdFilePurpose uint8
+
+const (
+	privateArtifact createdFilePurpose = iota
+	destinationArtifact
+)
+
 type fileIdentity struct {
 	Device uint64 `json:"device"`
 	Inode  uint64 `json:"inode"`
@@ -39,13 +51,23 @@ type durabilityTracker struct {
 
 func newDurability() durabilityTracker { return durabilityTracker{level: DurabilityFull} }
 
+func (d *durabilityTracker) degrade(detail string) {
+	d.level = DurabilityDegraded
+	if d.detail == "" || detail == destinationModeEnforcementUnsupported {
+		d.detail = detail
+	}
+}
+
+func (d *durabilityTracker) noteDestinationFilesystem(filesystemType int64) {
+	if isV9FS(filesystemType) {
+		d.degrade(destinationModeEnforcementUnsupported)
+	}
+}
+
 func (d *durabilityTracker) syncDir(dir *os.File, label string) error {
 	if err := syscall.Fsync(int(dir.Fd())); err != nil {
 		if isUnsupportedDirSync(err) {
-			d.level = DurabilityDegraded
-			if d.detail == "" {
-				d.detail = label + ": directory fsync unsupported (common on DrvFs)"
-			}
+			d.degrade(label + ": directory fsync unsupported (common on DrvFs)")
 			return nil
 		}
 		return fmt.Errorf("fsync directory %s: %w", label, err)
@@ -55,6 +77,18 @@ func (d *durabilityTracker) syncDir(dir *os.File, label string) error {
 
 func isUnsupportedDirSync(err error) bool {
 	return errors.Is(err, syscall.EINVAL) || errors.Is(err, syscall.ENOTSUP) || errors.Is(err, syscall.EOPNOTSUPP)
+}
+
+func isV9FS(filesystemType int64) bool {
+	return filesystemType == v9fsMagic
+}
+
+func descriptorFilesystemType(file *os.File) (int64, error) {
+	var stat syscall.Statfs_t
+	if err := syscall.Fstatfs(int(file.Fd()), &stat); err != nil {
+		return 0, fmt.Errorf("fstatfs %s: %w", file.Name(), err)
+	}
+	return int64(stat.Type), nil
 }
 
 func openDirAbsolute(path string) (*os.File, error) {
@@ -220,6 +254,26 @@ func verifyAt(parent *os.File, name string, expected snapshot) (snapshot, error)
 }
 
 func createFileAt(parent *os.File, prefix string, data []byte, mode uint32) (*os.File, string, fileIdentity, error) {
+	return createFileAtForPurpose(parent, prefix, data, mode, privateArtifact, 0, nil)
+}
+
+func createDestinationFileAt(parent *os.File, prefix string, data []byte, mode uint32, durability *durabilityTracker) (*os.File, string, fileIdentity, error) {
+	filesystemType, err := descriptorFilesystemType(parent)
+	if err != nil {
+		return nil, "", fileIdentity{}, fmt.Errorf("verify destination parent filesystem: %w", err)
+	}
+	return createFileAtForPurpose(parent, prefix, data, mode, destinationArtifact, filesystemType, durability)
+}
+
+func createFileAtForPurpose(
+	parent *os.File,
+	prefix string,
+	data []byte,
+	mode uint32,
+	purpose createdFilePurpose,
+	filesystemType int64,
+	durability *durabilityTracker,
+) (*os.File, string, fileIdentity, error) {
 	for range 16 {
 		var random [12]byte
 		if _, err := rand.Read(random[:]); err != nil {
@@ -255,14 +309,41 @@ func createFileAt(parent *os.File, prefix string, data []byte, mode uint32) (*os
 			_ = syscall.Unlinkat(int(parent.Fd()), name)
 			return nil, "", fileIdentity{}, fmt.Errorf("fstat %s: %w", name, err)
 		}
-		if stat.Mode&syscall.S_IFMT != syscall.S_IFREG || stat.Mode&0o777 != mode || stat.Nlink != 1 || stat.Uid != uint32(os.Geteuid()) {
+		degraded, validationErr := validateCreatedFile(stat, mode, purpose, filesystemType)
+		if validationErr != nil {
 			file.Close()
 			_ = syscall.Unlinkat(int(parent.Fd()), name)
-			return nil, "", fileIdentity{}, fmt.Errorf("created file %s failed mode, link, or effective-user ownership validation", name)
+			return nil, "", fileIdentity{}, fmt.Errorf("created file %s: %w", name, validationErr)
+		}
+		if degraded && durability != nil {
+			durability.degrade(destinationModeEnforcementUnsupported)
 		}
 		return file, name, identityOf(stat), nil
 	}
 	return nil, "", fileIdentity{}, errors.New("create temporary file: name collision limit reached")
+}
+
+func validateCreatedFile(stat syscall.Stat_t, requestedMode uint32, purpose createdFilePurpose, filesystemType int64) (bool, error) {
+	if stat.Mode&syscall.S_IFMT != syscall.S_IFREG {
+		return false, errors.New("created file is not regular")
+	}
+	if stat.Mode&(syscall.S_ISUID|syscall.S_ISGID|syscall.S_ISVTX) != 0 {
+		return false, errors.New("created file has unsafe special mode bits")
+	}
+	if stat.Nlink != 1 {
+		return false, errors.New("created file must have exactly one hard link")
+	}
+	if stat.Uid != uint32(os.Geteuid()) {
+		return false, fmt.Errorf("created file owner is uid %d; require effective uid %d", stat.Uid, os.Geteuid())
+	}
+	actualMode := stat.Mode & 0o777
+	if actualMode == requestedMode {
+		return false, nil
+	}
+	if purpose == destinationArtifact && isV9FS(filesystemType) {
+		return true, nil
+	}
+	return false, fmt.Errorf("created file mode is %04o; require %04o", actualMode, requestedMode)
 }
 
 func openLockAt(parent *os.File, name string) (*os.File, error) {
@@ -287,6 +368,14 @@ func openLockAt(parent *os.File, name string) (*os.File, error) {
 	if err := file.Chmod(0o600); err != nil {
 		file.Close()
 		return nil, fmt.Errorf("chmod transaction lock: %w", err)
+	}
+	if err := syscall.Fstat(fd, &stat); err != nil {
+		file.Close()
+		return nil, fmt.Errorf("re-fstat transaction lock: %w", err)
+	}
+	if _, err := validateCreatedFile(stat, 0o600, privateArtifact, 0); err != nil {
+		file.Close()
+		return nil, fmt.Errorf("transaction lock is not private: %w", err)
 	}
 	if err := syscall.Flock(fd, syscall.LOCK_EX|syscall.LOCK_NB); err != nil {
 		file.Close()
