@@ -86,10 +86,10 @@
         "/home/braka/.cache/ms-playwright/chromium-1228/chrome-linux64/chrome"
       ],
       "enabled": true,
-      "type": "local",
       "environment": {
         "LD_LIBRARY_PATH": "/home/braka/.cache/akrynt-playwright/lib/usr/lib/x86_64-linux-gnu"
-      }
+      },
+      "type": "local"
     },
     "ovav-sqlite": {
       "enabled": false
@@ -100,6 +100,7 @@
     "*": "allow",
     "bash": {
       "*": "allow",
+      "dd *of=/dev/*": "deny",
       "gh auth status*": "allow",
       "gh issue list*": "allow",
       "gh issue view*": "allow",
@@ -109,23 +110,29 @@
       "gh pr view*": "allow",
       "gh repo view*": "allow",
       "git add *": "allow",
+      "git branch --delete *": "deny",
       "git branch --show-current": "allow",
+      "git branch -D *": "deny",
       "git commit*": "allow",
       "git diff*": "allow",
       "git log*": "allow",
       "git ls-remote *": "allow",
+      "git push*": "deny",
       "git remote -v": "allow",
       "git rev-parse*": "allow",
       "git status*": "allow",
       "go run -C go-runtime ./cmd/ovav validate*": "allow",
       "go run -C go-runtime ./internal/validators/cmd/validate*": "allow",
+      "mkfs*": "deny",
       "npm run build*": "allow",
       "npm run lint*": "allow",
       "npm run test*": "allow",
       "npm run typecheck*": "allow",
       "npm test*": "allow",
       "pytest*": "allow",
-      "python3 -m pytest*": "allow"
+      "python3 -m pytest*": "allow",
+      "rm -rf /*": "deny",
+      "sudo *": "deny"
     },
     "diff": "allow",
     "doom_loop": "allow",
