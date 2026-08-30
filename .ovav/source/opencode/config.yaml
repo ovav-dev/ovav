@@ -48,36 +48,22 @@ mcp:
     enabled: false
   ovav-sqlite:
     enabled: false
-  # Web fetch via official MCP server (npx wrapper, no Go binary needed).
+  # Disabled: @modelcontextprotocol/server-fetch does not exist in npm.
   ovav-fetch:
-    type: local
-    command:
-    - npx
-    - -y
-    - '@modelcontextprotocol/server-fetch@latest'
-    enabled: true
-  # Persistent memory store via official MCP server (npx wrapper).
+    enabled: false
+  # Windows singleton: supergateway + stateful memory MCP.
   ovav-memory:
-    type: local
-    command:
-    - npx
-    - -y
-    - '@modelcontextprotocol/server-memory@latest'
+    type: remote
+    url: http://127.0.0.1:8932/mcp
     enabled: true
-  # Browser automation: Microsoft Playwright MCP (replaces ovav-browser
-  # which was a Go facade eliminated Aug 2026).
+  # Windows singleton: Microsoft Playwright MCP with Windows Chrome.
   ovav-playwright:
-    type: local
-    command:
-    - tools/mcp/consumer/bin/ovav-playwright-windows
+    type: remote
+    url: http://127.0.0.1:8931/mcp
     enabled: true
-  # Atuin shell history MCP (separate tool, not OVAV-owned).
+  # Atuin shell/history remains installed; its WSL MCP process is disabled.
   atuin:
-    type: local
-    command:
-    - atuin
-    - mcp
-    enabled: true
+    enabled: false
 plugins:
 - .opencode/plugins/ovav-monitor.js
 - .opencode/plugins/ovav-atuin-bridge.js
