@@ -493,27 +493,21 @@ func makeDoneHandler(repoRoot string) func(ctx context.Context, args map[string]
 					}
 				}
 
-				// ── Hygiene blocking: strict/maximum require ZERO issues ──
-				// standard requires no BLOCKING issues (warnings allowed)
-				if reqs.HygieneRequired && !vr.HygieneClean {
-					if complianceLevel == ComplianceStrict || complianceLevel == ComplianceMaximum {
-						return fmt.Errorf("owd: workspace hygiene not clean (%d issues) — compliance %s requires zero issues",
-							vr.HygieneIssues, complianceLevel)
-					}
-					// Standard: only block on blocking issues (large untracked files, etc.)
-					hygiene := WorkspaceHygieneScan(repoRoot)
-					if hygiene.BlockingIssues > 0 {
-						return fmt.Errorf("owd: %d blocking hygiene issue(s) — resolve before merging", hygiene.BlockingIssues)
-					}
-					// Warnings only: show but don't block for standard
-					fmt.Printf("   ⚠️  Hygiene: %d warning(s) (non-blocking for %s)\n", vr.HygieneIssues, complianceLevel)
+				// ── Hygiene blocking: findings have explicit severity ──
+				// Advisory warnings never become blocking merely because compliance is stricter.
+				if reqs.HygieneRequired && vr.HygieneBlocking > 0 {
+					return fmt.Errorf("owd: %d blocking hygiene issue(s) — resolve before merging", vr.HygieneBlocking)
+				}
+				if vr.HygieneIssues > vr.HygieneBlocking {
+					fmt.Printf("   ⚠️  Hygiene: %d advisory warning(s) (non-blocking for %s)\n",
+						vr.HygieneIssues-vr.HygieneBlocking, complianceLevel)
 				}
 
 				// ── Block on code-quality warnings (standard+) ──
 				// Only blocks if go vet, gofmt, go test, or validators failed.
 				// Hygiene warnings are handled separately above.
 				if reqs.BlockOnWarning {
-					codeFailed := !vr.GoVetPass || !vr.GofmtPass || !vr.GoTestPass
+					codeFailed := !vr.GoVetPass || !vr.GofmtPass || !vr.GoTestPass || vr.StackFailures > 0
 					if vr.ValidateRan && vr.ValidateFail > 0 && vr.ValidateTotal > 0 {
 						validatePct := float64(vr.ValidatePass) / float64(vr.ValidateTotal)
 						if validatePct < reqs.ValidateMinPct {
@@ -1692,7 +1686,8 @@ func makeVerifyHandler(repoRoot string) func(ctx context.Context, args map[strin
 		if allPass {
 			fmt.Println("✅ VERIFIED — ready for merge")
 		} else {
-			fmt.Printf("⚠️  VERIFIED WITH WARNINGS — %d/%d phases failed\n", failCount, len(phaseResults))
+			fmt.Printf("❌ VERIFICATION FAILED — %d/%d phases failed\n", failCount, len(phaseResults))
+			return fmt.Errorf("owv: %d verification phase(s) failed", failCount)
 		}
 		return nil
 	}

@@ -2523,9 +2523,9 @@ func TestSecurityHardening_ValidPolicy(t *testing.T) {
 	os.WriteFile(filepath.Join(dir, ".ovav", "policy", "permission_authority.json"), []byte(`{
 		"security_surfaces": {
 			"f4_bash_commands": {
-				"total_rules": 16,
+				"total_rules": 19,
 				"allowed": 9,
-				"denied": 7,
+				"denied": 10,
 				"deny_by_default": true,
 				"governor": "go-runtime/internal/permissions/governors.go",
 				"categories": {
@@ -2540,7 +2540,8 @@ func TestSecurityHardening_ValidPolicy(t *testing.T) {
 					"privilege_escalation": {},
 					"package_management": {},
 					"auth_management": {},
-					"network_external": {}
+					"network_external": {},
+					"filesystem_mutate": {}
 				}
 			},
 			"f4_unsafe_selectors": {
@@ -2636,7 +2637,7 @@ func TestSecurityHardening_WrongBashCounts(t *testing.T) {
 	}
 	hasTotalIssue := false
 	for _, issue := range result.Issues {
-		if strings.Contains(issue, "total_rules expected 16") {
+		if strings.Contains(issue, "total_rules expected 19") {
 			hasTotalIssue = true
 		}
 	}

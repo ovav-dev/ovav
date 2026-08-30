@@ -136,12 +136,17 @@ func TestValidationModeForProtectedAndWorktreeBranches(t *testing.T) {
 
 func TestParseSyncArgs(t *testing.T) {
 	tests := []struct {
-		name     string
-		args     []string
-		wantStep string
-		wantPlan bool
-		wantDry  bool
-		wantErr  bool
+		name        string
+		args        []string
+		wantStep    string
+		wantPlan    bool
+		wantDry     bool
+		wantHost    string
+		wantRoll    string
+		wantWin     string
+		wantApply   bool
+		wantApprove bool
+		wantErr     bool
 	}{
 		{name: "plan json", args: []string{"--plan-json"}, wantPlan: true},
 		{name: "step plan", args: []string{"--skills", "--plan-json"}, wantStep: "skills", wantPlan: true},
@@ -149,6 +154,19 @@ func TestParseSyncArgs(t *testing.T) {
 		{name: "unknown flag", args: []string{"--typo"}, wantErr: true},
 		{name: "unknown positional", args: []string{"agents"}, wantErr: true},
 		{name: "conflicting steps", args: []string{"--agents", "--skills"}, wantErr: true},
+		{name: "host plan", args: []string{"--host-profile", "opencode-bootstrap"}, wantHost: "opencode-bootstrap"},
+		{name: "windows host apply", args: []string{"--host-profile", "wsl2-resource-policy", "--windows-home", "/tmp/windows", "--apply", "--approve-host-write"}, wantHost: "wsl2-resource-policy", wantWin: "/tmp/windows", wantApply: true, wantApprove: true},
+		{name: "rollback", args: []string{"--rollback-journal", "/tmp/home/.local/state/ovav/host-projection/a.journal.json", "--approve-host-write"}, wantRoll: "/tmp/home/.local/state/ovav/host-projection/a.journal.json", wantApprove: true},
+		{name: "apply lacks approval", args: []string{"--host-profile", "opencode-bootstrap", "--apply"}, wantErr: true},
+		{name: "rollback lacks approval", args: []string{"--rollback-journal", "/tmp/journal"}, wantErr: true},
+		{name: "unknown host profile", args: []string{"--host-profile", "other"}, wantErr: true},
+		{name: "host and rollback conflict", args: []string{"--host-profile", "opencode-bootstrap", "--rollback-journal", "/tmp/journal", "--approve-host-write"}, wantErr: true},
+		{name: "host and legacy conflict", args: []string{"--host-profile", "opencode-bootstrap", "--agents"}, wantErr: true},
+		{name: "windows home on non-windows profile", args: []string{"--host-profile", "opencode-bootstrap", "--windows-home", "/tmp/windows"}, wantErr: true},
+		{name: "windows profile lacks home", args: []string{"--host-profile", "warp-wsl-tab"}, wantErr: true},
+		{name: "missing host profile value", args: []string{"--host-profile"}, wantErr: true},
+		{name: "empty host profile value", args: []string{"--host-profile", ""}, wantErr: true},
+		{name: "duplicate host profile", args: []string{"--host-profile", "opencode-bootstrap", "--host-profile", "opencode-bootstrap"}, wantErr: true},
 	}
 
 	for _, tt := range tests {
@@ -160,7 +178,9 @@ func TestParseSyncArgs(t *testing.T) {
 			if err != nil {
 				return
 			}
-			if opts.step != tt.wantStep || opts.planJSON != tt.wantPlan || opts.dryRun != tt.wantDry {
+			if opts.step != tt.wantStep || opts.planJSON != tt.wantPlan || opts.dryRun != tt.wantDry ||
+				opts.hostProfile != tt.wantHost || opts.rollbackJournal != tt.wantRoll || opts.windowsHome != tt.wantWin ||
+				opts.apply != tt.wantApply || opts.approveHostWrite != tt.wantApprove {
 				t.Errorf("parseSyncArgs() = %+v", opts)
 			}
 		})

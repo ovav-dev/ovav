@@ -283,16 +283,22 @@ func (o *Observer) RunREPL(ctx context.Context) error {
 		if len(parts) == 0 {
 			continue
 		}
-		// Suggest if risky
+		// Denies are mechanical. Suggestions explain the block but cannot be
+		// confirmed through interactively, including during CEO sessions when a
+		// permanent deny matched.
+		decision := getBashGovernor().CheckWithCEO(line, "shell-repl")
+		if !decision.Allowed {
+			fmt.Printf("[ovav] bloqueado: %s\n", decision.Reason)
+			for _, suggestion := range Suggest(line) {
+				fmt.Println("  - " + suggestion)
+			}
+			continue
+		}
+		// Suggest if risky but still permitted.
 		if sugg := Suggest(line); len(sugg) > 0 {
 			fmt.Println("[ovav] sugerencia(s):")
 			for _, s := range sugg {
 				fmt.Println("  - " + s)
-			}
-			fmt.Print("[ovav] continuar? (s/N): ")
-			confirm, _ := reader.ReadString('\n')
-			if strings.ToLower(strings.TrimSpace(confirm)) != "s" {
-				continue
 			}
 		}
 		// Execute

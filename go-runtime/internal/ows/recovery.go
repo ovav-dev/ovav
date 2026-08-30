@@ -158,20 +158,22 @@ func parseWorktreePaths(out string) []string {
 
 // VerifyResult holds structured output from a full verification run.
 type VerifyResult struct {
-	GoTestPass    bool    `json:"go_test_pass"`
-	GoVetPass     bool    `json:"go_vet_pass"`
-	GofmtPass     bool    `json:"gofmt_pass"`
-	CoveragePass  bool    `json:"coverage_pass"`
-	CoveragePct   float64 `json:"coverage_pct"`
-	ValidatePass  int     `json:"validate_pass"`
-	ValidateFail  int     `json:"validate_fail"`
-	ValidateTotal int     `json:"validate_total"`
-	ValidateRan   bool    `json:"validate_ran"`
-	HygieneClean  bool    `json:"hygiene_clean"`
-	HygieneIssues int     `json:"hygiene_issues"`
-	Passed        bool    `json:"passed"`
-	Detail        string  `json:"detail"`
-	Scoped        bool    `json:"scoped"` // true if running in scoped mode (changed-files set)
+	GoTestPass      bool    `json:"go_test_pass"`
+	GoVetPass       bool    `json:"go_vet_pass"`
+	GofmtPass       bool    `json:"gofmt_pass"`
+	CoveragePass    bool    `json:"coverage_pass"`
+	CoveragePct     float64 `json:"coverage_pct"`
+	ValidatePass    int     `json:"validate_pass"`
+	ValidateFail    int     `json:"validate_fail"`
+	ValidateTotal   int     `json:"validate_total"`
+	ValidateRan     bool    `json:"validate_ran"`
+	HygieneClean    bool    `json:"hygiene_clean"`
+	HygieneIssues   int     `json:"hygiene_issues"`
+	HygieneBlocking int     `json:"hygiene_blocking"`
+	StackFailures   int     `json:"stack_failures"`
+	Passed          bool    `json:"passed"`
+	Detail          string  `json:"detail"`
+	Scoped          bool    `json:"scoped"` // true if running in scoped mode (changed-files set)
 }
 
 // Verify runs the full OVAV validation pipeline and returns structured results.
@@ -207,6 +209,7 @@ func Verify(repoRoot string, changedFiles []string, quick ...bool) (*VerifyResul
 	currentBranch, _ := currentBranch(repoRoot)
 	profile := DetectProfileFromBranch(currentBranch)
 	verifyLevel := LevelForProfile(profile)
+	quickMode := len(quick) > 0 && quick[0]
 
 	// For OVAV's own repo (has go-runtime), keep legacy behavior
 	ovavGoRuntime := repoRoot + "/go-runtime"
@@ -256,7 +259,7 @@ func Verify(repoRoot string, changedFiles []string, quick ...bool) (*VerifyResul
 			// OWS-v2: quick mode skips go test (owd pre-merge gate — speed over full coverage)
 			// When changedFiles provided, use AffectedPackages for scoped testing
 			var testArgs []string
-			if len(quick) > 0 && quick[0] {
+			if quickMode {
 				r.GoTestPass = true
 			} else {
 				// Build test args: always include -count=1
@@ -347,28 +350,33 @@ func Verify(repoRoot string, changedFiles []string, quick ...bool) (*VerifyResul
 	hygiene := WorkspaceHygieneScan(repoRoot)
 	r.HygieneClean = hygiene.Clean
 	r.HygieneIssues = hygiene.TotalIssues
-	if !hygiene.Clean {
-		issues = append(issues, fmt.Sprintf("hygiene: %d issue(s) found", hygiene.TotalIssues))
+	r.HygieneBlocking = hygiene.BlockingIssues
+	if hygiene.TotalIssues > 0 {
 		fmt.Print(hygiene.Report())
+	}
+	if hygiene.BlockingIssues > 0 {
+		issues = append(issues, fmt.Sprintf("hygiene: %d blocking issue(s) found", hygiene.BlockingIssues))
 	}
 
 	// Phase 4: Stack-specific validators
 	for _, s := range stack.Stacks {
 		if s.Type == StackTSReact || s.Type == StackTSNode || s.Type == StackTSVue {
 			tsDir := filepath.Join(repoRoot, s.Dir)
-			if _, err := os.Stat(filepath.Join(tsDir, "tsconfig.json")); err == nil {
-				typeCmd := exec.Command("pnpm", "exec", "tsc", "--noEmit")
-				typeCmd.Dir = tsDir
-				if out, err := typeCmd.CombinedOutput(); err != nil {
-					issues = append(issues, fmt.Sprintf("typescript typecheck FAILED in %s: %s", s.Dir, truncateOutput(string(out), 200)))
+			for _, phase := range runNodeJSVerificationMode(tsDir, 2, !quickMode) {
+				if !phase.Pass {
+					r.StackFailures++
+					issues = append(issues, fmt.Sprintf("node %s FAILED in %s: %s",
+						phase.Name, s.Dir, truncateOutput(strings.Join(phase.Issues, "; "), 200)))
 				}
 			}
+			break
 		}
 		if s.Type == StackPython {
 			pyDir := filepath.Join(repoRoot, s.Dir)
 			ruffCmd := exec.Command("ruff", "check", ".")
 			ruffCmd.Dir = pyDir
 			if out, err := ruffCmd.CombinedOutput(); err != nil {
+				r.StackFailures++
 				issues = append(issues, fmt.Sprintf("ruff check FAILED in %s: %s", s.Dir, truncateOutput(string(out), 200)))
 			}
 		}
@@ -377,13 +385,14 @@ func Verify(repoRoot string, changedFiles []string, quick ...bool) (*VerifyResul
 			cargoCmd := exec.Command("cargo", "check")
 			cargoCmd.Dir = rustDir
 			if out, err := cargoCmd.CombinedOutput(); err != nil {
+				r.StackFailures++
 				issues = append(issues, fmt.Sprintf("cargo check FAILED in %s: %s", s.Dir, truncateOutput(string(out), 200)))
 			}
 		}
 	}
 
 	// Determine overall pass
-	r.Passed = r.GoVetPass && r.GofmtPass && r.GoTestPass && r.HygieneClean
+	r.Passed = r.GoVetPass && r.GofmtPass && r.GoTestPass && r.HygieneBlocking == 0 && r.StackFailures == 0
 	if r.ValidateRan && r.ValidateFail > 0 {
 		r.Passed = false
 	}

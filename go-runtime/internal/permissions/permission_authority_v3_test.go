@@ -102,15 +102,11 @@ func TestCanonicalPermissionsUseGoNativeCommands(t *testing.T) {
 }
 
 func TestCanonicalPermissionsRetainCriticalDenies(t *testing.T) {
-	// OVAV TRUSTED EXECUTION DOMAIN — 2026-08-13:
-	// YOLO mode: CriticalDenies() returns empty map (bash 100% allow).
-	// The test now verifies that CriticalDenies is intentionally empty
-	// under YOLO doctrine. Historical critical-deny patterns are now
-	// enforced by the Governor (decision_engine + trust_gate) and
-	// HMAC-signed CEO waivers, not by host-level string matching.
 	denies := CriticalDenies()
-	if len(denies) != 0 {
-		t.Errorf("CriticalDenies() expected empty (YOLO mode), got %d entries: %v", len(denies), denies)
+	for _, pattern := range []string{"git push*", "sudo *", "rm -rf /*", "mkfs*"} {
+		if denies[pattern] != "deny" {
+			t.Errorf("critical deny %q missing: %v", pattern, denies)
+		}
 	}
 }
 

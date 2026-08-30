@@ -10,12 +10,13 @@ import (
 // cmdAuth implements `ovav auth <sub>` — the new 2-flow auth surface.
 //
 // Usage:
-//   ovav auth                       # help
-//   ovav auth local [--persist]    # R-1: no seed persistence by default
-//   ovav auth local --seed-file    # file-based (auto-shred)
-//   ovav auth web [--check]        # R-3: mandatory preflight
-//   ovav auth status                # both local + web state
-//   ovav auth signout               # clear both
+//
+//	ovav auth                       # help
+//	ovav auth local [--persist]    # R-1: no seed persistence by default
+//	ovav auth local --seed-file    # file-based (auto-shred)
+//	ovav auth web [--check]        # R-3: mandatory preflight
+//	ovav auth status                # both local + web state
+//	ovav auth signout               # clear both
 //
 // The legacy `ovav login --web`, `--recover-ceo`, `--force` flags
 // continue to work under `ovav login` (back-compat). New code should

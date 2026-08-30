@@ -117,6 +117,7 @@ Commands:
 	ovav smoke           Bounded source-local CLI smoke test
 	ovav fresh-smoke     Bounded local fresh-clone verification
 	ovav sync --plan-json Emit a machine-readable no-write sync plan
+	ovav sync --host-profile <name> Plan an exact governed host projection
 	ovav surfaces        Check required public surfaces
 	ovav publish-check   Check public export requirements
 	ovav repo-check      Check repository presentation requirements
