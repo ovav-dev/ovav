@@ -39,3 +39,7 @@ func readRegularFileNoFollow(path string) ([]byte, error) {
 	}
 	return io.ReadAll(file)
 }
+
+func openRegularFileAtNoFollow(_, _ string, _ os.FileInfo) (*anchoredRegularFile, error) {
+	return nil, fmt.Errorf("anchored directory projection is unsupported on this platform")
+}
