@@ -252,26 +252,33 @@ function New-PrivateDirectory {
     param([Parameter(Mandatory = $true)][string]$Path)
 
     Assert-ManagedPath -Path $Path
-    if (-not (Test-Path -LiteralPath $Path)) {
+    $isNew = -not (Test-Path -LiteralPath $Path)
+    if ($isNew) {
         [void](New-Item -ItemType Directory -Path $Path)
     }
     Assert-ManagedPath -Path $Path
-    $sid = [Security.Principal.WindowsIdentity]::GetCurrent().User
-    $acl = [Security.AccessControl.DirectorySecurity]::new()
-    $acl.SetOwner($sid)
-    $acl.SetAccessRuleProtection($true, $false)
-    $rights = [Security.AccessControl.FileSystemRights]::FullControl
-    $inheritance = [Security.AccessControl.InheritanceFlags]'ContainerInherit, ObjectInherit'
-    $rule = [Security.AccessControl.FileSystemAccessRule]::new($sid, $rights, $inheritance, [Security.AccessControl.PropagationFlags]::None, [Security.AccessControl.AccessControlType]::Allow)
-    $acl.AddAccessRule($rule)
-    Set-Acl -LiteralPath $Path -AclObject $acl
-    Assert-ManagedPath -Path $Path
+    if ($isNew) {
+        $sid = [Security.Principal.WindowsIdentity]::GetCurrent().User
+        $acl = [Security.AccessControl.DirectorySecurity]::new()
+        $acl.SetOwner($sid)
+        $acl.SetAccessRuleProtection($true, $false)
+        $rights = [Security.AccessControl.FileSystemRights]::FullControl
+        $inheritance = [Security.AccessControl.InheritanceFlags]'ContainerInherit, ObjectInherit'
+        $rule = [Security.AccessControl.FileSystemAccessRule]::new($sid, $rights, $inheritance, [Security.AccessControl.PropagationFlags]::None, [Security.AccessControl.AccessControlType]::Allow)
+        $acl.AddAccessRule($rule)
+        Set-Acl -LiteralPath $Path -AclObject $acl
+        Assert-ManagedPath -Path $Path
+    }
 }
 
 function Initialize-ManagedDirectories {
     Assert-NoReparsePath -Path $LocalAppDataRoot
-    foreach ($path in @(
-        (Join-Path $LocalAppDataRoot 'OVAV'), $ManagedRoot, $PackageRoot, $DataRoot,
+    $ovavRoot = Join-Path $LocalAppDataRoot 'OVAV'
+    Assert-NoReparsePath -Path $ovavRoot
+    if (-not (Test-Path -LiteralPath $ovavRoot)) {
+        [void](New-Item -ItemType Directory -Path $ovavRoot)
+    }
+    foreach ($path in @($ManagedRoot, $PackageRoot, $DataRoot,
         $LogRoot, $RunRoot, $ManagerRoot, (Split-Path -Parent $StableManager),
         $StableBundleRoot, $RecoveryRoot, $ChromeUserDataRoot
     )) {
@@ -349,14 +356,18 @@ function Write-AtomicState {
 
     Assert-ManagedPath -Path $StatePath
     $State.updatedAt = [DateTimeOffset]::UtcNow.ToString('o')
-    $stateJson = $State | ConvertTo-Json -Depth 20 -Compress
+    $stateJson = $State | ConvertTo-Json -Depth 99 -Compress
+    $checksum = Get-Sha256Hex -Value $stateJson
+    # Store raw JSON bytes as base64 so re-serialization never diverges from checksum
+    $stateBytes = [Text.UTF8Encoding]::new($false).GetBytes($stateJson)
     $envelope = [ordered]@{
         schema = $EnvelopeSchema
         checksumAlgorithm = 'sha256'
-        checksum = Get-Sha256Hex -Value $stateJson
-        state = $State
+        checksum = $checksum
+        stateBytes = [Convert]::ToBase64String($stateBytes)
     }
-    $bytes = [Text.UTF8Encoding]::new($false).GetBytes(($envelope | ConvertTo-Json -Depth 24 -Compress))
+    $envelopeJson = $envelope | ConvertTo-Json -Depth 3 -Compress
+    $bytes = [Text.UTF8Encoding]::new($false).GetBytes($envelopeJson)
     $temp = "$StatePath.$PID.$([Guid]::NewGuid().ToString('N')).tmp"
     Write-DurableBytes -Path $temp -Bytes $bytes
     Assert-ManagedPath -Path $StatePath
@@ -369,15 +380,18 @@ function Read-State {
     $lastError = $null
     for ($attempt = 0; $attempt -lt 5; $attempt++) {
         try {
-            $envelope = Get-Content -LiteralPath $StatePath -Raw | ConvertFrom-Json
+            $rawJson = Get-Content -LiteralPath $StatePath -Raw
+            $envelope = $rawJson | ConvertFrom-Json
             if ([string]$envelope.schema -ne $EnvelopeSchema -or [string]$envelope.checksumAlgorithm -ne 'sha256') {
                 throw 'Unsupported state envelope schema'
             }
-            $stateJson = $envelope.state | ConvertTo-Json -Depth 20 -Compress
+            # Decode base64 to raw JSON bytes — avoids re-serialization divergence
+            $stateBytes = [Convert]::FromBase64String([string]$envelope.stateBytes)
+            $stateJson = [Text.UTF8Encoding]::new($false).GetString($stateBytes)
             Assert-StateChecksum -StateJson $stateJson -Checksum ([string]$envelope.checksum)
-            if ([string]$envelope.state.schema -ne $StateSchema) { throw 'Unsupported state schema' }
-            [void](Get-RecoveryDecision -Phase ([string]$envelope.state.phase))
-            return $envelope.state
+            $stateObj = $stateJson | ConvertFrom-Json
+            [void](Get-RecoveryDecision -Phase ([string]$stateObj.phase))
+            return $stateObj
         }
         catch [IO.IOException] {
             $lastError = $_
@@ -532,7 +546,9 @@ await import(pathToFileURL(process.env.OVAV_SUPERGATEWAY_ENTRY).href)
     Set-Content -LiteralPath $memoryChild -Encoding ascii -Value ('@echo off' + "`r`n" + 'set "MEMORY_FILE_PATH=' + $MemoryPath + '"' + "`r`n" + (Quote-CmdValue $Toolchain.Node) + ' ' + (Quote-CmdValue $memoryCli))
     $playwrightRunner = Join-Path $RunRoot 'playwright.cmd'
     $playwrightLog = Join-Path $LogRoot 'playwright.log'
-    $playwrightArgs = " --host 127.0.0.1 --allowed-hosts 127.0.0.1,localhost --port $PlaywrightPort --browser chrome --headless --isolated --shared-browser-context --user-data-dir " + (Quote-CmdValue $ChromeUserDataRoot)
+    # NOTE: --isolated mode does not support --user-data-dir or --shared-browser-context.
+    # Chrome profile is managed internally by the MCP server in isolated mode.
+    $playwrightArgs = " --host 127.0.0.1 --allowed-hosts 127.0.0.1,localhost --port $PlaywrightPort --browser chrome --headless --isolated"
     Set-Content -LiteralPath $playwrightRunner -Encoding ascii -Value ('@echo off' + "`r`n" + (Quote-CmdValue $Toolchain.Node) + ' ' + (Quote-CmdValue $playwrightCli) + $playwrightArgs + ' 1>>' + (Quote-CmdValue $playwrightLog) + ' 2>>&1')
     $memoryRunner = Join-Path $RunRoot 'memory.cmd'
     $memoryLog = Join-Path $LogRoot 'memory.log'
@@ -644,7 +660,7 @@ function Assert-ApprovedServiceProcess {
     }
     if ([string]::Equals([string]$Identity.Executable, [string]$State.nodePath, [StringComparison]::OrdinalIgnoreCase)) {
         if ($ServiceName -eq 'playwright') {
-            Assert-TokenSequence -Actual $tokens -Expected @([string]$State.nodePath, [string]$Service.playwrightCli, '--host', '127.0.0.1', '--allowed-hosts', '127.0.0.1,localhost', '--port', "$PlaywrightPort", '--browser', 'chrome', '--headless', '--isolated', '--shared-browser-context', '--user-data-dir', $ChromeUserDataRoot)
+            Assert-TokenSequence -Actual $tokens -Expected @([string]$State.nodePath, [string]$Service.playwrightCli, '--host', '127.0.0.1', '--allowed-hosts', '127.0.0.1,localhost', '--port', "$PlaywrightPort", '--browser', 'chrome', '--headless', '--isolated')
             return
         }
         if (Test-TokenSequence -Actual $tokens -Expected @([string]$State.nodePath, [string]$Service.bootstrap)) { return }
@@ -987,7 +1003,7 @@ function Get-ServiceStatus {
     try { $state = Read-State } catch { $status.state = 'corrupt'; $status.failClosed = $true; $status.error = $_.Exception.Message }
     if ($null -ne $state) { $status.state = [string]$state.phase }
     foreach ($name in @('playwright', 'memory')) {
-        $owned = $false; $healthy = $false; $listenerOwned = $false; $pid = $null
+        $owned = $false; $healthy = $false; $listenerOwned = $false; $processId = $null
         if ($null -ne $state -and $null -ne $state.services.$name) {
             $service = $state.services.$name
             $actual = Get-ProcessIdentity -ProcessId ([int]$service.root.Pid)
@@ -995,7 +1011,7 @@ function Get-ServiceStatus {
                 try {
                     Assert-IdentityValues -Actual $actual -Expected $service.root
                     Assert-ApprovedServiceProcess -ServiceName $name -Identity $actual -State $state -Service $service
-                    $owned = $true; $pid = $actual.Pid
+                    $owned = $true; $processId = $actual.Pid
                     $listener = Get-ListenerIdentity -Port ([int]$service.port)
                     Assert-IdentityValues -Actual $listener -Expected $service.listener
                     $listenerOwned = $true
@@ -1004,7 +1020,7 @@ function Get-ServiceStatus {
                 catch { $owned = $false; $healthy = $false; $listenerOwned = $false }
             }
         }
-        $status.services[$name] = [ordered]@{ owned = $owned; listenerOwned = $listenerOwned; mcpFunctional = $healthy; pid = $pid }
+        $status.services[$name] = [ordered]@{ owned = $owned; listenerOwned = $listenerOwned; mcpFunctional = $healthy; pid = $processId }
     }
     $status | ConvertTo-Json -Depth 8
 }
