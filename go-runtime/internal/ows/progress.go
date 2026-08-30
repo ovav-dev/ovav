@@ -111,16 +111,16 @@ func VerifyPhases(repoRoot string, changedFiles []string) ([]PhaseResult, error)
 		}
 	}
 
-	// Run Python verification if Python stack detected
-	if _, err := os.Stat(repoRoot + "/pyproject.toml"); err == nil {
-		results = append(results, runPythonVerification(repoRoot, 3)...)
-	} else if _, err := os.Stat(repoRoot + "/requirements.txt"); err == nil {
-		results = append(results, runPythonVerification(repoRoot, 3)...)
+	// Run Python verification only when the canonical stack detector selected
+	// Python. OVAV itself intentionally ignores legacy Python markers when the
+	// Go runtime is present.
+	for _, dir := range stackDirs(stacks, StackPython) {
+		results = append(results, runPythonVerification(filepath.Join(repoRoot, dir), 3)...)
 	}
 
-	// Run Rust verification if Rust stack detected
-	if _, err := os.Stat(repoRoot + "/Cargo.toml"); err == nil {
-		results = append(results, runRustVerification(repoRoot, 4)...)
+	// Run Rust verification only for roots selected by stack detection.
+	for _, dir := range stackDirs(stacks, StackRust) {
+		results = append(results, runRustVerification(filepath.Join(repoRoot, dir), 4)...)
 	}
 
 	// Phase: validators (if available)
@@ -155,6 +155,21 @@ func VerifyPhases(repoRoot string, changedFiles []string) ([]PhaseResult, error)
 	results = append(results, hygieneResult)
 
 	return results, nil
+}
+
+func stackDirs(stacks *StackInfo, stackType StackType) []string {
+	var dirs []string
+	for _, stack := range stacks.Stacks {
+		if stack.Type != stackType {
+			continue
+		}
+		dir := stack.Dir
+		if dir == "" {
+			dir = "."
+		}
+		dirs = append(dirs, dir)
+	}
+	return dirs
 }
 
 // runGoVerification runs go vet, gofmt, and go test.

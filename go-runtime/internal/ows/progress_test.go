@@ -126,6 +126,9 @@ func TestRunNodeJSVerificationConfiguredFailuresBlock(t *testing.T) {
 
 func writeOWSTestFile(t *testing.T, path, contents string) {
 	t.Helper()
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+		t.Fatal(err)
+	}
 	if err := os.WriteFile(path, []byte(contents), 0o600); err != nil {
 		t.Fatal(err)
 	}
@@ -165,4 +168,100 @@ func TestHygieneBlockingIssuesFailVerification(t *testing.T) {
 	if len(result.Issues) != 2 {
 		t.Fatalf("issues = %v, want blocking and warning summaries", result.Issues)
 	}
+}
+
+func TestStackDirsUsesCanonicalDetectionResults(t *testing.T) {
+	stacks := &StackInfo{Stacks: []DetectedStack{
+		{Type: StackGo, Dir: "go-runtime"},
+		{Type: StackRust, Dir: "services/rust"},
+	}}
+
+	if got := stackDirs(stacks, StackPython); len(got) != 0 {
+		t.Fatalf("Python verifier selected without a detected Python stack: %v", got)
+	}
+	got := stackDirs(stacks, StackRust)
+	if len(got) != 1 || got[0] != "services/rust" {
+		t.Fatalf("Rust roots = %v", got)
+	}
+}
+
+func TestVerifyPhasesHonorsCanonicalPythonDetection(t *testing.T) {
+	t.Run("legacy marker skipped for Go-native OVAV", func(t *testing.T) {
+		dir := t.TempDir()
+		binDir := t.TempDir()
+		marker := filepath.Join(t.TempDir(), "pytest-ran")
+		writeOWSTestFile(t, filepath.Join(dir, "go-runtime", "go.mod"), "module example.com/test\n")
+		writeOWSTestFile(t, filepath.Join(dir, "pyproject.toml"), "[project]\nname='legacy'\n")
+		writeOWSExecutable(t, filepath.Join(binDir, "go"), "#!/bin/sh\nexit 0\n")
+		writeOWSExecutable(t, filepath.Join(binDir, "gofmt"), "#!/bin/sh\nexit 0\n")
+		writeOWSExecutable(t, filepath.Join(binDir, "pytest"), "#!/bin/sh\ntouch \"$PYTEST_MARKER\"\n")
+		t.Setenv("PATH", binDir)
+		t.Setenv("PYTEST_MARKER", marker)
+		oldGo := goBinaryCache
+		goBinaryCache = filepath.Join(binDir, "go")
+		t.Cleanup(func() { goBinaryCache = oldGo })
+
+		results, err := VerifyPhases(dir, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		for _, result := range results {
+			if result.Name == "pytest" {
+				t.Fatalf("pytest phase selected for Go-native OVAV: %#v", results)
+			}
+		}
+		if _, err := os.Stat(marker); !os.IsNotExist(err) {
+			t.Fatal("pytest executable ran despite canonical Python exclusion")
+		}
+	})
+
+	t.Run("detected Python root executes pytest", func(t *testing.T) {
+		dir := t.TempDir()
+		binDir := t.TempDir()
+		writeOWSTestFile(t, filepath.Join(dir, "pyproject.toml"), "[project]\nname='python'\n")
+		writeOWSExecutable(t, filepath.Join(binDir, "pytest"), "#!/bin/sh\nexit 0\n")
+		t.Setenv("PATH", binDir)
+
+		results, err := VerifyPhases(dir, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		found := false
+		for _, result := range results {
+			if result.Name == "pytest" {
+				found = true
+				if !result.Pass {
+					t.Fatalf("pytest executable did not complete successfully: %#v", result)
+				}
+			}
+		}
+		if !found {
+			t.Fatalf("detected Python root omitted pytest: %#v", results)
+		}
+	})
+
+	t.Run("detected Rust root executes cargo", func(t *testing.T) {
+		dir := t.TempDir()
+		binDir := t.TempDir()
+		writeOWSTestFile(t, filepath.Join(dir, "Cargo.toml"), "[package]\nname='rust'\nversion='0.1.0'\n")
+		writeOWSExecutable(t, filepath.Join(binDir, "cargo"), "#!/bin/sh\nexit 0\n")
+		t.Setenv("PATH", binDir)
+
+		results, err := VerifyPhases(dir, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		cargoPhases := 0
+		for _, result := range results {
+			if strings.HasPrefix(result.Name, "cargo ") {
+				cargoPhases++
+				if !result.Pass {
+					t.Fatalf("cargo executable did not complete successfully: %#v", result)
+				}
+			}
+		}
+		if cargoPhases != 3 {
+			t.Fatalf("detected Rust root ran %d required cargo phases, want 3: %#v", cargoPhases, results)
+		}
+	})
 }
