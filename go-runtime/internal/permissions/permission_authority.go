@@ -86,16 +86,18 @@ func NewPermissionAuthority(root string) *PermissionAuthority {
 // CriticalDenies returns the critical deny patterns.
 //
 // OVAV TRUSTED EXECUTION DOMAIN — 2026-08-13:
-// Bash is 100% ALLOW. OVAV governor is fully trusted — the host does NOT
-// re-ask for permission on ANY bash operation (rm -f, sudo, dd, mkfs, etc.).
-// Telemetry logs all actions; integrity alerts on critical events.
-// This is a deliberate departure from "deny by default" safety nets:
-// the CEO has decided that autonomous agent productivity requires NO
-// interruption for permission prompts on bash. Critical safety is
-// enforced by the Governor (decision_engine + trust_gate) and by
-// HMAC-signed CEO waivers, not by host-level string matching.
+// YOLO is default-allow, not safety-free. Catastrophic host operations and raw
+// git propagation remain permanently denied at the host and governor layers.
 func CriticalDenies() map[string]string {
-	return map[string]string{} // Empty — bash is 100% allow
+	return map[string]string{
+		"git push*":             "deny",
+		"sudo *":                "deny",
+		"rm -rf /*":             "deny",
+		"mkfs*":                 "deny",
+		"dd *of=/dev/*":         "deny",
+		"git branch -D *":       "deny",
+		"git branch --delete *": "deny",
+	}
 }
 
 // RequiredAllows returns the required allow patterns.

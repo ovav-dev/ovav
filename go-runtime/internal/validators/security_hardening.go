@@ -45,6 +45,7 @@ func (s *SecurityHardening) Validate(ctx context.Context, root string) Result {
 			Message: "FAIL: permission_authority.json is invalid JSON", Duration: time.Since(start),
 		}
 	}
+	isYolo := isYOLOPolicy(root, policy)
 
 	// 1. Validate security_surfaces section exists
 	sec, ok := policy["security_surfaces"].(map[string]interface{})
@@ -80,7 +81,12 @@ func (s *SecurityHardening) Validate(ctx context.Context, root string) Result {
 		if denied != expectedDenied {
 			issues = append(issues, fmt.Sprintf("F4.1: bash_commands denied expected %d from Go governor, got %d", expectedDenied, denied))
 		}
-		if !denyDefault {
+		if allowed+denied != total {
+			issues = append(issues, fmt.Sprintf("F4.1: bash_commands allowed(%d) + denied(%d) != total(%d)", allowed, denied, total))
+		}
+		if isYolo && denyDefault {
+			issues = append(issues, "F4.1: YOLO bash_commands deny_by_default must be false")
+		} else if !isYolo && !denyDefault {
 			issues = append(issues, "F4.1: bash_commands deny_by_default must be true")
 		}
 		if governor == "" {
@@ -97,7 +103,7 @@ func (s *SecurityHardening) Validate(ctx context.Context, root string) Result {
 			"source_control_read", "source_control_mutate", "ovav_internal",
 			"filesystem_read", "interpreted_execution", "github_read",
 			"governed_git", "testing", "privilege_escalation",
-			"package_management", "auth_management", "network_external",
+			"package_management", "auth_management", "network_external", "filesystem_mutate",
 		}
 		for _, cat := range requiredCats {
 			if _, ok := cats[cat]; !ok {
@@ -113,11 +119,6 @@ func (s *SecurityHardening) Validate(ctx context.Context, root string) Result {
 		// not by host-level string matching.
 		// The validador should NOT fail on YOLO mode if the policy has a
 		// `_ovav_yolo` marker indicating YOLO is active.
-		ovavYolo, _ := policy["_ovav_yolo"].(map[string]interface{})
-		isYolo := ovavYolo != nil
-		if !denyDefault && !isYolo {
-			issues = append(issues, "F4.1: bash_commands deny_by_default must be true (or enable YOLO via _ovav_yolo marker)")
-		}
 	}
 
 	// 3. Validate F4.2 unsafe_selectors governance
@@ -135,17 +136,29 @@ func (s *SecurityHardening) Validate(ctx context.Context, root string) Result {
 		if total != 10 {
 			issues = append(issues, fmt.Sprintf("F4.2: unsafe_selectors total_rules expected 10, got %d", total))
 		}
-		if allowed != 2 {
+		if !isYolo && allowed != 2 {
 			issues = append(issues, fmt.Sprintf("F4.2: unsafe_selectors allowed expected 2, got %d", allowed))
 		}
-		if denied != 7 {
+		if isYolo && allowed != total {
+			issues = append(issues, fmt.Sprintf("F4.2: YOLO unsafe_selectors allowed must equal total_rules(%d), got %d", total, allowed))
+		}
+		if isYolo && denied != 0 {
+			issues = append(issues, fmt.Sprintf("F4.2: YOLO unsafe_selectors denied must be 0, got %d", denied))
+		} else if !isYolo && denied != 7 {
 			issues = append(issues, fmt.Sprintf("F4.2: unsafe_selectors denied expected 7, got %d", denied))
 		}
-		if ask != 1 {
+		if isYolo && ask != 0 {
+			issues = append(issues, fmt.Sprintf("F4.2: YOLO unsafe_selectors ask must be 0, got %d", ask))
+		} else if !isYolo && ask != 1 {
 			issues = append(issues, fmt.Sprintf("F4.2: unsafe_selectors ask expected 1, got %d", ask))
 		}
-		if !denyDefault {
+		if isYolo && denyDefault {
+			issues = append(issues, "F4.2: YOLO unsafe_selectors deny_by_default must be false")
+		} else if !isYolo && !denyDefault {
 			issues = append(issues, "F4.2: unsafe_selectors deny_by_default must be true")
+		}
+		if allowed+denied+ask != total {
+			issues = append(issues, fmt.Sprintf("F4.2: unsafe_selectors allowed(%d) + denied(%d) + ask(%d) != total(%d)", allowed, denied, ask, total))
 		}
 		if governor == "" {
 			issues = append(issues, "F4.2: unsafe_selectors governor path missing")
@@ -174,10 +187,8 @@ func (s *SecurityHardening) Validate(ctx context.Context, root string) Result {
 	// YOLO mode allows 0 deny rules in protected_denies.bash. Skip the
 	// ">= 10 deny rules" check when YOLO is active.
 	pd, _ := policy["protected_denies"].(map[string]interface{})
-	ovavYolo4, _ := policy["_ovav_yolo"].(map[string]interface{})
-	isYolo4 := ovavYolo4 != nil
 	if bashDenies, ok := pd["bash"].([]interface{}); ok {
-		if len(bashDenies) < 10 && !isYolo4 {
+		if len(bashDenies) < 10 && !isYolo {
 			issues = append(issues, "F4: protected_denies.bash should have >= 10 deny rules")
 		}
 	} else {
@@ -190,6 +201,10 @@ func (s *SecurityHardening) Validate(ctx context.Context, root string) Result {
 		if decision := governor.Check(command, "validator"); decision.Allowed {
 			issues = append(issues, fmt.Sprintf("F4 behavioral hard deny allowed command %q", command))
 		}
+		governor.CEOActive = true
+		if decision := governor.CheckWithCEO(command, "validator"); decision.Allowed {
+			issues = append(issues, fmt.Sprintf("F4 CEO bypass crossed permanent hard deny for %q", command))
+		}
 	}
 
 	// 5. Cross-validate: protected_denies.bash should cover at least bash_commands denies
@@ -200,7 +215,7 @@ func (s *SecurityHardening) Validate(ctx context.Context, root string) Result {
 	if bashDenies, ok := pd["bash"].([]interface{}); ok {
 		if bash, ok := sec["f4_bash_commands"].(map[string]interface{}); ok {
 			denied := intVal(bash, "denied")
-			if denied > len(bashDenies) && !isYolo4 {
+			if denied > len(bashDenies) && !isYolo {
 				issues = append(issues, fmt.Sprintf("F4.1: bash_commands.denied(%d) > protected_denies.bash(%d) — F4 denies not covered",
 					denied, len(bashDenies)))
 			}

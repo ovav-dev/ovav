@@ -69,6 +69,7 @@
   },
   "principle": "ALLOW ALL with telemetry. Deny nothing by default. OVAV SYSTEMS + OVAV AGENTS are fully trusted. 2026 YOLO MODE: total freedom.",
   "_ovav_yolo": {
+    "enabled": true,
     "applied": "2026-08-19",
     "rationale": "FULL YOLO MODE 2026 — every operation allowed, telemetry only. No deny patterns. No ask prompts. CEO waiver elevates all surface to allow.",
     "external_directory_default": "allow",
@@ -78,7 +79,7 @@
     "read_default": "allow",
     "doom_loop_default": "allow",
     "trust_boundary": "RAW HOST DOMAIN: bash primitives (rm -rf /, sudo, mkfs) → CriticalDenies. OVAV TRUSTED DOMAIN: anything routed through OVAV governor → ALLOW with telemetry.",
-    "bash_deny_policy": "none — bash 100% allow (everything allowed)"
+    "bash_deny_policy": "critical permanent denies only — raw git push, force operations, sudo, and destructive host commands remain blocked"
   },
   "telemetry": {
     "log_all_actions": true,
@@ -459,9 +460,9 @@
   "security_surfaces": {
     "f4_bash_commands": {
       "governor": "go-runtime/internal/permissions/governors.go",
-      "total_rules": 16,
+      "total_rules": 19,
       "allowed": 9,
-      "denied": 0,
+      "denied": 10,
       "deny_by_default": false,
       "principle": "OVAV 2026 YOLO — bash 100% allow. Telemetry only.",
       "categories": {
@@ -512,6 +513,10 @@
         "network_external": {
           "action": "allow",
           "risk": "medium"
+        },
+        "filesystem_mutate": {
+          "action": "deny",
+          "risk": "critical"
         }
       },
       "ask": 0
@@ -519,7 +524,7 @@
     "f4_unsafe_selectors": {
       "governor": "go-runtime/internal/permissions/governors.go",
       "total_rules": 10,
-      "allowed": 2,
+      "allowed": 10,
       "denied": 0,
       "ask": 0,
       "deny_by_default": false,
@@ -569,10 +574,18 @@
     }
   },
   "protected_denies": {
-    "bash": [],
+    "bash": [
+      "git push*",
+      "sudo *",
+      "rm -rf /*",
+      "mkfs*",
+      "dd *of=/dev/*",
+      "git branch -D *",
+      "git branch --delete *"
+    ],
     "_ovav_yolo_expanded_at": "2026-08-13",
     "_ovav_yolo_pattern_count": 199,
-    "_yolo_2026_state": "all_denies_emptied"
+    "_yolo_2026_state": "default_allow_with_permanent_critical_denies"
   },
   "advanced_surfaces": {
     "gates": {
@@ -605,7 +618,7 @@
     "f5_new_states": {
       "governor": "go-runtime/internal/permissions/governors.go",
       "total_rules": 14,
-      "allowed": 12,
+      "allowed": 14,
       "denied": 0,
       "states": {
         "adaptive": "allowed",

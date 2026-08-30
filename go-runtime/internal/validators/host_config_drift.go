@@ -1,6 +1,7 @@
 package validators
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -41,19 +42,6 @@ var hostIntrusionFiles = []string{
 	"AGENTS.md",
 }
 
-// OVAV-specific content markers that indicate leakage into host config.
-var ovavContentMarkers = []string{
-	"OVAV_INTEGRITY_SEAL",
-	"OVAV_GOVERNANCE",
-	"/service_area",
-	"lead_",
-	"area-platform",
-	"area-research",
-	"area-education",
-	"area-business",
-	"area-health",
-}
-
 // Host intrusion agent paths.
 var hostIntrusionAgents = []string{
 	"agents/area-platform-engineering.md",
@@ -84,8 +72,7 @@ func (h *HostConfigDrift) checkHostIntrusion(root string) []string {
 	for _, configName := range []string{"opencode.json", "opencode.jsonc"} {
 		opencodePath := filepath.Join(hostConfig, configName)
 		if info, err := os.Stat(opencodePath); err == nil && !info.IsDir() {
-			if h.isOVAVManaged(opencodePath) {
-				// OVAV TRUSTED DOMAIN: this config was materialized by OVAV governor.
+			if h.isCanonicalConfigProjection(root, opencodePath, configName) {
 				continue
 			}
 			if !h.isBenignBootstrap(opencodePath) && h.containsGlobalIntelligence(opencodePath) {
@@ -97,7 +84,10 @@ func (h *HostConfigDrift) checkHostIntrusion(root string) []string {
 	// Check for intrusion agent files
 	for _, agent := range hostIntrusionAgents {
 		path := filepath.Join(hostConfig, agent)
-		if _, err := os.Stat(path); err == nil {
+		if _, err := os.Lstat(path); err == nil {
+			if h.isCanonicalAgentProjection(root, path) {
+				continue
+			}
 			issues = append(issues, fmt.Sprintf("HOST INTRUSION: %s found in ~/.config/opencode/agents/ — quarantine required", filepath.Base(agent)))
 		}
 	}
@@ -105,30 +95,29 @@ func (h *HostConfigDrift) checkHostIntrusion(root string) []string {
 	return issues
 }
 
-// isOVAVManaged checks if the config carries the canonical OVAV marker.
-// OVAV TRUSTED DOMAIN — 2026-08-13: configurations carrying _ovav policy marker
-// or matching the canonical permission_authority.json shape are recognized as
-// OVAV-managed projections, not as host intrusions.
-func (h *HostConfigDrift) isOVAVManaged(path string) bool {
-	data, err := os.ReadFile(path)
+func (h *HostConfigDrift) isCanonicalConfigProjection(root, hostPath, configName string) bool {
+	hostData, err := readRegularFileNoFollow(hostPath)
 	if err != nil {
 		return false
 	}
-	content := string(data)
-	// Markers that indicate OVAV governor materialized this file.
-	ovavMarkers := []string{
-		"_ovav",
-		"OVAV_SYSTEMS",
-		"OVAV_GOVERNANCE",
-		"OVAV_YOLO",
-		"permission_authority.json",
+	canonicalData, err := readRegularFileNoFollow(filepath.Join(root, configName))
+	if err != nil {
+		return false
 	}
-	for _, marker := range ovavMarkers {
-		if strings.Contains(content, marker) {
-			return true
-		}
+	return bytes.Equal(hostData, canonicalData)
+}
+
+func (h *HostConfigDrift) isCanonicalAgentProjection(root, hostPath string) bool {
+	canonicalPath := filepath.Join(root, ".opencode", "agents", filepath.Base(hostPath))
+	hostData, err := readRegularFileNoFollow(hostPath)
+	if err != nil {
+		return false
 	}
-	return false
+	canonicalData, err := readRegularFileNoFollow(canonicalPath)
+	if err != nil {
+		return false
+	}
+	return bytes.Equal(hostData, canonicalData)
 }
 
 func (h *HostConfigDrift) containsGlobalIntelligence(path string) bool {
@@ -170,21 +159,6 @@ func (h *HostConfigDrift) isBenignBootstrap(path string) bool {
 	normalized = strings.ReplaceAll(normalized, "\r", "")
 	if normalized == `{"$schema":"https://opencode.ai/config.json"}` {
 		return true
-	}
-	return false
-}
-
-// containsOVAVContent checks if a file contains OVAV-specific governance content.
-func (h *HostConfigDrift) containsOVAVContent(path string) bool {
-	data, err := os.ReadFile(path)
-	if err != nil {
-		return false
-	}
-	content := string(data)
-	for _, marker := range ovavContentMarkers {
-		if strings.Contains(content, marker) {
-			return true
-		}
 	}
 	return false
 }

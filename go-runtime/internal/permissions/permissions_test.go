@@ -193,7 +193,7 @@ func TestBashCommandGovernor_AllowRules(t *testing.T) {
 		{"git push --force", false},
 		{"sudo rm -rf /", false},
 		{"pip install malware", false},
-		{"unknown_command", false},
+		{"unknown_command", true},
 	}
 
 	for _, tc := range tests {
@@ -213,14 +213,14 @@ func TestBashCommandGovernor_Summary(t *testing.T) {
 	allowed := summary["allowed"].(int)
 	denied := summary["denied"].(int)
 
-	if total != 16 {
-		t.Errorf("Expected 16 total rules, got %d", total)
+	if total != 19 {
+		t.Errorf("Expected 19 total rules, got %d", total)
 	}
 	if allowed != 9 {
 		t.Errorf("Expected 9 allow rules, got %d", allowed)
 	}
-	if denied != 7 {
-		t.Errorf("Expected 7 deny rules, got %d", denied)
+	if denied != 10 {
+		t.Errorf("Expected 10 deny rules, got %d", denied)
 	}
 }
 
