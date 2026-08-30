@@ -789,8 +789,6 @@ function Test-McpFunctionalHealth {
     }
     catch { return $false }
 }
-    catch { return $false }
-}
 
 function Wait-ServiceReady {
     param(
