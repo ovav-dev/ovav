@@ -297,6 +297,117 @@ func TestApplyFailureAutomaticallyRollsBack(t *testing.T) {
 	}
 }
 
+func TestInspectJournalRejectsSymlinkAndOversize(t *testing.T) {
+	t.Run("symlink", func(t *testing.T) {
+		f := newFixture(t, true)
+		tx := f.plan(t)
+		if _, err := tx.Apply(); err != nil {
+			t.Fatal(err)
+		}
+		journalPath := tx.Preview().JournalPath
+		realPath := journalPath + ".real"
+		if err := os.Rename(journalPath, realPath); err != nil {
+			t.Fatal(err)
+		}
+		mustSymlink(t, realPath, journalPath)
+		if _, err := InspectJournal(journalPath, f.backup); err == nil {
+			t.Fatal("InspectJournal accepted a symlink journal")
+		}
+		assertContent(t, f.destination, "new content")
+	})
+
+	t.Run("hard link", func(t *testing.T) {
+		f := newFixture(t, true)
+		tx := f.plan(t)
+		if _, err := tx.Apply(); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.Link(tx.Preview().JournalPath, tx.Preview().JournalPath+".link"); err != nil {
+			t.Fatal(err)
+		}
+		if _, err := InspectJournal(tx.Preview().JournalPath, f.backup); err == nil {
+			t.Fatal("InspectJournal accepted a multiply-linked journal")
+		}
+		assertContent(t, f.destination, "new content")
+	})
+
+	t.Run("oversize", func(t *testing.T) {
+		f := newFixture(t, true)
+		tx := f.plan(t)
+		if _, err := tx.Apply(); err != nil {
+			t.Fatal(err)
+		}
+		oversize := strings.Repeat("x", int(maximumJournalBytes)+1)
+		mustWrite(t, tx.Preview().JournalPath, oversize, 0o600)
+		if _, err := InspectJournal(tx.Preview().JournalPath, f.backup); err == nil {
+			t.Fatal("InspectJournal accepted an oversized journal")
+		}
+		assertContent(t, f.destination, "new content")
+	})
+}
+
+func TestRecoverInspectedRejectsJournalTamperAndSwap(t *testing.T) {
+	tests := []struct {
+		name   string
+		mutate func(t *testing.T, path string)
+	}{
+		{name: "content tamper", mutate: func(t *testing.T, path string) {
+			mustWrite(t, path, "{}", 0o600)
+		}},
+		{name: "identity swap", mutate: func(t *testing.T, path string) {
+			content, err := os.ReadFile(path)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if err := os.Rename(path, path+".old"); err != nil {
+				t.Fatal(err)
+			}
+			if err := os.WriteFile(path, content, 0o600); err != nil {
+				t.Fatal(err)
+			}
+		}},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			f := newFixture(t, true)
+			tx := f.plan(t)
+			if _, err := tx.Apply(); err != nil {
+				t.Fatal(err)
+			}
+			inspection, err := InspectJournal(tx.Preview().JournalPath, f.backup)
+			if err != nil || inspection.Digest() == "" || inspection.Identity() == (JournalIdentity{}) {
+				t.Fatalf("InspectJournal() = %+v, %v", inspection, err)
+			}
+			test.mutate(t, tx.Preview().JournalPath)
+			if _, err := RecoverInspected(inspection, inspection.Authority()); !errors.Is(err, ErrConcurrentChange) {
+				t.Fatalf("RecoverInspected() error = %v, want ErrConcurrentChange", err)
+			}
+			assertContent(t, f.destination, "new content")
+		})
+	}
+}
+
+func TestRecoverInspectedRejectsSymlinkAfterInspection(t *testing.T) {
+	f := newFixture(t, true)
+	tx := f.plan(t)
+	if _, err := tx.Apply(); err != nil {
+		t.Fatal(err)
+	}
+	inspection, err := InspectJournal(tx.Preview().JournalPath, f.backup)
+	if err != nil {
+		t.Fatal(err)
+	}
+	realPath := tx.Preview().JournalPath + ".old"
+	if err := os.Rename(tx.Preview().JournalPath, realPath); err != nil {
+		t.Fatal(err)
+	}
+	mustSymlink(t, realPath, tx.Preview().JournalPath)
+	if _, err := RecoverInspected(inspection, inspection.Authority()); err == nil {
+		t.Fatal("RecoverInspected accepted a journal symlink after inspection")
+	}
+	assertContent(t, f.destination, "new content")
+}
+
 func mustMkdir(t *testing.T, path string, mode os.FileMode) {
 	t.Helper()
 	if err := os.Mkdir(path, mode); err != nil {

@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"sync"
@@ -58,6 +59,12 @@ type Transaction struct {
 
 // Plan validates all path components with O_NOFOLLOW and performs no writes.
 func Plan(source, destination, allowedRoot, backupRoot string, at time.Time) (*Transaction, error) {
+	return PlanValidated(source, destination, allowedRoot, backupRoot, at, nil)
+}
+
+// PlanValidated plans a transaction and validates the exact source snapshot
+// that Apply later revalidates before mutation.
+func PlanValidated(source, destination, allowedRoot, backupRoot string, at time.Time, validate SourceValidator) (*Transaction, error) {
 	var err error
 	if source, err = absolute(source); err != nil {
 		return nil, fmt.Errorf("resolve source: %w", err)
@@ -90,6 +97,11 @@ func Plan(source, destination, allowedRoot, backupRoot string, at time.Time) (*T
 	sourceParent.Close()
 	if err != nil {
 		return nil, fmt.Errorf("read source: %w", err)
+	}
+	if validate != nil {
+		if err := validate(append([]byte(nil), sourceSnapshot.data...)); err != nil {
+			return nil, fmt.Errorf("validate source content: %w", err)
+		}
 	}
 	root, err := openDirAbsolute(allowedRoot)
 	if err != nil {
@@ -269,20 +281,22 @@ func (t *Transaction) Apply() (Result, error) {
 func (t *Transaction) Rollback() (Result, error) {
 	t.mu.Lock()
 	defer t.mu.Unlock()
-	return recoverTransaction(t.preview.JournalPath, t.preview.AllowedRoot, t.preview.BackupRoot, false)
+	inspection, err := InspectJournal(t.preview.JournalPath, t.preview.BackupRoot)
+	if err != nil {
+		return t.result("rollback", ""), err
+	}
+	result, err := RecoverInspected(inspection, JournalAuthority{
+		Source: t.preview.Source, Destination: t.preview.Destination,
+		AllowedRoot: t.preview.AllowedRoot, BackupRoot: t.preview.BackupRoot,
+	})
+	result.Operation = "rollback"
+	result.Recovered = false
+	return result, err
 }
 
 // Recover performs idempotent, lock-protected recovery from a durable journal.
 func Recover(journalPath, allowedRoot, backupRoot string) (Result, error) {
-	return recoverTransaction(journalPath, allowedRoot, backupRoot, true)
-}
-
-func recoverTransaction(journalPath, allowedRoot, backupRoot string, recovery bool) (Result, error) {
-	journalPath, err := absolute(journalPath)
-	if err != nil {
-		return Result{Operation: "recover"}, fmt.Errorf("resolve journal: %w", err)
-	}
-	allowedRoot, err = absolute(allowedRoot)
+	allowedRoot, err := absolute(allowedRoot)
 	if err != nil {
 		return Result{Operation: "recover"}, fmt.Errorf("resolve allowed root: %w", err)
 	}
@@ -290,38 +304,15 @@ func recoverTransaction(journalPath, allowedRoot, backupRoot string, recovery bo
 	if err != nil {
 		return Result{Operation: "recover"}, fmt.Errorf("resolve backup root: %w", err)
 	}
-	if filepath.Dir(journalPath) != backupRoot {
-		return Result{Operation: "recover"}, errors.New("journal is not a direct child of backup root")
-	}
-	backupDir, err := openBackupRoot(backupRoot)
+	inspection, err := InspectJournal(journalPath, backupRoot)
 	if err != nil {
 		return Result{Operation: "recover"}, err
 	}
-	defer backupDir.Close()
-	j, journalHash, err := loadJournal(backupDir, filepath.Base(journalPath))
-	if err != nil {
-		return Result{Operation: "recover"}, err
+	expected := inspection.Authority()
+	if expected.AllowedRoot != allowedRoot || expected.BackupRoot != backupRoot {
+		return Result{Operation: "recover"}, errors.New("journal roots do not match recovery authority")
 	}
-	if err := validateJournal(j, journalPath, allowedRoot, backupRoot); err != nil {
-		return resultFromJournal(j, "recover"), err
-	}
-	lock, err := openLockAt(backupDir, filepath.Base(j.LockPath))
-	if err != nil {
-		return resultFromJournal(j, "recover"), fmt.Errorf("recover: %w", err)
-	}
-	defer closeLock(lock)
-	latest, latestHash, err := loadJournal(backupDir, filepath.Base(journalPath))
-	if err != nil {
-		return resultFromJournal(j, "recover"), fmt.Errorf("journal changed while acquiring lock: %w", err)
-	}
-	if latestHash != journalHash {
-		return resultFromJournal(j, "recover"), fmt.Errorf("%w: journal changed while acquiring lock", ErrConcurrentChange)
-	}
-	j = latest
-	durability := durabilityTracker{level: j.Durability, detail: j.DurabilityDetail}
-	result, err := rollbackJournal(backupDir, &j, &journalHash, &durability)
-	result.Recovered = recovery
-	return result, err
+	return RecoverInspected(inspection, expected)
 }
 
 func rollbackJournal(backupDir *os.File, j *journal, journalHash *string, durability *durabilityTracker) (Result, error) {
@@ -542,20 +533,42 @@ func storeJournal(dir *os.File, name string, j *journal, expectedHash string, in
 }
 
 func loadJournal(dir *os.File, name string) (journal, string, error) {
-	file, err := readRegularAt(dir, name)
+	j, file, err := loadJournalSnapshot(dir, name)
+	return j, file.hash, err
+}
+
+func loadJournalSnapshot(dir *os.File, name string) (journal, snapshot, error) {
+	file, err := readJournalSnapshot(dir, name)
 	if err != nil {
-		return journal{}, "", fmt.Errorf("read transaction journal: %w", err)
+		return journal{}, snapshot{}, err
+	}
+	j, err := decodeJournalSnapshot(file)
+	return j, file, err
+}
+
+func readJournalSnapshot(dir *os.File, name string) (snapshot, error) {
+	file, err := readRegularAtBounded(dir, name, maximumJournalBytes)
+	if err != nil {
+		return snapshot{}, fmt.Errorf("read transaction journal: %w", err)
 	}
 	if err := verifyPrivateArtifact(file, "transaction journal"); err != nil {
-		return journal{}, "", err
+		return snapshot{}, err
 	}
+	return file, nil
+}
+
+func decodeJournalSnapshot(file snapshot) (journal, error) {
 	var j journal
 	decoder := json.NewDecoder(bytes.NewReader(file.data))
 	decoder.DisallowUnknownFields()
 	if err := decoder.Decode(&j); err != nil {
-		return journal{}, "", fmt.Errorf("decode transaction journal: %w", err)
+		return journal{}, fmt.Errorf("decode transaction journal: %w", err)
 	}
-	return j, file.hash, nil
+	var trailing interface{}
+	if err := decoder.Decode(&trailing); !errors.Is(err, io.EOF) {
+		return journal{}, errors.New("decode transaction journal: trailing JSON content")
+	}
+	return j, nil
 }
 
 func writeArtifact(dir *os.File, name string, data []byte, mode uint32, durability *durabilityTracker) error {
@@ -780,7 +793,7 @@ func validateJournal(j journal, path, allowedRoot, backupRoot string) error {
 }
 
 func verifyPrivateArtifact(file snapshot, label string) error {
-	if file.mode != 0o600 || file.links != 1 || file.owner != uint32(os.Geteuid()) {
+	if file.mode != 0o600 || file.special != 0 || file.links != 1 || file.owner != uint32(os.Geteuid()) {
 		return fmt.Errorf("%s must be mode 0600, have one hard link, and be owned by effective uid %d", label, os.Geteuid())
 	}
 	return nil

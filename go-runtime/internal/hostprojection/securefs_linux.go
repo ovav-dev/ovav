@@ -23,12 +23,13 @@ type fileIdentity struct {
 func (i fileIdentity) zero() bool { return i.Device == 0 && i.Inode == 0 }
 
 type snapshot struct {
-	data  []byte
-	mode  uint32
-	links uint64
-	owner uint32
-	id    fileIdentity
-	hash  string
+	data    []byte
+	mode    uint32
+	special uint32
+	links   uint64
+	owner   uint32
+	id      fileIdentity
+	hash    string
 }
 
 type durabilityTracker struct {
@@ -153,6 +154,10 @@ func safeRelative(path string) (string, error) {
 }
 
 func readRegularAt(parent *os.File, name string) (snapshot, error) {
+	return readRegularAtBounded(parent, name, 0)
+}
+
+func readRegularAtBounded(parent *os.File, name string, maximumBytes int64) (snapshot, error) {
 	fd, err := syscall.Openat(int(parent.Fd()), name, syscall.O_RDONLY|syscall.O_NOFOLLOW|syscall.O_CLOEXEC, 0)
 	if err != nil {
 		return snapshot{}, fmt.Errorf("open no-follow file %s: %w", name, err)
@@ -166,9 +171,19 @@ func readRegularAt(parent *os.File, name string) (snapshot, error) {
 	if before.Mode&syscall.S_IFMT != syscall.S_IFREG {
 		return snapshot{}, fmt.Errorf("%s is not a regular file", name)
 	}
-	data, err := io.ReadAll(file)
+	if maximumBytes > 0 && (before.Size < 0 || before.Size > maximumBytes) {
+		return snapshot{}, fmt.Errorf("%s exceeds maximum size %d", name, maximumBytes)
+	}
+	reader := io.Reader(file)
+	if maximumBytes > 0 {
+		reader = io.LimitReader(file, maximumBytes+1)
+	}
+	data, err := io.ReadAll(reader)
 	if err != nil {
 		return snapshot{}, fmt.Errorf("read %s: %w", name, err)
+	}
+	if maximumBytes > 0 && int64(len(data)) > maximumBytes {
+		return snapshot{}, fmt.Errorf("%s exceeds maximum size %d", name, maximumBytes)
 	}
 	var after syscall.Stat_t
 	if err := syscall.Fstat(fd, &after); err != nil {
@@ -178,7 +193,11 @@ func readRegularAt(parent *os.File, name string) (snapshot, error) {
 	if beforeID != afterID || before.Size != after.Size || before.Mtim != after.Mtim {
 		return snapshot{}, fmt.Errorf("%w while reading %s", ErrConcurrentChange, name)
 	}
-	return snapshot{data: data, mode: before.Mode & 0o777, links: uint64(before.Nlink), owner: before.Uid, id: beforeID, hash: digest(data)}, nil
+	return snapshot{
+		data: data, mode: before.Mode & 0o777,
+		special: before.Mode & (syscall.S_ISUID | syscall.S_ISGID | syscall.S_ISVTX),
+		links:   uint64(before.Nlink), owner: before.Uid, id: beforeID, hash: digest(data),
+	}, nil
 }
 
 func readOptionalAt(parent *os.File, name string) (snapshot, bool, error) {

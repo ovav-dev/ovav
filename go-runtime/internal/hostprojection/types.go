@@ -55,3 +55,44 @@ type Result struct {
 	Durability       DurabilityLevel
 	DurabilityDetail string
 }
+
+// SourceValidator validates the exact source snapshot captured by planning.
+type SourceValidator func([]byte) error
+
+// JournalAuthority is the minimal path authority recorded by a journal.
+type JournalAuthority struct {
+	Source      string
+	Destination string
+	AllowedRoot string
+	BackupRoot  string
+}
+
+// JournalIdentity identifies the inspected journal inode without exposing a
+// mutable recovery token.
+type JournalIdentity struct {
+	Device uint64
+	Inode  uint64
+}
+
+// JournalInspection is an immutable-by-API token issued after trusted journal
+// inspection. Its fields can be read only through value-returning methods.
+type JournalInspection struct {
+	authority   JournalAuthority
+	identity    JournalIdentity
+	journalPath string
+	backupRoot  string
+	lockPath    string
+	digest      string
+}
+
+// Authority returns a copy of the inspected journal authority.
+func (inspection JournalInspection) Authority() JournalAuthority { return inspection.authority }
+
+// Identity returns a copy of the inspected journal filesystem identity.
+func (inspection JournalInspection) Identity() JournalIdentity { return inspection.identity }
+
+// Digest returns the inspected journal SHA-256 digest.
+func (inspection JournalInspection) Digest() string { return inspection.digest }
+
+// JournalPath returns the exact inspected journal path.
+func (inspection JournalInspection) JournalPath() string { return inspection.journalPath }
