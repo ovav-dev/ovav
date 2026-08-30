@@ -8,7 +8,10 @@ permission:
   edit: "deny"
   bash:
     "*": "deny"
+    dd *of=/dev/*: "deny"
     find *: "allow"
+    "git branch --delete *": "deny"
+    "git branch -D *": "deny"
     git commit*: "deny"
     git diff*: "allow"
     git log*: "allow"
@@ -18,6 +21,8 @@ permission:
     go mod*: "allow"
     go vet*: "allow"
     "grep -rn*": "allow"
+    mkfs*: "deny"
+    "rm -rf /*": "deny"
     sudo *: "deny"
   external_directory:
     "*": "deny"

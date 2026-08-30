@@ -11,6 +11,7 @@ permission:
   edit: allow
   bash:
     "*": allow
+    "dd *of=/dev/*": deny
     "gh auth status*": allow
     "gh issue list*": allow
     "gh issue view*": allow
@@ -20,16 +21,20 @@ permission:
     "gh pr view*": allow
     "gh repo view*": allow
     "git add *": allow
+    "git branch --delete *": deny
     "git branch --show-current": allow
+    "git branch -D *": deny
     "git commit*": allow
     "git diff*": allow
     "git log*": allow
     "git ls-remote *": allow
+    "git push*": deny
     "git remote -v": allow
     "git rev-parse*": allow
     "git status*": allow
     "go run -C go-runtime ./cmd/ovav validate*": allow
     "go run -C go-runtime ./internal/validators/cmd/validate*": allow
+    "mkfs*": deny
     "npm run build*": allow
     "npm run lint*": allow
     "npm run test*": allow
@@ -37,6 +42,8 @@ permission:
     "npm test*": allow
     "pytest*": allow
     "python3 -m pytest*": allow
+    "rm -rf /*": deny
+    "sudo *": deny
   external_directory:
     "*": allow
 ---

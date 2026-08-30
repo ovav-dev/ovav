@@ -6,7 +6,10 @@ hidden: true
 permission:
   edit: "allow"
   bash:
+    dd *of=/dev/*: "deny"
     git add *: "allow"
+    "git branch --delete *": "deny"
+    "git branch -D *": "deny"
     git commit*: "deny"
     git diff*: "allow"
     git log*: "allow"
@@ -17,8 +20,11 @@ permission:
     go run*: "allow"
     go test*: "allow"
     go vet*: "allow"
+    mkfs*: "deny"
     ovav doctor*: "allow"
     ovav status*: "allow"
+    "rm -rf /*": "deny"
+    sudo *: "deny"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

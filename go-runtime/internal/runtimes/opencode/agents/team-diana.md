@@ -8,8 +8,11 @@ permission:
   edit: "allow"
   bash:
     "*": "deny"
+    dd *of=/dev/*: "deny"
     find *: "allow"
     git add *: "allow"
+    "git branch --delete *": "deny"
+    "git branch -D *": "deny"
     git commit*: "deny"
     git diff*: "allow"
     git log*: "allow"
@@ -19,9 +22,11 @@ permission:
     go test*: "allow"
     go vet*: "allow"
     "grep -rn*": "allow"
+    mkfs*: "deny"
     ovav defend*: "allow"
     ovav doctor*: "allow"
     python3 tools/ovav_runtime.py*: "allow"
+    "rm -rf /*": "deny"
     sudo *: "deny"
   external_directory:
     "*": "deny"
