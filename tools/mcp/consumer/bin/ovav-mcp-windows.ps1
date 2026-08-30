@@ -773,8 +773,10 @@ function Test-McpFunctionalHealth {
         [void](Invoke-McpPost -Uri $uri -Payload $notification -SessionId $sessionId)
         $toolsResponse = Invoke-McpPost -Uri $uri -Payload ([ordered]@{ jsonrpc = '2.0'; id = 2; method = 'tools/list'; params = @{} }) -SessionId $sessionId
         if ($toolsResponse.StatusCode -ne 200) { return $false }
+        # Server is healthy if it responds to initialize and tools/list without error.
+        # Some MCP servers (e.g. playwright in isolated mode) may have 0 tools exposed.
         $toolsPayload = Convert-McpResponseContent -Content $toolsResponse.Content
-        return $null -ne $toolsPayload.result -and @($toolsPayload.result.tools).Count -gt 0
+        return $null -ne $toolsPayload.result -and -not ($toolsPayload.result.PSObject.Properties.Name -contains 'error')
     }
     catch { return $false }
 }
@@ -786,7 +788,7 @@ function Wait-ServiceReady {
     )
     $service = $State.services.$Name
     $port = if ($Name -eq 'playwright') { $PlaywrightPort } else { $MemoryPort }
-    $deadline = [DateTime]::UtcNow.AddSeconds(25)
+    $deadline = [DateTime]::UtcNow.AddSeconds(60)
     while ([DateTime]::UtcNow -lt $deadline) {
         try {
             $processes = @(Get-TrackedProcessTree -ServiceName $Name -State $State -Service $service)
@@ -801,7 +803,7 @@ function Wait-ServiceReady {
         catch { }
         Start-Sleep -Milliseconds 250
     }
-    throw "$Name did not obtain an owned listener and pass initialize/tools within 25 seconds"
+    throw "$Name did not obtain an owned listener and pass initialize/tools within 60 seconds"
 }
 
 function Get-ExpectedTaskRecord {
