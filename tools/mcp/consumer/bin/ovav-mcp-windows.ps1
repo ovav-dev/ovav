@@ -546,11 +546,12 @@ await import(pathToFileURL(process.env.OVAV_SUPERGATEWAY_ENTRY).href)
     Set-Content -LiteralPath $memoryChild -Encoding ascii -Value ('@echo off' + "`r`n" + 'set "MEMORY_FILE_PATH=' + $MemoryPath + '"' + "`r`n" + (Quote-CmdValue $Toolchain.Node) + ' ' + (Quote-CmdValue $memoryCli))
     $playwrightRunner = Join-Path $RunRoot 'playwright.cmd'
     $playwrightLog = Join-Path $LogRoot 'playwright.log'
-    # NOTE: --isolated mode does not support --user-data-dir or --shared-browser-context.
-    # Chrome profile is managed internally by the MCP server in isolated mode.
+    # NOTE: --isolated was removed because playwright-core 1.63.0-alpha auto-assigns userDataDir
+    # for isolated mode, then crashes in validateBrowserConfig when it detects isolated+userDataDir.
+    # Using --headless without --isolated: browser runs with auto-assigned temp userDataDir.
     # NOTE: --allowed-hosts * is used because the playwright-core HTTP handler has a bug where
     # it compares the raw Host header (with port) against allowed hosts (without port).
-    $playwrightArgs = " --host 127.0.0.1 --allowed-hosts * --port $PlaywrightPort --browser chrome --headless --isolated"
+    $playwrightArgs = " --host 127.0.0.1 --allowed-hosts * --port $PlaywrightPort --browser chrome --headless"
     Set-Content -LiteralPath $playwrightRunner -Encoding ascii -Value ('@echo off' + "`r`n" + (Quote-CmdValue $Toolchain.Node) + ' ' + (Quote-CmdValue $playwrightCli) + $playwrightArgs + ' 1>>' + (Quote-CmdValue $playwrightLog) + ' 2>>&1')
     $memoryRunner = Join-Path $RunRoot 'memory.cmd'
     $memoryLog = Join-Path $LogRoot 'memory.log'
