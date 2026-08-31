@@ -764,12 +764,19 @@ function Test-McpFunctionalHealth {
     param([Parameter(Mandatory = $true)][int]$Port)
     try {
         $uri = "http://127.0.0.1:$Port/mcp"
-        # Use curl.exe for reliable HTTP POST - better SSE handling than Invoke-WebRequest
+        # Use curl.exe via ArgumentList to avoid shell quote interpretation
+        # (Arguments string mangled JSON; ArgumentList passes args directly)
         $body = (@{ jsonrpc = '2.0'; id = 1; method = 'initialize'; params = @{ protocolVersion = '2025-03-26'; capabilities = @{}; clientInfo = @{ name = 'ovav-manager'; version = $ManagerVersion } } } | ConvertTo-Json -Compress)
         $curlExe = 'curl.exe'
         $process = [Diagnostics.Process]::new()
         $process.StartInfo.FileName = $curlExe
-        $process.StartInfo.Arguments = "-s --max-time 5 -X POST `"$uri`" -H `"Content-Type: application/json`" -H `"Accept: application/json, text/event-stream`" -d `"$body`""
+        $process.StartInfo.ArgumentList.Add("-s")
+        $process.StartInfo.ArgumentList.Add("--max-time"); $process.StartInfo.ArgumentList.Add("5")
+        $process.StartInfo.ArgumentList.Add("-X"); $process.StartInfo.ArgumentList.Add("POST")
+        $process.StartInfo.ArgumentList.Add($uri)
+        $process.StartInfo.ArgumentList.Add("-H"); $process.StartInfo.ArgumentList.Add("Content-Type: application/json")
+        $process.StartInfo.ArgumentList.Add("-H"); $process.StartInfo.ArgumentList.Add("Accept: application/json, text/event-stream")
+        $process.StartInfo.ArgumentList.Add("-d"); $process.StartInfo.ArgumentList.Add($body)
         $process.StartInfo.RedirectStandardOutput = $true
         $process.StartInfo.RedirectStandardError = $true
         $process.StartInfo.UseShellExecute = $false
