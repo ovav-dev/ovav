@@ -656,14 +656,14 @@ function Assert-ApprovedServiceProcess {
         $cmdTargets = @([string]$Service.runner)
         if ($ServiceName -eq 'memory' -and -not [string]::IsNullOrWhiteSpace([string]$Service.memoryChild)) { $cmdTargets += [string]$Service.memoryChild }
         foreach ($target in $cmdTargets) {
-            if (Test-TokenSequence -Actual $tokens -Expected @([string]$env:ComSpec, '/d', '/s', '/c', 'call', $target)) { return }
-            if (Test-TokenSequence -Actual $tokens -Expected @([string]$env:ComSpec, '/d', '/s', '/c', $target)) { return }
+            if (Test-TokenSequence -Actual $tokens -Expected @([string]$env:ComSpec, '/d', '/c', 'call', $target)) { return }
+            if (Test-TokenSequence -Actual $tokens -Expected @([string]$env:ComSpec, '/d', '/c', $target)) { return }
         }
         throw 'cmd.exe command line is not an exact managed runner'
     }
     if ([string]::Equals([string]$Identity.Executable, [string]$State.nodePath, [StringComparison]::OrdinalIgnoreCase)) {
         if ($ServiceName -eq 'playwright') {
-            Assert-TokenSequence -Actual $tokens -Expected @([string]$State.nodePath, [string]$Service.playwrightCli, '--host', '127.0.0.1', '--allowed-hosts', '*', '--port', "$PlaywrightPort", '--browser', 'chrome', '--headless', '--isolated')
+            Assert-TokenSequence -Actual $tokens -Expected @([string]$State.nodePath, [string]$Service.playwrightCli, '--host', '127.0.0.1', '--allowed-hosts', '*', '--port', "$PlaywrightPort", '--browser', 'chrome', '--headless')
             return
         }
         if (Test-TokenSequence -Actual $tokens -Expected @([string]$State.nodePath, [string]$Service.bootstrap)) { return }
@@ -710,7 +710,7 @@ function Start-Runner {
     param([Parameter(Mandatory = $true)][string]$RunnerPath)
     $info = [Diagnostics.ProcessStartInfo]::new()
     $info.FileName = $env:ComSpec
-    $info.ArgumentList.Add('/d'); $info.ArgumentList.Add('/s'); $info.ArgumentList.Add('/c'); $info.ArgumentList.Add('call'); $info.ArgumentList.Add($RunnerPath)
+    $info.ArgumentList.Add('/d'); $info.ArgumentList.Add('/c'); $info.ArgumentList.Add('call'); $info.ArgumentList.Add($RunnerPath)
     $info.WorkingDirectory = $ManagedRoot
     $info.UseShellExecute = $false
     $info.CreateNoWindow = $true
