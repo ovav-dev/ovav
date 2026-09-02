@@ -1,31 +1,27 @@
 # OVAV Workstation Keybinding Cheatsheet
 
-> Designed for zero conflicts with Bash, Readline, fzf, Atuin, OpenCode, PSReadLine.
+> Active stack: Alacritty 0.17.0 → WSL2 → tmux 3.6 → Fish 4.2.1 → OpenCode 1.18.26.
 
 ## Strategy
 
 | Mod | Role |
 |-----|------|
-| `Ctrl+Shift+...` | Terminal-level (tabs, panes, workspace, palette) |
+| `Alt+1/2/3` | Workspace-level routes |
 | `Ctrl+Alt+...` | Pane operations (split, focus, resize) |
-| `Alt+...` | Pane navigation |
+| `Alt+...` | Named workspace navigation |
 | `Ctrl+...` | Shell-level (readline, Atuin, fzf) |
 | **No conflict** | OpenCode, Readline defaults, fzf defaults, Atuin defaults |
 
-## Intelligent Terminal (Windows host)
+## Alacritty + tmux (active host)
 
 | Shortcut | Action |
 |----------|--------|
-| `Ctrl+Shift+~` | **OVAV Workspace** — opens full layout (main + agent + logs) |
-| `Ctrl+Shift+T` | New OVAV Tab |
-| `Ctrl+Shift+P` | Command Palette |
-| `Ctrl+Shift+F` | Search (find match) |
-| `Ctrl+Shift+Z` | Toggle pane zoom |
-| `Ctrl+Shift+W` | Close pane |
-| `Ctrl+Alt+D` | Split pane vertical |
-| `Ctrl+Alt+S` | Split pane horizontal |
-| `Alt+Left/Right/Up/Down` | Focus pane direction |
-| `Ctrl+Shift+M` | New tab (terminal default, preserved) |
+| `Alt+1` | HOME — `/home/braka` |
+| `Alt+2` | OVAV — `/home/braka/Systems/ovav` |
+| `Alt+3` | AKRYNT — `/home/braka/Systems/projects/work/akrynt-agent` |
+| `Alt+A`, `n/p` | Next/previous tmux window |
+| `Ctrl+Shift+C` | Copy terminal selection |
+| `Ctrl+V` | Paste clipboard (host terminal) |
 
 ## Bash / Readline
 
@@ -72,11 +68,17 @@
 
 No keybindings — visual only. Renders contextual modules on each line.
 
-## OpenCode TUI (when in OpenCode tab)
+## OpenCode TUI (when in the `ovav` tmux window)
 
 | Shortcut | Action |
 |----------|--------|
 | `Enter` | Submit prompt |
+| `Shift+Enter` / `Ctrl+J` | Insert newline |
+| `Ctrl+X`, `N` | New OpenCode session |
+| `Ctrl+X`, `L` | Open session list |
+| `Ctrl+X`, `G` | Session timeline |
+| `Ctrl+X`, `B` | Toggle sidebar |
+| `Ctrl+X`, `Y` | Copy message |
 | `Shift+Tab` | Cycle agent mode |
 | `Ctrl+P` | Command palette (OpenCode internal) |
 | `Ctrl+C` | Cancel current operation |
@@ -96,16 +98,15 @@ No keybindings — visual only. Renders contextual modules on each line.
 | `Ctrl+Space` | Accept current suggestion |
 | `F2` | Toggle inline/list view |
 
-## Profiles → Quick Reference
+## Active workspace routes
 
-| Tab | Profile | Default cwd | Use |
+| Route | tmux window | Default cwd | Use |
 |-----|---------|-------------|-----|
-| Tab 1 | OVAV Ubuntu | ~/Systems/ovav | Main development |
-| Tab 2 | OpenCode Ubuntu | ~/Systems/ovav | AI agent TUI |
-| Tab 3 | OVAV Ubuntu | ~/Systems/ovav | OPS (git/logs/doctor) |
-| Tab 4 | OVAV Scratch | ~$HOME | Free Bash |
+| HOME | `home` | `/home/braka` | Shell / scratch |
+| OVAV | `ovav` | `/home/braka/Systems/ovav` | OpenCode + runtime |
+| AKRYNT | `akrynt` | `/home/braka/Systems/projects/work/akrynt-agent` | Project work |
 
-## Workspace Action (Ctrl+Shift+~)
+## Historical workspace action (inactive)
 
 Opens TAB 1 with this layout:
 

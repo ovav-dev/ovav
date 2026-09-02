@@ -193,8 +193,8 @@ func DefaultRegistry(modes ...ValidationMode) *Registry {
 		NewAdversarialVerification(),
 		// Batch 11 — IT keybindings regression guard (2026-08-14)
 		NewITKeybindings(),
-		// Batch 11b — IT live keybindings drift detection (2026-08-14)
-		NewITLiveKeybindings(),
+		// ITLiveKeybindings is retained for fixture-level compatibility only;
+		// the inactive Intelligent Terminal is not part of the live validator pipeline.
 		// Batch 11c — Bash readline shift+arrow bindings (2026-08-14)
 		NewBashReadlineBindings(),
 		// Batch 12 — Runtime integrity baseline versioning (2026-08-14, ADR-006)

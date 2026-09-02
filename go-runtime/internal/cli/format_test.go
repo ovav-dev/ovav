@@ -232,6 +232,26 @@ func TestFindRepoRoot(t *testing.T) {
 	})
 }
 
+func TestFindRepoRoot_SkipsNestedRuntimeOvavDirectory(t *testing.T) {
+	cwd, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	runtimeRoot := filepath.Clean(filepath.Join(cwd, "..", ".."))
+	if err := os.Chdir(runtimeRoot); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = os.Chdir(cwd) })
+
+	root, err := FindRepoRoot()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := os.Stat(filepath.Join(root, ".ovav", "plan", "caps.yaml")); err != nil {
+		t.Fatalf("FindRepoRoot returned a non-canonical root %q: %v", root, err)
+	}
+}
+
 // ── MustFindRepoRoot ──────────────────────────────────────────────────────────
 
 func TestMustFindRepoRoot(t *testing.T) {

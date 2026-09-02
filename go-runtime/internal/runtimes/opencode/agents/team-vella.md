@@ -8,6 +8,7 @@ permission:
   edit: "allow"
   bash:
     "*": "deny"
+    apt install *: "deny"
     dd *of=/dev/*: "deny"
     git add *: "allow"
     "git branch --delete *": "deny"
@@ -22,8 +23,10 @@ permission:
     go test*: "allow"
     go vet*: "allow"
     mkfs*: "deny"
+    npm install *: "deny"
     ovav doctor*: "allow"
     ovav status*: "allow"
+    pip install *: "deny"
     pytest*: "allow"
     "python3 -B tools/validators/*.py": "allow"
     "python3 -m pytest*": "allow"

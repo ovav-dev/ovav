@@ -52,6 +52,8 @@ func setupFakeRepo(t *testing.T) string {
 	t.Helper()
 	dir := t.TempDir()
 	os.MkdirAll(filepath.Join(dir, ".ovav"), 0755)
+	os.MkdirAll(filepath.Join(dir, ".ovav", "plan"), 0755)
+	os.WriteFile(filepath.Join(dir, ".ovav", "plan", "caps.yaml"), []byte("canonical: true\n"), 0644)
 	os.MkdirAll(filepath.Join(dir, "go-runtime"), 0755)
 	os.WriteFile(filepath.Join(dir, "go-runtime", "go.mod"), []byte("module x\n"), 0644)
 	return dir
@@ -68,6 +70,8 @@ func TestIsOVAVRepo(t *testing.T) {
 			setup: func(t *testing.T) string {
 				dir := t.TempDir()
 				os.MkdirAll(filepath.Join(dir, ".ovav"), 0755)
+				os.MkdirAll(filepath.Join(dir, ".ovav", "plan"), 0755)
+				os.WriteFile(filepath.Join(dir, ".ovav", "plan", "caps.yaml"), []byte("canonical: true\n"), 0644)
 				os.MkdirAll(filepath.Join(dir, "go-runtime"), 0755)
 				os.WriteFile(filepath.Join(dir, "go-runtime", "go.mod"), []byte("module x\n"), 0644)
 				return dir
@@ -129,6 +133,8 @@ func TestFindRepoRootFrom(t *testing.T) {
 			setup: func(t *testing.T) string {
 				dir := t.TempDir()
 				os.MkdirAll(filepath.Join(dir, ".ovav"), 0755)
+				os.MkdirAll(filepath.Join(dir, ".ovav", "plan"), 0755)
+				os.WriteFile(filepath.Join(dir, ".ovav", "plan", "caps.yaml"), []byte("canonical: true\n"), 0644)
 				os.MkdirAll(filepath.Join(dir, "go-runtime"), 0755)
 				os.WriteFile(filepath.Join(dir, "go-runtime", "go.mod"), []byte("module x\n"), 0644)
 				return dir
@@ -147,6 +153,8 @@ func TestFindRepoRootFrom(t *testing.T) {
 			setup: func(t *testing.T) string {
 				dir := t.TempDir()
 				os.MkdirAll(filepath.Join(dir, ".ovav"), 0755)
+				os.MkdirAll(filepath.Join(dir, ".ovav", "plan"), 0755)
+				os.WriteFile(filepath.Join(dir, ".ovav", "plan", "caps.yaml"), []byte("canonical: true\n"), 0644)
 				os.MkdirAll(filepath.Join(dir, "go-runtime"), 0755)
 				os.WriteFile(filepath.Join(dir, "go-runtime", "go.mod"), []byte("module x\n"), 0644)
 				nested := filepath.Join(dir, "a", "b", "c")
@@ -368,6 +376,8 @@ func TestFindRepoRoot(t *testing.T) {
 	// Create a valid OVAV repo in a temp dir and chdir into it
 	dir := t.TempDir()
 	os.MkdirAll(filepath.Join(dir, ".ovav"), 0755)
+	os.MkdirAll(filepath.Join(dir, ".ovav", "plan"), 0755)
+	os.WriteFile(filepath.Join(dir, ".ovav", "plan", "caps.yaml"), []byte("canonical: true\n"), 0644)
 	os.MkdirAll(filepath.Join(dir, "go-runtime"), 0755)
 	os.WriteFile(filepath.Join(dir, "go-runtime", "go.mod"), []byte("module x\n"), 0644)
 

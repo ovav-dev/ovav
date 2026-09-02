@@ -6,7 +6,9 @@
 # ─────────────────────────────────────────────────────────────
 set -euo pipefail
 
-INTEL_TERM_SETTINGS="/mnt/c/Users/Alexa/AppData/Local/Packages/Microsoft.IntelligentTerminal_8wekyb3d8bbwe/LocalState/settings.json"
+ALACRITTY_CONFIG="${ALACRITTY_CONFIG:-/mnt/c/Users/Alexa/AppData/Roaming/alacritty/alacritty.toml}"
+TMUX_DEST="$HOME/.tmux.conf"
+OPENCODE_TUI_DEST="$HOME/.config/opencode/tui.json"
 WIN_PS_PROFILE="/mnt/c/Users/Alexa/OneDrive/Documentos/PowerShell/Microsoft.PowerShell_profile.ps1"
 
 # Find most recent backup
@@ -37,10 +39,22 @@ if [ -f "$BACKUP/atuin-config.toml.bak" ]; then
   echo "✓ atuin/config.toml restored"
 fi
 
-# Intelligent Terminal
-if [ -f "$BACKUP/intel-terminal-settings.json.bak" ] && [ -f "$INTEL_TERM_SETTINGS" ]; then
-  cp -p "$BACKUP/intel-terminal-settings.json.bak" "$INTEL_TERM_SETTINGS"
-  echo "✓ Intelligent Terminal settings.json restored"
+# Alacritty
+if [ -f "$BACKUP/alacritty.toml.bak" ] && [ -f "$ALACRITTY_CONFIG" ]; then
+  cp -p "$BACKUP/alacritty.toml.bak" "$ALACRITTY_CONFIG"
+  echo "✓ Alacritty config restored"
+fi
+
+# tmux
+if [ -f "$BACKUP/tmux.conf.bak" ]; then
+  cp -p "$BACKUP/tmux.conf.bak" "$TMUX_DEST"
+  echo "✓ ~/.tmux.conf restored"
+fi
+
+# OpenCode TUI
+if [ -f "$BACKUP/opencode-tui.json.bak" ] && [ -f "$OPENCODE_TUI_DEST" ]; then
+  cp -p "$BACKUP/opencode-tui.json.bak" "$OPENCODE_TUI_DEST"
+  echo "✓ OpenCode TUI config restored"
 fi
 
 # PowerShell profile

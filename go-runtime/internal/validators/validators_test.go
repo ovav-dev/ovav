@@ -807,7 +807,7 @@ func findOVAVRoot() (string, error) {
 		return "", err
 	}
 	for {
-		if _, err := os.Stat(filepath.Join(dir, ".ovav")); err == nil {
+		if _, err := os.Stat(filepath.Join(dir, ".ovav", "plan", "caps.yaml")); err == nil {
 			return dir, nil
 		}
 		parent := filepath.Dir(dir)
@@ -829,12 +829,12 @@ func TestDefaultRegistry_70Validators(t *testing.T) {
 	// These are now handled by OMARS monitors or return SKIP
 	// 2026-08-11: Added WeztermWorkspaceIsolation (migrated from Python)
 	// 2026-08-14: Added ITKeybindings (regression guard for IT keybindings fragment)
-	// 2026-08-14: Added ITLiveKeybindings (drift detection for live IT settings.json)
+	// 2026-09-02: ITLiveKeybindings removed from the live registry; IT is historical.
 	// 2026-08-14: Added BashReadlineBindings (shift+arrow regression guard)
 	// 2026-08-14: Added IntegrityBaselineFresh (ADR-006 baseline versioning)
 	// 2026-08-14: Added PinnedBaselineDrift (ADR-006 pinned baseline firewall)
-	if len(all) != 76 {
-		t.Errorf("expected 76 validators in default registry, got %d", len(all))
+	if len(all) != 75 {
+		t.Errorf("expected 75 validators in default registry, got %d", len(all))
 	}
 	// Verify each has non-empty ID
 	for _, v := range all {
@@ -1326,6 +1326,37 @@ func TestHostConfigDrift_Clean(t *testing.T) {
 			}
 		}
 	})
+}
+
+func TestHostConfigDrift_AcceptsCanonicalSymlinkProjections(t *testing.T) {
+
+	dir := t.TempDir()
+	oldHome := os.Getenv("HOME")
+	os.Setenv("HOME", dir)
+	defer os.Setenv("HOME", oldHome)
+
+	// A normal OVAV install projects both the global config and agents through
+	// symlinks. The validator must compare their resolved, canonical contents
+	// without weakening its no-follow checks for untrusted files.
+	os.MkdirAll(filepath.Join(dir, ".git"), 0755)
+	runtimeAgents := filepath.Join(dir, "go-runtime", "internal", "runtimes", "opencode", "agents")
+	os.MkdirAll(runtimeAgents, 0755)
+	os.WriteFile(filepath.Join(runtimeAgents, "lead-thavren.md"), []byte("canonical agent"), 0644)
+	os.MkdirAll(filepath.Join(dir, ".opencode"), 0755)
+	os.Symlink("../go-runtime/internal/runtimes/opencode/agents", filepath.Join(dir, ".opencode", "agents"))
+	os.WriteFile(filepath.Join(dir, "opencode.json"), []byte(`{"agent":{"default":{}}}`), 0644)
+
+	hostConfig := filepath.Join(dir, ".config", "opencode")
+	os.MkdirAll(hostConfig, 0755)
+	os.Remove(filepath.Join(hostConfig, "opencode.json"))
+	os.Symlink(filepath.Join(dir, "opencode.json"), filepath.Join(hostConfig, "opencode.json"))
+	os.Remove(filepath.Join(hostConfig, "agents"))
+	os.Symlink(runtimeAgents, filepath.Join(hostConfig, "agents"))
+
+	result := NewHostConfigDrift().Validate(context.Background(), dir)
+	if result.Status != "pass" {
+		t.Fatalf("canonical symlink projections should pass, got %s: %v", result.Status, result.Issues)
+	}
 }
 
 func TestSurfaceDrift_NoPlan(t *testing.T) {

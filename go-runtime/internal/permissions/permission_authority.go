@@ -97,6 +97,9 @@ func CriticalDenies() map[string]string {
 		"dd *of=/dev/*":         "deny",
 		"git branch -D *":       "deny",
 		"git branch --delete *": "deny",
+		"apt install *":         "deny",
+		"npm install *":         "deny",
+		"pip install *":         "deny",
 	}
 }
 

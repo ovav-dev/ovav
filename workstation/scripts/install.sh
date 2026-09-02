@@ -8,10 +8,12 @@ set -euo pipefail
 
 OVAV_ROOT="${OVAV_ROOT:-/home/braka/Systems/ovav}"
 WORKSTATION="$OVAV_ROOT/workstation"
-INTEL_TERM_SETTINGS="/mnt/c/Users/Alexa/AppData/Local/Packages/Microsoft.IntelligentTerminal_8wekyb3d8bbwe/LocalState/settings.json"
-INTEL_TERM_STATE="/mnt/c/Users/Alexa/AppData/Local/Packages/Microsoft.IntelligentTerminal_8wekyb3d8bbwe/LocalState/state.json"
 WIN_PS_PROFILE_DIR="/mnt/c/Users/Alexa/OneDrive/Documentos/PowerShell"
 WIN_PS_PROFILE="$WIN_PS_PROFILE_DIR/Microsoft.PowerShell_profile.ps1"
+TMUX_SRC="$WORKSTATION/configs/tmux/tmux.conf"
+TMUX_DEST="$HOME/.tmux.conf"
+ALACRITTY_SRC="$WORKSTATION/configs/alacritty/keybindings.toml"
+ALACRITTY_CONFIG="${ALACRITTY_CONFIG:-/mnt/c/Users/Alexa/AppData/Roaming/alacritty/alacritty.toml}"
 
 TS="$(date +%Y%m%d-%H%M%S)"
 BACKUP_DIR="$HOME/.ovav-backups/$TS"
@@ -24,7 +26,7 @@ err()  { printf "\033[1;31m✗\033[0m %s\n" "$*" >&2; }
 
 # ─── Pre-flight ─────────────────────────────────────────────
 log "Pre-flight checks"
-for cmd in jq bash cp; do
+for cmd in bash cp; do
   command -v "$cmd" >/dev/null || { err "missing: $cmd"; exit 1; }
 done
 ok "tools available"
@@ -36,9 +38,10 @@ log "Backing up existing configs → $BACKUP_DIR"
 [ -f "$HOME/.config/starship.toml" ] && cp -p "$HOME/.config/starship.toml" "$BACKUP_DIR/starship.toml.bak" && ok "starship"
 mkdir -p "$HOME/.config/atuin"
 [ -f "$HOME/.config/atuin/config.toml" ] && cp -p "$HOME/.config/atuin/config.toml" "$BACKUP_DIR/atuin-config.toml.bak" && ok "atuin"
-[ -f "$INTEL_TERM_SETTINGS" ] && cp -p "$INTEL_TERM_SETTINGS" "$BACKUP_DIR/intel-terminal-settings.json.bak" && ok "IT settings"
-[ -f "$INTEL_TERM_STATE" ] && cp -p "$INTEL_TERM_STATE" "$BACKUP_DIR/intel-terminal-state.json.bak" && ok "IT state"
 [ -f "$WIN_PS_PROFILE" ] && cp -p "$WIN_PS_PROFILE" "$BACKUP_DIR/powershell-profile.ps1.bak" && ok "PS profile"
+[ -f "$TMUX_DEST" ] && cp -p "$TMUX_DEST" "$BACKUP_DIR/tmux.conf.bak" && ok "tmux"
+[ -f "$ALACRITTY_CONFIG" ] && cp -p "$ALACRITTY_CONFIG" "$BACKUP_DIR/alacritty.toml.bak" && ok "Alacritty"
+[ -f "$HOME/.config/opencode/tui.json" ] && cp -p "$HOME/.config/opencode/tui.json" "$BACKUP_DIR/opencode-tui.json.bak" && ok "OpenCode TUI"
 
 # ─── 2. Install bashrc additions ───────────────────────────
 log "Installing OVAV bashrc"
@@ -78,6 +81,30 @@ else
   ok "inputrc already has OVAV block"
 fi
 
+# ─── 2c. Install tmux stability config ──────────────────────
+log "Installing tmux keyboard/clipboard config"
+if [ -f "$TMUX_SRC" ]; then
+  cp -p "$TMUX_SRC" "$TMUX_DEST"
+  ok "tmux.conf installed (backup available)"
+else
+  warn "tmux source config not found: $TMUX_SRC"
+fi
+
+# ─── 2d. Install Alacritty Shift+Enter bridge ────────────────
+log "Installing Alacritty keyboard bridge"
+ALACRITTY_MARKER='OVAV Alacritty keyboard bridge'
+if [ ! -f "$ALACRITTY_CONFIG" ]; then
+  warn "Alacritty config not found at $ALACRITTY_CONFIG"
+elif ! grep -qF "$ALACRITTY_MARKER" "$ALACRITTY_CONFIG" 2>/dev/null; then
+  {
+    printf '\n'
+    cat "$ALACRITTY_SRC"
+  } >> "$ALACRITTY_CONFIG"
+  ok "Alacritty Shift+Enter bridge appended (backup available)"
+else
+  ok "Alacritty keyboard bridge already installed"
+fi
+
 # ─── 3. Install Starship ───────────────────────────────────
 log "Installing Starship config"
 cp -p "$WORKSTATION/configs/starship/starship.toml" "$HOME/.config/starship.toml"
@@ -97,40 +124,11 @@ cp -p "$WORKSTATION/configs/opencode/themes/ovav-night.json" "$HOME/.config/open
 cp -p "$WORKSTATION/configs/opencode/themes/ovav-day.json" "$HOME/.config/opencode/themes/ovav-day.json"
 ok "opencode tui.json + 2 themes"
 
-# ─── 6. Intelligent Terminal settings.json merge ──────────
-log "Merging Intelligent Terminal settings"
-if [ ! -f "$INTEL_TERM_SETTINGS" ]; then
-  warn "settings.json not found at $INTEL_TERM_SETTINGS"
-  warn "Skipping IT merge. Apply manually: $WORKSTATION/configs/intelligent-terminal/settings-fragment.json"
-else
-  # Surgical merge using jq
-  FRAG="$WORKSTATION/configs/intelligent-terminal/settings-fragment.json"
-  cp -p "$INTEL_TERM_SETTINGS" "$BACKUP_DIR/intel-terminal-settings.premerge.json"
-
-  # The merge: combine existing settings with OVAV fragment
-  # Uses jq -s (slurp) to merge two JSON objects deeply.
-  # IMPORTANT: After `.| ...` the `.` becomes the merged OBJECT, not the
-  # slurp array. So we cannot use .[0] / .[1] in subsequent expressions —
-  # use $existing / $fragment variables via `as`.
-  jq -s '
-    .[0] as $existing |
-    .[1] as $fragment |
-    $existing * $fragment
-    | .profiles.list = (($existing.profiles.list // []) + ($fragment.profiles.list // []) | unique_by(.guid))
-    | .schemes       = (($existing.schemes       // []) + ($fragment.schemes       // []) | unique_by(.name))
-    | .actions       = (($existing.actions       // []) + ($fragment.actions       // []) | unique_by(.name))
-  ' "$INTEL_TERM_SETTINGS" "$FRAG" > "$INTEL_TERM_SETTINGS.tmp"
-
-  if jq empty "$INTEL_TERM_SETTINGS.tmp" 2>/dev/null; then
-    mv "$INTEL_TERM_SETTINGS.tmp" "$INTEL_TERM_SETTINGS"
-    ok "settings.json merged (validated JSON)"
-  else
-    err "merged JSON invalid — restoring original"
-    jq . "$INTEL_TERM_SETTINGS.tmp" 2>&1 | head -20
-    mv "$BACKUP_DIR/intel-terminal-settings.json.bak" "$INTEL_TERM_SETTINGS"
-    exit 1
-  fi
-fi
+# ─── 6. Legacy terminal surfaces ────────────────────────────
+# Warp and Microsoft Intelligent Terminal are historical artifacts only.
+# The active host is Alacritty; never probe or mutate the legacy paths here.
+log "Skipping inactive Warp/Intelligent Terminal surfaces"
+ok "active host routing is Alacritty → WSL2 → tmux → OpenCode"
 
 # ─── 7. PowerShell profile ────────────────────────────────
 log "Installing PowerShell profile"
@@ -160,6 +158,7 @@ log "Verification"
 [ -f "$HOME/.config/opencode/themes/ovav-night.json" ] && ok "ovav-night theme installed"
 [ -f "$HOME/.config/opencode/themes/ovav-day.json" ] && ok "ovav-day theme installed"
 [ -f "$HOME/.inputrc" ] && ok "inputrc installed"
+[ -f "$ALACRITTY_CONFIG" ] && ok "Alacritty config present"
 
 if [ -x "$HOME/.local/bin/ovav" ]; then
   ok "OVAV CLI present"
@@ -183,7 +182,7 @@ cat <<EOF
   Workspace:   $WORKSTATION
 
   Next steps:
-    1. Restart Intelligent Terminal (or close+reopen)
+    1. Restart Alacritty only if live reload does not apply the keyboard change
     2. Source ~/.bashrc in current shell:   source ~/.bashrc
     3. Verify: ovav status
     4. Run E2E test: bash $WORKSTATION/tests/test-e2e.sh

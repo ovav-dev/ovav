@@ -1,10 +1,10 @@
 # OVAV Project Memory
 
 > **Canonical in-repo memory for OVAV project**
-> **Last updated:** 2026-08-19
+> **Last updated:** 2026-09-02
 > **Authority:** `.ovav/plan/caps.yaml` + Git HEAD + this file
-> **Harness:** OpenCode (active). Warp 2026 (terminal).
-> **Model:** `minimax-coding-plan/MiniMax-M3`
+> **Harness:** OpenCode (active) over tmux 3.6 on Alacritty 0.17.0 / WSL2.
+> **Model:** `gpt-5.6-luna`
 
 ---
 
@@ -17,7 +17,7 @@
 | Stack | Go runtime (`cmd/ovav/`, `cmd/cockpit/`) + Python tools + React/TS cpanel |
 | Owner | Alexander Salvador (CEO, `Alexander-Salvador`, user 97975177) |
 | Harness | OpenCode primary + Crush secondary |
-| Model | `minimax-coding-plan/MiniMax-M3` |
+| Model | `gpt-5.6-luna` |
 
 ---
 
@@ -53,12 +53,11 @@ Full detail: `clients/crush/agents/lead-thavren.md` (v2.5.0)
 |---|---|
 | Branch | `develop` |
 | HEAD | `30535a0` (Merge feature/feat-p18-p19-impl) |
-| Worktrees | `/home/braka/Systems/ovav` only (clean) |
-| Phase | Warp 2026 master plan — UI config phase (PASO 4 pending) |
-| P11 suite | 24 PASS / 0 FAIL / 7 DEFERRED / 31 total |
-| Warp settings.toml | Restored from `settings.toml.pre-p5v2-20260819-000213` |
-| MiniMax endpoint | ✅ Configured (PASO 2 done) |
-| Terminal mode | ✅ Configured (PASO 3 done) |
+| Worktrees | `/home/braka/Systems/ovav` only (working tree modified) |
+| Phase | OpenCode + terminal runtime convergence |
+| Active host | Alacritty 0.17.0 → WSL2 Ubuntu-26.04 → tmux 3.6 |
+| WSL profile | `3GB` memory / `8GB` swap; natural-stop activation only |
+| Historical Warp/Intelligent Terminal data | Archived context; neither is installed or active |
 
 ---
 
@@ -103,7 +102,10 @@ Full detail: `clients/crush/agents/lead-thavren.md` (v2.5.0)
 | Skills (source) | `.ovav/source/skills/` |
 | Skills (synced) | `.opencode/skills/` |
 | Vault | `~/.config/ovav/vault.key` (AES-256-GCM) |
-| Warp settings | `%LOCALAPPDATA%\warp\Warp\config\settings.toml` |
+| Alacritty settings (active) | `/mnt/c/Users/Alexa/AppData/Roaming/alacritty/alacritty.toml` |
+| tmux settings (active) | `workstation/configs/tmux/tmux.conf` → `~/.tmux.conf` |
+| OpenCode TUI settings (active) | `workstation/configs/opencode/tui.json` → `~/.config/opencode/tui.json` |
+| Warp / Windows Terminal configs | Historical only; do not target runtime changes |
 
 ---
 
@@ -111,8 +113,8 @@ Full detail: `clients/crush/agents/lead-thavren.md` (v2.5.0)
 
 | Blocker | Status | Owner |
 |---|---|---|
-| PASO 4 — Default profile YOLO + Tab Configs import | Awaiting CEO | CEO (manual UI) |
-| P10 — Secret redaction mode = asterisks | Awaiting CEO | CEO (manual UI) |
+| OpenCode restart + visual smoke for Shift+Enter/copy/session bindings | Pending | System/CEO visual confirmation |
+| Alacritty live reload confirmation | Pending | System/CEO visual confirmation |
 | GitHub push (SSH signing keys uploaded, awaiting async verification) | Async, wait 5-10 min | System |
 | Runtime snapshot fix for `/home/braka/Labs/mimocode/*` | Pending session restart | System |
 
