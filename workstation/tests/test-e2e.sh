@@ -12,6 +12,7 @@ FAIL=0
 pass() { printf "\033[1;32m✓\033[0m %s\n" "$*"; PASS=$((PASS+1)); }
 fail() { printf "\033[1;31m✗\033[0m %s\n" "$*" >&2; FAIL=$((FAIL+1)); }
 info() { printf "\033[1;36m▸\033[0m %s\n" "$*"; }
+warn() { printf "\033[1;33m⚠\033[0m %s\n" "$*"; }
 
 echo "═══════════════════════════════════════════════════════════"
 echo "  OVAV END-TO-END TEST (Rule #36)"
@@ -45,12 +46,12 @@ else
   pass "failing command exit != 0 (detection possible)"
 fi
 
-# 5. OSC133 — shell integration
-info "5. OSC133 shell integration"
-if [ -f "$HOME/.intelligent-terminal/shell-integration_v3.sh" ]; then
-  pass "shell-integration_v3.sh present"
+# 5. Active terminal stack
+info "5. Active terminal stack"
+if [ -n "${TMUX:-}" ] && tmux -V >/dev/null 2>&1; then
+  pass "tmux active ($(tmux -V))"
 else
-  fail "shell integration missing"
+  fail "tmux is not active"
 fi
 
 # 6. Atuin history DB
@@ -60,6 +61,42 @@ if command -v atuin >/dev/null 2>&1; then
   pass "atuin available (history commands: $ATUIN_HIST_COUNT)"
 else
   fail "atuin not installed"
+fi
+
+# 6b. tmux workspace routes
+info "6b. tmux workspace routes"
+if [ -n "${TMUX:-}" ]; then
+  for route in \
+    "home|/home/braka" \
+    "ovav|/home/braka/Systems/ovav" \
+    "akrynt|/home/braka/Systems/projects/work/akrynt-agent"; do
+    route_name="${route%%|*}"
+    route_path="${route#*|}"
+    if tmux select-window -t "main:=${route_name}" 2>/dev/null && \
+       [ "$(tmux display-message -p '#{window_name}|#{pane_current_path}')" = "$route" ]; then
+      pass "Alt route $route_name → $route_path"
+    else
+      fail "tmux route mismatch: $route"
+    fi
+  done
+  tmux select-window -t 'main:=ovav' 2>/dev/null || true
+  for binding in \
+    'M-1.*select-window -t =home' \
+    'M-2.*select-window -t =ovav' \
+    'M-3.*select-window -t =akrynt'; do
+    if tmux list-keys -T root | grep -Eq "$binding"; then
+      pass "binding present: ${binding%%.*}"
+    else
+      fail "binding missing: $binding"
+    fi
+  done
+  if bash "$OVAV_ROOT/workstation/tests/test-tmux-routes.sh" >/dev/null; then
+    pass "raw Alt bytes route through tmux correctly"
+  else
+    fail "raw Alt bytes do not route through tmux correctly"
+  fi
+else
+  fail "cannot test tmux routes outside tmux"
 fi
 
 # 7. fzf
@@ -115,22 +152,13 @@ info "12. OpenCode OVAV themes"
 [ -f "$HOME/.config/opencode/themes/ovav-night.json" ] && pass "ovav-night theme" || fail "ovav-night missing"
 [ -f "$HOME/.config/opencode/themes/ovav-day.json" ] && pass "ovav-day theme" || fail "ovav-day missing"
 
-# 13. Intelligent Terminal settings
-info "13. Intelligent Terminal settings"
-IT_SETTINGS="/mnt/c/Users/Alexa/AppData/Local/Packages/Microsoft.IntelligentTerminal_8wekyb3d8bbwe/LocalState/settings.json"
-if [ -f "$IT_SETTINGS" ]; then
-  if grep -q "OVAV Night" "$IT_SETTINGS" 2>/dev/null; then
-    pass "OVAV Night colorScheme present"
-  else
-    fail "OVAV Night colorScheme missing — run install.sh"
-  fi
-  if grep -q "OVAV Workspace" "$IT_SETTINGS" 2>/dev/null; then
-    pass "OVAV Workspace action present"
-  else
-    fail "OVAV Workspace action missing — run install.sh"
-  fi
+# 13. Alacritty host bridge
+info "13. Alacritty host bridge"
+ALACRITTY_CONFIG="${ALACRITTY_CONFIG:-/mnt/c/Users/Alexa/AppData/Roaming/alacritty/alacritty.toml}"
+if [ -f "$ALACRITTY_CONFIG" ] && grep -qF 'chars = "\u001b[13;2u"' "$ALACRITTY_CONFIG" 2>/dev/null; then
+  pass "Alacritty Shift+Enter CSI-u bridge present"
 else
-  fail "Intelligent Terminal settings.json not accessible"
+  fail "Alacritty Shift+Enter bridge missing — run install.sh"
 fi
 
 # 14. PowerShell profile

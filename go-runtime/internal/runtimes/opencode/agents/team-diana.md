@@ -8,6 +8,7 @@ permission:
   edit: "allow"
   bash:
     "*": "deny"
+    apt install *: "deny"
     dd *of=/dev/*: "deny"
     find *: "allow"
     git add *: "allow"
@@ -23,8 +24,10 @@ permission:
     go vet*: "allow"
     "grep -rn*": "allow"
     mkfs*: "deny"
+    npm install *: "deny"
     ovav defend*: "allow"
     ovav doctor*: "allow"
+    pip install *: "deny"
     python3 tools/ovav_runtime.py*: "allow"
     "rm -rf /*": "deny"
     sudo *: "deny"

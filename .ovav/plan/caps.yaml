@@ -4,8 +4,8 @@
 # Authority: Thavren (Platform Engineering Lead)
 # =============================================================================
 #
-# VERSIÓN ACTUAL: v103.0
-# FECHA: 2026-08-13
+# VERSIÓN ACTUAL: v104.0
+# FECHA: 2026-09-02
 # CAPA: 11
 # AUTORIDAD TEMPORAL: git HEAD (resuelta en runtime; no se fija un hash aquí)
 # RAMA: resuelta desde git en runtime
@@ -15,17 +15,38 @@
 # =============================================================================
 
 canonical: true
-version: "103.0"
-plan_version: "103.0"
+version: "104.0"
+plan_version: "104.0"
 capa: 11
-updated_at: "2026-08-14T13:50:00-05:00"
+updated_at: "2026-09-02T13:19:56-05:00"
 updated_by: "thavren"
-build_date: "2026-08-14"
+build_date: "2026-09-02"
 git_head: "git HEAD is the canonical temporal authority; resolve dynamically"
 git_branch: "resolve dynamically from git"
 status: "production_ready"
 next_phase: "Q1 2027 — Phase 5 commercial launch (GA promotion, community engagement, roadmap execution). See docs/architecture/ADR-005-anti-drift-2026.md for completed 2026 plan."
-layer_status: "canonical_truth_repair_pending_integrity_baseline"
+layer_status: "terminal_runtime_alignment_pending_integrity_baseline"
+
+# ── Active runtime projection (2026-09-02) ─────────────────────────────────
+active_runtime:
+  host_terminal:
+    product: "Alacritty"
+    version: "0.17.0"
+    config: "/mnt/c/Users/Alexa/AppData/Roaming/alacritty/alacritty.toml"
+  guest_runtime:
+    product: "WSL2 Ubuntu-26.04"
+    kernel: "6.18.33.2-microsoft-standard-WSL2"
+  multiplexer:
+    product: "tmux"
+    version: "3.6"
+    session: "main"
+  agent_runtime:
+    product: "OpenCode"
+    version: "1.18.26"
+  inactive_terminal_targets:
+    - "Warp"
+    - "Windows Terminal"
+    - "Microsoft Intelligent Terminal"
 
 # ── 2026 Roadmap (ADR-005) ────────────────────────────────────────────────
 roadmap_2026:
@@ -327,9 +348,9 @@ governance:
       status: "pass"
 
   validators:
-    total: 76
-    registered: 76
-    cli_visible: 76
+    total: 75
+    registered: 75
+    cli_visible: 75
     passed: 70
     warned: 6
     failed: 0

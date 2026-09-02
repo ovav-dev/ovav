@@ -1,10 +1,11 @@
-# OVAV Intelligent Terminal Workstation 2026
+# OVAV Alacritty Workstation 2026
 
-> Cohesive workstation terminal where Tabs, Panes, Bash, OVAV, OpenCode, ACP,
+> Cohesive workstation terminal where Windows, panes, Fish, OVAV, OpenCode, ACP,
 > history, and context form a single operational flow.
 
-**Mission:** convert Intelligent Terminal into the primary development workstation
-for OVAV, leveraging 2026 capabilities without overengineering.
+**Mission:** govern the active Alacritty → WSL2 → tmux → OpenCode workstation
+for OVAV. Warp, Windows Terminal, and Intelligent Terminal are historical artifacts,
+not active deployment targets.
 
 ---
 
@@ -25,9 +26,9 @@ The installer:
 3. Installs `~/.config/starship.toml` with OVAV Night/Day palettes
 4. Installs `~/.config/atuin/config.toml`
 5. Installs `~/.config/opencode/tui.json` + 2 OVAV themes
-6. Surgically merges OVAV profiles/schemes/actions into
-   Intelligent Terminal's `settings.json`
-7. Installs PowerShell profile with PSReadLine Predictive IntelliSense
+6. Installs the Alacritty Shift+Enter CSI-u bridge
+7. Skips inactive Warp/Windows Terminal/Intelligent Terminal surfaces
+8. Installs PowerShell profile with PSReadLine Predictive IntelliSense
 
 ---
 
@@ -36,11 +37,13 @@ The installer:
 ```
 USER
  ↓
-Intelligent Terminal 0.2.2192  (UI host — Agent Pane + ACP)
+ Alacritty 0.17.0  (Windows host terminal)
  ↓
 WSL2 Ubuntu 26.04  (Linux runtime)
  ↓
-Bash 5.x  (shell — no replacement, no Fish/Zsh)
+ tmux 3.6  (multiplexer — session main)
+ ↓
+ Fish 4.2.1  (shell)
  ↓
 OVAV runtime  (Go CLI — governor layer)
  ↓
@@ -67,7 +70,8 @@ Full architecture details: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 | OpenCode TUI | theme=system, ACP backend, FAST/DEEP models | `configs/opencode/tui.json` |
 | OVAV Night theme | Dark ANSI palette for OpenCode | `configs/opencode/themes/ovav-night.json` |
 | OVAV Day theme | Light ANSI palette for OpenCode | `configs/opencode/themes/ovav-day.json` |
-| Intelligent Terminal | Profiles, color schemes, actions, keybinds | `configs/intelligent-terminal/settings-fragment.json` |
+| Alacritty | Shift+Enter bridge, font, clipboard | `configs/alacritty/keybindings.toml` |
+| tmux | Extended keys, clipboard, mouse policy | `configs/tmux/tmux.conf` |
 | PowerShell | PSReadLine Predictive IntelliSense | `configs/powershell/Microsoft.PowerShell_profile.ps1` |
 
 ---
@@ -84,7 +88,7 @@ Full architecture details: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 | Inline completion | **Atuin+fzf+bash-completion** | inshellisense duplica y es frágil. |
 | PowerShell line editor | **PSReadLine** | Built-in pwsh 7+. Predictive IntelliSense maduro. |
 | AI agent | **OpenCode** | 197k★, ACP production-ready, theme=system. |
-| Terminal host | **Intelligent Terminal** | Agent Pane + ACP first-class (experimental pero usable). |
+| Terminal host | **Alacritty** | Confirmed live process: `C:\Program Files\Alacritty\alacritty.exe`. |
 
 Full decisions with evidence: [`docs/DECISIONS.md`](docs/DECISIONS.md).
 
@@ -97,8 +101,9 @@ Full decisions with evidence: [`docs/DECISIONS.md`](docs/DECISIONS.md).
 - ❌ **inshellisense** — Duplica Atuin+fzf, restricción "último en .bashrc" es frágil.
 - ❌ **Atuin pty-proxy** — Lanzado en v18.19.0 (2026-08-03), <30 días. Riesgoso.
 - ❌ **Atuin AI** — "Free during testing" = cambiar a paid sin aviso.
-- ❌ **Fish / Zsh / Warp / WezTerm / Ghostty / Zellij / tmux** — reemplazan stack;
-  el CEO explícitamente los excluyó.
+- ❌ **Warp / Windows Terminal / Intelligent Terminal** — no están instalados en el
+  entorno actual; sus archivos permanecen como histórico no operativo.
+- ❌ **WezTerm / Ghostty / Zellij** — no están instalados ni son targets activos.
 
 ---
 
@@ -106,21 +111,27 @@ Full decisions with evidence: [`docs/DECISIONS.md`](docs/DECISIONS.md).
 
 See [`docs/CHEATSHEET.md`](docs/CHEATSHEET.md) for the full cheatsheet.
 
+### Active tmux workspace routes
+
+| Shortcut | Workspace | Path |
+|---|---|---|
+| `Alt+1` | HOME | `/home/braka` |
+| `Alt+2` | OVAV | `/home/braka/Systems/ovav` |
+| `Alt+3` | AKRYNT | `/home/braka/Systems/projects/work/akrynt-agent` |
+
+Routes target stable tmux window names, not mutable window numbers.
+
 ---
 
 ## Remaining Limitations
 
-1. **Intelligent Terminal v0.2** = experimental, 1.7k★. Windows Terminal v1.24 es
-   más estable pero no tiene Agent Pane + ACP nativos. Workaround: Intelligent Terminal
-   para flujos AI, Windows Terminal como fallback.
+1. **OpenCode TUI requiere reinicio** tras cambiar `~/.config/opencode/tui.json`.
 2. **Atuin pty-proxy NO activado** — desactivado por madurez <30d. Esperar v18.21+.
 3. **Atuin sync NO activado** — espera credenciales Atuin Cloud en vault OVAV.
-4. **OpenCode es single-binary** — ACP backend funciona pero si OpenCode cambia la
+4. **OpenCode es single-binary** — si OpenCode cambia la
    API en el futuro, requerir reaplicar tui.json.
-5. **Intelligent Terminal package path assume usuario "Alexa"** — si cambia el
-   username Windows, ajustar `INTEL_TERM_SETTINGS` en `scripts/install.sh`.
-6. **Fonts** — Cascadia Mono NF requiere descarga manual desde
-   [microsoft/cascadia-code](https://github.com/microsoft/cascadia-code/releases).
+5. **Alacritty config path** — actualmente `%APPDATA%\alacritty\alacritty.toml`
+   para el usuario Windows `Alexa`.
 
 ---
 
@@ -137,8 +148,10 @@ workstation/
 │   │   └── themes/
 │   │       ├── ovav-night.json          # Dark ANSI palette
 │   │       └── ovav-day.json            # Light ANSI palette
-│   ├── intelligent-terminal/
-│   │   └── settings-fragment.json       # Surgical merge fragment
+│   ├── alacritty/
+│   │   └── keybindings.toml             # Active host bridge
+│   ├── tmux/
+│   │   └── tmux.conf                    # Active multiplexer config
 │   └── powershell/
 │       └── Microsoft.PowerShell_profile.ps1
 ├── scripts/

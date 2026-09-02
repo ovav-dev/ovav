@@ -31,7 +31,7 @@ func findRepoRoot() string {
 func findRepoRootFrom(startDir string) string {
 	dir := startDir
 	for range 10 {
-		if _, err := os.Stat(filepath.Join(dir, ".ovav")); err == nil {
+		if _, err := os.Stat(filepath.Join(dir, ".ovav", "plan", "caps.yaml")); err == nil {
 			if _, err := os.Stat(filepath.Join(dir, "go-runtime", "go.mod")); err == nil {
 				return dir
 			}
@@ -191,7 +191,7 @@ func main() {
 
 // isOVAVRepo verifies a directory is a valid OVAV repository root.
 func isOVAVRepo(dir string) bool {
-	_, err1 := os.Stat(filepath.Join(dir, ".ovav"))
+	_, err1 := os.Stat(filepath.Join(dir, ".ovav", "plan", "caps.yaml"))
 	_, err2 := os.Stat(filepath.Join(dir, "go-runtime", "go.mod"))
 	return err1 == nil && err2 == nil
 }

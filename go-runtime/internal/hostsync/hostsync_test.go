@@ -19,7 +19,7 @@ const v9fsModeDegradation = "destination mode enforcement unsupported on v9fs"
 
 const (
 	validOpenCode = "{\n  \"$schema\": \"https://opencode.ai/config.json\"\n}\n"
-	validWSL      = "# Activation requires a natural full WSL stop before reopening.\n# OVAV MUST NOT automatically run wsl --shutdown or wsl --terminate.\n[wsl2]\nmemory=4GB\nprocessors=4\nswap=4GB\nnetworkingMode=mirrored\ndnsTunneling=true\nautoProxy=true\nfirewall=true\n\n[experimental]\nautoMemoryReclaim=dropCache\n"
+	validWSL      = "# Activation requires a natural full WSL stop before reopening.\n# OVAV MUST NOT automatically run wsl --shutdown or wsl --terminate.\n[wsl2]\nmemory=3GB\nprocessors=4\nswap=8GB\nnetworkingMode=mirrored\ndnsTunneling=true\nautoProxy=true\nfirewall=true\n\n[experimental]\nautoMemoryReclaim=dropCache\n"
 	validWarp     = "name = \"OVAV WSL\"\ntitle = \"OVAV WSL\"\ncolor = \"blue\"\n\n[[panes]]\nid = \"main\"\ntype = \"terminal\"\ndirectory = \"~\"\nis_focused = true\n"
 )
 
@@ -117,7 +117,7 @@ func TestRunRejectsUnknownTraversalAndInvalidSource(t *testing.T) {
 		})
 	}
 
-	if err := os.WriteFile(fixture.source, []byte(strings.Replace(validWSL, "memory=4GB", "memory=8GB", 1)), 0o600); err != nil {
+	if err := os.WriteFile(fixture.source, []byte(strings.Replace(validWSL, "memory=3GB", "memory=8GB", 1)), 0o600); err != nil {
 		t.Fatal(err)
 	}
 	if _, err := Run(Request{RepoRoot: fixture.repo, Home: fixture.home, WindowsHome: fixture.windowsHome, Profile: fixture.profile}); err == nil {
@@ -134,7 +134,7 @@ func TestProfileContentValidationRejectsWidening(t *testing.T) {
 		{name: "OpenCode agent", validate: validateOpenCodeBootstrap, content: `{"$schema":"https://opencode.ai/config.json","agent":{}}`},
 		{name: "OpenCode provider", validate: validateOpenCodeBootstrap, content: `{"$schema":"https://opencode.ai/config.json","provider":{}}`},
 		{name: "OpenCode permission", validate: validateOpenCodeBootstrap, content: `{"$schema":"https://opencode.ai/config.json","permission":"allow"}`},
-		{name: "WSL memory", validate: validateWSLResourcePolicy, content: strings.Replace(validWSL, "memory=4GB", "memory=8GB", 1)},
+		{name: "WSL memory", validate: validateWSLResourcePolicy, content: strings.Replace(validWSL, "memory=3GB", "memory=8GB", 1)},
 		{name: "Warp shell", validate: validateWarpWSLTab, content: validWarp + "shell = \"bash\"\n"},
 		{name: "Warp commands", validate: validateWarpWSLTab, content: validWarp + "commands = []\n"},
 	}

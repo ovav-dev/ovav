@@ -45,7 +45,7 @@ func validateWSLResourcePolicy(content []byte) error {
 	}
 	want := map[string]map[string]string{
 		"wsl2": {
-			"memory": "4GB", "processors": "4", "swap": "4GB", "networkingMode": "mirrored",
+			"memory": "3GB", "processors": "4", "swap": "8GB", "networkingMode": "mirrored",
 			"dnsTunneling": "true", "autoProxy": "true", "firewall": "true",
 		},
 		"experimental": {"autoMemoryReclaim": "dropCache"},

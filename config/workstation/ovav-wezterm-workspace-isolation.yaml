@@ -33,8 +33,8 @@ recommended_mode:
   governed_payload: config/wezterm/wezterm.lua
   windows_loader: .ovav/source/configs/wezterm/ovav-windows-loader.wezterm.lua
   fallback_config: config/wezterm/wezterm-fallback-minimal.lua
-  helper_tool: tools/workstation/ovav_wezterm_workspace.py
-  validator: tools/validators/check_ovav_wezterm_workspace_isolation.py
+  helper_tool: go-runtime/internal/validators/workspace_isolation.go
+  validator: go-runtime/internal/validators/workspace_isolation.go
   path_integrity_validator: tools/validators/check_wezterm_path_integrity.py
   tool_config_registry: .ovav/registry/tool_configs.yaml
   ovav_tailor_surface: ovav tools wezterm plan
@@ -58,9 +58,9 @@ must_validate:
   - wezterm_template_uses_default_workspace
   - wezterm_template_reads_ovav_workspace_env
   - wezterm_template_marks_tab_title_with_branch
-  - helper_computes_repo_branch_hash_workspace
-  - helper_does_not_execute_wezterm
-  - helper_blocks_current_pane_mismatch
+  - go_validator_checks_repo_branch_workspace_boundary
+  - go_validator_does_not_execute_wezterm
+  - go_validator_blocks_global_apply
   - apply_remains_blocked
   - no_global_wezterm_writes
   - no_windows_user_config_writes

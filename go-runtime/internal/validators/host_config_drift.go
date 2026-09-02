@@ -105,20 +105,52 @@ func (h *HostConfigDrift) checkHostIntrusion(root string) []string {
 }
 
 func (h *HostConfigDrift) isCanonicalConfigProjection(root, hostPath, configName string) bool {
-	hostData, err := readRegularFileNoFollow(hostPath)
+	hostData, err := readCanonicalProjection(root, hostPath)
 	if err != nil {
 		return false
 	}
-	canonicalData, err := readRegularFileNoFollow(filepath.Join(root, configName))
+	canonicalData, err := readCanonicalProjection(root, filepath.Join(root, configName))
 	if err != nil {
 		return false
 	}
 	return bytes.Equal(hostData, canonicalData)
 }
 
+// readCanonicalProjection permits a host projection only when its resolved
+// target remains inside the repository root. The final read still uses
+// O_NOFOLLOW, so an untrusted symlink cannot be treated as canonical content.
+func readCanonicalProjection(root, path string) ([]byte, error) {
+	rootAbs, err := filepath.Abs(root)
+	if err != nil {
+		return nil, err
+	}
+	pathAbs, err := filepath.Abs(path)
+	if err != nil {
+		return nil, err
+	}
+	resolved, err := filepath.EvalSymlinks(pathAbs)
+	if err != nil {
+		return nil, err
+	}
+	resolved, err = filepath.Abs(resolved)
+	if err != nil {
+		return nil, err
+	}
+	rel, err := filepath.Rel(rootAbs, resolved)
+	if err != nil || rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) || filepath.IsAbs(rel) {
+		// A regular host file may be an exact copy rather than a symlink
+		// projection; it is accepted only through byte-for-byte comparison.
+		if resolved == pathAbs {
+			return readRegularFileNoFollow(pathAbs)
+		}
+		return nil, fmt.Errorf("projection target escapes repository root")
+	}
+	return readRegularFileNoFollow(resolved)
+}
+
 func (h *HostConfigDrift) isCanonicalAgentProjection(root, hostPath string) bool {
 	canonicalPath := filepath.Join(root, ".opencode", "agents", filepath.Base(hostPath))
-	canonicalData, err := readRegularFileNoFollow(canonicalPath)
+	canonicalData, err := readCanonicalProjection(root, canonicalPath)
 	if err != nil {
 		return false
 	}

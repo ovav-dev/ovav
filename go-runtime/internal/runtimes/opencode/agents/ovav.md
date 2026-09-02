@@ -11,6 +11,7 @@ permission:
   edit: allow
   bash:
     "*": allow
+    "apt install *": deny
     "dd *of=/dev/*": deny
     "gh auth status*": allow
     "gh issue list*": allow
@@ -35,11 +36,13 @@ permission:
     "go run -C go-runtime ./cmd/ovav validate*": allow
     "go run -C go-runtime ./internal/validators/cmd/validate*": allow
     "mkfs*": deny
+    "npm install *": deny
     "npm run build*": allow
     "npm run lint*": allow
     "npm run test*": allow
     "npm run typecheck*": allow
     "npm test*": allow
+    "pip install *": deny
     "pytest*": allow
     "python3 -m pytest*": allow
     "rm -rf /*": deny

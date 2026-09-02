@@ -8,6 +8,7 @@ permission:
   edit: "deny"
   bash:
     "*": "deny"
+    apt install *: "deny"
     dd *of=/dev/*: "deny"
     find *: "allow"
     "git branch --delete *": "deny"
@@ -22,6 +23,8 @@ permission:
     go vet*: "allow"
     "grep -rn*": "allow"
     mkfs*: "deny"
+    npm install *: "deny"
+    pip install *: "deny"
     "rm -rf /*": "deny"
     sudo *: "deny"
   external_directory:

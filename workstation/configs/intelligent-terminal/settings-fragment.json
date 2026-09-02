@@ -1,5 +1,5 @@
 {
-  "_comment": "OVAV IT v0.8 fragment \u2014 THEME-OPACITY FIX + keybindings + copy. Background: OVAV IT v0.8 sets backgroundImage=null, opacity=1, useAcrylic=false on every profile. Resolves the 'tablas transparentes' regression the CEO reported 2026-08-17. Copy/paste: ctrl+c=Copy, ctrl+v=Paste, ctrl+x=removed (IT has no Cut action), ctrl+insert=Copy, shift+insert=Paste. copyOnSelect=true + autoReloadSettings=true. Bash keeps ctrl+r (Atuin) and ctrl+t (fzf) at readline level.",
+  "_comment": "HISTORICAL / INACTIVE: OVAV IT v0.8 fragment. The current host is Alacritty 0.17.0; this file is retained only for historical compatibility and is not a live deployment target.",
   "$schema": "https://aka.ms/terminal-profiles-schema",
   "defaultProfile": "{e3cb3da9-9980-5990-a951-339efdad913d}",
   "theme": "OVAV Day",
