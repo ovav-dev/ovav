@@ -751,7 +751,13 @@ func Merge(repoRoot string) (*MergeResult, error) {
 	for _, target := range mergeTargets {
 		fmt.Printf("  Fetching origin/%s...\n", target)
 		if err := runGit(gitRoot, "fetch", "origin", target); err != nil {
-			return result, fmt.Errorf("fetch %s: %w", target, err)
+			// Local integration remains safe when the remote is unavailable as
+			// long as the base's remote-tracking ref already exists. This keeps
+			// OWS usable offline without silently inventing a new base.
+			if refErr := runGit(gitRoot, "show-ref", "--verify", "--quiet", "refs/remotes/origin/"+target); refErr != nil {
+				return result, fmt.Errorf("fetch %s: %w", target, err)
+			}
+			fmt.Printf("  ⚠️  Remote unavailable; using existing origin/%s ref for local integration.\n", target)
 		}
 	}
 
