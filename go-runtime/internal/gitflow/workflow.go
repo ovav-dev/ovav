@@ -943,8 +943,8 @@ func mergeLocalTarget(repoRoot, sourceBranch, target string) error {
 
 	// Pull latest
 	fmt.Printf("  Pulling latest %s...\n", target)
-	if err := runGit(repoRoot, "pull", "origin", target); err != nil {
-		return fmt.Errorf("pull %s: %w", target, err)
+	if err := pullTargetOrUseCachedRef(repoRoot, target); err != nil {
+		return err
 	}
 
 	// Merge the source branch (--no-ff ensures merge commit for traceability)
@@ -962,6 +962,36 @@ func mergeLocalTarget(repoRoot, sourceBranch, target string) error {
 
 	fmt.Printf("  ✅ Merged %s → %s (local)\n", sourceBranch, target)
 	return nil
+}
+
+// pullTargetOrUseCachedRef refreshes a merge target when the remote is
+// reachable. If the remote is unavailable, an existing origin/<target> ref is
+// an explicit local snapshot and is safe to use for local integration. Other
+// pull failures still abort instead of being treated as connectivity issues.
+func pullTargetOrUseCachedRef(repoRoot, target string) error {
+	cmd := exec.Command("git", "pull", "origin", target)
+	cmd.Dir = repoRoot
+	out, err := cmd.CombinedOutput()
+	if err == nil {
+		fmt.Print(string(out))
+		return nil
+	}
+
+	message := strings.ToLower(string(out))
+	remoteUnavailable := strings.Contains(message, "repository not found") ||
+		strings.Contains(message, "could not resolve host") ||
+		strings.Contains(message, "unable to access") ||
+		strings.Contains(message, "failed to connect") ||
+		strings.Contains(message, "network is unreachable") ||
+		strings.Contains(message, "connection timed out")
+	if remoteUnavailable {
+		if refErr := runGit(repoRoot, "show-ref", "--verify", "--quiet", "refs/remotes/origin/"+target); refErr == nil {
+			fmt.Printf("  ⚠️  Remote unavailable; using existing origin/%s ref for local integration.\n", target)
+			return nil
+		}
+	}
+
+	return fmt.Errorf("pull %s: %w: %s", target, err, strings.TrimSpace(string(out)))
 }
 
 // pushTarget pushes the target branch to origin with retry on timeout.
