@@ -964,12 +964,14 @@ func mergeLocalTarget(repoRoot, sourceBranch, target string) error {
 	return nil
 }
 
-// pullTargetOrUseCachedRef refreshes a merge target when the remote is
-// reachable. If the remote is unavailable, an existing origin/<target> ref is
-// an explicit local snapshot and is safe to use for local integration. Other
-// pull failures still abort instead of being treated as connectivity issues.
+// pullTargetOrUseCachedRef synchronizes a merge target without honoring the
+// repository's pull.rebase setting. The target was already fetched by Merge;
+// an explicit fast-forward merge safely handles local-ahead targets and avoids
+// unexpectedly rebasing protected branches. If the remote is unavailable, an
+// existing origin/<target> ref is an explicit local snapshot and is safe to
+// use for local integration.
 func pullTargetOrUseCachedRef(repoRoot, target string) error {
-	cmd := exec.Command("git", "pull", "origin", target)
+	cmd := exec.Command("git", "merge", "--ff-only", "origin/"+target)
 	cmd.Dir = repoRoot
 	out, err := cmd.CombinedOutput()
 	if err == nil {
@@ -978,20 +980,23 @@ func pullTargetOrUseCachedRef(repoRoot, target string) error {
 	}
 
 	message := strings.ToLower(string(out))
-	remoteUnavailable := strings.Contains(message, "repository not found") ||
-		strings.Contains(message, "could not resolve host") ||
-		strings.Contains(message, "unable to access") ||
-		strings.Contains(message, "failed to connect") ||
-		strings.Contains(message, "network is unreachable") ||
-		strings.Contains(message, "connection timed out")
-	if remoteUnavailable {
+	if isRemoteUnavailable(message) {
 		if refErr := runGit(repoRoot, "show-ref", "--verify", "--quiet", "refs/remotes/origin/"+target); refErr == nil {
 			fmt.Printf("  ⚠️  Remote unavailable; using existing origin/%s ref for local integration.\n", target)
 			return nil
 		}
 	}
 
-	return fmt.Errorf("pull %s: %w: %s", target, err, strings.TrimSpace(string(out)))
+	return fmt.Errorf("update %s: %w: %s", target, err, strings.TrimSpace(string(out)))
+}
+
+func isRemoteUnavailable(message string) bool {
+	return strings.Contains(message, "repository not found") ||
+		strings.Contains(message, "could not resolve host") ||
+		strings.Contains(message, "unable to access") ||
+		strings.Contains(message, "failed to connect") ||
+		strings.Contains(message, "network is unreachable") ||
+		strings.Contains(message, "connection timed out")
 }
 
 // pushTarget pushes the target branch to origin with retry on timeout.
