@@ -4,7 +4,7 @@
   "project": "OVAV",
   "hash_algorithm": "sha256",
   "metadata": {
-    "git_identity": "f597d590be99353db4dc90297d07ab1cd6373928fdc0b55909abfc3ac1cccc65"
+    "git_identity": "c20621c3243622dd372fe6681d524d53f5c795be128f20814fb41e3569068d9c"
   },
   "policy": {
     "version": "tracked-content-v1",
@@ -1188,10 +1188,6 @@
     "apps/docs/src/content/docs/reference/security.md": "742aa3717ee4d619d67cf62f3cae63fc3efdfe4ce5f589ea4b64890d528582c3",
     "apps/docs/src/ovav.css": "7bf35246de2de7e30a67b843f7def6cbaaec1d6af5b50b4607815bfc9c074bd9",
     "apps/docs/wrangler.toml": "3fadc1bb1d30757e47d34272112c1afcd63316220877dad687f095e50e14749f",
-    "bin/auth/ovav-auth-install": "8a391f26a7514d89c5fb4cc222bd431982b243c66516394089e4872dbbfe39d2",
-    "bin/auth/ovav-local": "6af7b0fd69e0dfe1335daf5943724f928e8c578e6c2c33368f0087cb3cce14b7",
-    "bin/auth/ovav-stale-lock-purge": "f60560d14cdb5b3650d04cd25d158134ca083a5e64f00bb5406725e04cc2a0ab",
-    "bin/auth/ovav-web": "c24d2ae3f37c8255d32b765f28e484b8a9113708ca1d6e79daff25a3097698a3",
     "clients/claude-code/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "clients/claude-code/agents/ovav.md": "14d22d08c372db6ea8d531e4686837c23c662cbac64c6c4724045b96bf136a04",
     "clients/claude-code/agents/platform-engineering.md": "299d28ec2d6e1408861c1869a6a5e9b5a4a3184da455fafbb890d3696b64faaf",
