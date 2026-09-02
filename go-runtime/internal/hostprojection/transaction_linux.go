@@ -61,19 +61,19 @@ type journal struct {
 
 // Transaction is a Linux-only, locked and journaled host projection.
 type Transaction struct {
-	mu             sync.Mutex
-	preview        Preview
-	source         snapshot
-	original       snapshot
-	destRel        string
-	backupParentID fileIdentity
-	backupMissing  []string
-	journalHash    string
+	mu                  sync.Mutex
+	preview             Preview
+	source              snapshot
+	original            snapshot
+	destRel             string
+	backupParentID      fileIdentity
+	backupMissing       []string
+	journalHash         string
 	afterRename         func(string) error
 	beforeMarkerRemoval func(string) error
 	afterMarkerRemoval  func(string) error
-	markerName     string
-	markerData     []byte
+	markerName          string
+	markerData          []byte
 }
 
 // Plan validates all path components with O_NOFOLLOW and performs no writes.

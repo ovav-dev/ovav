@@ -105,11 +105,12 @@ func (h *HostConfigDrift) checkHostIntrusion(root string) []string {
 }
 
 func (h *HostConfigDrift) isCanonicalConfigProjection(root, hostPath, configName string) bool {
-	hostData, err := readCanonicalProjection(root, hostPath)
+	projectionRoot := canonicalHostProjectionRoot(root)
+	hostData, err := readCanonicalProjection(projectionRoot, hostPath)
 	if err != nil {
 		return false
 	}
-	canonicalData, err := readCanonicalProjection(root, filepath.Join(root, configName))
+	canonicalData, err := readCanonicalProjection(projectionRoot, filepath.Join(projectionRoot, configName))
 	if err != nil {
 		return false
 	}
@@ -149,8 +150,9 @@ func readCanonicalProjection(root, path string) ([]byte, error) {
 }
 
 func (h *HostConfigDrift) isCanonicalAgentProjection(root, hostPath string) bool {
-	canonicalPath := filepath.Join(root, ".opencode", "agents", filepath.Base(hostPath))
-	canonicalData, err := readCanonicalProjection(root, canonicalPath)
+	projectionRoot := canonicalHostProjectionRoot(root)
+	canonicalPath := filepath.Join(projectionRoot, ".opencode", "agents", filepath.Base(hostPath))
+	canonicalData, err := readCanonicalProjection(projectionRoot, canonicalPath)
 	if err != nil {
 		return false
 	}
@@ -172,11 +174,11 @@ func (h *HostConfigDrift) isCanonicalAgentProjection(root, hostPath string) bool
 		return false
 	}
 
-	mainRoot, err := mainRepoRootNoGit(root)
-	if err != nil {
-		return false
+	runtimeRoot := projectionRoot
+	if mainRoot, mainErr := mainRepoRootNoGit(root); mainErr == nil {
+		runtimeRoot = mainRoot
 	}
-	runtimeAgentsDir := filepath.Join(mainRoot, "go-runtime", "internal", "runtimes", "opencode", "agents")
+	runtimeAgentsDir := filepath.Join(runtimeRoot, "go-runtime", "internal", "runtimes", "opencode", "agents")
 	linkTarget, err := os.Readlink(agentsDir)
 	if err != nil {
 		return false
@@ -243,6 +245,26 @@ func (h *HostConfigDrift) isCanonicalAgentProjection(root, hostPath string) bool
 		return false
 	}
 	return true
+}
+
+// canonicalHostProjectionRoot keeps host projections anchored to the main
+// repository while validation runs inside a feature worktree. The live host
+// intentionally points at the integrated main projection, not at a candidate
+// worktree's private runtime files.
+func canonicalHostProjectionRoot(root string) string {
+	mainRoot, err := mainRepoRootNoGit(root)
+	if err != nil || mainRoot == root {
+		return root
+	}
+
+	// A worktree whose .opencode/agents directory is a symlink is validated
+	// against the integrated main projection used by the live host. Fixtures
+	// with ordinary directories retain their local canonical root.
+	agentsDir := filepath.Join(root, ".opencode", "agents")
+	if info, statErr := os.Lstat(agentsDir); statErr == nil && info.Mode()&os.ModeSymlink != 0 {
+		return mainRoot
+	}
+	return root
 }
 
 func mainRepoRootNoGit(root string) (string, error) {
