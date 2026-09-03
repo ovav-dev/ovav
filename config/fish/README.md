@@ -22,3 +22,7 @@ set -gx OVAV_ROOT "$HOME/Systems/OVAV"
 ## Deploy Target
 
 - `config/fish/config.fish` → deploys to `~/.config/fish/config.fish` (WSL)
+- `config/fish/05-ovav-tmux-session.fish` → deploys to `~/.config/fish/conf.d/`
+
+Each new Alacritty window starts an isolated tmux session named
+`alacritty-<fish-pid>`. It never attaches to the shared `main` session.
