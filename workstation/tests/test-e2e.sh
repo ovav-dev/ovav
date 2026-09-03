@@ -168,6 +168,11 @@ if [ -f "$ALACRITTY_CONFIG" ] && grep -qF 'chars = "\u001b[13;2u"' "$ALACRITTY_C
 else
   fail "Alacritty Shift+Enter bridge missing — run install.sh"
 fi
+if [ -f "$ALACRITTY_CONFIG" ] && grep -qF 'key = "Return"' "$ALACRITTY_CONFIG" 2>/dev/null && grep -qF 'chars = "\r"' "$ALACRITTY_CONFIG" 2>/dev/null; then
+  pass "Alacritty Enter reaches shell/TUI"
+else
+  fail "Alacritty Enter binding missing — run install.sh"
+fi
 
 # 14. PowerShell profile
 info "14. PowerShell PSReadLine"
