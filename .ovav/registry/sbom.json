@@ -4,7 +4,7 @@
   "project": "OVAV",
   "hash_algorithm": "sha256",
   "metadata": {
-    "git_identity": "9b32bbc10355829d91f0685f85428c270467f1522d6ab5bf6a06b378f1928a3f"
+    "git_identity": "247112f182df16bfbd0032f4111d6aceaf6bd8806bd0b4175c0c02e9d8dc5ca8"
   },
   "policy": {
     "version": "tracked-content-v1",
@@ -1314,10 +1314,10 @@
     "config/fish/41-ovav-syntax-colors.fish": "edcbf743147bc7bf518108261b234fec383ea7f6780a709f0bde795197e9ab2a",
     "config/fish/90-ovav-terminal-auto.fish": "425a55f1104fd853c964584dad6d15cf05957ac47f05748f00508c128946cc3c",
     "config/fish/99-ovav-systems-lock.fish": "1736807f696be7124097889c1a7454440d382407182572ffaf6dae945abd5577",
-    "config/fish/README.md": "d6ef13c31bfac90fcaf7e5a44c40a9fe9df51d3cb2a3777cbbf24e4713b86545",
+    "config/fish/README.md": "95c210b5b87242d63945ebe68cde600521c21cd4c66f3be6eae0ede192b6da31",
     "config/fish/config.fish": "363d06193f92b6450cd507607d3ee6dfcbf3a278e4bbbcd2dd720df514ccbc99",
     "config/fish/fish_prompt.fish": "7adcbbe543802f462c97b698d41d774b6b90bc697f4161556851389b604eaf24",
-    "config/fish/metadata.yaml": "118a1228207c9542a3c8a0284382fe472dce41e5ab54333d6b902e4ff315c6f5",
+    "config/fish/metadata.yaml": "17816b1446de7739be0653825b15ab92fe600d186b37459d1265e877607dacd9",
     "config/fish/ovav-thavren-ssh-agent.fish.example": "15d9e7e6dd07e80baf709153e02631e131b3dcc42c66a676dbe0f022e8ca96ac",
     "config/fish/ovav.fish": "2b852346a82b4a14fc72d03d7beeef5924f50f882aa924062b63ab3de35bf77a",
     "config/git/README.md": "0ea50f8a262896c60261e65962d860b98a9e2779d6afadd7ec11b9d375a2d988",
@@ -2993,7 +2993,8 @@
     "web/frontend/tailwind.config.js": "28df76442fbe221316120727c6fb111ec0ec27aabc6e3bcf210f184767a5c6b2",
     "web/frontend/tsconfig.json": "75daa8c513a76f7ccf25abfd264c438e427bc4aaca96e10284fb66f02e4744b1",
     "web/start.sh": "9aa5951e7d3451dab91f478078a6765f18391d8bb68dba56abecf54b5a6a68f6",
-    "workstation/README.md": "412cfebb7cf49aa213b14b8c31cd7de945f0975f23aa12b4515c66f49bd9f18b",
+    "workstation/README.md": "901507485495a89dc04087ea5b13ff912be642b74ee58c61813a04c51bc34710",
+    "workstation/configs/alacritty/alacritty.toml": "c88156e1e92702d70d6018efda22b90ed4e5f9045b1924380e283646761442b8",
     "workstation/configs/alacritty/keybindings.toml": "3e69da64a6e18a607b892344f3bfbc1e4f93228a4065c0925db9d62f50ebcc8a",
     "workstation/configs/atuin/config.toml": "922d004ef72a26f150ef1a3ddb87589ef7cb3127b7945b7fefd7f779a2e5f427",
     "workstation/configs/bashrc/ovav.bashrc": "42a2f5f957028018baefaf779af05a75827d21e5feced4303cde60aba9667fe5",
@@ -3025,12 +3026,14 @@
     "workstation/scripts/ovav-clipboard-bridge.sh": "e8a46ba51e0d693df5e9b07b1af75cadbeb4399fbf1755a80f7207c1eaf227b5",
     "workstation/scripts/ovav-it-cache-clean.sh": "a90f4a70dee7fb85dec22a4f8f16411628136a609ec7cf36bc34e935a2884d02",
     "workstation/scripts/repair-bashrc.sh": "6224a8cbbb5c71af63a2328e7b28030455c0934613a2a39d05c2310c0f556b3a",
+    "workstation/scripts/reset-wsl2-workstation.sh": "6b759f04b6c1783016f8aed695dbd86f9b175e3e034e3fbd9e00415d03295734",
     "workstation/scripts/restore-missing-inits.sh": "be937438d569d14c1925e9c6216e577267331f1935af51ee7d896774308cab8e",
     "workstation/scripts/restore-simple.sh": "0cecfcda2c260ecbb3d51fdbd0c8b0ce8b6dced29359777f4ab7afac4d199afc",
     "workstation/scripts/rollback.sh": "aff9d1ee4b2dee4aa4c47543ba2cd8450b07058ee1b33d1f7120c01d50f2c05c",
     "workstation/tests/test-e2e.sh": "633ebba6d1c3bb2cc44a5dd2e9a0abf543b8aa96d9960711635bfdacc0abce4a",
     "workstation/tests/test-fish-session-isolation.sh": "366d25ec357185e035a0784b23abc698a0dc0d11d433fbfd9f3c7ecc688be4fd",
     "workstation/tests/test-opencode-wsl2.sh": "dd9815a89b027a926d615340786bca092e3f89b6b6440f703299a0f515fcdb30",
+    "workstation/tests/test-reset-wsl2-workstation.sh": "90669d93452982983030ab1a5b71df5f671ff9ded80ea8ff9415ad02b6bc972f",
     "workstation/tests/test-tmux-routes.sh": "be793277a09eeadf357d61e5ae3ce17db773178b4f0e7fcb886761f368b84322",
     "wrangler.toml": "e85b1f57e0ea9aeda30f583984bb257b8f7c4a0832655cb51eede1586459980c"
   }
