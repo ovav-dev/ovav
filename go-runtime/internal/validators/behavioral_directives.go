@@ -7,12 +7,9 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
-
-	"gopkg.in/yaml.v3"
 )
 
-// BehavioralDirectives validates behavioral directive integrity across agent
-// files and the BEHAVIORAL_DIRECTIVES.yaml configuration.
+// BehavioralDirectives validates source-level identity and area boundary truth.
 // Replaces: tools/validators/check_behavioral_directives.py
 type BehavioralDirectives struct{}
 
@@ -21,117 +18,51 @@ func NewBehavioralDirectives() *BehavioralDirectives { return &BehavioralDirecti
 func (v *BehavioralDirectives) ID() string   { return "behavioral_directives" }
 func (v *BehavioralDirectives) Name() string { return "Behavioral Directives" }
 func (v *BehavioralDirectives) Description() string {
-	return "Validates behavioral directive integrity across agent files and BEHAVIORAL_DIRECTIVES.yaml"
+	return "Validates canonical identity guard generation and source-level area hard-stop contracts"
 }
 func (v *BehavioralDirectives) Weight() int { return 7 }
-
-// Required scopes that must be present in behavioral directives.
-var requiredScopes = map[string]bool{
-	"personality":    true,
-	"delivery":       true,
-	"work_execution": true,
-	"safety":         true,
-}
-
-// Required behavioral governance markers that must appear in agent files.
-var requiredMarkers = []string{
-	"OVAV_INTEGRITY_SEAL",
-	"soberano",
-	"Redirigir a",
-}
 
 func (v *BehavioralDirectives) Validate(ctx context.Context, root string) Result {
 	start := time.Now()
 	var issues []string
 
-	// ── 1. Validate BEHAVIORAL_DIRECTIVES.yaml ───────────────────────────────
-	directivesPath := filepath.Join(root, ".ovav", "context", "BEHAVIORAL_DIRECTIVES.yaml")
-	data, err := os.ReadFile(directivesPath)
-	if err != nil {
-		issues = append(issues, "MISSING: BEHAVIORAL_DIRECTIVES.yaml not found — no behavioral context for sessions")
-	} else {
-		var directives struct {
-			Directives []struct {
-				Rule       string      `yaml:"rule"`
-				Confidence interface{} `yaml:"confidence"`
-				Scope      string      `yaml:"scope"`
-			} `yaml:"directives"`
-		}
-		if err := yaml.Unmarshal(data, &directives); err != nil {
-			issues = append(issues, fmt.Sprintf("SYNTAX_ERROR: BEHAVIORAL_DIRECTIVES.yaml invalid YAML: %v", err))
-		} else if len(directives.Directives) == 0 {
-			issues = append(issues, "EMPTY: BEHAVIORAL_DIRECTIVES.yaml has no directives defined")
-		} else {
-			// Count active directives (confidence >= 0.5)
-			active := 0
-			scopesPresent := make(map[string]bool)
-			for i, d := range directives.Directives {
-				if d.Rule == "" {
-					issues = append(issues, fmt.Sprintf("INCOMPLETE: Directive #%d missing 'rule' field", i+1))
-				}
-				conf := toFloat(d.Confidence)
-				if conf < 0 || conf > 1 {
-					issues = append(issues, fmt.Sprintf("INVALID: Directive #%d confidence must be 0.0-1.0, got %v", i+1, d.Confidence))
-				}
-				if conf >= 0.5 {
-					active++
-					if d.Scope != "" {
-						scopesPresent[d.Scope] = true
-					}
-				}
-			}
-			issues = append(issues, fmt.Sprintf("INFO: %d/%d behavioral directives active", active, len(directives.Directives)))
+	// 1. The converter is canonical for projection identity guards.
+	if !fileContainsAll(root, "go-runtime/internal/convert/convert.go", "OVAV_IDENTITY_GUARD", "WriteIdentityGuard") {
+		issues = append(issues, "ERROR: canonical converter missing source-level identity guard")
+	}
+	if !fileContainsAll(root, "go-runtime/internal/convert/opencode.go", "WriteIdentityGuard") {
+		issues = append(issues, "ERROR: OpenCode converter does not inject the canonical identity guard")
+	}
 
-			// Check scope coverage
-			var missingScopes []string
-			for scope := range requiredScopes {
-				if !scopesPresent[scope] {
-					missingScopes = append(missingScopes, scope)
-				}
+	// 2. Validate canonical area/lead source, never the generated projections.
+	areaDir := filepath.Join(root, ".ovav", "source", "agents", "areas")
+	areaEntries, err := os.ReadDir(areaDir)
+	if err != nil {
+		issues = append(issues, fmt.Sprintf("ERROR: cannot read canonical area agents: %v", err))
+	} else {
+		for _, entry := range areaEntries {
+			if entry.IsDir() || !strings.HasSuffix(entry.Name(), ".md") {
+				continue
 			}
-			if len(missingScopes) > 0 {
-				issues = append(issues, fmt.Sprintf("WARN: Missing behavioral directives for scopes: %s", strings.Join(missingScopes, ", ")))
+			data, readErr := os.ReadFile(filepath.Join(areaDir, entry.Name()))
+			if readErr != nil || !containsAnyText(string(data), "No cubre", "Hard boundaries", "HARD STOP") {
+				issues = append(issues, fmt.Sprintf("ERROR: canonical area %s missing scope hard-stop boundary", entry.Name()))
 			}
 		}
 	}
 
-	// ── 2. Validate agent files contain governance markers ───────────────────
-	agentsDir := filepath.Join(root, "clients", "opencode", "agents")
-	entries, err := os.ReadDir(agentsDir)
+	leadDir := filepath.Join(root, ".ovav", "source", "agents", "leads")
+	leadEntries, err := os.ReadDir(leadDir)
 	if err != nil {
-		issues = append(issues, fmt.Sprintf("ERROR: Cannot read agents directory: %v", err))
+		issues = append(issues, fmt.Sprintf("ERROR: cannot read canonical lead agents: %v", err))
 	} else {
-		var agentsWithoutMarkers []string
-		for _, e := range entries {
-			if !strings.HasSuffix(e.Name(), ".md") {
+		for _, entry := range leadEntries {
+			if entry.IsDir() || !strings.HasSuffix(entry.Name(), ".md") {
 				continue
 			}
-			agentPath := filepath.Join(agentsDir, e.Name())
-			content, err := os.ReadFile(agentPath)
-			if err != nil {
-				continue
-			}
-			text := string(content)
-			missing := []string{}
-			for _, marker := range requiredMarkers {
-				if !strings.Contains(text, marker) {
-					// Boundary law can also be expressed as "HARD STOP" or "Limitaciones"
-					if marker == "soberano" && (strings.Contains(text, "HARD STOP") || strings.Contains(text, "Limitaciones Explícitas")) {
-						continue
-					}
-					if marker == "Redirigir a" && strings.Contains(text, "HARD STOP") {
-						continue
-					}
-					missing = append(missing, marker)
-				}
-			}
-			if len(missing) > 0 {
-				agentsWithoutMarkers = append(agentsWithoutMarkers, fmt.Sprintf("%s (missing: %s)", e.Name(), strings.Join(missing, ", ")))
-			}
-		}
-		if len(agentsWithoutMarkers) > 0 {
-			for _, a := range agentsWithoutMarkers {
-				issues = append(issues, fmt.Sprintf("BEHAVIORAL: agent %s", a))
+			data, readErr := os.ReadFile(filepath.Join(leadDir, entry.Name()))
+			if readErr != nil || !containsAnyText(strings.ToLower(string(data)), "hard stop", "handoff", "redirigir") {
+				issues = append(issues, fmt.Sprintf("ERROR: canonical lead %s missing out-of-scope routing contract", entry.Name()))
 			}
 		}
 	}
@@ -156,12 +87,21 @@ func (v *BehavioralDirectives) Validate(ctx context.Context, root string) Result
 	}
 	return Result{
 		ID: v.ID(), Name: v.Name(), Status: "pass", Weight: v.Weight(),
-		Message:  "PASS behavioral directives — YAML valid, agent governance markers present",
+		Message:  "PASS behavioral directives — canonical identity guard and area hard-stop sources verified",
 		Duration: time.Since(start),
 	}
 }
 
-// toFloat converts an interface{} to float64, handling int and float64.
+func containsAnyText(content string, alternatives ...string) bool {
+	for _, alternative := range alternatives {
+		if strings.Contains(content, alternative) {
+			return true
+		}
+	}
+	return false
+}
+
+// toFloat remains for compatibility with historical validator fixtures.
 func toFloat(v interface{}) float64 {
 	switch val := v.(type) {
 	case float64:

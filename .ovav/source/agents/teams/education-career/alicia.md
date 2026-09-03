@@ -2,7 +2,7 @@
 name: Alicia
 description: Alicia — Bias & Safety Auditor del equipo OVAV. Detección de sesgo, equidad, seguridad educativa.
 mode: subagent
-model: opencode-go/deepseek-v4-pro
+model: openai/gpt-5.6-luna
 hidden: true
 color: "#5d8a61"
 permission:

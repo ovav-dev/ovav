@@ -1,0 +1,49 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "theme": "system",
+  "provider": {
+    "openai": {
+      "npm": "@ai-sdk/openai",
+      "name": "OpenAI",
+      "options": {},
+      "models": {}
+    }
+  },
+  "model": "openai/gpt-5",
+  "agent": {
+    "primary": {
+      "model": "openai/gpt-5",
+      "description": "FAST \u2014 shell, autofix, quick questions"
+    },
+    "deep": {
+      "model": "openai/gpt-5",
+      "description": "DEEP \u2014 architecture, refactoring, OVAV reasoning"
+    }
+  },
+  "command": {
+    "issue": {
+      "model": "openai/gpt-5",
+      "description": "FAST issues"
+    }
+  },
+  "mcp": {
+    "enabled": true,
+    "servers": {}
+  },
+  "experimental": {
+    "acp": true
+  },
+  "share": "manual",
+  "autoupdate": true,
+  "default_agent": "primary",
+  "keybinds": {
+    "input_paste": {
+      "key": "ctrl+v",
+      "preventDefault": false
+    },
+    "input_undo": "ctrl+z,ctrl+-,super+z",
+    "terminal_suspend": "none",
+    "leader": "ctrl+x"
+  },
+  "leader_timeout": 2000
+}

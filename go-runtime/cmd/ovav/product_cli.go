@@ -265,7 +265,22 @@ func findOvavRoot() (string, error) {
 		return "", err
 	}
 	for {
+		// Must have .ovav/ directory
+		hasGov := false
 		if _, err := os.Stat(filepath.Join(dir, ".ovav")); err == nil {
+			hasGov = true
+		}
+		// Must have go-runtime/go.mod (OVAV mono-repo structure)
+		hasMod := false
+		if _, err := os.Stat(filepath.Join(dir, "go-runtime", "go.mod")); err == nil {
+			hasMod = true
+		}
+		// Must have .ovav/service_areas/ to distinguish OVAV root from go-runtime/ (which has .ovav/vault/)
+		hasServiceAreas := false
+		if _, err := os.Stat(filepath.Join(dir, ".ovav", "service_areas")); err == nil {
+			hasServiceAreas = true
+		}
+		if hasGov && hasMod && hasServiceAreas {
 			return dir, nil
 		}
 		parent := filepath.Dir(dir)

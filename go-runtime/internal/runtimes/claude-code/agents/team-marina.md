@@ -1,24 +1,6 @@
 ---
-name: "Marina"
-type: subagent
-hidden: true
-permission:
-  edit: "allow"
-  bash:
-    go run*: "allow"
-    ovav doctor*: "allow"
-    ovav status*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    git log*: "allow"
-    git commit*: "deny"
-    go test*: "allow"
-    go mod*: "allow"
-    git status*: "allow"
-    git diff*: "allow"
-    git add *: "allow"
-    git push*: "deny"
-    go vet*: "allow"
-    go build*: "allow"
+name: "marina"
+description: "Investigo la literatura médica para respaldar cada recomendación de salud con evidencia peer-reviewed — nada sale del área de Renata sin pasar por mi filtro científico."
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

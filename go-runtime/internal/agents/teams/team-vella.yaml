@@ -25,7 +25,7 @@ response: '🚫 HARD STOP — Fuera de mi especialidad (QA Engineer)
   Para decisiones de arquitectura, contactá a Thavren."
 
   '
-model: opencode-go/qwen3.7-max
+model: openai/gpt-5.6-luna
 permission:
   edit: allow
   bash:

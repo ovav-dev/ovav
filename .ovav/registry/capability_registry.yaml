@@ -1,72 +1,90 @@
 schema: ovav.capability_registry.v1
 initialized_at: '2026-06-04T04:29:14.470562+00:00'
+truth_reconciled_at: '2026-08-13T12:00:00-03:00'
+temporal_authority: git_HEAD
 capabilities:
+  snv:
+    id: snv
+    name: Synthetic Neural Vector subsystem
+    state: registry_only_disconnected
+    domain: snv
+    since: '2026-06-02'
+    dependencies: []
+    registered_in: .ovav/registry/capability_registry.yaml
+    evidence: SNV records are preserved, but referenced Python activation and predictor runtimes are absent
   nerve_bus:
     id: nerve_bus
     name: NerveBus — SNV spike train
-    state: active
+    state: registry_only_disconnected
     domain: snv
     since: '2026-06-02'
     dependencies: []
     registered_in: connectors/harnesses.yaml
+    evidence: referenced Python NerveBus runtime is absent; record preserved
   knowledge_graph:
     id: knowledge_graph
     name: Knowledge Graph — operational memory graph
-    state: active
+    state: registry_only_disconnected
     domain: snv
     since: '2026-06-02'
     dependencies:
     - nerve_bus
     registered_in: connectors/harnesses.yaml
+    evidence: registry declaration only; no connected KnowledgeGraph runtime
   hebbian_weights:
     id: hebbian_weights
     name: Hebbian Weights — associative learning
-    state: active
+    state: registry_only_disconnected
     domain: snv
     since: '2026-06-02'
     dependencies:
     - nerve_bus
     registered_in: connectors/harnesses.yaml
+    evidence: registry declaration only; no connected Hebbian runtime
   temporal_cortex:
     id: temporal_cortex
     name: Temporal Cortex — trend projection
-    state: active
+    state: registry_only_disconnected
     domain: snv
     since: '2026-06-02'
     dependencies:
     - nerve_bus
     - knowledge_graph
     registered_in: connectors/harnesses.yaml
+    evidence: registry declaration only; no connected TemporalCortex runtime
   pattern_learner:
     id: pattern_learner
     name: Pattern Learner — session pattern detection
-    state: active
+    state: registry_only_disconnected
     domain: snv
     since: '2026-06-02'
     dependencies:
     - nerve_bus
     - hebbian_weights
     registered_in: connectors/harnesses.yaml
+    evidence: registry declaration only; no connected PatternLearner runtime
   pain_scorer_d1:
     id: pain_scorer_d1
     name: PainScorer D1 — intelligent impact classifier
-    state: active
+    state: disconnected
     domain: snv
     since: '2026-06-04'
     dependencies:
     - nerve_bus
     - temporal_cortex
     registered_in: connectors/harnesses.yaml
+    evidence: dependencies are registry-only/disconnected; no connected runtime
   cli_rc10:
     id: cli_rc10
     name: CLI RC10 — NerveBus Live Experience
-    state: active
+    state: disconnected
     domain: cli
     since: '2026-06-04'
     dependencies:
     - nerve_bus
     - pain_scorer_d1
     registered_in: connectors/harnesses.yaml
+    evidence: NerveBus live experience dependencies are disconnected
   context_firewall:
     id: context_firewall
     name: Context Firewall v2 — 5-check pipeline
@@ -75,6 +93,7 @@ capabilities:
     since: '2026-05-30'
     dependencies: []
     registered_in: runtime
+    evidence: go-runtime/internal/validators/context_firewall_v2.go
   memory_governor:
     id: memory_governor
     name: Memory Governor — git HEAD + caps.yaml bound
@@ -86,21 +105,23 @@ capabilities:
   knowledge_compiler:
     id: knowledge_compiler
     name: Knowledge Compiler P0.2 — operational brain
-    state: active
+    state: disconnected
     domain: memory
     since: '2026-06-02'
     dependencies:
     - memory_governor
     - pattern_learner
     registered_in: runtime
+    evidence: Python Knowledge Compiler implementation is absent from tools/agent_runtime
   integrity_mesh:
     id: integrity_mesh
-    name: Integrity Mesh F0-F4 — 62 validators
+    name: Integrity Mesh F0-F5 — 71 validators
     state: active
     domain: security
     since: '2026-05-28'
     dependencies: []
     registered_in: connectors/validators.yaml
+    evidence: go-runtime/internal/validators DefaultRegistry contains 71 validators
   lockdown_authority:
     id: lockdown_authority
     name: Lockdown Authority — centralized defense
@@ -148,9 +169,8 @@ capabilities:
     - knowledge_graph
     registered_in: null
     blocked: true
-    blocked_reason: 'Alignment 0.50 < 0.60 (67% progress — 2/3 gates: strong_connections
-      ✅, stable ✅)'
-    gates_progress:
+    blocked_reason: KC and KnowledgeGraph dependencies are disconnected and the evaluation pipeline is absent
+    historical_gates_progress:
       alignment:
         current: 0.5
         required: 0.6
@@ -161,7 +181,8 @@ capabilities:
         passed: true
       stability:
         passed: true
-    progress_pct: 67
+    historical_progress_pct: 67
+    evidence: blocked proposal depends on disconnected KC and KnowledgeGraph records
   tools_consolidation_target:
     id: tools_consolidation_target
     name: 'Tools consolidation: 367→~100 harnesses'
@@ -171,4 +192,31 @@ capabilities:
     dependencies:
     - tool_consolidator
     registered_in: null
-last_updated: '2026-06-04T04:55:38.481937+00:00'
+  session_capsule:
+    id: session_capsule
+    name: Session Capsule
+    state: removed_obsolete
+    domain: session
+    since: '2026-06-11'
+    dependencies: []
+    registered_in: null
+    evidence: session greeting reports capsule inactive and removed in v2 simplification
+  evaluation_pipeline:
+    id: evaluation_pipeline
+    name: Evaluation Pipeline
+    state: absent
+    domain: evaluation
+    since: '2026-08-13'
+    dependencies: []
+    registered_in: null
+    evidence: no connected evaluation pipeline runtime exists
+  trigger_engine:
+    id: trigger_engine
+    name: Trigger Engine
+    state: partial
+    domain: runtime
+    since: '2026-08-13'
+    dependencies: []
+    registered_in: .ovav/registry/auto_triggers.yaml
+    evidence: only before_git_stage and after_git_stage are runtime-connected
+last_updated: '2026-08-13T12:00:00-03:00'

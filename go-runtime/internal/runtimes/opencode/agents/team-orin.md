@@ -2,27 +2,35 @@
 name: "Orin"
 description: "Deep Explorer — exploración profunda de repositorio, mapeo de dependencias, context packs."
 mode: subagent
-model: opencode-go/qwen3.7-max
+model: openai/gpt-5.6-luna
 hidden: true
 permission:
   edit: "deny"
   bash:
-    "go mod*": "allow"
-    "go vet*": "allow"
-    "grep -rn*": "allow"
-    "git commit*": "deny"
-    "go list*": "allow"
-    "find *": "allow"
-    "git status*": "allow"
-    "git diff*": "allow"
-    "git log*": "allow"
-    "git push*": "deny"
-    "sudo *": "deny"
     "*": "deny"
+    apt install *: "deny"
+    dd *of=/dev/*: "deny"
+    find *: "allow"
+    "git branch --delete *": "deny"
+    "git branch -D *": "deny"
+    git commit*: "deny"
+    git diff*: "allow"
+    git log*: "allow"
+    git push*: "deny"
+    git status*: "allow"
+    go list*: "allow"
+    go mod*: "allow"
+    go vet*: "allow"
+    "grep -rn*": "allow"
+    mkfs*: "deny"
+    npm install *: "deny"
+    pip install *: "deny"
+    "rm -rf /*": "deny"
+    sudo *: "deny"
   external_directory:
-    "/home/braka/Systems/OVAV": "allow"
     "*": "deny"
     "/home/braka/Labs/mimocode/data/memory/*": "allow"
+    "/home/braka/Systems/OVAV": "allow"
 steps: 12
 ---
 

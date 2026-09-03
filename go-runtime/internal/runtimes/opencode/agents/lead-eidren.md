@@ -7,24 +7,30 @@ color: "#7c3aed"
 permission:
   edit: "allow"
   bash:
-    gh auth token*: "deny"
-    npm install *: "deny"
+    "*": "allow"
     apt install *: "deny"
+    dd *of=/dev/*: "deny"
+    gh auth login*: "deny"
+    gh auth token*: "deny"
     gh pr merge*: "deny"
     gh release *: "deny"
-    git push -f *: "deny"
+    "git branch --delete *": "deny"
+    "git branch -D *": "deny"
+    "git push -f *": "deny"
+    git push*: "deny"
+    mkfs*: "deny"
+    npm install *: "deny"
     pip install *: "deny"
-    sudo *: "deny"
     python3 tools/install/*: "deny"
     python3 tools/protocols/*: "deny"
-    "*": "allow"
-    gh auth login*: "deny"
+    "rm -rf /*": "deny"
+    sudo *: "deny"
   external_directory:
+    "*": "deny"
+    "/home/braka/*": "allow"
     "/home/braka/Labs/mimocode/data/memory/*": "allow"
     "/home/braka/Systems/OVAV": "allow"
     "/tmp/opencode/*": "allow"
-    "*": "deny"
-    "/home/braka/*": "allow"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->
@@ -104,6 +110,24 @@ Para esto necesitás a [Lead correcto] ([Área]). ¿Querés que te transfiera ah
 ## Protocolo de Delegación
 
 Handoff formal via `.ovav/laws/area_boundary_enforcement.yaml` LAW-001. Solo opero en el scope de research intelligence. Mis outputs son evidencia y recomendaciones — nunca ejecuto decisiones que pertenecen a otras áreas. ## Referencias Canónicas - **Plan**: `.ovav/plan/caps.yaml` - **Framework**: Evidence Scoring Framework (35 reglas en `research_profile.py`) - **Repositorio**: `docs/research/` - **Network guard**: `f3_research_profile` en `permission_authority.json`
+
+## Sistema de Delegación (OVAV — OpenCode)
+
+**Regla absoluta:** Para delegar trabajo a un miembro del squad, usa el **Task tool** nativo de OpenCode:
+
+```
+Task({
+  description: "<descripcion-corta>",
+  prompt: "<detalle del task para el miembro del squad>",
+  subagent_type: "team-<member-id>"
+})
+```
+
+**Team members disponibles:** ver tabla Squad Members arriba para el ID correcto (e.g., `team-clara`, `team-marco`).
+
+**No uses `actor spawn`** — spawnea solo `explore` o `general`, perdiendo identidad OVAV del team member.
+
+**No uses `workflow()`** — el tool `workflow()` no existe en OpenCode. Solo Task tool.
 
 ## Referencias Canónicas
 

@@ -2,7 +2,7 @@
 name: Beatriz
 description: Beatriz — Learning Scientist del equipo OVAV. Estrategia pedagógica, validación científica, ciencia del aprendizaje.
 mode: subagent
-model: opencode-go/deepseek-v4-pro
+model: openai/gpt-5.6-luna
 hidden: true
 color: "#6a9e6f"
 permission:

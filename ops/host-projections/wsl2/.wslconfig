@@ -1,0 +1,13 @@
+# Activation occurs only after every WSL session closes and WSL reaches a natural full WSL stop before reopening.
+# OVAV MUST NOT automatically run wsl --shutdown or wsl --terminate.
+[wsl2]
+memory=3GB
+processors=4
+swap=8GB
+networkingMode=mirrored
+dnsTunneling=true
+autoProxy=true
+firewall=true
+
+[experimental]
+autoMemoryReclaim=dropCache

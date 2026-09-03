@@ -322,4 +322,8 @@ var (
 	TabInactive = lipgloss.NewStyle().
 			Foreground(Muted).
 			Padding(0, 1)
+
+	Breadcrumb = lipgloss.NewStyle().
+			Foreground(PrimaryDim).
+			Italic(true)
 )

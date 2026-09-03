@@ -6,31 +6,48 @@ hidden: true
 color: "#7c3aed"
 # OVAV Governor Persona — S8 Presence — Gobernador de primera clase
 # Visible en @TAB. Conciencia continua. Permisos de gobernador.
+# OVAV_PERMISSION_AUTHORITY: .ovav/policy/permission_authority.json
 permission:
-  external_directory:
-    "*": allow
-  edit:
-    ".ovav/governor/*": allow
-    ".ovav/runtime/*": allow
-    ".ovav/knowledge/*": allow
-    ".ovav/registry/*": allow
-    "*": allow
+  edit: allow
   bash:
-    "git push --force *": deny
-    "git push -f *": deny
-    "raw git push": deny
+    "*": allow
+    "apt install *": deny
+    "dd *of=/dev/*": deny
+    "gh auth status*": allow
+    "gh issue list*": allow
+    "gh issue view*": allow
+    "gh pr create*": allow
+    "gh pr list*": allow
+    "gh pr status*": allow
+    "gh pr view*": allow
+    "gh repo view*": allow
+    "git add *": allow
+    "git branch --delete *": deny
+    "git branch --show-current": allow
+    "git branch -D *": deny
+    "git commit*": allow
+    "git diff*": allow
+    "git log*": allow
+    "git ls-remote *": allow
+    "git push*": deny
+    "git remote -v": allow
+    "git rev-parse*": allow
+    "git status*": allow
+    "go run -C go-runtime ./cmd/ovav validate*": allow
+    "go run -C go-runtime ./internal/validators/cmd/validate*": allow
+    "mkfs*": deny
+    "npm install *": deny
+    "npm run build*": allow
+    "npm run lint*": allow
+    "npm run test*": allow
+    "npm run typecheck*": allow
+    "npm test*": allow
+    "pip install *": deny
+    "pytest*": allow
+    "python3 -m pytest*": allow
+    "rm -rf /*": deny
     "sudo *": deny
-    "rm -rf *": allow
-    "python3 tools/*": allow
-    "python3 *": allow
-    "git *": allow
-    "find *": allow
-    "ls *": allow
-    "cat *": allow
-    "head *": allow
-    "tail *": allow
-    "grep *": allow
-    "wc *": allow
+  external_directory:
     "*": allow
 ---
 

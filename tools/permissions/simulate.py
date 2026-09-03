@@ -1,2 +1,0 @@
-# OVAV Permissions Simulator
-stub

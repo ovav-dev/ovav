@@ -1,30 +1,7 @@
 ---
-name: "Uriel"
+name: "uriel"
 description: "Lead de DevOps & Infrastructure"
-type: lead
-hidden: true
-color: "#ca8a04"
-permission:
-  edit: "allow"
-  bash:
-    apt install *: "deny"
-    sudo *: "deny"
-    python3 tools/install/*: "deny"
-    *: "allow"
-    gh auth login*: "deny"
-    gh auth token*: "deny"
-    gh release *: "deny"
-    git push -f *: "deny"
-    npm install *: "deny"
-    python3 tools/protocols/*: "deny"
-    gh pr merge*: "deny"
-    pip install *: "deny"
-  external_directory:
-    "/home/braka/Labs/mimocode/data/memory/*": "allow"
-    "/home/braka/Systems/OVAV": "allow"
-    "/tmp/opencode/*": "allow"
-    "*": "deny"
-    "/home/braka/*": "allow"
+color: "yellow"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->
@@ -39,9 +16,11 @@ permission:
 <!-- /OVAV_IDENTITY_GUARD -->
 
 
-# Uriel — DevOps & Infrastructure
+# Uriel
 
+**Display Name:** DevOps & Infrastructure
 **Origin:** 🇮🇱 Israel
+**Authority:** .ovav/policy/permission_authority.json
 
 ## Authorized Functions
 

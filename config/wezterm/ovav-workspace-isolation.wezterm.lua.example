@@ -1,0 +1,73 @@
+-- OVAV WezTerm Workspace Isolation example.
+-- Template de referencia. La config canónica activa está en config/wezterm/wezterm.lua.
+-- No copiar a ~/.config/wezterm sin aprobación explícita.
+
+local wezterm = require("wezterm")
+local mux = wezterm.mux
+
+local function env_or_empty(name)
+  return os.getenv(name) or ""
+end
+
+local function ovav_workspace()
+  local workspace = env_or_empty("OVAV_WEZTERM_WORKSPACE")
+  if workspace == "" then
+    return "ovav-unscoped"
+  end
+  return workspace
+end
+
+local function ovav_branch()
+  local branch = env_or_empty("OVAV_GIT_BRANCH")
+  if branch == "" then
+    return "unknown-branch"
+  end
+  return branch
+end
+
+local function ovav_repo_root()
+  local root = env_or_empty("OVAV_REPO_ROOT")
+  if root == "" then
+    return nil
+  end
+  return root
+end
+
+wezterm.on("gui-startup", function(cmd)
+  local spawn = {
+    workspace = ovav_workspace(),
+  }
+
+  local cwd = ovav_repo_root()
+  if cwd then
+    spawn.cwd = cwd
+  end
+
+  if cmd and cmd.args then
+    spawn.args = cmd.args
+  end
+
+  local _, _, window = mux.spawn_window(spawn)
+  local gui_window = window:gui_window()
+  if gui_window then
+    gui_window:set_title(ovav_workspace() .. " · " .. ovav_branch())
+  end
+end)
+
+wezterm.on("format-tab-title", function()
+  return " " .. ovav_workspace() .. " · " .. ovav_branch() .. " "
+end)
+
+wezterm.on("update-right-status", function(window)
+  window:set_right_status(wezterm.format({
+    { Foreground = { Color = "#cba6f7" } },
+    { Text = " " .. ovav_workspace() .. " · " .. ovav_branch() .. " " },
+  }))
+end)
+
+return {
+  -- Keeps panes/tabs under the computed OVAV workspace when this template is installed later.
+  default_workspace = ovav_workspace(),
+  automatically_reload_config = false,
+  window_close_confirmation = "AlwaysPrompt",
+}

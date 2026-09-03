@@ -4589,7 +4589,14 @@ func TestHandleProductVersion(t *testing.T) {
 }
 
 func TestHandleProductUpdate(t *testing.T) {
-	fixRepoRoot()
+	root := t.TempDir()
+	t.Setenv("OVAV_ROOT", root)
+	if err := os.WriteFile(filepath.Join(root, "VERSION"), []byte("test\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	previous := runProductSyncCommand
+	runProductSyncCommand = func(context.Context, string, ...string) ([]byte, error) { return nil, nil }
+	t.Cleanup(func() { runProductSyncCommand = previous })
 
 	// Initialize hub so ClientCount() works
 	hub.Start()
@@ -5297,7 +5304,14 @@ func TestRouterGovernorRoutes(t *testing.T) {
 }
 
 func TestRouterProductRoutes(t *testing.T) {
-	fixRepoRoot()
+	root := t.TempDir()
+	t.Setenv("OVAV_ROOT", root)
+	if err := os.WriteFile(filepath.Join(root, "VERSION"), []byte("test\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	previous := runProductSyncCommand
+	runProductSyncCommand = func(context.Context, string, ...string) ([]byte, error) { return nil, nil }
+	t.Cleanup(func() { runProductSyncCommand = previous })
 	registerRoutes()
 
 	routes := []struct {

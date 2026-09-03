@@ -162,14 +162,11 @@ func (m Model) renderSync() string {
 	sb.WriteString(styles.MutedFg.Render("  Model Routing Active:"))
 	sb.WriteString("\n")
 	sb.WriteString(fmt.Sprintf("    Default: %s %s\n",
-		styles.GreenFg.Render("mimo-auto"),
-		styles.MutedFg.Render("(free)")))
-	sb.WriteString(fmt.Sprintf("    Coding:  %s %s\n",
-		styles.BlueFg.Render("deepseek-v4-pro"),
-		styles.MutedFg.Render("($0.55/$2.19)")))
-	sb.WriteString(fmt.Sprintf("    Review:  %s %s\n",
-		styles.PurpleFg.Render("claude-sonnet-4"),
-		styles.MutedFg.Render("($3.00/$15.00)")))
+		styles.GreenFg.Render("openai/gpt-5.6-luna"),
+		styles.MutedFg.Render("(primary)")))
+	sb.WriteString(fmt.Sprintf("    Fallback: %s %s\n",
+		styles.YellowFg.Render("minimax-coding-plan/MiniMax-M3"),
+		styles.MutedFg.Render("(MiniMax API)")))
 	sb.WriteString("\n")
 
 	// Help

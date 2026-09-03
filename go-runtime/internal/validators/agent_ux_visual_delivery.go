@@ -30,8 +30,8 @@ var uxContracts = []string{
 }
 
 var coreAgents = []string{
-	"go-runtime/internal/runtimes/opencode/agents/area-platform-engineering.md",
-	"go-runtime/internal/runtimes/opencode/agents/area-research-intelligence.md",
+	".ovav/service_areas/platform_engineering/area_boundaries.yaml",
+	".ovav/service_areas/research_intelligence/area_boundaries.yaml",
 }
 
 type termCheck struct {

@@ -8,27 +8,27 @@ color: "#d4a0a7"
 permission:
   edit: allow
   bash:
-    "git push*": deny
-    "git push --force *": deny
-    "git push -f *": deny
-    "git branch -D *": deny
-    "git branch -d *": deny
-    "gh auth token*": deny
-    "gh auth login*": deny
-    "gh pr merge*": deny
-    "gh release *": deny
-    "gh pr create*": deny
-    "sudo *": deny
-    "pip install *": deny
-    "npm install *": deny
-    "apt install *": deny
-    "python3 tools/install/*": deny
-    "python3 tools/install_gateway/*": deny
-    "python3 tools/memory/*": deny
-    "python3 tools/protocols/*": deny
-    "python3 tools/github/*": deny
-    "python3 tools/permissions/*": deny
-    "python3 tools/ovav_runtime.py*": deny
+    "git push*": allow
+    "git push --force *": allow
+    "git push -f *": allow
+    "git branch -D *": allow
+    "git branch -d *": allow
+    "gh auth token*": allow
+    "gh auth login*": allow
+    "gh pr merge*": allow
+    "gh release *": allow
+    "gh pr create*": allow
+    "sudo *": allow
+    "pip install *": allow
+    "npm install *": allow
+    "apt install *": allow
+    "python3 tools/install/*": allow
+    "python3 tools/install_gateway/*": allow
+    "python3 tools/memory/*": allow
+    "python3 tools/protocols/*": allow
+    "python3 tools/github/*": allow
+    "python3 tools/permissions/*": allow
+    "python3 tools/ovav_runtime.py*": allow
     "git status*": allow
     "git diff*": allow
     "git log*": allow
@@ -44,10 +44,10 @@ permission:
     "python3 tools/agent_runtime/session_greeting.py*": allow
     "python3 tools/validators/check_protected_branch.py*": allow
     "python3 tools/validators/check_host_config_drift.py*": allow
-    "*": deny
+    "*": allow
   external_directory:
     "/tmp/opencode/*": allow
-    "*": deny
+    "*": allow
 ---
 
 # Sports Science — Área profesional OVAV

@@ -4,9 +4,12 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/ovav/ovav/internal/ceo"
 )
 
 // GitPush validates OVAV git push gate rules:
@@ -28,6 +31,7 @@ func (g *GitPush) Weight() int { return 10 }
 func (g *GitPush) Validate(ctx context.Context, root string) Result {
 	start := time.Now()
 	var issues []string
+	var warnings []string
 
 	// Resolve git config path (handles worktrees where .git is a file)
 	gitConfig := resolveGitPath(root, "config")
@@ -65,12 +69,44 @@ func (g *GitPush) Validate(ctx context.Context, root string) Result {
 		issues = append(issues, fmt.Sprintf("Cannot read platform agent: %v", err))
 	}
 
-	// Rule 4: Check opencode.json references ovav_git_push_gate
+	// Rule 4: Raw push remains denied in the harness and the Go-native governed
+	// push command is dispatched to its implementation.
+	// OVAV TRUSTED EXECUTION DOMAIN — 2026-08-13:
+	// YOLO mode: bash is 100% allow (no deny rules). The raw push gate is
+	// enforced by the Go push_cli (ovav git push) which routes through the
+	// Go push engine with protected-branch gates. Skip the opencode.json
+	// deny check if YOLO is active.
 	opencodeJSON := filepath.Join(root, "opencode.json")
 	if jsonData, err := os.ReadFile(opencodeJSON); err == nil {
-		if !strings.Contains(string(jsonData), "ovav_git_push_gate") {
-			issues = append(issues, "opencode.json missing ovav_git_push_gate wiring")
+		text := string(jsonData)
+		isYolo := strings.Contains(text, `"_ovav"`) || strings.Contains(text, `"yolo"`)
+		if !isYolo {
+			if !strings.Contains(text, `"git push*": "deny"`) && !strings.Contains(text, `"git push*":"deny"`) {
+				issues = append(issues, "opencode.json does not deny raw git push")
+			}
 		}
+	} else {
+		issues = append(issues, fmt.Sprintf("Cannot read opencode.json: %v", err))
+	}
+	pushCLI, pushErr := os.ReadFile(filepath.Join(root, "go-runtime", "cmd", "ovav", "push_cli.go"))
+	dispatch, dispatchErr := os.ReadFile(filepath.Join(root, "go-runtime", "cmd", "ovav", "dispatch.go"))
+	if pushErr != nil || dispatchErr != nil || !strings.Contains(string(pushCLI), "cmdPush") || !strings.Contains(string(pushCLI), "gitflow.Push") || !strings.Contains(string(dispatch), `case "push"`) && !strings.Contains(string(dispatch), "cmdPush") {
+		issues = append(issues, "Go-native governed push command wiring is incomplete")
+	}
+
+	// Rule 5: Protected branch must have waiver (migrated from Python)
+	if safe, msg := g.checkBranchSafety(root); !safe {
+		issues = append(issues, msg)
+	}
+
+	// Rule 6: No uncommitted changes (migrated from Python)
+	if safe, msg := g.checkUncommitted(root); !safe {
+		warnings = append(warnings, msg)
+	}
+
+	// Rule 7: No stale locks (migrated from Python)
+	if safe, msg := g.checkLocks(root); !safe {
+		issues = append(issues, msg)
 	}
 
 	if len(issues) > 0 {
@@ -80,11 +116,90 @@ func (g *GitPush) Validate(ctx context.Context, root string) Result {
 			Issues:  issues, Duration: time.Since(start),
 		}
 	}
+	if len(warnings) > 0 {
+		return Result{
+			ID: g.ID(), Name: g.Name(), Status: "warn", Weight: g.Weight(),
+			Message: fmt.Sprintf("WARN git push gate — wiring valid, %d worktree warning(s)", len(warnings)),
+			Issues:  warnings, Duration: time.Since(start),
+		}
+	}
 	return Result{
 		ID: g.ID(), Name: g.Name(), Status: "pass", Weight: g.Weight(),
-		Message:  "PASS git push gate — HTTPS transport verified, no force push allowed",
+		Message:  "PASS git push gate — HTTPS transport, branch safety, hygiene verified",
 		Duration: time.Since(start),
 	}
+}
+
+// checkBranchSafety checks if current branch is protected and has a waiver.
+//
+// Resolution order (matches protected_branch.go):
+//  1. Non-protected branch → always safe.
+//  2. Active CEO session → bypass all waiver requirements.
+//  3. Centralized runtime waiver (.ovav/runtime/protected_branch_waiver.yaml)
+//     that covers the branch → safe.
+//  4. Otherwise → fail with "no active waiver".
+func (g *GitPush) checkBranchSafety(root string) (bool, string) {
+	branch := getCurrentBranch(root)
+	if branch == "" {
+		return false, "Cannot determine current branch"
+	}
+	if !protectedBranches[branch] {
+		return true, ""
+	}
+	// Protected branch — CEO session auto-bypasses.
+	if ceo.IsActive(root) {
+		return true, ""
+	}
+	// Protected branch — require the centralized runtime waiver file.
+	waiverPath := filepath.Join(root, ".ovav", "runtime", "protected_branch_waiver.yaml")
+	if _, err := os.Stat(waiverPath); os.IsNotExist(err) {
+		return false, fmt.Sprintf("Protected branch '%s' has no active waiver", branch)
+	}
+	return true, ""
+}
+
+// checkUncommitted checks for uncommitted changes.
+func (g *GitPush) checkUncommitted(root string) (bool, string) {
+	cmd := exec.Command("git", "status", "--porcelain")
+	cmd.Dir = root
+	out, err := cmd.Output()
+	if err != nil {
+		return false, fmt.Sprintf("Git status check failed: %v", err)
+	}
+	if len(strings.TrimSpace(string(out))) > 0 {
+		return false, "Uncommitted changes exist"
+	}
+	return true, ""
+}
+
+// checkLocks checks for stale lock files (older than 1 hour).
+func (g *GitPush) checkLocks(root string) (bool, string) {
+	locksDir := filepath.Join(root, ".ovav", "locks")
+	info, err := os.Stat(locksDir)
+	if err != nil || !info.IsDir() {
+		return true, ""
+	}
+	entries, err := os.ReadDir(locksDir)
+	if err != nil {
+		return true, ""
+	}
+	cutoff := time.Now().Add(-1 * time.Hour).Unix()
+	var stale []string
+	for _, entry := range entries {
+		if !strings.HasSuffix(entry.Name(), ".lock") {
+			continue
+		}
+		path := filepath.Join(locksDir, entry.Name())
+		if stat, err := os.Stat(path); err == nil {
+			if stat.ModTime().Unix() < cutoff {
+				stale = append(stale, entry.Name())
+			}
+		}
+	}
+	if len(stale) > 0 {
+		return false, fmt.Sprintf("Stale locks: %s", strings.Join(stale[:3], ", "))
+	}
+	return true, ""
 }
 
 // resolveGitPath resolves a path inside the .git directory, handling worktrees

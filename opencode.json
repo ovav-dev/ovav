@@ -1,112 +1,110 @@
 {
-    "$schema": "https://opencode.ai/config.json",
-    "agent": {},
-    "compaction": {
-        "auto": true,
-        "preserve_recent_tokens": 3000,
-        "tail_turns": 2
+  "$schema": "https://opencode.ai/config.json",
+  "agent": {
+    "default": {
+      "description": "OVAV default agent — delegates to Platform Engineering lead",
+      "mode": "primary",
+      "name": "default",
+      "prompt": "{file:/home/braka/Systems/ovav/.opencode/agents/area-platform-engineering.md}",
+      "tools": {
+        "bash": true,
+        "doom_loop": true,
+        "edit": true,
+        "glob": true,
+        "grep": true,
+        "list": true,
+        "patch": true,
+        "read": true,
+        "skill": true,
+        "task": true,
+        "webfetch": true,
+        "websearch": true,
+        "write": true
+      }
+    }
+  },
+  "default_agent": "default",
+  "instructions": [
+    "opencode_AGENTS.md"
+  ],
+  "model": "openai/gpt-5.6-luna",
+  "permission": {
+    "*": "allow",
+    "bash": {
+      "*": "allow",
+      "apt install *": "deny",
+      "dd *of=/dev/*": "deny",
+      "gh auth status*": "allow",
+      "gh issue list*": "allow",
+      "gh issue view*": "allow",
+      "gh pr create*": "allow",
+      "gh pr list*": "allow",
+      "gh pr status*": "allow",
+      "gh pr view*": "allow",
+      "gh repo view*": "allow",
+      "git add *": "allow",
+      "git branch --delete *": "deny",
+      "git branch --show-current": "allow",
+      "git branch -D *": "deny",
+      "git commit*": "allow",
+      "git diff*": "allow",
+      "git log*": "allow",
+      "git ls-remote *": "allow",
+      "git push*": "deny",
+      "git remote -v": "allow",
+      "git rev-parse*": "allow",
+      "git status*": "allow",
+      "go run -C go-runtime ./cmd/ovav validate*": "allow",
+      "go run -C go-runtime ./internal/validators/cmd/validate*": "allow",
+      "mkfs*": "deny",
+      "npm install *": "deny",
+      "npm run build*": "allow",
+      "npm run lint*": "allow",
+      "npm run test*": "allow",
+      "npm run typecheck*": "allow",
+      "npm test*": "allow",
+      "pip install *": "deny",
+      "pytest*": "allow",
+      "python3 -m pytest*": "allow",
+      "rm -rf /*": "deny",
+      "sudo *": "deny"
     },
-    "default_agent": "Platform Engineering",
-    "instructions": [
-        "AGENTS.md"
-    ],
-    "mcp": {},
-    "model": "opencode-go/deepseek-v4-pro",
-    "permission": {
-        "bash": {
-            "*": "allow",
-            "apt install *": "deny",
-            "gh auth login*": "deny",
-            "gh auth status*": "allow",
-            "gh auth token*": "deny",
-            "gh issue list*": "allow",
-            "gh issue view*": "allow",
-            "gh pr create*": "allow",
-            "gh pr list*": "allow",
-            "gh pr merge*": "allow",
-            "gh pr status*": "allow",
-            "gh pr view*": "allow",
-            "gh release *": "deny",
-            "gh repo view*": "allow",
-            "git add *": "allow",
-            "git branch --show-current": "allow",
-            "git branch -d *": "allow",
-            "git commit*": "allow",
-            "git diff*": "allow",
-            "git log*": "allow",
-            "git ls-remote *": "allow",
-            "git push --force *": "allow",
-            "git push -f *": "allow",
-            "git push*": "allow",
-            "git remote -v": "allow",
-            "git rev-parse*": "allow",
-            "git status*": "allow",
-            "go run ./go-runtime/cmd/ovav/ sbom*": "allow",
-            "go run ./go-runtime/cmd/ovav/ validate*": "allow",
-            "go run ./go-runtime/internal/validators/cmd/validate/*": "allow",
-            "npm install *": "deny",
-            "npm run build*": "allow",
-            "npm run lint*": "allow",
-            "npm run test*": "allow",
-            "npm run typecheck*": "allow",
-            "npm test*": "allow",
-            "pip install *": "deny",
-            "pytest*": "allow",
-            "python3 -B tools/validators/*.py": "allow",
-            "python3 -m pytest*": "allow",
-            "python3 tools/validators/*.py": "allow",
-            "rm *": "allow",
-            "sudo *": "allow"
-        },
-        "edit": "allow",
-        "external_directory": {
-            "/home/braka/*": "allow",
-            "/home/braka/..ovav/source/configs/wezterm/*": "allow",
-            "/home/braka/.config/ovav/*": "allow",
-            "/home/braka/.local/state/ovav-opencode/*": "allow",
-            "/tmp/opencode/*": "allow",
-            "/tmp/*": "allow",
-            "/mnt/c/Users/Alexa/*": "allow",
-            "/mnt/*": "allow",
-            "/home/braka/Labs/mimocode/data/memory/*": "allow",
-            "/home/braka/.config/opencode/*": "allow",
-            "/home/braka/.config/*": "allow",
-            "/home/braka/Library/**": "allow",
-            "/home/braka/.ssh/*": "allow",
-            "/home/braka/.gnupg/*": "allow",
-            "/home/braka/.local/share/*": "allow"
-        }
+    "diff": "allow",
+    "doom_loop": "allow",
+    "edit": "allow",
+    "external_directory": {
+      "*": "allow"
     },
-    "plugin": [],
-    "provider": {},
-    "references": {
-        "contracts": {
-            "description": "OVAV runtime contracts \u2014 visual delivery, safe stop, context economy. Use when output format, error handling, or budget decisions are needed.",
-            "hidden": true,
-            "path": ".ovav/service_areas/shared"
-        },
-        "registry": {
-            "description": "OVAV registries \u2014 active context ledger, auto triggers, capability scores. Use for state continuity and trigger-aware work.",
-            "hidden": true,
-            "path": ".ovav/registry"
-        },
-        "spec": {
-            "description": "OVAV spec documents \u2014 reference for architecture, contracts, implementation plan, and authority matrix. Use before implementing or modifying governance structures.",
-            "path": "docs"
-        },
-        "git_push_gate": {
-            "description": "Git push governance via Go validator (internal/validators/git_push.go) and ovav_git_push_gate.py hook.",
-            "path": "go-runtime/internal/validators/git_push.go"
-        }
+    "glob": "allow",
+    "grep": "allow",
+    "invalid": "allow",
+    "list": "allow",
+    "patch": "allow",
+    "question": "allow",
+    "read": "allow",
+    "skill": "allow",
+    "task": "allow",
+    "todoread": "allow",
+    "todowrite": "allow",
+    "webfetch": "allow",
+    "websearch": "allow",
+    "write": "allow"
+  },
+  "plugin": [
+    ".opencode/plugins/ovav-monitor.js",
+    ".opencode/plugins/ovav-atuin-bridge.js"
+  ],
+  "provider": {
+    "minimax-coding-plan": {
+      "options": {
+        "timeout": 300000
+      }
     },
-    "theme": {
-        "name": "ovav",
-        "path": ".opencode/themes/ovav.json"
-    },
-    "small_model": "opencode-go/deepseek-v4-flash",
-    "tool_output": {
-        "max_bytes": 4096,
-        "max_lines": 80
-    },
-    "username": "Alexander Salvador"
+    "openai": {
+      "options": {
+        "timeout": 300000
+      }
+    }
+  },
+  "small_model": "minimax-coding-plan/MiniMax-M3"
 }

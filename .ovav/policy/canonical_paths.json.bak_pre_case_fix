@@ -1,0 +1,32 @@
+{
+  "version": "1.0.0",
+  "description": "OVAV CANONICAL PATH AUTHORITY — single source of truth. All tools, runtimes, and agents MUST resolve paths from here. Do NOT hardcode paths elsewhere.",
+  "locked": true,
+  "paths": {
+    "source_root": "/home/braka/Systems/OVAV",
+    "repo_root": "/home/braka/Systems/OVAV",
+    "workspace_root": "/home/braka/Systems/OVAV",
+    "global_config_opencode": "/home/braka/.config/opencode",
+    "global_config_ovav": "/home/braka/.config/ovav",
+    "global_config_wezterm": "/home/braka/.config/wezterm",
+    "global_state_ovav": "/home/braka/.local/state/ovav-opencode",
+    "global_share_ovav": "/home/braka/.local/share/ovav",
+    "global_bin_ovav": "/home/braka/.local/bin",
+    "runtime_context_file": "/home/braka/.local/state/ovav-opencode/current-mode.md",
+    "opencode_mode_config": "/home/braka/.config/ovav/opencode-mode/config.json",
+    "wezterm_config_target": "/home/braka/.config/wezterm/wezterm.lua",
+    "wezterm_config_source": "/home/braka/Systems/OVAV/config/wezterm/wezterm.lua",
+    "wezterm_windows_config": "/mnt/c/Users/Alexa/.wezterm.lua",
+    "wezterm_windows_fallback": "/mnt/c/Users/Alexa/.wezterm-fallback.lua",
+    "user_home": "/home/braka"
+  },
+  "immutable_rules": [
+    "OVAV_SOURCE_ROOT env var is OVERRIDDEN by this file. Tools must read canonical_paths.json first.",
+    "No path outside this file shall be considered authoritative.",
+    "The source_root field is the single source of truth for the OVAV repository location.",
+    "Any runtime, agent, or tool that hardcodes /home/braka/dev/bab/ventures/ovav is in violation."
+  ],
+  "obsolete_paths": [
+    "/home/braka/dev/bab/ventures/ovav"
+  ]
+}

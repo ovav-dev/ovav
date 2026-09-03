@@ -45,7 +45,7 @@ absorptions:
     description: "If the active model runs out of tokens, OVAV automatically detects\
       \ it, triggers fallback via model_body_router.py \u2192 provider_abstraction.py,\
       \ and continues work. Implemented as L3 Model Body Router with real opencode.json\
-      \ switching. Fallback ladder limited to opencode-go models exclusively (no OpenAI,\
+      \ switching. HISTORICAL: fallback ladder was limited to opencode-go models exclusively (no OpenAI,\
       \ Anthropic, Google per no_external_providers rule).\n"
     id: BL-007
     phase: completed

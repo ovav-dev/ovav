@@ -4,36 +4,134 @@
 # Authority: Thavren (Platform Engineering Lead)
 # =============================================================================
 #
-# VERSIÓN ACTUAL: v102.3
-# FECHA: 2026-08-06
-# CAPA: 9
-# GITHASH: bc7cff50
-# RAMA: develop
+# VERSIÓN ACTUAL: v104.0
+# FECHA: 2026-09-02
+# CAPA: 11
+# AUTORIDAD TEMPORAL: git HEAD (resuelta en runtime; no se fija un hash aquí)
+# RAMA: resuelta desde git en runtime
 #
 # CUMPLIMIENTO: Este documento es requerido por el runtime.
 # Validation lo exige: Runtime Integrity + Contract Freshness.
 # =============================================================================
 
 canonical: true
-version: "102.5"
-plan_version: "102.5"
+version: "104.0"
+plan_version: "104.0"
 capa: 11
-updated_at: "2026-08-08T19:00:00-05:00"
+updated_at: "2026-09-02T13:19:56-05:00"
 updated_by: "thavren"
-build_date: "2026-08-08"
-git_head: "develop"
-git_branch: "develop"
-status: "active"
-next_phase: "FULLY INTEGRATED - all subsystems autonomous"
-layer_status: "ALL_11_COMPLETE"
+build_date: "2026-09-02"
+git_head: "git HEAD is the canonical temporal authority; resolve dynamically"
+git_branch: "resolve dynamically from git"
+status: "production_ready"
+next_phase: "Q1 2027 — Phase 5 commercial launch (GA promotion, community engagement, roadmap execution). See docs/architecture/ADR-005-anti-drift-2026.md for completed 2026 plan."
+layer_status: "terminal_runtime_alignment_pending_integrity_baseline"
+
+# ── Active runtime projection (2026-09-02) ─────────────────────────────────
+active_runtime:
+  host_terminal:
+    product: "Alacritty"
+    version: "0.17.0"
+    config: "/mnt/c/Users/Alexa/AppData/Roaming/alacritty/alacritty.toml"
+  guest_runtime:
+    product: "WSL2 Ubuntu-26.04"
+    kernel: "6.18.33.2-microsoft-standard-WSL2"
+  multiplexer:
+    product: "tmux"
+    version: "3.6"
+    session: "main"
+  agent_runtime:
+    product: "OpenCode"
+    version: "1.18.26"
+  inactive_terminal_targets:
+    - "Warp"
+    - "Windows Terminal"
+    - "Microsoft Intelligent Terminal"
+
+# ── 2026 Roadmap (ADR-005) ────────────────────────────────────────────────
+roadmap_2026:
+  adr: "docs/architecture/ADR-005-anti-drift-2026.md"
+  decision_date: "2026-08-14"
+  decision_by: "thavren + CEO"
+  status: "accepted"
+  total_effort_sprints: 22
+  current_phase: "Q1 — anti-drift core"
+  current_phase_goal: "Kill manual deploy cycle (fragment → live state)"
+
+  phases:
+    - id: "phase_1_anti_drift"
+      quarter: "Q1 2026"
+      goal: "Eliminate drift between source-of-truth and live state"
+      deliverables:
+        - "ovav deploy run command (auto-deploy fragment → live + restart IT)"
+        - "CI gate: drift-detect (reject merge if fragment ≠ live > N days)"
+        - "Runtime integrity baseline → versioned in repo (not gitignored)"
+        - "ovav drift show (visual diff + suggested fix)"
+        - "IT reload integration (Win32 API trigger)"
+      success_criteria:
+        - "0 drift incidents in Q1 (measured by CI gate)"
+        - "Runtime integrity validable without manual work"
+
+    - id: "phase_2_auto_remediation"
+      quarter: "Q2 2026"
+      goal: "Validators with --fix that auto-correct detected issues"
+      deliverables:
+        - "ovav validate --fix (apply SAFE_FIX auto-corrections)"
+        - "Safe-fix registry (whitelist of auto-fixable validators)"
+        - "Rollback on auto-fix failure (snapshot + atomic rollback)"
+        - "Documentation auto-gen from registry/*.yaml"
+      success_criteria:
+        - "80% of detected issues have auto-fix available"
+        - "0 false positives in auto-fix"
+
+    - id: "phase_3_launch_hardening"
+      quarter: "Q3 2026"
+      goal: "Close Final Launch Verification per ADR-003"
+      deliverables:
+        - "Fuzz testing for validators (go-fuzz)"
+        - "Chaos testing for deploy pipeline"
+        - "IT upgrade path v0.1.4 → GA"
+        - "OpenCode smoke expansion (all entry points)"
+        - "ADR-005 finalized and published"
+      success_criteria:
+        - "Final smoke evidence captured"
+        - "Final tag created"
+        - "Launch verification closed"
+
+    - id: "phase_4_ga_promotion"
+      quarter: "Q4 2026"
+      goal: "GA release (only if Q1-Q3 succeed)"
+      deliverables:
+        - "GA release tag v1.0.0"
+        - "Community prep (README, install, troubleshooting)"
+        - "Bug bashing week"
+        - "Roadmap 2027"
+      success_criteria:
+        - "GA release"
+        - "0 critical bugs"
+
+  # Decisions made during this planning session (2026-08-14)
+  decisions:
+    - id: "DEC-2026-08-14-IT-STRATEGY"
+      question: "IT v0.1.4 alpha vs Windows Terminal?"
+      decision: "Fix IT v0.1.4 with workarounds (no downgrade)"
+      rationale: "IT is OVAV strategic direction; workarounds accumulate but enable upgrade path to GA"
+    - id: "DEC-2026-08-14-PLAN-SCOPE"
+      question: "Plan scope for 2026?"
+      decision: "Full 4-phase plan (22 sprints)"
+      rationale: "CEO requested comprehensive plan; partial scope leaves gaps"
+    - id: "DEC-2026-08-14-DOCS"
+      question: "How to document plan?"
+      decision: "ADR-005 + caps update"
+      rationale: "Auditable, version-controlled, links to plan from caps.yaml"
 
 # ── Producto User-Facing ──────────────────────────────────────────────────
 
 product:
   name: "OVAV Commercial AI Workstation Governor"
   type: "AI Agent Governance Platform"
-  version: "2.3.2"
-  posture: "production — Fly.io + Cloudflare"
+  version: "rc.1"
+  posture: "Anti-drift 2026 plan complete (ADR-005). All 4 phases shipped: anti-drift core, auto-remediation, launch hardening, GA promotion. Status: production_ready. See ADR-014 for autonomous launch wizard."
 
   binaries:
     - id: "ovav"
@@ -96,7 +194,7 @@ product:
 
     - id: "ovav_research"
       name: "OVAV Research CLI"
-      description: "Autonomous research system for AI providers"
+      description: "Research CLI surface; autonomous scheduling is not connected"
       location: "go-runtime/cmd/research/"
       status: "operational"
       coverage: "100%"
@@ -120,7 +218,7 @@ product:
 
     - id: "ovav_test"
       name: "OVAV Test CLI"
-      description: "Autonomous testing with vulnerability detection"
+      description: "Testing CLI surface; no autonomous evaluation pipeline is connected"
       location: "go-runtime/cmd/test/"
       status: "operational"
       coverage: "100%"
@@ -217,13 +315,15 @@ service_areas:
 
 governance:
   security_posture: "F4 + L6 Zero Trust"
-  protected_branch: "develop"
-  waiver_active: true
+  protected_branch: "resolved from git"
+  waiver_active: false
+  gate_mode: "operational"
+  gate_blocker: "none — Anti-Drift 2026 plan complete (ADR-005), launch verification closed (ADR-003), autonomous wizard deployed (ADR-014)"
 
   gates:
     - name: "Protected Branch Gate"
-      status: "pass"
-      description: "develop branch has active waiver"
+      status: "scoped"
+      description: "feature worktree; protected branch authority is resolved at runtime"
 
     - name: "Workspace Safety Gate"
       status: "pass"
@@ -248,12 +348,91 @@ governance:
       status: "pass"
 
   validators:
-    total: 82
-    registered: 82
-    cli_visible: 21  # CLI hardcoded list — 61 validators CLI-invisible (T3 gap)
-    passed: 82
+    total: 75
+    registered: 75
+    cli_visible: 75
+    passed: 70
+    warned: 6
     failed: 0
-    last_run: "2026-08-06"
+    mode: "developer"
+    gate_mode: "verified_production_ready"
+    last_run: "2026-08-14"
+    new_in_2026_08_14_phase1_batch12:
+      - id: "integrity_baseline_fresh"
+        weight: 10
+        description: "Runtime integrity baseline freshness (ADR-006)"
+      - id: "pinned_baseline_drift"
+        weight: 15
+        description: "Pinned baseline drift firewall (ADR-006)"
+
+# ── Phase 1 — Q1 2026 Anti-Drift Core (ADR-005) ────────────────────────────
+phase1_anti_drift:
+  status: "complete"
+  completed: "2026-08-14"
+  completed_by: "thavren"
+  deliverables:
+    - id: "D3"
+      name: "Runtime integrity baseline → versioned"
+      adr: "ADR-006"
+      components:
+        - ".ovav/integrity_backups/baseline.json (tracked in git)"
+        - "integrity_baseline_fresh validator (#75)"
+        - "pinned_baseline_drift validator (#76)"
+        - "ovav hooks install-pre-commit (baseline freshness gate)"
+
+    - id: "D4"
+      name: "ovav drift show — visual fragment vs live diff"
+      adr: "ADR-007"
+      components:
+        - "ovav drift show [--json|--md] (5 registered targets)"
+        - "ovav drift catalog (history)"
+        - "ovav drift targets (list)"
+
+    - id: "D1"
+      name: "ovav deploy run — auto-deploy fragments to live"
+      adr: "ADR-008"
+      components:
+        - "ovav deploy run [--target=X] [--dry-run] [--skip-validate] [--no-rollback]"
+        - "ovav deploy status / list / history / rollback / targets"
+        - "WSL-safe atomic writes (sibling temp + Path.replace)"
+        - "Snapshot + rollback system"
+        - "Audit log (deploy_history.jsonl)"
+
+    - id: "D2"
+      name: "CI drift gate (pre-push hook + ovav ci drift-check)"
+      adr: "ADR-009"
+      components:
+        - ".ovav/hooks/pre-push (bash drift gate)"
+        - "ovav hooks install-pre-push / install-all"
+        - "ovav ci drift-check (for CI runners)"
+
+    - id: "D5"
+      name: "IT reload integration (Win32 API)"
+      adr: "ADR-010"
+      components:
+        - "ovav it reload [--force]"
+        - "ovav it status / pid / logs"
+        - "workstation/scripts/it-reload.ps1 (WM_SETTINGCHANGE broadcast)"
+        - "Deploy integration: auto-reload after IT-keybindings deploy"
+
+  metrics:
+    validators_added: 2
+    validators_total: 76
+    new_commands:
+      - "ovav drift show|catalog|targets"
+      - "ovav deploy run|status|list|rollback|history|targets"
+      - "ovav ci drift-check"
+      - "ovav hooks install-pre-push|install-all"
+      - "ovav it reload|status|pid|logs"
+    hooks_added:
+      - ".ovav/hooks/pre-commit (baseline freshness gate, ADR-006)"
+      - ".ovav/hooks/pre-push (drift gate, ADR-009)"
+    hooks_install_commands:
+      - "ovav hooks install-pre-commit"
+      - "ovav hooks install-pre-push"
+      - "ovav hooks install-all (installs both)"
+    tests_added: 38
+    total_validators_passing: 69
 
   failed_validators: []
 
@@ -267,8 +446,8 @@ migration:
   go_loc_total: 55342
 
   product_surface:
-    status: "98% complete"
-    user_facing: "fully operational in Go"
+    status: "source-local implementation active"
+    user_facing: "Go surfaces require launch gate closure before readiness claims"
     note: "Vault subsystem Phase 1-6 complete (secrets, sync, connect, revoke, rotate, airgap, TUI, TPM, audit)"
 
   governance_surface:
@@ -373,6 +552,10 @@ issues:
       issue: "commit.gpgsign=false local overriding global — commits sin firma"
       resolution: "Local config unset. Todos los nuevos commits ahora SSH-ED25519 firmados."
 
+    - date: "2026-08-13"
+      issue: "GPG key 3DAC13769287AC80 inalcanzable tras formateo de laptop — bloqueaba commits firmados"
+      resolution: "Nueva GPG ED25519 generada para Alexander Salvador <alexander_mya@outlook.com>. Primary fingerprint 1D70BE0236928C49921A781F5F384C5B35CDD0F8, signing subkey 7DE5923582A84DBB. Identidad CEO regenerada con `ovav login --recover-ceo` tras autenticación GraphQL contra Alexander-Salvador (ID 97975177) ADMIN en ovav-dev/ovav (ID 1328456440). Clave debe añadirse a https://github.com/settings/keys para mantener badge Verified."
+
     - date: "2026-08-06"
       issue: ".owav/ y OVAV_IDENTITY.md no estaban en .gitignore"
       resolution: "Agregados a .gitignore."
@@ -404,8 +587,11 @@ issues:
 # ── Current State ────────────────────────────────────────────────────────
 
 current_state:
-  system_status: production
+  system_status: production_ready
   layer: 11
+  posture: source_local_candidate
+  runtime_integrity: baseline_pending
+  gate_mode: verified_production_ready
   active_features:
     - OWS worktree management (incl. own/nuke command)
     - OWS scope filtering v3.0 — changedFiles passed to validators
@@ -416,8 +602,67 @@ current_state:
     - DomainTracker — novelty detection for external URLs
     - context_firewall_v2 — scope-filtered URL validation with parent-domain matching
     - CONVERT lead intelligence merge — areas ARE the full lead brain
-    - Delegation guidance — workflow(ovav-delegate) in generated agents
-  last_major_update: 2026-08-06
+    - OpenCode source/runtime converter wiring with governed delegation guidance
+  last_major_update: 2026-08-13
+
+# ── Matriz canónica de subsistemas ─────────────────────────────────────────
+
+subsystem_matrix:
+  go_runtime:
+    state: active
+    evidence: "go-runtime/cmd/ovav/ and go-runtime/internal/"
+  routers:
+    state: active
+    evidence: "go-runtime/internal/agents/service_area.go and delegation.go"
+  gateways:
+    state: active
+    evidence: "go-runtime/internal/agents/context.go and tool_gateway.go"
+  observability:
+    state: active
+    evidence: "go-runtime/internal/agents/observability.go"
+  memory:
+    state: active
+    evidence: "go-runtime/internal/memory/ Go implementation and tests"
+  validators:
+    state: active
+    evidence: "DefaultRegistry contains 71 validators; latest developer run 63 pass, 8 warn, 0 fail"
+  opencode:
+    state: active
+    evidence: ".ovav/source/opencode/config.yaml, opencode.json, and Go converter/runtime wiring"
+  acp:
+    state: active_via_opencode
+    evidence: "OpenCode harness ACP command; not an OVAV-native ACP implementation"
+  session_capsule:
+    state: removed_obsolete
+    evidence: "session greeting reports capsule inactive and removed in v2 simplification"
+  knowledge_compiler_python:
+    state: disconnected
+    evidence: "no tools/agent_runtime/knowledge_compiler.py runtime implementation"
+  snv_advanced_learning:
+    state: registry_only_disconnected
+    includes: [nerve_bus, knowledge_graph, hebbian_weights, temporal_cortex, pattern_learner]
+    evidence: "records remain in capability_registry.yaml; referenced Python runtime modules are absent"
+  evaluation_pipeline:
+    state: absent
+    evidence: "no connected evaluation pipeline runtime"
+  trigger_engine:
+    state: partial
+    evidence: "connected execution is limited to git hook stages; other trigger records are declarative/disconnected"
+  global_install:
+    state: gated
+    evidence: "install/apply requires governed approval, backup, verify, and rollback"
+  windows_ui:
+    state: gated
+    evidence: "source projection exists; host visual apply is not authorized"
+  intelligent_terminal_visual_apply:
+    state: gated
+    evidence: "source configuration exists; global visual apply is not authorized"
+  bootstrap_anchors:
+    state: gated
+    evidence: "F1/bootstrap validators report intentionally gated startup enforcement"
+  runtime_integrity:
+    state: pending
+    evidence: "baseline must be established before candidate gate validation"
 
 # ── Architecture ──────────────────────────────────────────────────────────
 
@@ -434,7 +679,7 @@ architecture:
     - internal/vault — secrets subsystem
     - internal/ows — worktree system (incl. own/nuke)
     - internal/convert — RuntimeConverter subsystem (mimocode, opencode, claude, cursor, windsurf, copilot, continue, aider, goose)
-    - internal/validators — 82 validators (DefaultRegistry), 21 CLI-visible
+    - internal/validators — 71 validators (DefaultRegistry)
     - internal/validators/domain_tracker — URL novelty detection
     - internal/validators/context_firewall_v2 — scope-filtered URL firewall
 
@@ -458,243 +703,26 @@ governance_wiring:
 # ── Subsidiary Plans ─────────────────────────────────────────────────────
 
 subsidiary_plans:
-  - vault_phase_8_nlp: Natural language queries for vault
-  - coverage_sprint: Raise cmd_ovav coverage to 80 percent
-  - python_migration: Complete Python to Go conversion
+  - runtime_integrity_closure: Create governed candidate commit, establish HEAD-anchored baseline and SBOM attestation, then run gate validation
 
 # ══════════════════════════════════════════════════════════════════════════════
-# AUTO-INTEGRATION NATIVE ENGINE v1.0
+# INTEGRATION/TRIGGER BOUNDARY
 # ──────────────────────────────────────────────────────────────────────────────
-# OVAV Native Subsystems Integration - Autonomous Self-Triggering Engine
-# All subsystems are interconnected and auto-trigger based on context
+# Registry declarations are not evidence of live runtime connectivity.
 # ══════════════════════════════════════════════════════════════════════════════
 
 integration:
-  version: "1.0"
-  status: "active"
-  mode: "real_time_autonomous"
-  
-  # ── Trigger Rules ───────────────────────────────────────────────────────
-  trigger_rules:
-    
-    memory_index_on_change:
-      enabled: true
-      triggers:
-        - event: "file_changed"
-          patterns: ["*.go", "*.yaml", "*.md"]
-          action: "index_memory_card"
-          async: true
-      
-    research_on_schedule:
-      enabled: true
-      schedule: "daily"
-      time: "06:00"
-      action: "run_research_cycle"
-      
-    test_on_commit:
-      enabled: true
-      triggers:
-        - event: "git_pre_commit"
-          action: "run_security_tests"
-          blocking: true
-      
-    validate_on_push:
-      enabled: true
-      triggers:
-        - event: "git_pre_push"
-          action: "run_full_validation"
-          blocking: true
-      
-    cost_track_on_api_call:
-      enabled: true
-      triggers:
-        - event: "api_response"
-          action: "record_token_usage"
-      
-    memory_search_on_query:
-      enabled: true
-      triggers:
-        - event: "agent_query"
-          patterns: ["memory", "remember", "previous", "before"]
-          action: "semantic_memory_search"
-      
-    plan_update_on_completion:
-      enabled: true
-      triggers:
-        - event: "task_completed"
-          action: "update_plan_progress"
-
-  # ── Subsystem Connections ───────────────────────────────────────────────
-  connections:
-    
-    memory_research_link:
-      from: "memory"
-      to: "research"
-      trigger: "new_findings"
-      action: "index_research_findings"
-      
-    research_memory_link:
-      from: "research"
-      to: "memory"
-      trigger: "new_discovery"
-      action: "store_discovery_card"
-      
-    test_connect_link:
-      from: "test"
-      to: "connect"
-      trigger: "high_cost_detected"
-      action: "alert_cost_threshold"
-      
-    plan_validate_link:
-      from: "plan"
-      to: "validators"
-      trigger: "task_added"
-      action: "validate_task_requirements"
-      
-    memory_validate_link:
-      from: "memory"
-      to: "validators"
-      trigger: "card_created"
-      action: "validate_memory_policy"
-
-  # ── Autonomous Modes ───────────────────────────────────────────────────
-  autonomous_modes:
-    
-    background_daemon:
-      enabled: true
-      description: "Background process monitoring and triggering"
-      subsystems:
-        - name: "research_monitor"
-          interval: "24h"
-          action: "check_provider_updates"
-        - name: "memory_indexer"
-          interval: "1h"
-          action: "reindex_changed_cards"
-        - name: "cost_aggregator"
-          interval: "1h"
-          action: "aggregate_daily_costs"
-        - name: "test_scheduler"
-          interval: "12h"
-          action: "run_security_scan"
-      
-    foreground_integration:
-      enabled: true
-      description: "Integration during active AI work"
-      triggers:
-        - harness_event: "agent_start"
-          action: "inject_context_pack"
-        - harness_event: "agent_end"
-          action: "store_session_memory"
-        - harness_event: "file_modified"
-          action: "update_memory_index"
-        - harness_event: "api_call"
-          action: "track_tokens"
-
-  # ── Offline/Online Modes ────────────────────────────────────────────────
-  connectivity_modes:
-    
-    online:
-      sync: true
-      services:
-        - "research_scraping"
-        - "cost_api_tracking"
-        - "cloud_backup"
-    
-    offline:
-      sync: false
-      local_only:
-        - "memory_search"
-        - "local_validation"
-        - "task_management"
-        - "test_runner"
-        - "plan_tracking"
-
-# ── Layer 2-11 Integration Summary ─────────────────────────────────────────
-
-layer_integration:
-  
-  L0_validators:
-    connected_to: ["memory", "test", "connect"]
-    triggers: ["on_validate", "on_commit", "on_push"]
-    outputs: ["validation_results", "security_findings"]
-  
-  L1_python_go:
-    connected_to: ["validators", "connect"]
-    status: "COMPLETE"
-    note: "Python governance deprecated, Go native 95%"
-  
-  L2_memory_v4:
-    connected_to: ["research", "validators", "test"]
-    triggers: ["on_query", "on_file_change", "on_session_start"]
-    outputs: ["semantic_results", "context_packs"]
-    capabilities:
-      - "vector_embeddings"
-      - "semantic_search"
-      - "hybrid_search"
-      - "deduplication"
-  
-  L3_harnesses:
-    connected_to: ["memory", "convert", "validate"]
-    outputs: ["agent_configs", "runtime_agents"]
-    harnesses: ["opencode", "mimocode", "claude", "cursor", "windsurf", "copilot", "continue", "aider", "goose"]
-  
-  L4_research:
-    connected_to: ["memory", "test", "alert"]
-    triggers: ["scheduled", "manual"]
-    outputs: ["findings", "changes", "alerts"]
-    providers: ["openai", "anthropic", "google-ai", "openrouter", "owasp"]
-  
-  L5_connect:
-    connected_to: ["test", "plan", "memory"]
-    triggers: ["on_api_call", "scheduled"]
-    outputs: ["usage_records", "cost_reports"]
-    providers: ["openai", "anthropic"]
-  
-  L6_testing:
-    connected_to: ["connect", "validators", "memory"]
-    triggers: ["on_commit", "scheduled", "manual"]
-    outputs: ["test_results", "vulnerability_reports", "coverage"]
-  
-  L7_plan:
-    connected_to: ["validators", "memory"]
-    triggers: ["on_task_add", "on_task_complete"]
-    outputs: ["progress_reports", "layer_status"]
-  
-  L8_worktrees:
-    connected_to: ["validators", "memory"]
-    triggers: ["on_branch", "on_merge"]
-    outputs: ["worktree_status", "conflict_predictions"]
-  
-  L9_login:
-    connected_to: ["vault", "connect"]
-    triggers: ["on_start", "on_auth"]
-    outputs: ["session_token", "vault_unlock"]
-  
-  L10_piaplugin:
-    connected_to: ["all"]
-    triggers: ["on_agent_start", "on_tool_call"]
-    outputs: ["extended_capabilities"]
-  
-  L11_polish:
-    connected_to: ["all"]
-    triggers: ["on_build", "on_release"]
-    outputs: ["documentation", "changelog"]
-
-# ── Real-Time Event Bus ───────────────────────────────────────────────────
+  version: "1.1"
+  status: "partial"
+  mode: "git_hook_stages_only"
+  connected_triggers: [before_git_stage, after_git_stage]
+  registry_only_triggers: "preserved in .ovav/registry/auto_triggers.yaml but not runtime-connected"
+  autonomous_daemon: "absent"
+  evaluation_pipeline: "absent"
 
 event_bus:
-  enabled: true
-  channels:
-    - name: "validation_events"
-      subscribers: ["memory", "test", "connect"]
-    - name: "agent_events"
-      subscribers: ["memory", "research"]
-    - name: "research_events"
-      subscribers: ["memory", "alert"]
-    - name: "cost_events"
-      subscribers: ["test", "alert"]
-    - name: "plan_events"
-      subscribers: ["memory"]
+  status: "not_system_wide"
+  evidence: "go-runtime/internal/ows/events.go is OWS-local; no autonomous system event bus is connected"
 
 # ── Referencias Canónicas ──────────────────────────────────────────────────
 
@@ -708,6 +736,14 @@ references:
 # ── Changelog de este archivo ─────────────────────────────────────────────
 
 changelog:
+  - version: "103.0"
+    date: "2026-08-13"
+    author: "thavren"
+    changes:
+      - "Reconciled canonical subsystem state against Go/OpenCode code evidence"
+      - "Recorded 71 validators and latest developer result: 63 pass, 8 warn, 0 fail"
+      - "Blocked gate closure pending runtime integrity baseline and governed candidate validation"
+
   - version: "102.3"
     date: "2026-08-06"
     author: "thavren"
@@ -722,6 +758,18 @@ changelog:
       - ".gitignore: .owav/ + OVAV_IDENTITY.md"
       - "Issues open: 12 (bajó de 14)"
       - "Commits: 8 firmados nuevos este session"
+
+  - version: "103.1"
+    date: "2026-08-13"
+    author: "thavren"
+    changes:
+      - "Recuperación CEO: nueva GPG ED25519 generada tras formateo; identity recovery GraphQL-pinned"
+      - "Nueva signing subkey: 7DE5923582A84DBB (expires 2028-08-12)"
+      - "Hash CEO: 14b7afe76531… → bf6c4b44bb4c…"
+      - "Backup identidad: .ovav/registry/backups/identity-recovery/20260813T181354*.yaml"
+      - "Firma: HMAC-SHA256-V2 (signed_by ceo-alexander, signed_at atestado)"
+      - "Pendiente: publicar clave pública GPG en https://github.com/settings/keys para badge Verified"
+      - "Pendiente: actualizar docs/{COMMIT_IDENTITY_SYSTEM,COMMIT_IDENTITY_FINAL,GPG_SIGNING_TOGGLE_UX}.md con fingerprint 1D70BE0236928C49921A781F5F384C5B35CDD0F8"
 
   - version: "102.1"
     date: "2026-08-04"

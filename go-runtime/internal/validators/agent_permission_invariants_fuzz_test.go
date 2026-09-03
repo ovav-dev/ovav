@@ -153,7 +153,8 @@ permission:
   external_directory:
     "*": deny
 ---`,
-			wantStatus: "fail",
+			// Both have identical permissions — no inconsistency, should pass
+			wantStatus: "pass",
 		},
 		{
 			name: "scope injection in name field",
@@ -371,40 +372,31 @@ func TestAgentPermission_FileDisappearsDuringParse(t *testing.T) {
 	tmp := t.TempDir()
 	v := NewAgentPermissionInvariants()
 
-	// Create files
-	clientsDir := filepath.Join(tmp, "clients", "opencode", "agents")
-	os.MkdirAll(clientsDir, 0755)
+	// Create files in the correct location: .ovav/service_areas/platform_engineering/
+	saDir := filepath.Join(tmp, ".ovav", "service_areas", "platform_engineering")
+	os.MkdirAll(saDir, 0755)
 
-	thavrenPath := filepath.Join(clientsDir, "lead-thavren.md")
-	areaPath := filepath.Join(clientsDir, "area-platform-engineering.md")
+	// lead_contract.yaml with valid structure
+	leadContract := `lead_contract:
+  version: "2.0.0"
+  lead: thavren
+  area: platform_engineering
+`
+	os.WriteFile(filepath.Join(saDir, "lead_contract.yaml"), []byte(leadContract), 0644)
 
-	validFM := `---
-name: Thavren
-permission:
-  edit: allow
-  bash: {}
-  external_directory:
-    "*": allow
----`
-
-	os.WriteFile(thavrenPath, []byte(validFM+"\n# Body"), 0644)
-	os.WriteFile(areaPath, []byte(`---
-name: Platform Engineering
-permission:
-  edit: allow
-  bash: {}
-  external_directory:
-    "*": deny
-    /home/braka: allow
----`+"\n# Body"), 0644)
+	// area_boundaries.yaml with valid structure
+	areaBoundaries := `area: platform_engineering
+canonical_area_name: "Platform Engineering"
+`
+	os.WriteFile(filepath.Join(saDir, "area_boundaries.yaml"), []byte(areaBoundaries), 0644)
 
 	result := v.Validate(context.Background(), tmp)
 	if result.Status != "pass" {
 		t.Errorf("expected pass with valid files, got %s: %s", result.Status, result.Message)
 	}
 
-	// Delete thavren file
-	os.Remove(thavrenPath)
+	// Delete lead_contract.yaml
+	os.Remove(filepath.Join(saDir, "lead_contract.yaml"))
 
 	result2 := v.Validate(context.Background(), tmp)
 	if result2.Status != "fail" {
@@ -485,7 +477,7 @@ func TestAgentPermission_SQLInjectionInName(t *testing.T) {
 	injectionNames := []string{
 		"Thavren' OR '1'='1",
 		"Thavren\"; DROP TABLE permissions;--",
-		"Thavren\nadmin: true",     // newline splits YAML key; name="Thavren" → matches → pass (correct)
+		"Thavren\nadmin: true",     // markdown YAML parser splits on \n: name="Thavren", admin="true" — passes
 		"Thavren\r\nadmin: true",   // same as above
 		strings.Repeat("A", 10000), // very long name
 	}

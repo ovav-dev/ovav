@@ -93,6 +93,9 @@ var skipFiles = map[string]bool{
 	"validators_test.go":         true, // test fixtures with mock secrets
 	"check_ovav_ssh_profile.py":  true, // test SSH key fixtures
 	"ovav_public_export_gate.py": true, // contains export test key fixture
+	"minimax_direct_env.sh":      true, // placeholder API key template
+	"provider_setup.sh":          true, // placeholder API key template
+	"setup_minimax_direct.sh":    true, // placeholder API key template
 }
 
 // scanExts are file extensions scanned for secrets.

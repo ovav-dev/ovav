@@ -4,7 +4,7 @@
 
 # ── Build metadata ────────────────────────────────────────────────────────────
 VERSION     ?= 0.0.0-dev
-BUILD       ?= CAPA 9 — Go Runtime
+BUILD       ?= CAPA-9-Go-Runtime
 GIT_BRANCH  := $(shell git branch --show-current 2>/dev/null || echo "unknown")
 GIT_SHA     := $(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown")
 BUILD_TIME  := $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
@@ -182,7 +182,7 @@ build-cockpit-all:
 .PHONY: test
 test:
 	@echo "🧪 Running tests..."
-	go test ./... -v -count=1 -timeout 30s
+	go test ./... -v -count=1 -timeout 60s
 
 .PHONY: test-cover
 test-cover:

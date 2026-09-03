@@ -403,7 +403,7 @@ func GetBudgetConsumption(repoRoot string) (*BudgetConsumption, error) {
 // ── Budget status writer (migrated from economy_runtime.update_budget_status)
 
 // UpdateBudgetStatus writes budget_status.json from current ledger data.
-// model is the active model ID (e.g. "opencode-go/deepseek-v4-pro").
+// model is the active model ID (e.g. "openai/gpt-5.6-luna").
 // If model is empty, "unknown" is used.
 func UpdateBudgetStatus(repoRoot string, model string) error {
 	if model == "" {

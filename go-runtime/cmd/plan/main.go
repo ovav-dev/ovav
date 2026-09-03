@@ -334,10 +334,10 @@ func loadPlan(planDir string) *Plan {
 	if err != nil {
 		if os.IsNotExist(err) {
 			return &Plan{
-				Name:        "OVAV Plan",
-				Tasks:       []Task{},
-				CreatedAt:   time.Now(),
-				UpdatedAt:   time.Now(),
+				Name:      "OVAV Plan",
+				Tasks:     []Task{},
+				CreatedAt: time.Now(),
+				UpdatedAt: time.Now(),
 			}
 		}
 		fmt.Fprintf(os.Stderr, "Error reading plan: %v\n", err)

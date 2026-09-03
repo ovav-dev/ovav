@@ -11,12 +11,14 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"github.com/creack/pty"
 	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/ovav/ovav/internal/auth"
@@ -96,6 +98,7 @@ Commands:
   ovav git             Git workflow v3.0 (start, status, save, push, merge, release)
   ovav chronos         Temporal orientation (Git-based, pure Go)
   ovav login           Unlock OVAV with seed → vault + web identity
+  ovav login --recover-ceo  Recover canonical CEO identity after machine loss
   ovav whoami          Show current OVAV identity and session
   ovav logout          Close session and clear vault key
   ovav waiver          Waiver inteligente (identidad, firma, TTL máximo 60 min)
@@ -105,10 +108,23 @@ Commands:
   ovav govern decide   Run decision engine
   ovav govern trust    Verify trust gate on claims
   ovav validate        Run security validators (all | list | <id>)
-  ovav defend          Defense status dashboard
-  ovav defend scan     Run active defense scan
-  ovav defend lockdown Toggle system lockdown
-  ovav memory          Agent memory — store, recall, verify, stats
+	ovav integrity baseline [--plan|--write]
+	ovav terminal windows plan --settings <path> --fragment <path>
+	ovav defend          Defense status dashboard
+	ovav defend scan     Run active defense scan
+	ovav defend lockdown Toggle system lockdown
+	ovav security        Alias for defense status
+	ovav smoke           Bounded source-local CLI smoke test
+	ovav fresh-smoke     Bounded local fresh-clone verification
+	ovav sync --plan-json Emit a machine-readable no-write sync plan
+	ovav sync --host-profile <name> Plan an exact governed host projection
+	ovav surfaces        Check required public surfaces
+	ovav publish-check   Check public export requirements
+	ovav repo-check      Check repository presentation requirements
+	ovav release-check   Check release package requirements
+	ovav backup --plan   Emit a no-write backup plan
+	ovav rollback --plan Emit a no-write rollback plan
+	ovav memory          Agent memory — store, recall, verify, stats
   ovav version         Show version information
   ovav help            This help
 
@@ -177,15 +193,20 @@ func main() {
 
 	if len(os.Args) < 2 {
 		// Default (no args): launch Cockpit TUI if available
-		// Fallback to flat help if cockpit not built or not in repo
+		// Falls back to CLI help if cockpit unavailable
 		code := launchCockpitDefault()
 		if code == 0 {
 			os.Exit(0)
 		}
-		// Cockpit unavailable — show help with build hint
+		// Cockpit unavailable — show CLI help
 		printUsage()
-		fmt.Fprintf(os.Stderr, "\n💡 Run 'make build-cockpit' in go-runtime/ to build the TUI.\n")
 		os.Exit(0)
+	}
+
+	// "ovav cockpit" — run cockpit directly as subcommand
+	if os.Args[1] == "cockpit" {
+		code := runCockpitInternal()
+		os.Exit(code)
 	}
 
 	cmd := os.Args[1]
@@ -235,34 +256,99 @@ func printUsage() {
 
 // launchCockpitDefault attempts to launch the Cockpit TUI.
 // Returns 0 on success, non-zero if cockpit is unavailable.
-// Searches: 1) go-runtime/build/cockpit  2) ~/.local/bin/ovav-cockpit
-//  3. same directory as the ovav binary (ovav-cockpit)
 func launchCockpitDefault() int {
-	// Resolve cockpit binary path
 	cockpitPath := resolveCockpitBinary()
 	if cockpitPath == "" {
+		fmt.Fprintf(os.Stderr, "ovav: cockpit binary not found.\n")
+		fmt.Fprintf(os.Stderr, "  Run 'make build-cockpit' in go-runtime/ to build the TUI.\n")
 		return 1
 	}
-
-	// Verify binary exists and is executable
 	if _, err := os.Stat(cockpitPath); err != nil {
+		fmt.Fprintf(os.Stderr, "ovav: cockpit binary not accessible: %v\n", err)
 		return 1
 	}
-
 	repoRoot, err := cli.FindRepoRoot()
 	if err != nil {
-		// Not in a repo — still try to launch cockpit without repo context
 		repoRoot, _ = os.Getwd()
 	}
 
+	// Allocate a PTY so Bubble Tea gets a real controlling TTY.
+	// Without PTY, Bubble Tea fails with "could not open a new TTY" in
+	// non-interactive environments (AI shell, scripts, pipes).
 	cmd := exec.Command(cockpitPath)
+	cmd.Dir = repoRoot
+
+	ptyShell, tty, err := pty.Open()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "ovav: PTY allocation failed: %v\n", err)
+		return 1
+	}
+	defer ptyShell.Close()
+	defer tty.Close()
+
+	// Start the cockpit process with the PTY as its controlling terminal.
+	cmd.SysProcAttr = &syscall.SysProcAttr{Setsid: true}
+	cmd.Stdin = tty
+	cmd.Stdout = tty
+	cmd.Stderr = tty
+
+	if err := cmd.Start(); err != nil {
+		fmt.Fprintf(os.Stderr, "ovav: failed to start cockpit: %v\n", err)
+		return 1
+	}
+
+	// Relay stdin → PTY and PTY → stdout
+	done := make(chan struct{})
+	go func() {
+		buf := make([]byte, 4096)
+		for {
+			n, err := os.Stdin.Read(buf)
+			if n > 0 {
+				ptyShell.Write(buf[:n])
+			}
+			if err != nil {
+				close(done)
+				return
+			}
+		}
+	}()
+	go func() {
+		buf := make([]byte, 4096)
+		for {
+			n, err := ptyShell.Read(buf)
+			if n > 0 {
+				os.Stdout.Write(buf[:n])
+			}
+			if err != nil {
+				close(done)
+				return
+			}
+		}
+	}()
+
+	cmd.Wait()
+	return 0
+}
+
+// runCockpitInternal runs the cockpit as an internal subcommand.
+// This is used for "ovav cockpit" to bypass the TTY launch complexity.
+func runCockpitInternal() int {
+	cockpitPath := resolveCockpitBinary()
+	if cockpitPath == "" {
+		fmt.Fprintf(os.Stderr, "ovav: cockpit binary not found.\n")
+		return 1
+	}
+	repoRoot, err := cli.FindRepoRoot()
+	if err != nil {
+		repoRoot, _ = os.Getwd()
+	}
+	cmd := exec.Command(cockpitPath)
+	cmd.Dir = repoRoot
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	cmd.Dir = repoRoot
-
 	if err := cmd.Run(); err != nil {
-		fmt.Fprintf(os.Stderr, "Cockpit error: %v\n", err)
+		fmt.Fprintf(os.Stderr, "ovav: cockpit error: %v\n", err)
 		return 1
 	}
 	return 0
@@ -284,8 +370,7 @@ func resolveCockpitBinary() string {
 	}
 
 	// 3) ~/.local/bin/ovav-cockpit (installed alongside ovav)
-	homeDir, _ := os.UserHomeDir()
-	if homeDir != "" {
+	if homeDir, _ := os.UserHomeDir(); homeDir != "" {
 		localCockpit := filepath.Join(homeDir, ".local", "bin", "ovav-cockpit")
 		if _, err := os.Stat(localCockpit); err == nil {
 			return localCockpit
@@ -363,6 +448,85 @@ func jsonOutput(v interface{}) int {
 	return 0
 }
 
+type recoveryOptions struct {
+	mode   install.Mode
+	packID string
+	plan   bool
+}
+
+func parseRecoveryArgs(args []string) (recoveryOptions, error) {
+	opts := recoveryOptions{mode: install.ModeDryRun, packID: "default"}
+	modeSet := false
+	setMode := func(mode install.Mode) error {
+		if modeSet && opts.mode != mode {
+			return fmt.Errorf("conflicting recovery modes %q and %q", opts.mode, mode)
+		}
+		opts.mode = mode
+		modeSet = true
+		return nil
+	}
+
+	for i := 0; i < len(args); i++ {
+		arg := args[i]
+		switch {
+		case arg == "--plan":
+			opts.plan = true
+		case arg == "--json":
+		case arg == "--dry-run":
+			if err := setMode(install.ModeDryRun); err != nil {
+				return recoveryOptions{}, err
+			}
+		case arg == "--sandbox":
+			if err := setMode(install.ModeSandbox); err != nil {
+				return recoveryOptions{}, err
+			}
+		case arg == "--apply":
+			if err := setMode(install.ModeSourceLocalApply); err != nil {
+				return recoveryOptions{}, err
+			}
+		case arg == "--full":
+			opts.packID = "build8_source_local_apply_pack"
+		case arg == "--mode":
+			if i+1 >= len(args) {
+				return recoveryOptions{}, fmt.Errorf("--mode requires a value")
+			}
+			i++
+			mode, err := install.ResolveMode(args[i])
+			if err != nil {
+				return recoveryOptions{}, fmt.Errorf("invalid --mode: %w", err)
+			}
+			if err := setMode(mode); err != nil {
+				return recoveryOptions{}, err
+			}
+		case strings.HasPrefix(arg, "--mode="):
+			mode, err := install.ResolveMode(strings.TrimPrefix(arg, "--mode="))
+			if err != nil {
+				return recoveryOptions{}, fmt.Errorf("invalid --mode: %w", err)
+			}
+			if err := setMode(mode); err != nil {
+				return recoveryOptions{}, err
+			}
+		case arg == "--pack-id":
+			if i+1 >= len(args) || strings.HasPrefix(args[i+1], "-") {
+				return recoveryOptions{}, fmt.Errorf("--pack-id requires a value")
+			}
+			i++
+			opts.packID = args[i]
+		case strings.HasPrefix(arg, "--pack-id="):
+			opts.packID = strings.TrimPrefix(arg, "--pack-id=")
+			if opts.packID == "" {
+				return recoveryOptions{}, fmt.Errorf("--pack-id requires a value")
+			}
+		default:
+			return recoveryOptions{}, fmt.Errorf("unknown recovery argument %q", arg)
+		}
+	}
+	if opts.plan && opts.mode != install.ModeDryRun {
+		return recoveryOptions{}, fmt.Errorf("--plan conflicts with write-capable mode %q", opts.mode)
+	}
+	return opts, nil
+}
+
 // ── Subcommand: install ──────────────────────────────────────────────────────
 
 func cmdInstall(args []string) int {
@@ -408,17 +572,21 @@ func cmdPlan(args []string) int {
 // ── Subcommand: backup ───────────────────────────────────────────────────────
 
 func cmdBackup(args []string) int {
-	mode := parseModeFlag(args)
-	packID := resolvePackID(args)
+	opts, err := parseRecoveryArgs(args)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+		return 2
+	}
 	repoRoot := cli.MustFindRepoRoot()
-	plan := install.BuildPlan(packID, mode, repoRoot)
+	plan := install.BuildPlan(opts.packID, opts.mode, repoRoot)
 	manifest := install.BuildManifest(plan)
-	backupReport := install.ExecuteBackup(manifest, mode, repoRoot)
+	backupReport := install.ExecuteBackup(manifest, opts.mode, repoRoot)
 	result := map[string]interface{}{
 		"command": "backup",
 		"status":  "ok",
 		"backup":  backupReport,
-		"summary": fmt.Sprintf("Backup for pack '%s' in %s mode.", packID, mode),
+		"plan":    opts.plan,
+		"summary": fmt.Sprintf("Backup for pack '%s' in %s mode.", opts.packID, opts.mode),
 	}
 	return jsonOutput(result)
 }
@@ -466,20 +634,24 @@ func cmdVerify(args []string) int {
 // ── Subcommand: restore/rollback ─────────────────────────────────────────────
 
 func cmdRestore(args []string) int {
-	mode := parseModeFlag(args)
-	packID := resolvePackID(args)
+	opts, err := parseRecoveryArgs(args)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+		return 2
+	}
 	repoRoot := cli.MustFindRepoRoot()
-	plan := install.BuildPlan(packID, mode, repoRoot)
+	plan := install.BuildPlan(opts.packID, opts.mode, repoRoot)
 	manifest := install.BuildManifest(plan)
-	backupReport := install.ExecuteBackup(manifest, mode, repoRoot)
-	rollbackReport := install.ExecuteRollback(backupReport, manifest, mode, repoRoot)
+	backupReport := install.ExecuteBackup(manifest, opts.mode, repoRoot)
+	rollbackReport := install.ExecuteRollback(backupReport, manifest, opts.mode, repoRoot)
 	result := map[string]interface{}{
 		"command":  "restore",
 		"status":   "ok",
+		"plan":     opts.plan,
 		"rollback": rollbackReport,
-		"summary":  fmt.Sprintf("Rollback for pack '%s' in %s mode.", packID, mode),
+		"summary":  fmt.Sprintf("Rollback for pack '%s' in %s mode.", opts.packID, opts.mode),
 	}
-	if !rollbackReport.RollbackPerformed && mode != install.ModeDryRun {
+	if !rollbackReport.RollbackPerformed && opts.mode != install.ModeDryRun {
 		result["status"] = "blocked"
 	}
 	return jsonOutput(result)
@@ -488,6 +660,16 @@ func cmdRestore(args []string) int {
 // ── Subcommand: deploy ───────────────────────────────────────────────────────
 
 func cmdDeploy(args []string) int {
+	// New: subcommand dispatch (run / status / list / rollback / history / targets / chaos)
+	// Legacy: governed deploy (no args or --mode flag)
+	if len(args) > 0 {
+		switch args[0] {
+		case "run", "status", "list", "rollback", "history", "targets", "chaos",
+			"help", "--help", "-h":
+			return cmdDeployDispatch(args)
+		}
+	}
+	// Legacy path: governed deploy
 	mode := parseModeFlag(args)
 	repoRoot := cli.MustFindRepoRoot()
 	result := install.GovernedDeploy(mode, repoRoot)
@@ -498,6 +680,36 @@ func cmdDeploy(args []string) int {
 		"summary": fmt.Sprintf("Governed deploy: %d entries in %s mode.", result.DeployEntries, mode),
 	}
 	return jsonOutput(output)
+}
+
+// cmdDeployDispatch is the new subcommand-based deploy handler.
+func cmdDeployDispatch(args []string) int {
+	if len(args) == 0 {
+		return runDeployRun(args)
+	}
+	switch args[0] {
+	case "run":
+		return runDeployRun(args[1:])
+	case "status":
+		return runDeployStatus(args[1:])
+	case "list":
+		return runDeployList(args[1:])
+	case "rollback":
+		return runDeployRollback(args[1:])
+	case "history":
+		return runDeployHistory(args[1:])
+	case "targets":
+		return runDeployTargets(args[1:])
+	case "chaos":
+		return cmdDeployChaos(args[1:])
+	case "help", "--help", "-h":
+		printDeployHelp()
+		return 0
+	default:
+		fmt.Fprintf(os.Stderr, "OVAV deploy: unknown subcommand %q\n", args[0])
+		printDeployHelp()
+		return 2
+	}
 }
 
 // ── Subcommand: status ──────────────────────────────────────────────────────
@@ -644,7 +856,7 @@ func cmdProfile(args []string) int {
 	rest := args[1:]
 
 	switch sub {
-	case "list":
+	case "list", "show":
 		return profile.CmdList(rest)
 	case "apply":
 		return profile.CmdApply(rest)
@@ -839,26 +1051,63 @@ func cmdDoctor(args []string) int {
 // ── Subcommand: validate ───────────────────────────────────────────────────
 
 func cmdValidate(args []string) int {
+	// Check for --fix flag → dispatch to auto-remediation
+	for _, a := range args {
+		if a == "--fix" || a == "--fix-list" {
+			return cmdValidateFix(args)
+		}
+		if a == "--help" || a == "-h" {
+			fmt.Println(`OVAV validate — run validation gates
+
+Usage:
+  ovav validate                  # Run all validators (dev mode)
+  ovav validate --mode=gate      # Gate mode (strict)
+  ovav validate --target=X       # Run specific validator
+  ovav validate --fix            # Auto-remediate SAFE_FIX validators (ADR-011)
+  ovav validate --fix-list       # List SAFE_FIX validators
+  ovav validate --help           # This help`)
+			return 0
+		}
+	}
+
 	repoRoot, err := cli.FindRepoRoot()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: cannot find repo root: %v\n", err)
 		return 1
 	}
 
-	// Build registry with all available validators (aligned with DefaultRegistry)
-	registry := validators.DefaultRegistry()
+	mode, targetID, err := parseValidateArgs(args, validationModeForRepo(repoRoot))
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+		return 2
+	}
+	// Protected and release branches use fail-closed gate mode. Feature
+	// worktrees use explicit developer mode so scoped candidate drift is visible.
+	registry := validators.DefaultRegistry(mode)
 
-	if len(args) == 0 || args[0] == "all" {
+	if targetID == "all" {
 		// Run all validators
 		ctx := context.Background()
 		results := registry.Run(ctx, repoRoot)
 		failed := 0
+		passed := 0
+		warned := 0
+		skipped := 0
 		for _, r := range results {
 			icon := "✅"
-			if r.Status == "fail" {
+			switch r.Status {
+			case "pass":
+				passed++
+			case "warn":
+				icon = "⚠️"
+				warned++
+			case "skip":
+				icon = "⏭"
+				skipped++
+			case "fail":
 				icon = "❌"
 				failed++
-			} else if r.Status == "error" {
+			case "error":
 				icon = "⚠️"
 				failed++
 			}
@@ -869,7 +1118,7 @@ func cmdValidate(args []string) int {
 				}
 			}
 		}
-		fmt.Printf("\n%d/%d validators passed", len(results)-failed, len(results))
+		fmt.Printf("\n%d passed, %d warned, %d skipped, %d failed (%d total)", passed, warned, skipped, failed, len(results))
 		if failed > 0 {
 			fmt.Println(" ❌")
 			return 1
@@ -878,7 +1127,7 @@ func cmdValidate(args []string) int {
 		return 0
 	}
 
-	if args[0] == "list" {
+	if targetID == "list" {
 		// List all validators
 		fmt.Println("Available validators:")
 		fmt.Println()
@@ -891,7 +1140,6 @@ func cmdValidate(args []string) int {
 	}
 
 	// Run specific validator by ID
-	targetID := args[0]
 	ctx := context.Background()
 	all := registry.All()
 	for _, v := range all {
@@ -900,8 +1148,10 @@ func cmdValidate(args []string) int {
 			icon := "✅"
 			if result.Status == "fail" {
 				icon = "❌"
-			} else if result.Status == "error" {
+			} else if result.Status == "error" || result.Status == "warn" {
 				icon = "⚠️"
+			} else if result.Status == "skip" {
+				icon = "⏭"
 			}
 			fmt.Printf("%s %s — %s\n", icon, result.Name, result.Message)
 			if len(result.Issues) > 0 {
@@ -917,6 +1167,42 @@ func cmdValidate(args []string) int {
 	}
 	fmt.Fprintf(os.Stderr, "Unknown validator: %s\nRun 'ovav validate list' to see available validators.\n", targetID)
 	return 1
+}
+
+func parseValidateArgs(args []string, defaultMode validators.ValidationMode) (validators.ValidationMode, string, error) {
+	mode := defaultMode
+	target := "all"
+	targetSet := false
+	for _, arg := range args {
+		switch arg {
+		case "--gate":
+			mode = validators.ValidationGate
+		case "--developer":
+			mode = validators.ValidationDeveloper
+		default:
+			if strings.HasPrefix(arg, "-") {
+				return "", "", fmt.Errorf("unknown validate option %s", arg)
+			}
+			if targetSet {
+				return "", "", fmt.Errorf("validate accepts one target")
+			}
+			target = arg
+			targetSet = true
+		}
+	}
+	return mode, target, nil
+}
+
+func validationModeForRepo(root string) validators.ValidationMode {
+	branch := strings.TrimSpace(gitCmdOutput(root, "branch", "--show-current"))
+	switch branch {
+	case "main", "master", "develop", "staging", "prod", "production":
+		return validators.ValidationGate
+	}
+	if strings.HasPrefix(branch, "release/") || strings.HasPrefix(branch, "hotfix/") {
+		return validators.ValidationGate
+	}
+	return validators.ValidationDeveloper
 }
 
 // ── Subcommand: update ──────────────────────────────────────────────────────
@@ -2342,6 +2628,20 @@ func cmdSBOM(args []string) int {
 
 func sbomGenerate(args []string) int {
 	jsonOutput := cli.HasJSONFlag(args)
+	dryRun := false
+	check := false
+	for _, arg := range args {
+		switch arg {
+		case "--json":
+		case "--dry-run":
+			dryRun = true
+		case "--check":
+			check = true
+		default:
+			fmt.Fprintf(os.Stderr, "Unknown sbom generate option: %s\n", arg)
+			return 2
+		}
+	}
 	repoRoot := cli.MustFindRepoRoot()
 
 	s, err := sbom.Generate(repoRoot)
@@ -2350,6 +2650,31 @@ func sbomGenerate(args []string) int {
 		return 1
 	}
 
+	changed := true
+	if current, loadErr := sbom.Load(repoRoot); loadErr == nil {
+		changed = !sbom.Equal(s, current)
+	}
+	if check {
+		if changed {
+			fmt.Fprintln(os.Stderr, "SBOM baseline is missing or differs from canonical git HEAD output")
+			return 1
+		}
+		fmt.Println("[OVAV SBOM] CHECK PASS — baseline matches canonical git HEAD output.")
+		return 0
+	}
+	if dryRun {
+		data, marshalErr := s.Marshal()
+		if marshalErr != nil {
+			fmt.Fprintf(os.Stderr, "Error rendering SBOM: %v\n", marshalErr)
+			return 1
+		}
+		if jsonOutput {
+			fmt.Print(string(data))
+		} else {
+			fmt.Printf("[OVAV SBOM] DRY RUN — no files written.\n  Identity: %s\n  Files: %d\n  Would change: %t\n  Target: %s\n", s.Metadata.GitIdentity, len(s.CoreFiles), changed, sbom.SBOMRegistry)
+		}
+		return 0
+	}
 	if err := s.Save(repoRoot); err != nil {
 		fmt.Fprintf(os.Stderr, "Error saving SBOM: %v\n", err)
 		return 1
@@ -2363,13 +2688,14 @@ func sbomGenerate(args []string) int {
 			"go_deps":     len(s.Dependencies.Go),
 			"python_deps": len(s.Dependencies.Python),
 			"registry":    sbom.SBOMRegistry,
+			"changed":     changed,
 		}, true)
 		return 0
 	}
 
 	fmt.Printf("[OVAV SBOM] Supply Chain Bill of Materials generated.\n")
 	fmt.Printf("  Schema:  %s\n", s.SchemaVersion)
-	fmt.Printf("  Commit:  %s\n", s.Metadata.GitCommit)
+	fmt.Printf("  Identity: %s\n", s.Metadata.GitIdentity)
 	fmt.Printf("  Files:   %d core files tracked\n", len(s.CoreFiles))
 	fmt.Printf("  Go deps: %d dependencies\n", len(s.Dependencies.Go))
 	fmt.Printf("  Registry: %s\n", sbom.SBOMRegistry)
@@ -2377,7 +2703,21 @@ func sbomGenerate(args []string) int {
 }
 
 func sbomVerify(args []string) int {
-	jsonOutput := cli.HasJSONFlag(args)
+	jsonOutput := false
+	mode := validators.ValidationDeveloper
+	for _, arg := range args {
+		switch arg {
+		case "--json":
+			jsonOutput = true
+		case "--gate":
+			mode = validators.ValidationGate
+		case "--inspect":
+			mode = validators.ValidationDeveloper
+		default:
+			fmt.Fprintf(os.Stderr, "Unknown sbom verify option: %s\n", arg)
+			return 2
+		}
+	}
 	repoRoot := cli.MustFindRepoRoot()
 
 	result, err := sbom.Verify(repoRoot)
@@ -2385,25 +2725,55 @@ func sbomVerify(args []string) int {
 		fmt.Fprintf(os.Stderr, "SBOM verification error: %v\n", err)
 		return 1
 	}
-
-	if jsonOutput {
-		cli.Output(map[string]interface{}{
-			"status":     "ok",
-			"command":    "sbom verify",
-			"valid":      result.Valid,
-			"total":      result.TotalFiles,
-			"mismatches": result.Mismatches,
-		}, true)
-		return 0
+	securityCandidateIssues := 0
+	if mode == validators.ValidationGate {
+		for _, warning := range result.WorktreeWarnings {
+			if validators.IsSensitiveCandidateDrift(warning) {
+				securityCandidateIssues++
+			}
+		}
 	}
 
-	if result.Valid {
+	if jsonOutput {
+		status := "pass"
+		if len(result.BaselineIssues) > 0 || securityCandidateIssues > 0 {
+			status = "fail"
+		} else if len(result.WorktreeWarnings) > 0 {
+			status = "warn"
+		}
+		cli.Output(map[string]interface{}{
+			"status":            status,
+			"command":           "sbom verify",
+			"valid":             result.Valid,
+			"total":             result.TotalFiles,
+			"baseline_issues":   result.BaselineIssues,
+			"worktree_warnings": result.WorktreeWarnings,
+			"mode":              mode,
+		}, true)
+		if len(result.BaselineIssues) > 0 || securityCandidateIssues > 0 {
+			return 1
+		}
+		return 0
+	}
+	if securityCandidateIssues > 0 {
+		fmt.Printf("[OVAV SBOM Verify] ❌ FAIL — %d sensitive candidate drift item(s) in gate mode.\n", securityCandidateIssues)
+		return 1
+	}
+
+	if result.Valid && len(result.WorktreeWarnings) == 0 {
 		fmt.Printf("[OVAV SBOM Verify] ✅ PASS — %d files verified, 0 mismatches.\n", result.TotalFiles)
 		return 0
 	}
+	if result.Valid {
+		fmt.Printf("[OVAV SBOM Verify] ⚠️ WARN — HEAD baseline valid; %d working-tree drift item(s):\n", len(result.WorktreeWarnings))
+		for _, warning := range result.WorktreeWarnings {
+			fmt.Printf("  %s\n", warning)
+		}
+		return 0
+	}
 
-	fmt.Printf("[OVAV SBOM Verify] ❌ FAIL — %d mismatch(es):\n", len(result.Mismatches))
-	for _, m := range result.Mismatches {
+	fmt.Printf("[OVAV SBOM Verify] ❌ FAIL — %d baseline issue(s):\n", len(result.BaselineIssues))
+	for _, m := range result.BaselineIssues {
 		fmt.Printf("  %s\n", m)
 	}
 	return 1
@@ -2424,7 +2794,11 @@ func printSBOMHelp() {
 
 Commands:
   ovav sbom generate        Generate SBOM → .ovav/registry/sbom.json
+  ovav sbom generate --dry-run  Inspect canonical output without writing
+  ovav sbom generate --check    Exit non-zero if baseline needs updating
   ovav sbom verify          Verify current files against stored baseline
+  ovav sbom verify --inspect  Developer inspection; candidate drift warns
+  ovav sbom verify --gate     Protected/release gate; sensitive drift fails
   ovav sbom hash            Compute combined requirements hash
 
 Go-native. Replaces tools/security/sbom.py (Python).
@@ -3154,7 +3528,7 @@ func cliRuntimeOS() string {
 // ── infra command ──────────────────────────────────────────────────────────
 
 func cmdInfra(args []string) int {
-	if len(args) == 0 {
+	if len(args) == 0 || args[0] == "--help" || args[0] == "-h" {
 		fmt.Println("OVAV Infrastructure Manager")
 		fmt.Println()
 		fmt.Println("Commands:")
@@ -3369,15 +3743,19 @@ func cmdSurfaces(args []string) int {
 		result = cli.SurfacesCheck(repoRoot)
 	}
 
+	exitCode := requiredGateExitCode(result, "passed")
 	if jsonOut {
-		return jsonOutput(result)
+		if jsonOutput(result) != 0 {
+			return 1
+		}
+		return exitCode
 	}
 
 	surfaces, _ := result["surfaces"].([]map[string]interface{})
 	fmt.Println("OVAV Surface Manager")
 	for _, s := range surfaces {
 		icon := "✅"
-		if s["status"] == "missing" {
+		if s["status"] == "missing" || s["status"] == "missing_required" {
 			icon = "❌"
 		}
 		req := ""
@@ -3386,6 +3764,14 @@ func cmdSurfaces(args []string) int {
 		}
 		fmt.Printf("  %s %s%s — %s\n", icon, s["path"], req, s["desc"])
 	}
+	return exitCode
+}
+
+func requiredGateExitCode(result map[string]interface{}, field string) int {
+	passed, ok := result[field].(bool)
+	if !ok || !passed {
+		return 1
+	}
 	return 0
 }
 
@@ -3393,9 +3779,13 @@ func cmdExportGate(args []string) int {
 	repoRoot := cli.MustFindRepoRoot()
 	jsonOut := cli.HasJSONFlag(args)
 	result := cli.ExportGateCheck(repoRoot)
+	exitCode := requiredGateExitCode(result, "passed")
 
 	if jsonOut {
-		return jsonOutput(result)
+		if jsonOutput(result) != 0 {
+			return 1
+		}
+		return exitCode
 	}
 
 	passed := result["passed"].(bool)
@@ -3413,16 +3803,20 @@ func cmdExportGate(args []string) int {
 	} else {
 		fmt.Println("\n⚠️  Some checks failed — review before publishing.")
 	}
-	return 0
+	return exitCode
 }
 
 func cmdRepoCheck(args []string) int {
 	repoRoot := cli.MustFindRepoRoot()
 	jsonOut := cli.HasJSONFlag(args)
 	result := cli.RepoPresentationGate(repoRoot)
+	exitCode := requiredGateExitCode(result, "passed")
 
 	if jsonOut {
-		return jsonOutput(result)
+		if jsonOutput(result) != 0 {
+			return 1
+		}
+		return exitCode
 	}
 
 	passed := result["passed"].(bool)
@@ -3438,16 +3832,20 @@ func cmdRepoCheck(args []string) int {
 	if passed {
 		fmt.Println("\n✅ Repo presentation passed.")
 	}
-	return 0
+	return exitCode
 }
 
 func cmdReleaseCheck(args []string) int {
 	repoRoot := cli.MustFindRepoRoot()
 	jsonOut := cli.HasJSONFlag(args)
 	result := cli.ReleasePackageCheck(repoRoot)
+	exitCode := requiredGateExitCode(result, "ready")
 
 	if jsonOut {
-		return jsonOutput(result)
+		if jsonOutput(result) != 0 {
+			return 1
+		}
+		return exitCode
 	}
 
 	ready := result["ready"].(bool)
@@ -3465,31 +3863,29 @@ func cmdReleaseCheck(args []string) int {
 	} else {
 		fmt.Println("\n⚠️  Release not ready — fix issues above.")
 	}
-	return 0
+	return exitCode
 }
 
 func cmdFreshSmoke(args []string) int {
-	repoRoot := cli.MustFindRepoRoot()
-	jsonOut := cli.HasJSONFlag(args)
-	keepClone := false
-	for _, a := range args {
-		if a == "--keep-clone" {
-			keepClone = true
-		}
+	opts, err := parseSmokeArgs(args, true)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+		return 2
 	}
+	repoRoot := cli.MustFindRepoRoot()
+	result := cli.FreshCloneSmokeWithTimeout(repoRoot, opts.keepClone, opts.timeout)
 
-	fmt.Println("OVAV Fresh Clone Smoke — cloning repo...")
-	result := cli.FreshCloneSmoke(repoRoot, keepClone)
-
-	if jsonOut {
-		b, _ := json.MarshalIndent(result, "", "  ")
-		fmt.Println(string(b))
+	if opts.json {
+		if jsonOutput(result) != 0 {
+			return 1
+		}
 		if result.OverallOK {
 			return 0
 		}
 		return 1
 	}
 
+	fmt.Printf("OVAV Fresh Clone Smoke (timeout %s)\n", opts.timeout)
 	for _, c := range result.Checks {
 		icon := "✅"
 		if !c["passed"].(bool) {

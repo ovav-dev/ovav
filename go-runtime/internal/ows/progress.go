@@ -1,20 +1,39 @@
 package ows
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"sync"
 	"time"
 )
 
 // ProgressTracker manages animated progress reporting.
+
+// collectIssueLines extracts up to maxLines trimmed, non-empty lines from command
+// output. Guards against slice out-of-bounds when output is empty or shorter
+// than maxLines (replaces the repeated buggy [:5] pattern).
+func collectIssueLines(out string, maxLines int) []string {
+	var lines []string
+	for _, l := range strings.Split(strings.TrimSpace(out), "\n") {
+		if t := strings.TrimSpace(l); t != "" {
+			lines = append(lines, t)
+			if len(lines) >= maxLines {
+				break
+			}
+		}
+	}
+	return lines
+}
+
 type ProgressTracker struct {
-	label    string
+	label   string
 	total   int
 	current int
-	mu       sync.Mutex
+	mu      sync.Mutex
 }
 
 // NewProgressTracker creates a new progress tracker.
@@ -38,7 +57,7 @@ func (p *ProgressTracker) Increment(stepLabel string) {
 	}
 	cur := p.current
 	p.mu.Unlock()
-	
+
 	icon := spinnerIcon(cur)
 	if cur >= p.total {
 		fmt.Printf("\r  ✅ %-42s %3d%%\n", stepLabel, pct)
@@ -49,10 +68,10 @@ func (p *ProgressTracker) Increment(stepLabel string) {
 
 // PhaseResult holds the result of a single verification phase.
 type PhaseResult struct {
-	Name    string
-	Pass    bool
-	Issues  []string
-	DurMS   int64
+	Name   string
+	Pass   bool
+	Issues []string
+	DurMS  int64
 }
 
 // VerifyPhases runs multi-stack verification with animated progress.
@@ -87,21 +106,21 @@ func VerifyPhases(repoRoot string, changedFiles []string) ([]PhaseResult, error)
 			if s.Dir != "." {
 				dir = repoRoot + "/" + s.Dir
 			}
-			results = append(results, runNodeJSVerification(dir, 3)...)
+			results = append(results, runNodeJSVerification(dir, 2)...)
 			break // only one Node.js project per repo
 		}
 	}
 
-	// Run Python verification if Python stack detected
-	if _, err := os.Stat(repoRoot + "/pyproject.toml"); err == nil {
-		results = append(results, runPythonVerification(repoRoot, 3)...)
-	} else if _, err := os.Stat(repoRoot + "/requirements.txt"); err == nil {
-		results = append(results, runPythonVerification(repoRoot, 3)...)
+	// Run Python verification only when the canonical stack detector selected
+	// Python. OVAV itself intentionally ignores legacy Python markers when the
+	// Go runtime is present.
+	for _, dir := range stackDirs(stacks, StackPython) {
+		results = append(results, runPythonVerification(filepath.Join(repoRoot, dir), 3)...)
 	}
 
-	// Run Rust verification if Rust stack detected
-	if _, err := os.Stat(repoRoot + "/Cargo.toml"); err == nil {
-		results = append(results, runRustVerification(repoRoot, 4)...)
+	// Run Rust verification only for roots selected by stack detection.
+	for _, dir := range stackDirs(stacks, StackRust) {
+		results = append(results, runRustVerification(filepath.Join(repoRoot, dir), 4)...)
 	}
 
 	// Phase: validators (if available)
@@ -118,8 +137,7 @@ func VerifyPhases(repoRoot string, changedFiles []string) ([]PhaseResult, error)
 			valArgs = append(valArgs, "--changed-files", strings.Join(changedFiles, ","))
 			valArgs = append(valArgs, "--root", repoRoot)
 		}
-		valCmd := exec.Command("go", valArgs...)
-		valCmd.Dir = validateDir
+		valCmd := goCmd(validateDir, valArgs...)
 		valOut, _ := valCmd.CombinedOutput()
 		_, fail := parseValidateOutput(string(valOut))
 		valIssues := []string{}
@@ -132,13 +150,26 @@ func VerifyPhases(repoRoot string, changedFiles []string) ([]PhaseResult, error)
 	// Final phase: hygiene
 	start := time.Now()
 	hygiene := WorkspaceHygieneScan(repoRoot)
-	hygIssues := []string{}
-	if !hygiene.Clean {
-		hygIssues = append(hygIssues, fmt.Sprintf("%d hygiene issue(s)", hygiene.TotalIssues))
-	}
-	results = append(results, PhaseResult{Name: "hygiene", Pass: hygiene.Clean, Issues: hygIssues, DurMS: time.Since(start).Milliseconds()})
+	hygieneResult := hygienePhaseResult(hygiene)
+	hygieneResult.DurMS = time.Since(start).Milliseconds()
+	results = append(results, hygieneResult)
 
 	return results, nil
+}
+
+func stackDirs(stacks *StackInfo, stackType StackType) []string {
+	var dirs []string
+	for _, stack := range stacks.Stacks {
+		if stack.Type != stackType {
+			continue
+		}
+		dir := stack.Dir
+		if dir == "" {
+			dir = "."
+		}
+		dirs = append(dirs, dir)
+	}
+	return dirs
 }
 
 // runGoVerification runs go vet, gofmt, and go test.
@@ -160,8 +191,7 @@ func runGoVerification(goRoot string, phaseCount int) []PhaseResult {
 	go func() {
 		defer wg.Done()
 		start := time.Now()
-		vetCmd := exec.Command("go", "vet", "./...")
-		vetCmd.Dir = goRoot
+		vetCmd := goCmd(goRoot, "vet", "./...")
 		out, err := vetCmd.CombinedOutput()
 		pass := true
 		issues := []string{}
@@ -195,8 +225,7 @@ func runGoVerification(goRoot string, phaseCount int) []PhaseResult {
 	// Phase 3: go test
 	fmt.Printf("\n  ⏳ go test running (this may take a moment)...\n")
 	startTest := time.Now()
-	testCmd := exec.Command("go", "test", "-count=1", "./...")
-	testCmd.Dir = goRoot
+	testCmd := goCmd(goRoot, "test", "-count=1", "./...")
 	out, err := testCmd.CombinedOutput()
 	testIssues := []string{}
 	testPass := true
@@ -210,68 +239,183 @@ func runGoVerification(goRoot string, phaseCount int) []PhaseResult {
 	return results
 }
 
-// runNodeJSVerification runs biome/tsc and npm test.
+// runNodeJSVerification runs only checks explicitly configured by the project.
 func runNodeJSVerification(nodeRoot string, phaseCount int) []PhaseResult {
-	var results []PhaseResult
+	return runNodeJSVerificationMode(nodeRoot, phaseCount, true)
+}
+
+func runNodeJSVerificationMode(nodeRoot string, phaseCount int, includeTests bool) []PhaseResult {
 	tracker := NewProgressTracker("nodejs", phaseCount)
-
-	// Try biome (Rust-based, fast)
-	hasBiome := false
-	if _, err := exec.LookPath("biome"); err == nil {
-		hasBiome = true
-	}
-
-	if hasBiome {
-		start := time.Now()
-		cmd := exec.Command("biome", "check", "--enabled", "lint", ".")
-		cmd.Dir = nodeRoot
-		out, err := cmd.CombinedOutput()
-		pass := err == nil
-		issues := []string{}
-		if !pass {
-			for _, l := range strings.Split(strings.TrimSpace(string(out)), "\n")[:5] {
-				if t := strings.TrimSpace(l); t != "" {
-					issues = append(issues, t)
-				}
-			}
-		}
-		results = append(results, PhaseResult{Name: "biome check", Pass: pass, Issues: issues, DurMS: time.Since(start).Milliseconds()})
-		tracker.Increment("biome check")
-	} else {
-		// Fallback to tsc
-		start := time.Now()
-		cmd := exec.Command("npx", "tsc", "--noEmit")
-		cmd.Dir = nodeRoot
-		out, err := cmd.CombinedOutput()
-		issues := []string{}
-		if err != nil {
-			for _, l := range strings.Split(strings.TrimSpace(string(out)), "\n")[:5] {
-				if t := strings.TrimSpace(l); t != "" {
-					issues = append(issues, t)
-				}
-			}
-		}
-		results = append(results, PhaseResult{Name: "tsc", Pass: err == nil, Issues: issues, DurMS: time.Since(start).Milliseconds()})
-		tracker.Increment("tsc")
-	}
-
-	// npm test
-	start := time.Now()
-	cmd := exec.Command("npm", "test")
-	cmd.Dir = nodeRoot
-	out, err := cmd.CombinedOutput()
-	issues := []string{}
+	manifest, err := loadNodePackageManifest(nodeRoot)
 	if err != nil {
-		for _, l := range strings.Split(strings.TrimSpace(string(out)), "\n")[:5] {
-			if t := strings.TrimSpace(l); t != "" {
-				issues = append(issues, t)
-			}
-		}
+		return []PhaseResult{{Name: "Node manifest", Pass: false, Issues: []string{err.Error()}}}
 	}
-	results = append(results, PhaseResult{Name: "npm test", Pass: err == nil, Issues: issues, DurMS: time.Since(start).Milliseconds()})
-	tracker.Increment("npm test")
+	manager, err := resolveNodePackageManager(nodeRoot, manifest.PackageManager)
+	if err != nil {
+		return []PhaseResult{{Name: "Node package manager", Pass: false, Issues: []string{err.Error()}}}
+	}
+
+	var results []PhaseResult
+	runTool := func(name, tool string, args ...string) {
+		start := time.Now()
+		cmd, cmdErr := nodeToolCommand(nodeRoot, manager, tool, args...)
+		var out []byte
+		if cmdErr == nil {
+			out, cmdErr = cmd.CombinedOutput()
+		}
+		issues := collectIssueLines(string(out), 5)
+		if cmdErr != nil {
+			issues = append(issues, cmdErr.Error())
+		}
+		results = append(results, PhaseResult{
+			Name: name, Pass: cmdErr == nil, Issues: issues, DurMS: time.Since(start).Milliseconds(),
+		})
+		tracker.Increment(name)
+	}
+
+	if hasBiomeConfig(nodeRoot, manifest) {
+		runTool("biome check", "biome", "check", ".")
+	} else if hasTypeScriptConfig(nodeRoot) {
+		runTool("tsc", "tsc", "--noEmit")
+	} else {
+		results = append(results, PhaseResult{Name: "tsc", Pass: true, Issues: []string{"skipped: no TypeScript or Biome configuration"}})
+		tracker.Increment("tsc (skipped)")
+	}
+
+	if strings.TrimSpace(manifest.Scripts["test"]) == "" || !includeTests {
+		reason := "skipped: package.json has no test script"
+		if !includeTests && strings.TrimSpace(manifest.Scripts["test"]) != "" {
+			reason = "skipped: quick verification mode"
+		}
+		results = append(results, PhaseResult{Name: "node test", Pass: true, Issues: []string{reason}})
+		tracker.Increment("node test (skipped)")
+		return results
+	}
+
+	start := time.Now()
+	cmd, cmdErr := nodeScriptCommand(nodeRoot, manager, "test")
+	var out []byte
+	if cmdErr == nil {
+		out, cmdErr = cmd.CombinedOutput()
+	}
+	issues := collectIssueLines(string(out), 5)
+	if cmdErr != nil {
+		issues = append(issues, cmdErr.Error())
+	}
+	results = append(results, PhaseResult{
+		Name: "node test", Pass: cmdErr == nil, Issues: issues, DurMS: time.Since(start).Milliseconds(),
+	})
+	tracker.Increment("node test")
 
 	return results
+}
+
+func hygienePhaseResult(hygiene *HygieneResult) PhaseResult {
+	issues := make([]string, 0, 2)
+	if hygiene.BlockingIssues > 0 {
+		issues = append(issues, fmt.Sprintf("%d blocking hygiene issue(s)", hygiene.BlockingIssues))
+	}
+	if hygiene.WarningIssues > 0 {
+		issues = append(issues, fmt.Sprintf("%d warning hygiene issue(s)", hygiene.WarningIssues))
+	}
+	return PhaseResult{Name: "hygiene", Pass: hygiene.BlockingIssues == 0, Issues: issues}
+}
+
+type nodePackageManifest struct {
+	Scripts         map[string]string `json:"scripts"`
+	Dependencies    map[string]string `json:"dependencies"`
+	DevDependencies map[string]string `json:"devDependencies"`
+	PackageManager  string            `json:"packageManager"`
+}
+
+func loadNodePackageManifest(nodeRoot string) (nodePackageManifest, error) {
+	data, err := os.ReadFile(filepath.Join(nodeRoot, "package.json"))
+	if err != nil {
+		return nodePackageManifest{}, fmt.Errorf("read package.json: %w", err)
+	}
+	var manifest nodePackageManifest
+	if err := json.Unmarshal(data, &manifest); err != nil {
+		return nodePackageManifest{}, fmt.Errorf("parse package.json: %w", err)
+	}
+	return manifest, nil
+}
+
+func hasTypeScriptConfig(nodeRoot string) bool {
+	matches, err := filepath.Glob(filepath.Join(nodeRoot, "tsconfig*.json"))
+	return err == nil && len(matches) > 0
+}
+
+func hasBiomeConfig(nodeRoot string, manifest nodePackageManifest) bool {
+	for _, name := range []string{"biome.json", "biome.jsonc"} {
+		if _, err := os.Stat(filepath.Join(nodeRoot, name)); err == nil {
+			return true
+		}
+	}
+	return manifest.Dependencies["@biomejs/biome"] != "" || manifest.DevDependencies["@biomejs/biome"] != ""
+}
+
+func resolveNodePackageManager(nodeRoot, declared string) (string, error) {
+	if declared != "" {
+		name := strings.SplitN(declared, "@", 2)[0]
+		switch name {
+		case "npm", "pnpm", "yarn", "bun":
+			return name, nil
+		default:
+			return "", fmt.Errorf("unsupported packageManager %q", declared)
+		}
+	}
+
+	for _, candidate := range []struct {
+		lockfile string
+		manager  string
+	}{
+		{"pnpm-lock.yaml", "pnpm"},
+		{"yarn.lock", "yarn"},
+		{"bun.lock", "bun"},
+		{"bun.lockb", "bun"},
+		{"package-lock.json", "npm"},
+	} {
+		if _, err := os.Stat(filepath.Join(nodeRoot, candidate.lockfile)); err == nil {
+			return candidate.manager, nil
+		}
+	}
+
+	return "npm", nil
+}
+
+func nodeToolCommand(nodeRoot, manager, tool string, args ...string) (*exec.Cmd, error) {
+	var command string
+	var commandArgs []string
+	switch manager {
+	case "npm":
+		command = "npx"
+		commandArgs = append([]string{"--no-install", tool}, args...)
+	case "pnpm", "yarn":
+		command = manager
+		commandArgs = append([]string{"exec", tool}, args...)
+	case "bun":
+		command = "bun"
+		commandArgs = append([]string{"run", tool}, args...)
+	default:
+		return nil, fmt.Errorf("unsupported package manager %q", manager)
+	}
+
+	cmd := exec.Command(command, commandArgs...)
+	cmd.Dir = nodeRoot
+	cmd.Env = append(os.Environ(), "CI=true")
+	return cmd, nil
+}
+
+func nodeScriptCommand(nodeRoot, manager, script string) (*exec.Cmd, error) {
+	switch manager {
+	case "npm", "pnpm", "yarn", "bun":
+		cmd := exec.Command(manager, "run", script)
+		cmd.Dir = nodeRoot
+		cmd.Env = append(os.Environ(), "CI=true")
+		return cmd, nil
+	default:
+		return nil, fmt.Errorf("unsupported package manager %q", manager)
+	}
 }
 
 // runPythonVerification runs ruff and pytest.
@@ -292,7 +436,7 @@ func runPythonVerification(pythonRoot string, phaseCount int) []PhaseResult {
 		out, err := cmd.CombinedOutput()
 		issues := []string{}
 		if err != nil {
-			for _, l := range strings.Split(strings.TrimSpace(string(out)), "\n")[:5] {
+			for _, l := range collectIssueLines(string(out), 5) {
 				if t := strings.TrimSpace(l); t != "" {
 					issues = append(issues, t)
 				}
@@ -309,7 +453,7 @@ func runPythonVerification(pythonRoot string, phaseCount int) []PhaseResult {
 	out, err := cmd.CombinedOutput()
 	issues := []string{}
 	if err != nil {
-		for _, l := range strings.Split(strings.TrimSpace(string(out)), "\n")[:5] {
+		for _, l := range collectIssueLines(string(out), 5) {
 			if t := strings.TrimSpace(l); t != "" {
 				issues = append(issues, t)
 			}
@@ -333,7 +477,7 @@ func runRustVerification(rustRoot string, phaseCount int) []PhaseResult {
 	out, err := cmd.CombinedOutput()
 	issues := []string{}
 	if err != nil {
-		for _, l := range strings.Split(strings.TrimSpace(string(out)), "\n")[:5] {
+		for _, l := range collectIssueLines(string(out), 5) {
 			if t := strings.TrimSpace(l); t != "" {
 				issues = append(issues, t)
 			}
@@ -349,7 +493,7 @@ func runRustVerification(rustRoot string, phaseCount int) []PhaseResult {
 	out, err = cmd.CombinedOutput()
 	issues = []string{}
 	if err != nil {
-		for _, l := range strings.Split(strings.TrimSpace(string(out)), "\n")[:5] {
+		for _, l := range collectIssueLines(string(out), 5) {
 			if t := strings.TrimSpace(l); t != "" {
 				issues = append(issues, t)
 			}
@@ -365,7 +509,7 @@ func runRustVerification(rustRoot string, phaseCount int) []PhaseResult {
 	out, err = cmd.CombinedOutput()
 	issues = []string{}
 	if err != nil {
-		for _, l := range strings.Split(strings.TrimSpace(string(out)), "\n")[:5] {
+		for _, l := range collectIssueLines(string(out), 5) {
 			if t := strings.TrimSpace(l); t != "" {
 				issues = append(issues, t)
 			}
@@ -382,7 +526,7 @@ func runRustVerification(rustRoot string, phaseCount int) []PhaseResult {
 		out, err = cmd.CombinedOutput()
 		issues = []string{}
 		if err != nil {
-			for _, l := range strings.Split(strings.TrimSpace(string(out)), "\n")[:5] {
+			for _, l := range collectIssueLines(string(out), 5) {
 				if t := strings.TrimSpace(l); t != "" {
 					issues = append(issues, t)
 				}

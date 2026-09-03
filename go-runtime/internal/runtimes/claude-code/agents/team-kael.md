@@ -1,38 +1,7 @@
 ---
-name: "Kael"
-type: subagent
-hidden: true
-permission:
-  edit: "allow"
-  bash:
-    go test*: "allow"
-    owl*: "allow"
-    ovav *: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    git status*: "allow"
-    git commit*: "deny"
-    git push*: "deny"
-    npm install *: "deny"
-    go vet*: "allow"
-    go mod*: "allow"
-    owd*: "allow"
-    owv*: "allow"
-    python3 tools/harnesses/check_*.py: "allow"
-    git add *: "allow"
-    apt install *: "deny"
-    go run*: "allow"
-    go build*: "allow"
-    owc*: "allow"
-    python3 tools/validators/*.py: "allow"
-    git diff*: "allow"
-    git log*: "allow"
-    pip install *: "deny"
-    *: "deny"
-    sudo *: "deny"
-  external_directory:
-    "/home/braka/Systems/OVAV": "allow"
-    "*": "deny"
-    "/home/braka/Labs/mimocode/data/memory/*": "allow"
+name: "kael"
+description: "Implementador Junior — parches pequeños, fixtures y ediciones determinísticas."
+model: openai/gpt-5.6-luna
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

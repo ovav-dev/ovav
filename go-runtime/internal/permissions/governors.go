@@ -2,6 +2,7 @@ package permissions
 
 import (
 	"fmt"
+	"path/filepath"
 	"regexp"
 	"strings"
 )
@@ -50,15 +51,18 @@ func NewBashCommandGovernor() *BashCommandGovernor {
 			{Name: "python_inline", Pattern: `^python3\s+-c\s+.*`, Action: "allow", Category: "interpreted_execution", Note: "Inline Python execution", RateLimited: true},
 			{Name: "gh_issue_read", Pattern: `^gh\s+issue\s+(list|view|status)(\s+.*)?$`, Action: "allow", Category: "github_read", Note: "GitHub issue read operations", F0Integrations: []string{"f0.4_network_guard"}, RateLimited: true},
 			{Name: "test_runners", Pattern: `^(python3\s+-m\s+pytest|make\s+test|python3\s+setup\.py\s+test)(\s+.*)?$`, Action: "allow", Category: "testing", Note: "Test execution"},
-			{Name: "governed_git_push", Pattern: `^python3\s+tools/github/ovav_git_push_gate\.py(\s+--confirm)?$`, Action: "allow", Category: "governed_git", Note: "Git push through governed gate", F0Integrations: []string{"f0.5_bootstrap_chain"}},
+			{Name: "governed_git_push", Pattern: `^(ovav\s+push|go\s+run\s+-C\s+go-runtime\s+\./cmd/ovav\s+push)(\s+--dry-run)?$`, Action: "allow", Category: "governed_git", Note: "Git push through Go-native governed command"},
 			// DENY rules (7)
-			{Name: "git_push_force", Pattern: `^git\s+push\s+(-f|--force|--force-with-lease)`, Action: "deny", Category: "source_control_mutate", Note: "Force push permanently blocked"},
+			{Name: "git_push_force", Pattern: `^git\s+push(?:\s+.*)?$`, Action: "deny", Category: "source_control_mutate", Note: "Raw and force git push permanently blocked; use ovav push"},
 			{Name: "git_branch_delete", Pattern: `^git\s+branch\s+(-d|-D|--delete)\s+.*`, Action: "deny", Category: "source_control_mutate", Note: "Branch deletion requires user action"},
 			{Name: "git_checkout_new_branch", Pattern: `^git\s+(checkout|switch)\s+(-b|-c)\s+.*`, Action: "deny", Category: "source_control_mutate", Note: "Branch creation must use OVAV harness"},
 			{Name: "sudo_root", Pattern: `^sudo\s+.*`, Action: "deny", Category: "privilege_escalation", Note: "Root/sudo execution permanently blocked"},
 			{Name: "package_install", Pattern: `^(pip|pip3|npm|yarn|apt|apt-get|yum|dnf|pacman|brew)\s+(install|uninstall)\s+.*`, Action: "deny", Category: "package_management", Note: "Package install blocked"},
 			{Name: "gh_auth_token", Pattern: `^gh\s+auth\s+(token|login|logout|status|setup-git|credential)(\s+.*)?$`, Action: "deny", Category: "auth_management", Note: "GitHub auth reconfiguration blocked"},
 			{Name: "network_unbounded", Pattern: `^(curl|wget|httpie|nc|ncat|telnet|ssh\s+-|scp|rsync|ftp)(\s+.*)?$`, Action: "deny", Category: "network_external", Note: "Unbounded network commands blocked", F0Integrations: []string{"f0.4_network_guard"}},
+			{Name: "destructive_root_delete", Pattern: `^rm\s+-[^\s]*r[^\s]*f[^\s]*\s+/(?:\s|$|\*)`, Action: "deny", Category: "filesystem_mutate", Note: "Root filesystem deletion permanently blocked"},
+			{Name: "filesystem_format", Pattern: `^mkfs(?:\.[a-z0-9]+)?\s+.*`, Action: "deny", Category: "filesystem_mutate", Note: "Filesystem formatting permanently blocked"},
+			{Name: "raw_device_write", Pattern: `^dd\s+.*\bof=/dev/.*`, Action: "deny", Category: "filesystem_mutate", Note: "Raw device writes permanently blocked"},
 		},
 	}
 }
@@ -66,6 +70,16 @@ func NewBashCommandGovernor() *BashCommandGovernor {
 // Check evaluates a bash command against the rules.
 func (g *BashCommandGovernor) Check(command, operator string) BashDecision {
 	normalized := strings.Join(strings.Fields(strings.TrimSpace(command)), " ")
+	if rule, reason, denied := permanentCommandDeny(normalized); denied {
+		decision := BashDecision{
+			Allowed:     false,
+			Command:     normalized[:min(128, len(normalized))],
+			MatchedRule: rule,
+			Reason:      reason,
+		}
+		g.logDecision(command, decision)
+		return decision
+	}
 
 	for _, rule := range g.rules {
 		matched, _ := regexp.MatchString(rule.Pattern, normalized)
@@ -108,15 +122,125 @@ func (g *BashCommandGovernor) Check(command, operator string) BashDecision {
 		}
 	}
 
-	// No rule matched — default deny
+	// YOLO trusted domain: unmatched commands are allowed with telemetry. The
+	// explicit deny rules above remain authoritative and non-bypassable.
 	decision := BashDecision{
-		Allowed:     false,
+		Allowed:     true,
 		Command:     normalized[:min(128, len(normalized))],
 		MatchedRule: "",
-		Reason:      fmt.Sprintf("No allowlist rule matched for: %s", normalized[:min(80, len(normalized))]),
+		Reason:      fmt.Sprintf("YOLO default allow for unmatched command: %s", normalized[:min(80, len(normalized))]),
 	}
 	g.logDecision(command, decision)
 	return decision
+}
+
+func permanentCommandDeny(command string) (string, string, bool) {
+	if strings.ContainsAny(command, ";|&\n\r`") || strings.Contains(command, "$(") {
+		return "compound_shell_command", "Compound shell execution is permanently blocked", true
+	}
+	fields := strings.Fields(command)
+	for i, raw := range fields {
+		token := strings.Trim(raw, `"'`)
+		base := filepath.Base(token)
+		switch {
+		case (base == "sh" || base == "bash" || base == "zsh" || base == "dash") && containsShellCommandFlag(fields[i+1:]):
+			return "compound_shell_command", "Nested shell execution is permanently blocked", true
+		case base == "sudo":
+			return "sudo_root", "Root/sudo execution permanently blocked", true
+		case base == "mkfs" || strings.HasPrefix(base, "mkfs."):
+			return "filesystem_format", "Filesystem formatting permanently blocked", true
+		case base == "dd" && hasRawDeviceOutput(fields[i+1:]):
+			return "raw_device_write", "Raw device writes permanently blocked", true
+		case base == "rm" && isDestructiveRemove(fields[i+1:]):
+			return "destructive_root_delete", "Recursive forced deletion of absolute or home paths permanently blocked", true
+		case base == "git":
+			if rule, denied := permanentGitDeny(fields[i+1:]); denied {
+				return rule, "Raw git propagation or branch deletion permanently blocked", true
+			}
+		}
+	}
+	return "", "", false
+}
+
+func containsShellCommandFlag(args []string) bool {
+	for _, arg := range args {
+		arg = strings.Trim(arg, `"'`)
+		if arg == "--command" || (strings.HasPrefix(arg, "-") && !strings.HasPrefix(arg, "--") && strings.Contains(strings.TrimPrefix(arg, "-"), "c")) {
+			return true
+		}
+	}
+	return false
+}
+
+func hasRawDeviceOutput(args []string) bool {
+	for _, arg := range args {
+		if strings.HasPrefix(strings.Trim(arg, `"'`), "of=/dev/") {
+			return true
+		}
+	}
+	return false
+}
+
+func isDestructiveRemove(args []string) bool {
+	recursive := false
+	force := false
+	var targets []string
+	for _, raw := range args {
+		arg := strings.Trim(raw, `"'`)
+		if strings.HasPrefix(arg, "--") {
+			recursive = recursive || arg == "--recursive"
+			force = force || arg == "--force"
+			continue
+		}
+		if strings.HasPrefix(arg, "-") {
+			recursive = recursive || strings.Contains(arg[1:], "r") || strings.Contains(arg[1:], "R")
+			force = force || strings.Contains(arg[1:], "f")
+			continue
+		}
+		targets = append(targets, arg)
+	}
+	if !recursive || !force {
+		return false
+	}
+	for _, target := range targets {
+		if filepath.IsAbs(target) || target == "~" || strings.HasPrefix(target, "~/") || strings.HasPrefix(target, "$HOME") || strings.HasPrefix(target, "${HOME}") {
+			return true
+		}
+	}
+	return false
+}
+
+func permanentGitDeny(args []string) (string, bool) {
+	for len(args) > 0 {
+		arg := strings.Trim(args[0], `"'`)
+		if arg == "-C" || arg == "-c" || arg == "--git-dir" || arg == "--work-tree" {
+			if len(args) < 2 {
+				return "", false
+			}
+			args = args[2:]
+			continue
+		}
+		if strings.HasPrefix(arg, "--git-dir=") || strings.HasPrefix(arg, "--work-tree=") || strings.HasPrefix(arg, "-c=") {
+			args = args[1:]
+			continue
+		}
+		if strings.HasPrefix(arg, "-") {
+			args = args[1:]
+			continue
+		}
+		switch arg {
+		case "push":
+			return "git_push_force", true
+		case "branch":
+			for _, branchArg := range args[1:] {
+				if branchArg == "-D" || branchArg == "-d" || branchArg == "--delete" {
+					return "git_branch_delete", true
+				}
+			}
+		}
+		return "", false
+	}
+	return "", false
 }
 
 // CheckWithCEO evaluates a command like Check() but applies CEO session bypass.
@@ -125,7 +249,7 @@ func (g *BashCommandGovernor) Check(command, operator string) BashDecision {
 func (g *BashCommandGovernor) CheckWithCEO(command, operator string) BashDecision {
 	decision := g.Check(command, operator)
 
-	if g.CEOActive && !decision.Allowed && decision.MatchedRule != "" {
+	if g.CEOActive && !decision.Allowed && decision.MatchedRule != "" && !permanentDenyRule(decision.MatchedRule) {
 		// CEO bypass: convert DENY → ALLOW (only when a rule actually matched)
 		decision.Allowed = true
 		decision.Reason = "[CEO-BYPASS] " + decision.Reason
@@ -133,6 +257,15 @@ func (g *BashCommandGovernor) CheckWithCEO(command, operator string) BashDecisio
 	}
 
 	return decision
+}
+
+func permanentDenyRule(rule string) bool {
+	switch rule {
+	case "git_push_force", "git_branch_delete", "sudo_root", "destructive_root_delete", "filesystem_format", "raw_device_write", "compound_shell_command":
+		return true
+	default:
+		return false
+	}
 }
 
 func (g *BashCommandGovernor) checkNetworkGuard() bool {
@@ -180,7 +313,7 @@ func (g *BashCommandGovernor) GetSummary() map[string]interface{} {
 		"total_rules":     len(g.rules),
 		"allowed":         allowed,
 		"denied":          denied,
-		"deny_by_default": true,
+		"deny_by_default": false,
 		"rules":           rulesInfo,
 	}
 }

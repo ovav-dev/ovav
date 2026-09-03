@@ -1,0 +1,82 @@
+profile_id: ovav-workstation-scripts
+status: source_local_plan
+owner_scope: ovav_bab_private
+visible_service: Platform Engineering
+
+# OVAV Workstation Maintenance Scripts
+# This policy describes the 3 source-local shell scripts that were flagged as
+# UNEXPECTED_TRACKED by the SBOM baseline validator. They are now formally
+# registered under tool_configs.yaml → ovav_workstation_scripts.
+
+purpose:
+  - audit_and_repair_intelligent_terminal_settings
+  - provide_idempotent_guid_replacement
+  - provide_safe_cache_reset_without_process_kill
+  - never_auto_run_from_ovav_governor
+  - externalize_all_paths_and_dependencies_via_env_vars
+
+recommended_mode:
+  scripts_root: workstation/scripts/
+  runner: bash
+  runner_min_version: 4.0
+  required_external_dependencies:
+    - bash
+    - python3  # only for audit-it-guids and fix-it-guids (JSON manipulation)
+  path_strategy:
+    no_hardcoded_absolute_paths: true
+    paths_via: env_vars
+    required_env_vars:
+      - OVAV_IT_SETTINGS  # settings.json path (required, no default — user provides)
+      - OVAV_BACKUP_DIR   # backup destination (default $HOME/.ovav-backups, configurable)
+    optional_env_vars:
+      - OVAV_GUID_NAMESPACE  # uuid5 namespace for deterministic GUIDs
+      - OVAV_AUDIT_MODE      # audit-only | fix
+  script_registry:
+    audit-it-guids:
+      path: workstation/scripts/audit-it-guids.sh
+      side_effects: read-only
+      writes_to_disk: false
+      requires_backup: false
+    fix-it-guids:
+      path: workstation/scripts/fix-it-guids.sh
+      side_effects: modifies_settings_json_with_backup
+      writes_to_disk: true
+      requires_backup: true
+      idempotent: true
+    ovav-it-cache-clean:
+      path: workstation/scripts/ovav-it-cache-clean.sh
+      side_effects: backs_up_then_resets_cache
+      writes_to_disk: true
+      requires_backup: true
+      kills_processes: false
+    deploy-it-keybindings:
+      path: workstation/scripts/deploy-it-keybindings.sh
+      side_effects: merges_fragment_into_live_settings_json_with_backup
+      writes_to_disk: true
+      requires_backup: true
+      idempotent: true
+      kills_processes: false
+      dry_run_supported: true
+
+must_validate:
+  - scripts_root_exists
+  - all_listed_scripts_exist_and_are_executable
+  - no_hardcoded_absolute_paths_in_scripts
+  - env_vars_are_documented
+  - python3_dependency_is_documented
+  - bash_dependency_is_documented
+  - no_global_state_writes_without_backup
+  - no_ovav_governor_auto_invocation
+
+blocked_until_explicit_user_invocation:
+  - run_audit-it-guids
+  - run_fix-it-guids
+  - run_ovav-it-cache-clean
+
+success_definition_source_local:
+  - scripts_root_exists
+  - all_scripts_present_and_executable
+  - no_hardcoded_absolute_paths
+  - env_var_contracts_documented
+  - ovav_governor_does_not_auto_run_them
+  - sbom_baseline_includes_these_scripts

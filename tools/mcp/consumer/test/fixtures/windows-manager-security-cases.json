@@ -1,0 +1,101 @@
+[
+  {
+    "name": "task-owned",
+    "case": "task-ownership",
+    "expectSuccess": true,
+    "actual": {
+      "execute": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
+      "arguments": "-NoLogo -NoProfile -NonInteractive -File \"C:\\Users\\test\\AppData\\Local\\OVAV\\mcp\\manager\\1.1.0\\ovav-mcp-windows.ps1\" -Mode Start",
+      "userId": "S-1-5-21-1000",
+      "managerPath": "C:\\Users\\test\\AppData\\Local\\OVAV\\mcp\\manager\\1.1.0\\ovav-mcp-windows.ps1",
+      "workingDirectory": "C:\\Users\\test\\AppData\\Local\\OVAV\\mcp"
+    },
+    "expected": {
+      "execute": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
+      "arguments": "-NoLogo -NoProfile -NonInteractive -File \"C:\\Users\\test\\AppData\\Local\\OVAV\\mcp\\manager\\1.1.0\\ovav-mcp-windows.ps1\" -Mode Start",
+      "userId": "S-1-5-21-1000",
+      "managerPath": "C:\\Users\\test\\AppData\\Local\\OVAV\\mcp\\manager\\1.1.0\\ovav-mcp-windows.ps1",
+      "workingDirectory": "C:\\Users\\test\\AppData\\Local\\OVAV\\mcp"
+    }
+  },
+  {
+    "name": "task-homonym-unowned",
+    "case": "task-ownership",
+    "expectSuccess": false,
+    "actual": {
+      "execute": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "arguments": "-File C:\\attacker.ps1",
+      "userId": "S-1-5-21-1000",
+      "managerPath": "C:\\attacker.ps1",
+      "workingDirectory": "C:\\Users\\test\\AppData\\Local\\OVAV\\mcp"
+    },
+    "expected": {
+      "execute": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
+      "arguments": "-NoLogo -NoProfile -NonInteractive -File \"C:\\Users\\test\\AppData\\Local\\OVAV\\mcp\\manager\\1.1.0\\ovav-mcp-windows.ps1\" -Mode Start",
+      "userId": "S-1-5-21-1000",
+      "managerPath": "C:\\Users\\test\\AppData\\Local\\OVAV\\mcp\\manager\\1.1.0\\ovav-mcp-windows.ps1",
+      "workingDirectory": "C:\\Users\\test\\AppData\\Local\\OVAV\\mcp"
+    }
+  },
+  {
+    "name": "path-reparse-rejected",
+    "case": "path-chain",
+    "expectSuccess": false,
+    "chain": [
+      { "path": "C:\\Users\\test\\AppData\\Local", "reparse": false },
+      { "path": "C:\\Users\\test\\AppData\\Local\\OVAV", "reparse": true }
+    ]
+  },
+  {
+    "name": "pid-reuse",
+    "case": "identity",
+    "expectSuccess": false,
+    "actual": { "pid": 4242, "parentPid": 1, "startTimeTicks": 638605440000000001, "executable": "C:\\node.exe", "commandLine": "node exact" },
+    "expected": { "pid": 4242, "parentPid": 1, "startTimeTicks": 638605440000000000, "executable": "C:\\node.exe", "commandLine": "node exact" }
+  },
+  {
+    "name": "exact-command-mismatch",
+    "case": "identity",
+    "expectSuccess": false,
+    "actual": { "pid": 4242, "parentPid": 1, "startTimeTicks": 638605440000000000, "executable": "C:\\node.exe", "commandLine": "node attacker" },
+    "expected": { "pid": 4242, "parentPid": 1, "startTimeTicks": 638605440000000000, "executable": "C:\\node.exe", "commandLine": "node exact" }
+  },
+  {
+    "name": "corrupt-state",
+    "case": "state-envelope",
+    "expectSuccess": false,
+    "stateJson": "{\"phase\":\"running\"}",
+    "checksum": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  {
+    "name": "partial-start",
+    "case": "recovery-decision",
+    "expectSuccess": true,
+    "phase": "starting",
+    "expectedDecision": "recover-recorded-only"
+  },
+  {
+    "name": "root-dead-recorded-child",
+    "case": "recorded-stop-targets",
+    "expectSuccess": true,
+    "recorded": [
+      { "pid": 100, "parentPid": 1, "startTimeTicks": 10, "executable": "C:\\cmd.exe", "commandLine": "root" },
+      { "pid": 101, "parentPid": 100, "startTimeTicks": 11, "executable": "C:\\node.exe", "commandLine": "child" }
+    ],
+    "livePids": [101],
+    "expectedPids": [101]
+  },
+  {
+    "name": "port-owner-mismatch",
+    "case": "listener-owner",
+    "expectSuccess": false,
+    "listenerPid": 999,
+    "trackedPids": [100, 101]
+  },
+  {
+    "name": "memory-data-preserved",
+    "case": "uninstall-targets",
+    "expectSuccess": true,
+    "forbiddenSuffixes": ["\\data", "\\data\\memory.jsonl"]
+  }
+]

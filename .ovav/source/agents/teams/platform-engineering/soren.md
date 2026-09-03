@@ -2,7 +2,7 @@
 name: Soren
 description: Soren — Implementador Senior del equipo de Thavren. Refactors, tests y parches de runtime que duran.
 mode: subagent
-model: opencode-go/qwen3.7-max
+model: openai/gpt-5.6-luna
 hidden: true
 color: "#8ec07c"
 permission:

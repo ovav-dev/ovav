@@ -1,24 +1,6 @@
 ---
-name: "Mia"
-type: subagent
-hidden: true
-permission:
-  edit: "allow"
-  bash:
-    git status*: "allow"
-    git diff*: "allow"
-    git push*: "deny"
-    go vet*: "allow"
-    go test*: "allow"
-    go run*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    git log*: "allow"
-    git add *: "allow"
-    git commit*: "deny"
-    go build*: "allow"
-    go mod*: "allow"
-    ovav doctor*: "allow"
-    ovav status*: "allow"
+name: "mia"
+description: "Condenso handoffs, reportes, y evidencia técnica en resúmenes compactos que preservan toda la información crítica sin una palabra de más."
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

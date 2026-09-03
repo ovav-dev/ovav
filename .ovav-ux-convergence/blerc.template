@@ -1,0 +1,82 @@
+# ─────────────────────────────────────────────────────────────
+#  ~/.blerc — OVAV UX Convergence 2026
+#  ble.sh v0.3.4 — MINIMAL config
+#  Only history-based ghost suggestion. Everything else OFF.
+#  Atuin owns Ctrl+R. Starship owns prompt.
+# ─────────────────────────────────────────────────────────────
+
+# ── ENABLE: history-based ghost suggestion only ──────────────
+bleopt complete_auto_complete=1          # enable auto-complete
+bleopt complete_auto_history=1            # history as primary source
+bleopt complete_auto_delay=2              # small delay (avoid work while typing fast)
+bleopt complete_auto_polling_cycle=10     # background polling cycle
+bleopt complete_ambiguous=0               # no ambiguous completion UI
+
+# ── DISABLE: completion menu (we want INLINE ghost only) ─────
+bleopt complete_menu_style=''             # disable menu UI
+bleopt complete_menu_complete=0           # no menu completion
+bleopt complete_menu_filter=0             # no menu filtering
+bleopt complete_menu_align=0              # no menu align
+
+# ── DISABLE: syntax highlighting ──────────────────────────────
+bleopt syntax_highlighting=disabled       # disable syntax highlighting
+ble-color-defface syntax_default=
+ble-color-defface syntax_command=
+ble-color-defface syntax_quoted=
+
+# ── DISABLE: filename highlighting ────────────────────────────
+bleopt filename_ls_colors=                # clear LS_COLORS override
+ble-color-defface filename_lsattr=
+
+# ── DISABLE: prompt replacement (Starship owns it) ────────────
+bleopt rps1=                              # right prompt empty
+bleopt rps1_transient=                    # no transient rps
+bleopt prompt_eol_mark=                   # no EOF marker
+bleopt prompt_xterm_title=                # no xterm title replacement
+
+# ── DISABLE: status / decorations ─────────────────────────────
+bleopt term_status_line=disabled
+bleopt term_status_line_enable=no
+bleopt edit_vbell=                        # no visual bell
+bleopt edit_abell=0                       # no audible bell
+bleopt vbell_duration=                    # no duration
+
+# ── OWNERSHIP: Atuin owns Ctrl+R, ble.sh does NOT ───────────
+# ble.sh may bind C-r by default for its own incremental search.
+# Explicitly rebind to 'ignore' so Atuin (pty-proxy) keeps it.
+ble-bind -s 'C-r' 'ignore'
+
+# ── OWNERSHIP: bash TAB stays with completion stack ──────────
+# ble.sh's auto-complete uses TAB implicitly only when menu is open.
+# With complete_menu_style='' above, TAB falls through to bash-completion.
+
+# ── ADAPTIVE GHOST COLORS (works on Day AND Night) ──────────
+# Use grayscale attribute (intensity 5 = dim/faint) so it appears
+# as a soft ghost on both light and dark backgrounds.
+ble-color-defface auto_complete 'fg=240,underline='
+ble-color-defface auto_complete 'attr=dim'   # additional dim attribute
+
+# Better: use 8-bit grayscale that's readable on both Day (240 = soft gray)
+# and Night (240 = mid gray, still legible). Background of the suggestion
+# is left transparent (no bg).
+ble-color-setfg auto_complete 240          # foreground = ANSI 240 (mid gray)
+
+# ── PROMPT INTEGRATION: do NOT touch Starship prompt ─────────
+# ble.sh wraps PS1 but if we leave prompt_ps1 unset it uses the
+# existing PS1 (which Starship sets). Starship's ANSI sequences
+# pass through ble.sh cleanly.
+# (no bleopt prompt_ps1 set) ← intentional
+
+# ── UNDO: enable edit undo (Ctrl+Z undo of input) ────────────
+# ble.sh has built-in undo support. Default key is C-_. Keep it.
+# Also bind C-z to undo-when in edit mode (NOT job control).
+ble-bind -s 'C-z' 'undo'                   # Ctrl+Z = undo in edit mode
+
+# ── DELAY: small input idle delay before computing suggestion ─
+# Already set above as complete_auto_delay=2 (2× polling cycle = ~20ms)
+
+# ── LOG: minimal logging only on errors ───────────────────────
+bleopt edit_line_error_face=               # no error face decoration
+
+# ── END ~/.blerc ──────────────────────────────────────────────
+echo "[blerc] loaded: minimal history-suggest config" >&2

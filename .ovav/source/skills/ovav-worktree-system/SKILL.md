@@ -28,4 +28,21 @@ Wraps 11 shell abbreviations (`owc`, `owd`, `owl`, `owv`, `ows`, `owclean`, `owm
 - `/ovav-owr` — Rescue
 - `/ovav-owlk` — Lock
 
+## AI+Human Commit Integration
+
+Every worktree commit uses the AI+Human model:
+- **Author**: Agent identity (e.g. `Thavren <thavren@ovav.dev>`)
+- **Committer**: Verified human (`Alexander Salvador <alexander_mya@outlook.com>`)
+- **Badge**: GPG "Verified" ✅ on GitHub
+
+Set the active lead before committing:
+```bash
+export OVAV_ACTIVE_LEAD=thavren
+```
+
+Or use the wrapper directly:
+```bash
+.ovav/ovav-commit-wrapper -- <files>
+```
+
 See `OVS_USER_GUIDE.md` for full details.

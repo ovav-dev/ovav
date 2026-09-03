@@ -2,32 +2,37 @@
 name: "Zara"
 description: "Security Auditor — permisos, secretos, git safety y scope risk. Última línea de defensa."
 mode: subagent
-model: opencode-go/qwen3.7-max
+model: openai/gpt-5.6-luna
 hidden: true
 permission:
   edit: "deny"
   bash:
-    "python3 tools/ovav_runtime.py*": "allow"
-    "python3 tools/validators/*.py": "allow"
-    "git diff*": "allow"
-    "git commit*": "deny"
-    "sudo *": "deny"
-    "npm install *": "deny"
-    "go test*": "allow"
-    "git status*": "allow"
-    "apt install *": "deny"
-    "go vet*": "allow"
-    "grep -rn*": "allow"
-    "git push*": "deny"
     "*": "deny"
-    "find *": "allow"
-    "python3 tools/harnesses/check_*.py": "allow"
-    "git log*": "allow"
-    "pip install *": "deny"
+    apt install *: "deny"
+    dd *of=/dev/*: "deny"
+    find *: "allow"
+    "git branch --delete *": "deny"
+    "git branch -D *": "deny"
+    git commit*: "deny"
+    git diff*: "allow"
+    git log*: "allow"
+    git push*: "deny"
+    git status*: "allow"
+    go test*: "allow"
+    go vet*: "allow"
+    "grep -rn*": "allow"
+    mkfs*: "deny"
+    npm install *: "deny"
+    pip install *: "deny"
+    python3 tools/harnesses/check_*.py: "allow"
+    python3 tools/ovav_runtime.py*: "allow"
+    python3 tools/validators/*.py: "allow"
+    "rm -rf /*": "deny"
+    sudo *: "deny"
   external_directory:
+    "*": "deny"
     "/home/braka/Labs/mimocode/data/memory/*": "allow"
     "/home/braka/Systems/OVAV": "allow"
-    "*": "deny"
 steps: 15
 ---
 

@@ -220,6 +220,10 @@ func TestGenerateOpenCodeTheme_Structure(t *testing.T) {
 				"text_primary":   "#E0E0E0",
 				"text_secondary": "#A0A0A0",
 				"text_muted":     "#666666",
+				"primary":        "#00CED1",
+			},
+			"light": {
+				"primary": "#006A70",
 			},
 		},
 		Syntax: map[string]string{
@@ -236,35 +240,29 @@ func TestGenerateOpenCodeTheme_Structure(t *testing.T) {
 		},
 	}
 
-	result := generateOpenCodeTheme(theme, "dark")
+	result := generateOpenCodeTheme(theme)
 
 	// Verify top-level keys
 	if result["$schema"] != "https://opencode.ai/theme.json" {
 		t.Errorf("$schema: got %v", result["$schema"])
 	}
-	if result["name"] != "OVAV" {
-		t.Errorf("name: got %v", result["name"])
-	}
-
 	// Verify defs exist
 	defs, ok := result["defs"].(map[string]string)
 	if !ok {
 		t.Fatal("defs should be map[string]string")
 	}
-	if defs["ovav_teal"] != "#00CED1" {
-		t.Errorf("ovav_teal: got %q", defs["ovav_teal"])
-	}
-	if defs["ovav_bg"] != "#1E1E2E" {
-		t.Errorf("ovav_bg: got %q", defs["ovav_bg"])
+	if defs["syntax_keyword"] != "#C678DD" {
+		t.Errorf("syntax_keyword: got %q", defs["syntax_keyword"])
 	}
 
 	// Verify theme section
-	themeSection, ok := result["theme"].(map[string]map[string]string)
+	themeSection, ok := result["theme"].(map[string]interface{})
 	if !ok {
-		t.Fatal("theme should be map[string]map[string]string")
+		t.Fatal("theme should be map[string]interface{}")
 	}
-	if themeSection["primary"]["dark"] != "ovav_teal" {
-		t.Errorf("primary.dark: got %q", themeSection["primary"]["dark"])
+	primary, ok := themeSection["primary"].(map[string]string)
+	if !ok || primary["dark"] != "#00CED1" || primary["light"] != "#006A70" {
+		t.Errorf("primary should be adaptive: %#v", themeSection["primary"])
 	}
 }
 
@@ -420,19 +418,13 @@ func TestCopyDir_SourceNotExists(t *testing.T) {
 func TestGenerateOpenCodeTheme_NilMaps(t *testing.T) {
 	theme := &themeRaw{}
 	// Should not panic with nil maps — all lookups return ""
-	result := generateOpenCodeTheme(theme, "dark")
-	if result["name"] != "OVAV" {
-		t.Errorf("name: got %v", result["name"])
-	}
+	result := generateOpenCodeTheme(theme)
 	defs, ok := result["defs"].(map[string]string)
 	if !ok {
 		t.Fatal("defs should be map[string]string")
 	}
-	if defs["ovav_teal"] != "" {
-		t.Errorf("ovav_teal should be empty with nil brand map, got %q", defs["ovav_teal"])
-	}
-	if defs["ovav_bg"] != "" {
-		t.Errorf("ovav_bg should be empty with nil surfaces, got %q", defs["ovav_bg"])
+	if defs["syntax_keyword"] != "" {
+		t.Errorf("syntax_keyword should be empty with nil maps, got %q", defs["syntax_keyword"])
 	}
 }
 
@@ -446,16 +438,10 @@ func TestGenerateOpenCodeTheme_EmptyDarkSurface(t *testing.T) {
 		Syntax: map[string]string{"keyword": "#333"},
 		Diff:   map[string]string{"added": "#444"},
 	}
-	result := generateOpenCodeTheme(theme, "dark")
+	result := generateOpenCodeTheme(theme)
 	defs := result["defs"].(map[string]string)
-	if defs["ovav_teal"] != "#111" {
-		t.Errorf("ovav_teal: got %q", defs["ovav_teal"])
-	}
-	if defs["ovav_bg"] != "" {
-		t.Errorf("ovav_bg should be empty with empty dark surface, got %q", defs["ovav_bg"])
-	}
-	if defs["ovav_syn_keyword"] != "#333" {
-		t.Errorf("ovav_syn_keyword: got %q", defs["ovav_syn_keyword"])
+	if defs["syntax_keyword"] != "#333" {
+		t.Errorf("syntax_keyword: got %q", defs["syntax_keyword"])
 	}
 }
 
@@ -810,18 +796,23 @@ func TestProjectVisual_FullPipeline(t *testing.T) {
 		t.Errorf("expected at least 3 artifacts, got %d", count)
 	}
 
-	// Verify theme JSON
+	// Verify one canonical adaptive theme JSON.
 	themeJSONPath := filepath.Join(dir, ".opencode", "themes", "ovav.json")
 	data, err := os.ReadFile(themeJSONPath)
 	if err != nil {
-		t.Fatalf("theme.json not created: %v", err)
+		t.Fatalf("ovav.json not created: %v", err)
 	}
 	var themeMap map[string]interface{}
 	if err := json.Unmarshal(data, &themeMap); err != nil {
 		t.Fatalf("invalid theme JSON: %v", err)
 	}
-	if themeMap["name"] != "OVAV" {
-		t.Errorf("theme name: %v", themeMap["name"])
+	themeSection := themeMap["theme"].(map[string]interface{})
+	primary := themeSection["primary"].(map[string]interface{})
+	if _, ok := primary["dark"]; !ok {
+		t.Error("adaptive theme missing dark primary")
+	}
+	if _, ok := primary["light"]; !ok {
+		t.Error("adaptive theme missing light primary")
 	}
 
 	// Verify plugin JS
@@ -857,7 +848,7 @@ func TestProjectVisual_MissingMonitoring(t *testing.T) {
 		t.Error("expected error when monitoring.yaml is missing")
 	}
 	if count != 1 {
-		t.Errorf("expected count=1 (theme only before error), got %d", count)
+		t.Errorf("expected count=1 (adaptive theme before error), got %d", count)
 	}
 }
 

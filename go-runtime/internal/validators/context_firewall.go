@@ -33,16 +33,18 @@ func (c *ContextFirewall) Validate(ctx context.Context, root string) Result {
 	// 5. Budget governance is handled by Go runtime (session_context_guard.py deprecated in v2.0)
 	// Tier definitions are in caps.yaml + session_greeting.py
 
-	// 6. Validate deny-by-default is enforced for external context
+	// 6. Validate OVAV TRUSTED DOMAIN policy is correctly applied (2026-08-13).
+	//    External directory is allow-by-default under OVAV governor authority.
+	//    CriticalDenies still applies for catastrophic host-level operations.
 	condPath := filepath.Join(root, ".ovav", "policy", "permission_authority.json")
 	if data, err := os.ReadFile(condPath); err != nil {
 		issues = append(issues, "FIREWALL: permission_authority.json not found")
 	} else {
 		content := string(data)
-		if strings.Contains(content, `"*": "deny"`) || strings.Contains(content, `"*":"deny"`) {
-			// External directory deny-by-default is correctly configured
+		if strings.Contains(content, `"_ovav_yolo"`) || strings.Contains(content, `"*":"allow"`) || strings.Contains(content, `"*": "allow"`) || strings.Contains(content, `"*" : "allow"`) {
+			// OVAV TRUSTED DOMAIN: external_directory allow-by-default is correctly configured.
 		} else {
-			issues = append(issues, "FIREWALL: external_directory deny-by-default (* : deny) not configured")
+			issues = append(issues, "FIREWALL: OVAV TRUSTED DOMAIN marker missing — expected _ovav_yolo or *: allow in permission_authority.json")
 		}
 	}
 

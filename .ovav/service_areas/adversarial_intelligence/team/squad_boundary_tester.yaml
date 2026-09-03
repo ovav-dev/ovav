@@ -1,6 +1,38 @@
-squad: {id: squad_boundary_tester, display_name: Ryu, area: adversarial_intelligence, lead: kenji, role: "Area boundary testing, hard stop verification, escalation path validation", role_id: boundary_tester}
-activation: {modes: [focused_squad], never_default: true}
-model_body: {primary: "opencode-go/deepseek-v4-pro", secondary: "minimax-coding-plan/MiniMax-M3"}
-lanes: [boundary_testing, red_team_operations]
-capabilities: ["Area boundary limit testing", "Hard stop enforcement verification", "Handoff protocol stress testing", "Escalation path validation"]
-constraints: ["No cruza boundaries sin handoff del lead receptor", "Pruebas de límite, no invasión"]
+# Squad: Ryu
+# Lead contract team member — delegated by kenji
+# Auto-upgraded to v3.0.0 baseline 2026-08-19
+
+squad:
+  id: squad_boundary_tester
+  display_name: Ryu
+  area: adversarial_intelligence
+  lead: kenji
+  role: Area boundary testing, hard stop verification, escalation path validation
+  role_id: boundary_tester
+  version: 3.0.0
+activation:
+  modes:
+  - focused_squad
+  never_default: true
+  router: Delegation Router
+model_body:
+  primary: openai/gpt-5.6-luna
+  secondary: minimax-coding-plan/MiniMax-M3
+lanes:
+- boundary_testing
+- red_team_operations
+capabilities:
+- Area boundary limit testing
+- Hard stop enforcement verification
+- Handoff protocol stress testing
+- Escalation path validation
+constraints:
+- No cruza boundaries sin handoff del lead receptor
+- Pruebas de límite, no invasión
+authority:
+  can:
+  - execute capabilities within lead scope
+  cannot:
+  - Cite lead's anti-patterns
+last_review: '2026-08-19'
+next_review: '2026-11-19'

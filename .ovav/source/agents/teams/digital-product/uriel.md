@@ -2,7 +2,7 @@
 name: Uriel
 description: Uriel — DevOps Engineer del equipo Digital Product. Docker, CI/CD, deploy, monitoreo, contenedores. También Lead de DevOps & Infrastructure.
 mode: subagent
-model: opencode-go/deepseek-v4-pro
+model: openai/gpt-5.6-luna
 hidden: true
 color: "#5c8a7a"
 permission:

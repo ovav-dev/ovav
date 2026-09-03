@@ -26,38 +26,33 @@ func (f *FeedbackLoop) Validate(ctx context.Context, root string) Result {
 	start := time.Now()
 	var issues []string
 
-	// 1. This Go validator IS the feedback loop (Python version migrated to Go)
-	// L7 feedback loop functionality is implemented in this package
-
-	// 2. Check belief_manager module
-	bmPath := filepath.Join(root, "tools", "agent_runtime", "belief_manager.py")
+	// 1. Check the Go belief manager, including functional aging rather than a TODO stub.
+	bmPath := filepath.Join(root, "go-runtime", "internal", "agents", "belief.go")
 	if data, err := os.ReadFile(bmPath); err == nil {
 		content := string(data)
-		if !strings.Contains(content, "class BeliefManager") {
-			issues = append(issues, "L7: BeliefManager class not found in belief_manager.py")
+		for _, token := range []string{"type BeliefManager struct", "AddBelief(", "AddBeliefWithState(", "DeprecateBelief(", "DeprecateStaleEmergent(", "DeprecateStaleEmergentAt(", "delete("} {
+			if !strings.Contains(content, token) {
+				issues = append(issues, fmt.Sprintf("L7: Go belief manager missing functional token %q", token))
+			}
 		}
-		if !strings.Contains(content, "add_belief") {
-			issues = append(issues, "L7: add_belief method not found")
-		}
-		if !strings.Contains(content, "deprecate_belief") {
-			issues = append(issues, "L7: deprecate_belief method not found")
-		}
-		if !strings.Contains(content, "deprecate_stale_emergent") {
-			issues = append(issues, "L7: deprecate_stale_emergent method not found — emergent expiry missing")
+		if strings.Contains(content, "TODO: implement emergent belief aging") {
+			issues = append(issues, "L7: emergent belief aging remains TODO/nonfunctional")
 		}
 	} else {
-		issues = append(issues, "L7: belief_manager.py not found")
+		issues = append(issues, "L7: go-runtime/internal/agents/belief.go not found")
 	}
 
-	// 3. Check memory governor
-	govPath := filepath.Join(root, "tools", "memory", "governor.py")
+	// 2. Check the current Go memory governor write and context-pack pipelines.
+	govPath := filepath.Join(root, "go-runtime", "internal", "memory", "governor.go")
 	if data, err := os.ReadFile(govPath); err == nil {
 		content := string(data)
-		if !strings.Contains(content, "ledger_write_allowed") && !strings.Contains(content, "ledger_vivo") {
-			issues = append(issues, "L7: ledger_vivo gate not found in memory governor")
+		for _, token := range []string{"type Governor struct", "func (g *Governor) Write(", "Classify(", "UpsertCard(", "Save()", "func (g *Governor) SessionPack("} {
+			if !strings.Contains(content, token) {
+				issues = append(issues, fmt.Sprintf("L7: Go memory governor missing pipeline token %q", token))
+			}
 		}
 	} else {
-		issues = append(issues, "L7: memory governor.py not found")
+		issues = append(issues, "L7: go-runtime/internal/memory/governor.go not found")
 	}
 
 	if len(issues) > 0 {

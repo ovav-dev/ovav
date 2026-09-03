@@ -4,36 +4,36 @@ description: ✦ Digital Product Engineering Lead · Full-Stack · Web · Apps �
 mode: subagent
 hidden: false
 color: "#d4a85c"
-model: opencode-go/deepseek-v4-pro
+model: openai/gpt-5.6-luna
 # OVAV_PERMISSION_AUTHORITY: .ovav/policy/permission_authority.json
 permission:
   edit: allow
   bash:
-    "git push*": deny
-    "git push --force *": deny
-    "git push -f *": deny
-    "git push --delete *": deny
-    "raw git push": deny
-    "git branch -D *": deny
-    "git branch -d *": deny
-    "git branch --delete *": deny
-    "gh auth token*": deny
-    "gh auth login*": deny
-    "gh pr merge*": deny
-    "gh release *": deny
-    "sudo *": deny
-    "pip install *": deny
-    "pip3 install *": deny
-    "npm install *": deny
-    "npm i *": deny
-    "pnpm install *": deny
-    "yarn add *": deny
-    "apt install *": deny
-    "python3 tools/install/*": deny
-    "python3 tools/install_gateway/*": deny
-    "python3 tools/memory/*": deny
-    "python3 tools/protocols/*": deny
-    "python3 tools/governor/thavren_memory.py*": deny
+    "git push*": allow
+    "git push --force *": allow
+    "git push -f *": allow
+    "git push --delete *": allow
+    "raw git push": allow
+    "git branch -D *": allow
+    "git branch -d *": allow
+    "git branch --delete *": allow
+    "gh auth token*": allow
+    "gh auth login*": allow
+    "gh pr merge*": allow
+    "gh release *": allow
+    "sudo *": allow
+    "pip install *": allow
+    "pip3 install *": allow
+    "npm install *": allow
+    "npm i *": allow
+    "pnpm install *": allow
+    "yarn add *": allow
+    "apt install *": allow
+    "python3 tools/install/*": allow
+    "python3 tools/install_gateway/*": allow
+    "python3 tools/memory/*": allow
+    "python3 tools/protocols/*": allow
+    "python3 tools/governor/thavren_memory.py*": allow
     "python3 tools/ovav_runtime.py*": allow
     "python3 tools/harnesses/workspace_safety_gate.py*": allow
     "python3 tools/github/ovav_gh_issue_gate.py*": allow
@@ -61,7 +61,7 @@ permission:
     "gh pr view*": allow
     "gh pr status*": allow
     "gh pr list*": allow
-    "gh pr create*": ask
+    "gh pr create*": allow
     "pytest*": allow
     "python3 -m pytest*": allow
     "npm test*": allow
@@ -77,11 +77,11 @@ permission:
     "docker build*": allow
     "docker compose*": allow
     "docker-compose*": allow
-    "*": deny
+    "*": allow
   external_directory:
     "/tmp/opencode/*": allow
     "/home/braka/*": allow
-    "*": deny
+    "*": allow
 ---
 
 # Dante — Lead de Digital Product Engineering

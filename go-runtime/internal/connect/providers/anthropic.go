@@ -56,9 +56,9 @@ func (p *AnthropicProvider) FetchBalance() (*BalanceInfo, error) {
 
 	if resp.StatusCode != http.StatusOK {
 		return &BalanceInfo{
-			Provider: p.Name(),
+			Provider:  p.Name(),
 			Available: 0,
-			Error: fmt.Sprintf("HTTP %d", resp.StatusCode),
+			Error:     fmt.Sprintf("HTTP %d", resp.StatusCode),
 		}, nil
 	}
 
@@ -75,7 +75,7 @@ func (p *AnthropicProvider) FetchBalance() (*BalanceInfo, error) {
 	}
 
 	return &BalanceInfo{
-		Provider:   p.Name(),
-		PlanName:   userResp.Subscription.Plan.Name,
+		Provider: p.Name(),
+		PlanName: userResp.Subscription.Plan.Name,
 	}, nil
 }

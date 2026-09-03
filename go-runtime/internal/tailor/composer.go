@@ -53,6 +53,31 @@ func (s *State) disableDisallowed() {
 	}
 }
 
+// enableAllowed turns ON items whose min_plan is at or below the current
+// selection. Mirrors disableDisallowed so initial state, plan upgrades,
+// and explicit Apply all leave the composer in a consistent state where
+// allowed items are Active=true and disallowed items are Active=false.
+func (s *State) enableAllowed() {
+	for i := range s.Tools {
+		if s.IsAllowed(s.Tools[i].MinPlan) {
+			s.Tools[i].Active = true
+		}
+	}
+	for i := range s.Roles {
+		if s.IsAllowed(s.Roles[i].MinPlan) {
+			s.Roles[i].Active = true
+		}
+	}
+}
+
+// ApplyAllowed applies both enable + disable to keep the composer state
+// consistent with the currently-selected plan. Used by initial-state
+// constructors and any caller that has set SelectedPlan directly.
+func (s *State) ApplyAllowed() {
+	s.enableAllowed()
+	s.disableDisallowed()
+}
+
 // ── ToggleAt ────────────────────────────────────────────────────────
 
 // ToggleAt toggles the selectable row at the given index.

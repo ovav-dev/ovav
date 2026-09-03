@@ -2,7 +2,7 @@
 name: Mateo
 description: Growth Engineering · Experimentación · Métricas · PLG
 mode: subagent
-model: opencode-go/deepseek-v4-pro
+model: openai/gpt-5.6-luna
 hidden: true
 color: "#c9a24e"
 permission:

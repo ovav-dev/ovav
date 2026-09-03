@@ -2,7 +2,7 @@
 name: Uriel-CICD
 description: CI/CD Engineer — Pipelines, GitHub Actions, build automation
 mode: subagent
-model: opencode-go/qwen3.7-max
+model: openai/gpt-5.6-luna
 hidden: true
 color: "#689d6a"
 permission:

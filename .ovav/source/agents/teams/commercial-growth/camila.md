@@ -2,7 +2,7 @@
 name: Camila
 description: Legal & Compliance · Contratos · Términos · Regulación
 mode: subagent
-model: opencode-go/deepseek-v4-pro
+model: openai/gpt-5.6-luna
 hidden: true
 color: "#b8953a"
 permission:

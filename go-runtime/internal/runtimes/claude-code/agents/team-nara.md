@@ -1,23 +1,7 @@
 ---
-name: "Nara"
-type: subagent
-hidden: true
-permission:
-  edit: "deny"
-  bash:
-    go vet*: "allow"
-    git status*: "allow"
-    git diff*: "allow"
-    *: "deny"
-    git log*: "allow"
-    git commit*: "deny"
-    git push*: "deny"
-    sudo *: "deny"
-    go test*: "allow"
-  external_directory:
-    "/home/braka/Labs/mimocode/data/memory/*": "allow"
-    "/home/braka/Systems/OVAV": "allow"
-    "*": "deny"
+name: "nara"
+description: "Benchmark Analyst — análisis competitivo, comparativas técnicas y briefs de decisión."
+model: openai/gpt-5.6-luna
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

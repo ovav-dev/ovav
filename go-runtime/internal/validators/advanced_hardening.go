@@ -61,6 +61,7 @@ func (a *AdvancedHardening) Validate(ctx context.Context, root string) Result {
 			Message: "FAIL: invalid JSON", Duration: time.Since(start),
 		}
 	}
+	isYolo := isYOLOPolicy(root, policy)
 
 	// 1. Validate advanced_surfaces section exists
 	adv, ok := policy["advanced_surfaces"].(map[string]interface{})
@@ -84,14 +85,26 @@ func (a *AdvancedHardening) Validate(ctx context.Context, root string) Result {
 		if total != 14 {
 			issues = append(issues, fmt.Sprintf("F5.1: new_states total_rules expected 14, got %d", total))
 		}
-		if allowed != 12 {
+		if isYolo && allowed != total {
+			issues = append(issues, fmt.Sprintf("F5.1: YOLO new_states allowed expected %d, got %d", total, allowed))
+		} else if !isYolo && allowed != 12 {
 			issues = append(issues, fmt.Sprintf("F5.1: new_states allowed expected 12, got %d", allowed))
 		}
-		if denied != 2 {
+		if isYolo && denied != 0 {
+			issues = append(issues, fmt.Sprintf("F5.1: YOLO new_states denied expected 0, got %d", denied))
+		} else if !isYolo && denied != 2 {
 			issues = append(issues, fmt.Sprintf("F5.1: new_states denied expected 2, got %d", denied))
 		}
 		if allowed+denied != total {
 			issues = append(issues, fmt.Sprintf("F5.1: new_states allowed(%d) + denied(%d) != total(%d)", allowed, denied, total))
+		}
+		if isYolo {
+			states, _ := ns["states"].(map[string]interface{})
+			for _, state := range expectedNewStates {
+				if strVal(states, state) != "allowed" {
+					issues = append(issues, fmt.Sprintf("F5.1: YOLO state %q must be allowed", state))
+				}
+			}
 		}
 	}
 

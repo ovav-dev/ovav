@@ -1,0 +1,122 @@
+{
+  "$schema": "https://aka.ms/terminal-profiles-schema",
+  "theme": {
+    "light": "OVAV Day UI",
+    "dark": "OVAV Night UI"
+  },
+  "showTabsInTitlebar": true,
+  "tabWidthMode": "compact",
+  "useAcrylicInTabRow": false,
+  "windowingBehavior": "useAnyExisting",
+  "profiles": {
+    "defaults": {
+      "colorScheme": {
+        "light": "OVAV Day",
+        "dark": "OVAV Night"
+      },
+      "opacity": 96,
+      "useAcrylic": false,
+      "padding": "10, 14, 10, 14",
+      "scrollbarState": "hidden"
+    },
+    "list": [
+      {
+        "guid": "{b6b87dc1-6f1e-5d3c-9f4e-2c4f7b8a1c6d}",
+        "name": "Ubuntu-26.04 — OVAV",
+        "commandline": "C:\\Windows\\System32\\wsl.exe -d Ubuntu-26.04 --cd /home/braka/Systems/ovav",
+        "startingDirectory": "//wsl.localhost/Ubuntu-26.04/home/braka/Systems/ovav",
+        "hidden": false,
+        "suppressApplicationTitle": true,
+        "tabTitle": "OVAV"
+      }
+    ]
+  },
+  "schemes": [
+    {
+      "name": "OVAV Night",
+      "background": "#202124",
+      "foreground": "#D9DADD",
+      "cursorColor": "#72B8AA",
+      "selectionBackground": "#42474F",
+      "black": "#202124",
+      "red": "#E17F74",
+      "green": "#86C78A",
+      "yellow": "#E0B86B",
+      "blue": "#79AEE0",
+      "purple": "#DF8997",
+      "cyan": "#72B8AA",
+      "white": "#D9DADD",
+      "brightBlack": "#979BA3",
+      "brightRed": "#EF9A91",
+      "brightGreen": "#9BD39E",
+      "brightYellow": "#EAC87F",
+      "brightBlue": "#91BCE4",
+      "brightPurple": "#E8A1AC",
+      "brightCyan": "#8DCCBF",
+      "brightWhite": "#F7F4EE"
+    },
+    {
+      "name": "OVAV Day",
+      "background": "#F7F4EE",
+      "foreground": "#202124",
+      "cursorColor": "#2F685C",
+      "selectionBackground": "#CBC3B7",
+      "black": "#202124",
+      "red": "#97392F",
+      "green": "#356B39",
+      "yellow": "#785500",
+      "blue": "#285D82",
+      "purple": "#8B4050",
+      "cyan": "#2F685C",
+      "white": "#555B63",
+      "brightBlack": "#4F545C",
+      "brightRed": "#A64238",
+      "brightGreen": "#447B47",
+      "brightYellow": "#886318",
+      "brightBlue": "#32658D",
+      "brightPurple": "#984B5A",
+      "brightCyan": "#397568",
+      "brightWhite": "#202124"
+    }
+  ],
+  "themes": [
+    {
+      "name": "OVAV Night UI",
+      "tab": {
+        "background": "terminalBackground",
+        "unfocusedBackground": "#202124CC",
+        "showCloseButton": "activeOnly",
+        "iconStyle": "monochrome"
+      },
+      "tabRow": {
+        "background": "#202124",
+        "unfocusedBackground": "#202124CC"
+      },
+      "window": {
+        "applicationTheme": "dark",
+        "useMica": true,
+        "frame": "#4B5058",
+        "unfocusedFrame": "#2D3035"
+      }
+    },
+    {
+      "name": "OVAV Day UI",
+      "tab": {
+        "background": "terminalBackground",
+        "unfocusedBackground": "#F7F4EECC",
+        "showCloseButton": "activeOnly",
+        "iconStyle": "monochrome"
+      },
+      "tabRow": {
+        "background": "#F7F4EE",
+        "unfocusedBackground": "#ECE7DD"
+      },
+      "window": {
+        "applicationTheme": "light",
+        "useMica": true,
+        "frame": "#AAA49B",
+        "unfocusedFrame": "#D8D1C6"
+      }
+    }
+  ]
+}

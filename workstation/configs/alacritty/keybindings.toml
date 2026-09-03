@@ -1,0 +1,27 @@
+# OVAV Alacritty keyboard bridge — documented CSI-u Shift+Enter sequence.
+# Source of truth: workstation/configs/alacritty/keybindings.toml
+# The host terminal is Alacritty 0.17.x running WSL2.
+
+[selection]
+# Finish a mouse selection by copying it to the Windows clipboard.
+save_to_clipboard = true
+
+# Explicitly pass an unmodified Enter through to the shell/TUI.
+[[keyboard.bindings]]
+key = "Return"
+chars = "\r"
+
+[[keyboard.bindings]]
+key = "V"
+mods = "Control"
+action = "Paste"
+
+[[keyboard.bindings]]
+key = "C"
+mods = "Control|Shift"
+action = "Copy"
+
+[[keyboard.bindings]]
+key = "Return"
+mods = "Shift"
+chars = "\u001b[13;2u"

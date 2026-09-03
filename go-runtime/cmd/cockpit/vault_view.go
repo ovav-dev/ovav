@@ -604,3 +604,12 @@ func openSecretsStoreForCockpit(key []byte) (*secrets.SecretStore, *secrets.Depe
 	}
 	return store, graph, nil
 }
+
+func (vm *vaultSubModel) clearKey() {
+	if vm.key != nil {
+		for i := range vm.key {
+			vm.key[i] = 0
+		}
+		vm.key = nil
+	}
+}

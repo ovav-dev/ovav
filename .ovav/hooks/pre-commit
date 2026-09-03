@@ -1,0 +1,106 @@
+#!/usr/bin/env bash
+# OVAV pre-commit hook: enforces baseline update when protected surface changes.
+#
+# Per ADR-006 (baseline versioning): if a tracked protected surface file
+# (caps.yaml, AGENTS.md, permission_authority.json, etc.) is modified in this
+# commit, then baseline.json must also be updated. Otherwise the validator's
+# comparison becomes stale.
+#
+# Installation:
+#   ovav hooks install-pre-commit
+#   (or manually: cp .ovav/hooks/pre-commit .git/hooks/pre-commit && chmod +x)
+#
+# Bypass:
+#   git commit --no-verify                    # skip ALL hooks (not recommended)
+#   OVAV_BYPASS_BASELINE_CHECK=1 git commit  # skip only baseline check
+#
+# Exit codes:
+#   0 = commit allowed
+#   1 = commit blocked, fix required
+#
+# Companion validator: integrity_baseline_fresh (internal/validators/)
+# Companion validator: pinned_baseline_drift (internal/validators/)
+
+set -euo pipefail
+
+# ── Configuration ──────────────────────────────────────────────────────────
+PROTECTED_SURFACES=(
+  "AGENTS.md"
+  "opencode.json"
+  ".ovav/policy/permission_authority.json"
+  ".ovav/plan/caps.yaml"
+  "go-runtime/go.mod"
+  "go-runtime/internal/validators/cmd/validate/main.go"
+)
+BASELINE_FILE=".ovav/integrity_backups/baseline.json"
+
+# ── Bypass detection ───────────────────────────────────────────────────────
+if [ "${OVAV_BYPASS_BASELINE_CHECK:-0}" = "1" ]; then
+  echo "⚠️  OVAV: skipping baseline freshness check (OVAV_BYPASS_BASELINE_CHECK=1)"
+  exit 0
+fi
+
+if [ "${GIT_REFLOG_ACTION:-}" = "commit" ] && [ -n "${GIT_INDEX_FILE:-}" ]; then
+  : # Git's internal flow
+fi
+
+# ── Stage detection ────────────────────────────────────────────────────────
+# Get list of staged files (porcelain v1, names only)
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACMR 2>/dev/null || true)
+
+if [ -z "$STAGED_FILES" ]; then
+  exit 0
+fi
+
+# ── Check 1: protected surface changed without baseline update? ───────────
+PROTECTED_CHANGED=()
+for surface in "${PROTECTED_SURFACES[@]}"; do
+  if echo "$STAGED_FILES" | grep -qx "$surface"; then
+    PROTECTED_CHANGED+=("$surface")
+  fi
+done
+
+BASELINE_STAGED=0
+if echo "$STAGED_FILES" | grep -qx "$BASELINE_FILE"; then
+  BASELINE_STAGED=1
+fi
+
+if [ "${#PROTECTED_CHANGED[@]}" -gt 0 ] && [ "$BASELINE_STAGED" -eq 0 ]; then
+  echo "🚫 OVAV pre-commit hook: baseline update required"
+  echo ""
+  echo "Protected surfaces modified but baseline.json not updated:"
+  for f in "${PROTECTED_CHANGED[@]}"; do
+    echo "  • $f"
+  done
+  echo ""
+  echo "The runtime integrity validator compares protected surfaces against"
+  echo "baseline.json. If surfaces change without baseline update, the"
+  echo "validator becomes stale (per ADR-006)."
+  echo ""
+  echo "Fix:"
+  echo "  1. Regenerate baseline:"
+  echo "     (cd go-runtime && go build -o ../bin/ovav ./cmd/ovav/ && \\"
+  echo "      cd .. && ./bin/ovav integrity baseline --write)"
+  echo "  2. Stage baseline.json:"
+  echo "     git add -f $BASELINE_FILE"
+  echo "  3. Re-stage commit:"
+  echo "     git commit ..."
+  echo ""
+  echo "Bypass (NOT recommended, breaks integrity guarantees):"
+  echo "  OVAV_BYPASS_BASELINE_CHECK=1 git commit ..."
+  echo ""
+  exit 1
+fi
+
+# ── Check 2: baseline freshness (warn only, not block) ─────────────────────
+if [ -f "$BASELINE_FILE" ]; then
+  BASELINE_AGE_DAYS=$(( ( $(date +%s) - $(stat -c %Y "$BASELINE_FILE" 2>/dev/null || stat -f %m "$BASELINE_FILE" 2>/dev/null || echo 0) ) / 86400 ))
+  if [ "$BASELINE_AGE_DAYS" -gt 7 ]; then
+    echo "⚠️  OVAV: baseline.json is $BASELINE_AGE_DAYS days old (>7 days threshold)"
+    echo "   Validator integrity_baseline_fresh will WARN in dev mode, FAIL in gate mode."
+    echo "   Regenerate via: ./bin/ovav integrity baseline --write"
+    # Don't block — just warn
+  fi
+fi
+
+exit 0

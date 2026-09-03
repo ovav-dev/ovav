@@ -1,0 +1,182 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "_ovav": {
+    "autonomous": true,
+    "managed_by": ".ovav/policy/permission_authority.json",
+    "policy": "yolo-trusted-domain",
+    "rationale": "OVAV TRUSTED DOMAIN — host does not re-ask when OVAV governor decides.",
+    "version": "yolo-2026-08-13",
+    "wildcard_global": true
+  },
+  "agent": {
+    "default": {
+      "description": "OVAV default agent — delegates to Platform Engineering lead",
+      "mode": "primary",
+      "name": "default",
+      "prompt": "{file:/home/braka/Systems/ovav/.opencode/agents/area-platform-engineering.md}",
+      "tools": {
+        "bash": true,
+        "doom_loop": true,
+        "edit": true,
+        "glob": true,
+        "grep": true,
+        "list": true,
+        "patch": true,
+        "read": true,
+        "skill": true,
+        "task": true,
+        "webfetch": true,
+        "websearch": true,
+        "write": true
+      }
+    }
+  },
+  "default_agent": "Platform Engineering",
+  "default_permission": "allow",
+  "instructions": [
+    "opencode_AGENTS.md"
+  ],
+  "mcp": {
+    "ovav-budget": {
+      "enabled": false
+    },
+    "ovav-design-system": {
+      "enabled": false
+    },
+    "ovav-figma": {
+      "enabled": false
+    },
+    "ovav-git": {
+      "enabled": false
+    },
+    "ovav-sqlite": {
+      "enabled": false
+    },
+    "ovav-playwright": {
+      "command": [
+        "npx",
+        "@playwright/mcp@latest"
+      ],
+      "type": "local",
+      "enabled": true
+    },
+    "atuin": {
+      "command": [
+        "atuin",
+        "mcp"
+      ],
+      "type": "local",
+      "enabled": true
+    }
+  },
+  "model": "openai/gpt-5.6-sol",
+  "permission": {
+    "*": "allow",
+    "bash": {
+      "*": "allow",
+      "gh auth status*": "allow",
+      "gh issue list*": "allow",
+      "gh issue view*": "allow",
+      "gh pr create*": "allow",
+      "gh pr list*": "allow",
+      "gh pr status*": "allow",
+      "gh pr view*": "allow",
+      "gh repo view*": "allow",
+      "git add *": "allow",
+      "git branch --show-current": "allow",
+      "git commit*": "allow",
+      "git diff*": "allow",
+      "git log*": "allow",
+      "git ls-remote *": "allow",
+      "git remote -v": "allow",
+      "git rev-parse*": "allow",
+      "git status*": "allow",
+      "go run -C go-runtime ./cmd/ovav validate*": "allow",
+      "go run -C go-runtime ./internal/validators/cmd/validate*": "allow",
+      "npm run build*": "allow",
+      "npm run lint*": "allow",
+      "npm run test*": "allow",
+      "npm run typecheck*": "allow",
+      "npm test*": "allow",
+      "pytest*": "allow",
+      "python3 -m pytest*": "allow"
+    },
+    "diff": "allow",
+    "doom_loop": "allow",
+    "edit": "allow",
+    "external_directory": {
+      "*": "allow"
+    },
+    "glob": "allow",
+    "grep": "allow",
+    "invalid": "allow",
+    "list": "allow",
+    "patch": "allow",
+    "question": "allow",
+    "read": "allow",
+    "skill": "allow",
+    "task": "allow",
+    "todoread": "allow",
+    "todowrite": "allow",
+    "webfetch": "allow",
+    "websearch": "allow",
+    "write": "allow"
+  },
+  "plugin": [
+    ".opencode/plugins/ovav-monitor.js",
+    ".opencode/plugins/ovav-atuin-bridge.js"
+  ],
+  "provider": {
+    "anthropic": {
+      "options": {
+        "timeout": 300000
+      }
+    },
+    "azure": {
+      "options": {
+        "timeout": 300000
+      }
+    },
+    "cohere": {
+      "options": {
+        "timeout": 300000
+      }
+    },
+    "deepseek": {
+      "options": {
+        "timeout": 300000
+      }
+    },
+    "google": {
+      "options": {
+        "timeout": 300000
+      }
+    },
+    "groq": {
+      "options": {
+        "timeout": 300000
+      }
+    },
+    "minimax-coding-plan": {
+      "options": {
+        "timeout": 300000
+      }
+    },
+    "mistral": {
+      "options": {
+        "timeout": 300000
+      }
+    },
+    "openai": {
+      "options": {
+        "timeout": 300000
+      }
+    },
+    "xai": {
+      "options": {
+        "timeout": 300000
+      }
+    }
+  },
+  "small_model": "minimax-coding-plan/MiniMax-M3"
+}

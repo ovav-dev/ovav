@@ -1,0 +1,23 @@
+# Shift+arrow: deliberately UNBOUND (handled by terminal layer, not bash readline)
+set editing-mode emacs
+set bell-style none
+set enable-bracketed-paste on
+bind -r "\C-c"
+"\e[A": history-substring-search-backward
+"\e[B": history-substring-search-forward
+"\e[1;5C": forward-word
+"\e[1;5D": backward-word
+"\e[1;3C": forward-word
+"\e[1;3D": backward-word
+"\e[H": beginning-of-line
+"\e[F": end-of-line
+"\e[1~": beginning-of-line
+"\e[7~": beginning-of-line
+"\e[4~": end-of-line
+"\e[8~": end-of-line
+"\e[3~": delete-char
+"\e[2~": yank
+"\C-x\C-x": exchange-point-and-mark
+"\e[5~": history-substring-search-backward
+"\e[6~": history-substring-search-forward
+"\C-s": forward-search-history

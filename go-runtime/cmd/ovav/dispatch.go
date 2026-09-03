@@ -56,8 +56,6 @@ func routeCommand(cmd string, args []string) int {
 		return cmdDeploy(args)
 	case "sbom":
 		return cmdSBOM(args)
-	case "cockpit", "shell", "tui":
-		return cmdCockpit(args)
 	case "project":
 		return cmdProject(args)
 	case "worktree", "wt":
@@ -70,8 +68,10 @@ func routeCommand(cmd string, args []string) int {
 		return cmdHook(args)
 	case "infra":
 		return cmdInfra(args)
-	case "login", "signin", "auth":
+	case "login", "signin":
 		return cmdLogin(args)
+	case "auth":
+		return cmdAuth(args)
 	case "whoami", "identity":
 		return cmdWhoami(args)
 	case "logout", "signout":
@@ -82,8 +82,14 @@ func routeCommand(cmd string, args []string) int {
 		return cmdGovern(args)
 	case "product":
 		return cmdProduct(args)
-	case "defend":
+	case "defend", "security":
 		return cmdDefend(args)
+	case "smoke":
+		return cmdSmoke(args)
+	case "smoke-all":
+		return cmdSmokeExpanded(args)
+	case "launch":
+		return cmdLaunch(args)
 	case "surfaces":
 		return cmdSurfaces(args)
 	case "export-gate", "publish-check":
@@ -100,19 +106,47 @@ func routeCommand(cmd string, args []string) int {
 		return cmdGateway(args)
 	case "sync":
 		return cmdSync(args)
+	case "convert":
+		return cmdConvert(args)
 	case "resolve-subagent", "resolve_subagent":
 		return cmdResolveSubagent(args)
 	case "delegate":
 		return cmdDelegate(args)
+	case "adversarial":
+		return cmdAdversarial(args)
+	case "fde":
+		return cmdFDE(args)
+	case "benchmark":
+		return cmdBenchmark(args)
+	case "coverage":
+		return cmdCoverage(args)
 	case "validate":
 		return cmdValidate(args)
+	case "monitor":
+		return cmdMonitor(args)
+	case "integrity":
+		return cmdIntegrity(args)
+	case "terminal":
+		return cmdTerminal(args)
 	case "push":
 		return cmdPush(args)
 	case "memory", "mem":
 		return cmdMemory(args)
+	case "provider", "providers":
+		return cmdProvider(args)
 	case "help", "--help", "-h":
 		printUsage()
 		return 0
+	case "hooks":
+		return cmdHooks(args)
+	case "drift":
+		return cmdDrift(args)
+	case "ci":
+		return cmdCI(args)
+	case "docs":
+		return cmdDocs(args)
+	case "it":
+		return cmdIT(args)
 	default:
 		fmt.Fprintf(os.Stderr, "Unknown command: %s\nRun 'ovav help' for usage.\n", cmd)
 		return 2
@@ -128,22 +162,27 @@ func knownCommands() []string {
 		"version", "--version", "-v",
 		"install", "uninstall", "plan", "backup", "apply", "verify",
 		"restore", "rollback", "deploy", "sbom",
-		"cockpit", "shell", "tui",
+		// "ovav" (no args) launches Cockpit TUI via launchCockpitDefault()
 		"project", "git", "worktree", "wt",
 		"chronos", "hook", "infra",
 		"login", "signin", "auth",
 		"whoami", "identity",
 		"logout", "signout",
-		"license", "govern", "defend", "product", "surfaces",
+		"license", "govern", "defend", "security", "product", "surfaces",
 		"export-gate", "publish-check",
 		"repo-check", "presentation-check",
 		"release-check", "rc-check",
-		"fresh-smoke", "dogfood",
+		"smoke", "fresh-smoke", "dogfood",
 		"detect-env", "gateway",
 		"sync",
 		"resolve-subagent", "resolve_subagent",
 		"delegate",
+		"adversarial",
+		"fde",
+		"benchmark",
+		"coverage",
 		"validate",
+		"monitor", "integrity", "terminal",
 		"push",
 		"memory", "mem",
 		"help", "--help", "-h",

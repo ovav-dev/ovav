@@ -2,25 +2,33 @@
 name: "Ryn"
 description: "Explorer rápido — búsqueda de codebase, archivos por patrón, escaneo rápido."
 mode: subagent
-model: opencode-go/qwen3.7-plus
+model: openai/gpt-5.6-luna
 hidden: true
 permission:
   edit: "deny"
   bash:
-    "go list*": "allow"
-    "find *": "allow"
-    "git status*": "allow"
-    "git diff*": "allow"
-    "git log*": "allow"
-    "git commit*": "deny"
-    "sudo *": "deny"
-    "grep -rn*": "allow"
-    "git push*": "deny"
     "*": "deny"
+    apt install *: "deny"
+    dd *of=/dev/*: "deny"
+    find *: "allow"
+    "git branch --delete *": "deny"
+    "git branch -D *": "deny"
+    git commit*: "deny"
+    git diff*: "allow"
+    git log*: "allow"
+    git push*: "deny"
+    git status*: "allow"
+    go list*: "allow"
+    "grep -rn*": "allow"
+    mkfs*: "deny"
+    npm install *: "deny"
+    pip install *: "deny"
+    "rm -rf /*": "deny"
+    sudo *: "deny"
   external_directory:
+    "*": "deny"
     "/home/braka/Labs/mimocode/data/memory/*": "allow"
     "/home/braka/Systems/OVAV": "allow"
-    "*": "deny"
 steps: 8
 ---
 

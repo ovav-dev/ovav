@@ -1,0 +1,230 @@
+{
+  "schema": "ovav.warp.workflows.v1",
+  "owner": "thavren",
+  "owner_team": "platform-engineering",
+  "version": "2026-08-18",
+  "authority": "WARPS workflows call OWS — never git worktree directly",
+  "source": "OVAV × WARP 2026 master plan §17",
+  "import_method": "Warp Drive → Workflows → New → import JSON or manual",
+  "shared_input_profiles": [
+    "wt.feature", "wt.refactor", "wt.docs", "wt.spike", "wt.hotfix", "wt.release"
+  ],
+  "shared_input_profiles_descriptions": {
+    "wt.feature": "New feature work (default)",
+    "wt.refactor": "Code refactor without behavior change",
+    "wt.docs": "Documentation only",
+    "wt.spike": "Time-boxed experimentation (1-3 days)",
+    "wt.hotfix": "Urgent production fix (small, focused)",
+    "wt.release": "Release preparation (versioning, tagging)"
+  },
+  "shared_input_profiles_advanced_routing": {
+    "wt.migration": "wt.feature",
+    "wt.enterprise": "wt.feature",
+    "wt.research": "wt.spike",
+    "wt.patch": "wt.hotfix",
+    "wt.emergency": "wt.hotfix",
+    "note": "Advanced profiles auto-route to base profile based on task name pattern. Visible only in /advanced mode."
+  },
+  "namespace_convention": {
+    "warp_execution_profiles": "ovav.build, ovav.yolo, ovav.review, thavren.systems (plan §12)",
+    "owsm_worktree_profiles": "wt.feature, wt.refactor, wt.docs, wt.spike, wt.hotfix, wt.release (P6 inputs)",
+    "rationale": "Different scopes. Warp execution profiles = governance/permissions. Worktree profiles = OWS routing. `wt.` prefix disambiguates."
+  },
+  "workflows": [
+    {
+      "id": "ovav.create-worktree",
+      "name": "OVAV · Create Worktree",
+      "description": "Create isolated worktree via OWS with profile selection",
+      "command": "ovav worktree owc {{task}} --profile {{profile}}",
+      "inputs": [
+        {"name": "task", "type": "text", "required": true, "description": "Short feature name (e.g., feat-minimax-endpoints)"},
+        {"name": "profile", "type": "enum", "required": true, "options": [
+          "wt.feature", "wt.refactor", "wt.docs", "wt.spike", "wt.hotfix", "wt.release"
+        ], "description": "OWS worktree profile (wt.* namespace)"}
+      ],
+      "working_directory": "current",
+      "shell": "fish",
+      "category": "OVAV",
+      "icon": "🚧"
+    },
+    {
+      "id": "ovav.status",
+      "name": "OVAV · Status",
+      "description": "List all worktrees with conflict predictions",
+      "command": "ovav worktree owl",
+      "inputs": [],
+      "working_directory": "current",
+      "shell": "fish",
+      "category": "OVAV",
+      "icon": "📊"
+    },
+    {
+      "id": "ovav.visual-status",
+      "name": "OVAV · Visual Status",
+      "description": "Visual status with HP colors and OVAV branding",
+      "command": "ovav worktree owlsv",
+      "inputs": [],
+      "working_directory": "current",
+      "shell": "fish",
+      "category": "OVAV",
+      "icon": "🎨"
+    },
+    {
+      "id": "ovav.verify",
+      "name": "OVAV · Verify",
+      "description": "Run full validation pipeline (tests + lint + security)",
+      "command": "ovav worktree owv",
+      "inputs": [],
+      "working_directory": "current",
+      "shell": "fish",
+      "category": "OVAV",
+      "long_running": true,
+      "icon": "✅"
+    },
+    {
+      "id": "ovav.update",
+      "name": "OVAV · Update",
+      "description": "Fetch + rebase worktree onto base branch",
+      "command": "ovav worktree owu",
+      "inputs": [],
+      "working_directory": "current",
+      "shell": "fish",
+      "category": "OVAV",
+      "icon": "⬇️"
+    },
+    {
+      "id": "ovav.done",
+      "name": "OVAV · Done",
+      "description": "Verify → merge → push → cleanup worktree",
+      "command": "ovav worktree owd",
+      "inputs": [],
+      "working_directory": "current",
+      "shell": "fish",
+      "category": "OVAV",
+      "long_running": true,
+      "destructive": true,
+      "warning": "Merges feature branch to develop. Cannot be undone.",
+      "confirm": true,
+      "requires_code_review": true,
+      "icon": "🚀"
+    },
+    {
+      "id": "ovav.route-commit",
+      "name": "OVAV · Route Commit",
+      "description": "Cherry-pick commit to target branch",
+      "command": "ovav worktree owx cherry-pick {{commit}}",
+      "inputs": [
+        {"name": "commit", "type": "text", "required": true, "description": "Commit SHA to cherry-pick"}
+      ],
+      "working_directory": "current",
+      "shell": "fish",
+      "category": "OVAV",
+      "icon": "🚚"
+    },
+    {
+      "id": "ovav.cleanup-preview",
+      "name": "OVAV · Cleanup Preview",
+      "description": "Dry run of worktree cleanup",
+      "command": "ovav worktree owclean --dry-run",
+      "inputs": [],
+      "working_directory": "current",
+      "shell": "fish",
+      "category": "OVAV",
+      "icon": "🧹"
+    },
+    {
+      "id": "ovav.sync",
+      "name": "OVAV · Sync",
+      "description": "Sync remotes + maintenance + prune stale worktrees",
+      "command": "ovav worktree ows",
+      "inputs": [],
+      "working_directory": "current",
+      "shell": "fish",
+      "category": "OVAV",
+      "long_running": true,
+      "icon": "🔄"
+    },
+    {
+      "id": "ovav.abort",
+      "name": "OVAV · Abort",
+      "description": "Rollback current in-progress operation",
+      "command": "ovav worktree owa",
+      "inputs": [],
+      "working_directory": "current",
+      "shell": "fish",
+      "category": "OVAV",
+      "destructive": true,
+      "warning": "Aborts current in-progress worktree operation.",
+      "confirm": true,
+      "icon": "⛔"
+    },
+    {
+      "id": "ovav.rescue",
+      "name": "OVAV · Rescue",
+      "description": "Recover lost branches, worktrees, or commits",
+      "command": "ovav worktree owr",
+      "inputs": [],
+      "working_directory": "current",
+      "shell": "fish",
+      "category": "OVAV",
+      "icon": "🆘"
+    },
+    {
+      "id": "ovav.doctor",
+      "name": "OVAV · Doctor",
+      "description": "Run full system diagnostic",
+      "command": "ovav doctor",
+      "inputs": [],
+      "working_directory": "current",
+      "shell": "fish",
+      "category": "OVAV",
+      "icon": "🩺"
+    },
+    {
+      "id": "ovav.preflight",
+      "name": "OVAV · Preflight",
+      "description": "Environment diagnostic for current worktree",
+      "command": "ovav worktree --preflight",
+      "inputs": [],
+      "working_directory": "current",
+      "shell": "fish",
+      "category": "OVAV",
+      "icon": "✈️"
+    }
+  ],
+  "tab_groups": [
+    {
+      "name": "PROTECTED",
+      "tabs": ["main", "develop", "staging", "prod"],
+      "color": "red",
+      "warning": "Isolated visually as danger zone. Any command here is a high-risk action."
+    },
+    {
+      "name": "OVAV CORE",
+      "tabs": ["system", "tests"],
+      "color": "blue"
+    },
+    {
+      "name": "ACTIVE AGENTS",
+      "tabs": ["AUTH/OpenCode", "API/OpenCode", "REVIEW/Crush"],
+      "color": "purple"
+    },
+    {
+      "name": "DEV",
+      "tabs": ["backend", "frontend", "logs"],
+      "color": "green"
+    }
+  ],
+  "code_review_gate": {
+    "enabled": true,
+    "trigger": "before owd",
+    "prerequisite": "Warp Code Review approval",
+    "sentinel": "<gate:owd>",
+    "description": "Code Review is part of the gate. Never bypassed. Workflows requiring review are flagged with requires_code_review: true."
+  },
+  "dependencies": {
+    "shell": "fish 4.x",
+    "rationale": "All workflows use fish for deterministic quoting. Bash wrapper would re-introduce OWS-launched-shell anti-pattern (plan §2).",
+    "docs": ".ovav/warp/README.md"
+  }
+}

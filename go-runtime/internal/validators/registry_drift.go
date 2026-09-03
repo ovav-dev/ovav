@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"time"
 
@@ -160,6 +161,70 @@ func (r *RegistryDrift) checkAutoTriggersFallbacks(root string) []string {
 	return issues
 }
 
+// goValidatorIDRegexp matches the ID literal returned by a Go validator's
+// ID() method, e.g. `return "registry_drift"`. It captures the ID string.
+var goValidatorIDRegexp = regexp.MustCompile(`return\s+"([^"]+)"`)
+
+// extractGoValidatorID reads a Go validator source file and returns the
+// first string literal returned by its ID() method. Returns "" if the
+// file does not contain a recognisable ID() declaration.
+func extractGoValidatorID(path string) string {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return ""
+	}
+	// Locate the ID() function (single line `func (x *X) ID() string { return "..." }`).
+	idx := strings.Index(string(data), ") ID() string")
+	if idx < 0 {
+		return ""
+	}
+	// Take a small window after the ID() signature and search for the
+	// first return literal.
+	window := string(data[idx : idx+200])
+	m := goValidatorIDRegexp.FindStringSubmatch(window)
+	if len(m) < 2 {
+		return ""
+	}
+	return m[1]
+}
+
+// autoTriggersMetaKeys are top-level keys in auto_triggers.yaml that are not
+var autoTriggersMetaKeys = map[string]bool{
+	"schema":                  true,
+	"updated_at":              true,
+	"status":                  true,
+	"execution_scope":         true,
+	"note":                    true,
+	"router":                  true,
+	"registry_only_router":    true,
+	"sdd_init":                true,
+	"phase_dag":               true,
+	"artifact_dependency":     true,
+	"result_contract_runtime": true,
+	"h_verify_evidence":       true,
+	"memory_write_gateway":    true,
+	"workspace_safety_gate":   true,
+	"behavioral_directives":   true,
+}
+
+// eventBlocksForScope returns the list of top-level event-block names that
+// should be validated for the given execution_scope value.
+//
+// When execution_scope == "git_hook_stages_only", only the live `router:`
+// block is validated. Entries under `registry_only_router:` (and any other
+// non-router block) are intentionally preserved as registry-only /
+// disconnected records for documentation — they are NOT wired to git hooks
+// and must not produce drift noise.
+//
+// When execution_scope is missing or any other value, all known event
+// blocks (router + registry_only_router) are validated (legacy mode).
+func eventBlocksForScope(executionScope string) []string {
+	if executionScope == "git_hook_stages_only" {
+		return []string{"router"}
+	}
+	return []string{"router", "registry_only_router"}
+}
+
 func (r *RegistryDrift) checkRouterTriggerCrossValidation(root string) []string {
 	var issues []string
 	atPath := filepath.Join(root, ".ovav", "registry", "auto_triggers.yaml")
@@ -168,64 +233,93 @@ func (r *RegistryDrift) checkRouterTriggerCrossValidation(root string) []string 
 		return issues // Already reported in checkAutoTriggers
 	}
 
-	var at struct {
-		AutoTriggers map[string]yaml.Node `yaml:"auto_triggers"`
-	}
-	if err := yaml.Unmarshal(data, &at); err != nil {
+	// Parse the entire YAML as a generic map so we can inspect every
+	// top-level key. The schema is:
+	//   schema: ...
+	//   router: { event: [trigger_name, ...] }
+	//   registry_only_router: { event: [trigger_name, ...] }
+	//   <trigger_name>: { tier: N, when: [...], module: ..., function: ... }
+	//   ...
+	// Top-level keys that are not meta and not router blocks are trigger
+	// definitions.
+	var raw map[string]yaml.Node
+	if err := yaml.Unmarshal(data, &raw); err != nil {
 		return issues
 	}
 
-	// Build set of defined triggers (keys that have definition blocks)
-	definedTriggers := make(map[string]bool)
-	specialKeys := map[string]bool{
-		"router": true, "sdd_init": true,
-		"phase_dag": true, "artifact_dependency": true, "result_contract_runtime": true,
-		"h_verify_evidence": true, "memory_write_gateway": true,
-		"workspace_safety_gate": true, "behavioral_directives": true,
+	// Extract execution_scope (canonical declaration of which blocks are wired).
+	executionScope := ""
+	if scopeNode, ok := raw["execution_scope"]; ok {
+		_ = scopeNode.Decode(&executionScope)
 	}
 
-	for name := range at.AutoTriggers {
-		if !specialKeys[name] && name != "router" {
+	// Build set of defined triggers (top-level keys that aren't meta).
+	definedTriggers := make(map[string]bool)
+	for name := range raw {
+		if !autoTriggersMetaKeys[name] {
 			definedTriggers[name] = true
 		}
 	}
 
-	// Parse router section manually
-	type routerData struct {
-		Router map[string][]string `yaml:"router"`
-	}
-	var rd routerData
-	yaml.Unmarshal(data, &rd)
-
-	for eventName, triggerList := range rd.Router {
-		for _, name := range triggerList {
-			if specialKeys[name] {
-				continue
-			}
-			if !definedTriggers[name] {
-				// Check for prefix mismatch (check_ vs h_)
-				alternatives := []string{}
-				for _, pair := range [][2]string{{"check_", "h_"}, {"h_", "check_"}} {
-					if strings.HasPrefix(name, pair[0]) {
-						candidate := pair[1] + name[len(pair[0]):]
-						if definedTriggers[candidate] {
-							alternatives = append(alternatives, candidate)
+	// Validate each event block in scope.
+	for _, blockName := range eventBlocksForScope(executionScope) {
+		var block map[string][]string
+		node, ok := raw[blockName]
+		if !ok {
+			continue
+		}
+		if err := node.Decode(&block); err != nil {
+			continue
+		}
+		for eventName, triggerList := range block {
+			for _, name := range triggerList {
+				if autoTriggersMetaKeys[name] {
+					continue
+				}
+				if !definedTriggers[name] {
+					// Check for prefix mismatch (check_ vs h_)
+					alternatives := []string{}
+					for _, pair := range [][2]string{{"check_", "h_"}, {"h_", "check_"}} {
+						if strings.HasPrefix(name, pair[0]) {
+							candidate := pair[1] + name[len(pair[0]):]
+							if definedTriggers[candidate] {
+								alternatives = append(alternatives, candidate)
+							}
 						}
 					}
-				}
-				if len(alternatives) > 0 {
-					issues = append(issues, fmt.Sprintf(
-						"DRIFT: auto_triggers router → '%s' (event: %s) has NO definition. Did you mean '%s'?",
-						name, eventName, strings.Join(alternatives, " or ")))
-				} else {
-					issues = append(issues, fmt.Sprintf(
-						"DRIFT: auto_triggers router → '%s' (event: %s) has NO trigger definition — will be silently skipped",
-						name, eventName))
+					if len(alternatives) > 0 {
+						issues = append(issues, fmt.Sprintf(
+							"DRIFT: auto_triggers router → '%s' (event: %s) has NO definition. Did you mean '%s'?",
+							name, eventName, strings.Join(alternatives, " or ")))
+					} else {
+						issues = append(issues, fmt.Sprintf(
+							"DRIFT: auto_triggers router → '%s' (event: %s) has NO trigger definition — will be silently skipped",
+							name, eventName))
+					}
 				}
 			}
 		}
 	}
 	return issues
+}
+
+// pythonToGoValidatorID maps legacy Python-era validator IDs (still
+// referenced in surface_validator_map.yaml) to their Go-native successors.
+// Surface maps declared this way are explicitly preserved as the canonical
+// Python→Go migration is rolled out. New entries should reference the Go
+// ID directly.
+var pythonToGoValidatorID = map[string]string{
+	"validate_permission_policy_drift": "permission_drift",
+	"validate_harnesses":               "harness_integrity",
+	"validate_memory_policy":           "validate_memory_policy", // Go kept the original name
+	"validate_phase_dag":               "validate_phase_dag",     // Go kept the original name
+	"validate_service_profiles":        "validate_service_profiles",
+	"validate_skills":                  "validate_skills",
+	"validate_model_policy":            "model_policy",
+	"check_supply_chain":               "supply_chain",
+	"check_network_hardening":          "network_hardening",
+	"validate_result_contracts":        "contract_enforcement",
+	"validate_registries":              "registry_validator",
 }
 
 func (r *RegistryDrift) checkSurfaceValidatorMap(root string) []string {
@@ -260,14 +354,41 @@ func (r *RegistryDrift) checkSurfaceValidatorMap(root string) []string {
 			}
 		}
 	}
-	// Also add Go validators
+	// Also add Go validators. For each non-test .go file we add both the
+	// filename (without .go) and the ID returned by the validator's ID()
+	// method — they may differ (e.g. memory_policy.go declares ID
+	// "validate_memory_policy").
 	goValDir := filepath.Join(root, "go-runtime", "internal", "validators")
 	goEntries, _ := os.ReadDir(goValDir)
 	for _, e := range goEntries {
-		if !e.IsDir() && strings.HasSuffix(e.Name(), ".go") && !strings.HasSuffix(e.Name(), "_test.go") && e.Name() != "validators.go" {
-			name := strings.TrimSuffix(e.Name(), ".go")
-			existing[name] = true
+		if e.IsDir() || !strings.HasSuffix(e.Name(), ".go") ||
+			strings.HasSuffix(e.Name(), "_test.go") || e.Name() == "validators.go" {
+			continue
 		}
+		name := strings.TrimSuffix(e.Name(), ".go")
+		existing[name] = true
+		// Parse the actual ID declared by the validator's ID() method.
+		// Some Go validators (memory_policy.go, phase_dag.go, etc.) keep
+		// historical "validate_" prefixes in their ID while the file name
+		// drops that prefix.
+		if id := extractGoValidatorID(filepath.Join(goValDir, e.Name())); id != "" {
+			existing[id] = true
+		}
+	}
+
+	// translateLegacyValidatorID resolves a legacy Python-era validator ID
+	// to its Go-native successor per the pythonToGoValidatorID map. If the
+	// ID is not in the map, it is returned unchanged. The translation is
+	// additive — the original ID is also accepted so surface maps can list
+	// either form.
+	translateLegacyValidatorID := func(vName string) []string {
+		goID, ok := pythonToGoValidatorID[vName]
+		if !ok {
+			return []string{vName}
+		}
+		// Accept both the legacy ID and the Go ID so surface maps can
+		// list either form.
+		return []string{vName, goID}
 	}
 
 	total, missing := 0, 0
@@ -286,7 +407,10 @@ func (r *RegistryDrift) checkSurfaceValidatorMap(root string) []string {
 			if vName == "" {
 				continue
 			}
-			candidates := []string{vName, "check_" + vName, "validate_" + vName}
+			// Build candidate list: legacy ID + Go ID (if translated) +
+			// conventional prefix variants (check_/validate_).
+			candidates := append([]string{}, translateLegacyValidatorID(vName)...)
+			candidates = append(candidates, "check_"+vName, "validate_"+vName)
 			if strings.HasPrefix(vName, "validate_") {
 				candidates = append(candidates, "check_"+vName[len("validate_"):])
 			} else if strings.HasPrefix(vName, "check_") {
@@ -310,7 +434,8 @@ func (r *RegistryDrift) checkSurfaceValidatorMap(root string) []string {
 	for laneName, validators := range svm.LaneValidators {
 		for _, v := range validators {
 			total++
-			candidates := []string{v, "check_" + v, "validate_" + v}
+			candidates := append([]string{}, translateLegacyValidatorID(v)...)
+			candidates = append(candidates, "check_"+v, "validate_"+v)
 			found := false
 			for _, c := range candidates {
 				if existing[c] {
@@ -333,22 +458,22 @@ func (r *RegistryDrift) checkSurfaceValidatorMap(root string) []string {
 }
 
 func (r *RegistryDrift) checkArtifactRegistry(root string) []string {
-	var issues []string
-	artPath := filepath.Join(root, ".ovav", "registry", "artifacts.yaml")
-	if _, err := os.Stat(artPath); os.IsNotExist(err) {
-		return nil // Not critical
-	}
-
-	// Sample check: verify known artifact paths
-	samplePaths := []string{
-		".ovav/context/CURRENT_HANDOFF.md",
-	}
-	for _, sp := range samplePaths {
-		if _, err := os.Stat(filepath.Join(root, sp)); os.IsNotExist(err) {
-			issues = append(issues, fmt.Sprintf("DRIFT: artifact_registry → known path '%s' not found", sp))
-		}
-	}
-	return issues
+	// artifacts.yaml is a historical ledger of build-phase artifacts (S13,
+	// S22, S45, …). Most declared paths are not expected to exist on disk
+	// for the current build — they are records of past work.
+	//
+	// The previous implementation hardcoded a single sample path
+	// (`.ovav/context/CURRENT_HANDOFF.md`) that was never declared in
+	// any registry and that is gitignored / runtime-generated. That
+	// hardcoded sample was the source of false-positive drift. The check
+	// is now a no-op: artifact_registry is informational, not a gate.
+	//
+	// A future change may add targeted checks (e.g. verifying the
+	// CURRENT_HANDOFF.md referenced by authorized_changes_ledger.yaml
+	// exists), but that requires a real canonical pattern rather than
+	// a hardcoded slice.
+	_ = root
+	return nil
 }
 
 var _ Validator = (*RegistryDrift)(nil)

@@ -2,20 +2,28 @@
 name: "Nara"
 description: "Benchmark Analyst — análisis competitivo, comparativas técnicas y briefs de decisión."
 mode: subagent
-model: opencode-go/qwen3.7-plus
+model: openai/gpt-5.6-luna
 hidden: true
 permission:
   edit: "deny"
   bash:
-    "git diff*": "allow"
-    "git push*": "deny"
-    "sudo *": "deny"
-    "go test*": "allow"
-    "go vet*": "allow"
-    "git status*": "allow"
-    "git log*": "allow"
-    "git commit*": "deny"
     "*": "deny"
+    apt install *: "deny"
+    dd *of=/dev/*: "deny"
+    "git branch --delete *": "deny"
+    "git branch -D *": "deny"
+    git commit*: "deny"
+    git diff*: "allow"
+    git log*: "allow"
+    git push*: "deny"
+    git status*: "allow"
+    go test*: "allow"
+    go vet*: "allow"
+    mkfs*: "deny"
+    npm install *: "deny"
+    pip install *: "deny"
+    "rm -rf /*": "deny"
+    sudo *: "deny"
   external_directory:
     "*": "deny"
     "/home/braka/Labs/mimocode/data/memory/*": "allow"

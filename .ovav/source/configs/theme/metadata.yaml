@@ -1,0 +1,47 @@
+# Theme Config Metadata
+version: "1.0.0"
+description: "OVAV unified theme system with dark/light/auto detection"
+
+# Canonical source: .ovav/source/configs/theme/
+
+# Files
+files:
+  - dark.yaml                    # Dark palette (canonical)
+  - light.yaml                   # Light palette (canonical)
+  - auto.wezterm.lua            # WezTerm auto-detection module
+
+# Color schemes
+schemes:
+  dark:
+    name: "OVAV Dark"
+    bg: "#242424"
+    fg: "#d4d4d4"
+    accent: "#7eb77f"
+
+  light:
+    name: "OVAV Light"
+    bg: "#f5f5f5"
+    fg: "#242424"
+    accent: "#6d9bc3"
+
+# Auto-detection
+auto_detection:
+  wezterm:
+    module: "auto.wezterm.lua"
+    env_var: "OVAV_COLOR_SCHEME"
+    default: "dark"
+    projection_gate: "command -v wezterm"
+
+# Features
+features:
+  - System theme detection
+  - Dark/Light manual override via OVAV_COLOR_SCHEME
+  - WezTerm GUI appearance detection via wezterm.gui.get_appearance()
+  - Workspace-aware coloring
+
+# Deploy targets
+deploy:
+  - path: config/wezterm/themes/
+    description: WezTerm theme files
+  - path: config/windows-terminal/themes/
+    description: Windows Terminal theme files

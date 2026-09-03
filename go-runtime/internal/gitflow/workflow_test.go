@@ -1209,6 +1209,27 @@ func runGitTest(dir string, args ...string) {
 	cmd.Run()
 }
 
+func TestPullTargetOrUseCachedRef_DoesNotRebaseLocalAheadTarget(t *testing.T) {
+	repo, _ := setupTestRepoWithRemote(t)
+	runGitCmd(t, repo, "checkout", "develop")
+
+	os.WriteFile(filepath.Join(repo, "local-only.txt"), []byte("local\n"), 0644)
+	runGitCmd(t, repo, "add", "local-only.txt")
+	runGitCmd(t, repo, "commit", "-m", "feat: local target change")
+	before := strings.TrimSpace(runGitOutput(repo, "rev-parse", "HEAD"))
+
+	if err := pullTargetOrUseCachedRef(repo, "develop"); err != nil {
+		t.Fatalf("pullTargetOrUseCachedRef: %v", err)
+	}
+	after := strings.TrimSpace(runGitOutput(repo, "rev-parse", "HEAD"))
+	if after != before {
+		t.Fatalf("target HEAD changed from %s to %s", before, after)
+	}
+	if strings.TrimSpace(runGitOutput(repo, "rev-parse", "--verify", "REBASE_HEAD")) != "" {
+		t.Fatal("target unexpectedly left in a rebase")
+	}
+}
+
 // ── SU-2: Merge conflict rollback cleans staged files ─────────────────────
 
 // TestMergeConflictRollback_CleanStaged verifies that after a merge conflict,

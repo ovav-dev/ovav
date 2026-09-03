@@ -4,167 +4,150 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"sort"
 	"strings"
 	"time"
 
 	"github.com/ovav/ovav/internal/sbom"
 )
 
-// SupplyChain verifies dependency hashes and SBOM integrity.
-// Uses Go-native SBOM (sbom package) for hash verification.
-// Checks that go.sum exists (Go) and requirements.txt hash is consistent (Python remnants).
-type SupplyChain struct{}
+type ValidationMode string
 
-func NewSupplyChain() *SupplyChain { return &SupplyChain{} }
+const (
+	ValidationDeveloper ValidationMode = "developer"
+	ValidationGate      ValidationMode = "gate"
+)
+
+// SupplyChain verifies the HEAD-anchored SBOM without mutating it.
+type SupplyChain struct{ mode ValidationMode }
+
+func NewSupplyChain(modes ...ValidationMode) *SupplyChain {
+	mode := ValidationDeveloper
+	if len(modes) > 0 {
+		mode = modes[0]
+	}
+	return &SupplyChain{mode: mode}
+}
 
 func (s *SupplyChain) ID() string   { return "supply_chain" }
 func (s *SupplyChain) Name() string { return "Supply Chain Integrity" }
 func (s *SupplyChain) Description() string {
-	return "Verifies dependency hashes and SBOM integrity via Go-native SBOM"
+	return "Verifies the canonical SBOM against git HEAD and reports worktree drift separately"
 }
 func (s *SupplyChain) Weight() int { return 20 }
 
-func (s *SupplyChain) Validate(ctx context.Context, root string) Result {
+// Mode reports whether drift is being evaluated for developer feedback or as a gate.
+func (s *SupplyChain) Mode() ValidationMode { return s.mode }
+
+func (s *SupplyChain) Validate(_ context.Context, root string) Result {
 	start := time.Now()
-	var issues []string
-
-	// Verify go.sum exists and has content
-	goSum := filepath.Join(root, "go-runtime", "go.sum")
-	if info, err := os.Stat(goSum); os.IsNotExist(err) {
-		issues = append(issues, "MISSING: go-runtime/go.sum — Go module checksums not found")
+	var failures, warnings []string
+	goSum, err := headOrFilesystemFile(root, "go-runtime/go.sum")
+	if os.IsNotExist(err) {
+		failures = append(failures, "MISSING: go-runtime/go.sum — Go module checksums not found")
 	} else if err != nil {
-		issues = append(issues, fmt.Sprintf("ERROR: Cannot read go.sum: %v", err))
-	} else if info.Size() == 0 {
-		issues = append(issues, "EMPTY: go-runtime/go.sum — no dependency hashes")
+		failures = append(failures, fmt.Sprintf("ERROR: Cannot read go.sum: %v", err))
+	} else if len(goSum) == 0 {
+		failures = append(failures, "EMPTY: go-runtime/go.sum — no dependency hashes")
+	}
+	if _, err := headOrFilesystemFile(root, "go-runtime/go.mod"); os.IsNotExist(err) {
+		failures = append(failures, "MISSING: go-runtime/go.mod — Go module definition not found")
 	}
 
-	// Verify go.mod exists
-	goMod := filepath.Join(root, "go-runtime", "go.mod")
-	if _, err := os.Stat(goMod); os.IsNotExist(err) {
-		issues = append(issues, "MISSING: go-runtime/go.mod — Go module definition not found")
-	}
-
-	// Go-native SBOM verification (replaces Python sbom.py)
-	sbomResult, err := sbom.Verify(root)
-	if err != nil {
-		// SBOM baseline might not exist yet — that's ok, just note it
-		issues = append(issues, fmt.Sprintf("SBOM: baseline not found — run 'ovav sbom generate' to create"))
-	} else if !sbomResult.Valid {
-		// Self-healing: check if ALL mismatches are in known-volatile operational paths.
-		// If so, regenerate the baseline and re-verify automatically.
-		// This handles legitimate source changes (new files, updated configs) without manual intervention.
-		if allMismatchesVolatile(sbomResult.Mismatches) {
-			if regenerated, regenErr := sbom.Generate(root); regenErr == nil {
-				if saveErr := regenerated.Save(root); saveErr == nil {
-					// Re-verify with fresh baseline
-					if retryResult, retryErr := sbom.Verify(root); retryErr == nil && retryResult.Valid {
-						// Self-healed: baseline was stale but is now correct
-					} else {
-						// Still failing after regen — real issues remain
-						for _, m := range sbomResult.Mismatches {
-							issues = append(issues, fmt.Sprintf("SBOM: %s", m))
-						}
-					}
-				} else {
-					for _, m := range sbomResult.Mismatches {
-						issues = append(issues, fmt.Sprintf("SBOM: %s", m))
-					}
-				}
+	if result, err := sbom.Verify(root); err != nil {
+		failures = append(failures, "baseline_invalid: "+err.Error())
+	} else {
+		for _, issue := range result.BaselineIssues {
+			failures = append(failures, "baseline_invalid: "+issue)
+		}
+		for _, warning := range result.WorktreeWarnings {
+			issue := "working_tree_drift: " + warning
+			if s.mode == ValidationGate && sensitiveCandidateDrift(warning) {
+				failures = append(failures, issue)
 			} else {
-				for _, m := range sbomResult.Mismatches {
-					issues = append(issues, fmt.Sprintf("SBOM: %s", m))
-				}
-			}
-		} else {
-			// Non-volatile mismatches are real integrity issues — do not self-heal
-			for _, m := range sbomResult.Mismatches {
-				issues = append(issues, fmt.Sprintf("SBOM: %s", m))
+				warnings = append(warnings, issue)
 			}
 		}
 	}
 
-	// Check for suspicious binaries in the repo
-	suspiciousExts := map[string]bool{
-		".exe": true, ".dll": true, ".so": true, ".dylib": true,
+	for _, path := range trackedSuspiciousBinaries(root) {
+		failures = append(failures, "SUSPICIOUS: tracked binary file in HEAD: "+path)
 	}
-	filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+	sort.Strings(failures)
+	sort.Strings(warnings)
+	issues := append(append([]string(nil), failures...), warnings...)
+	if len(failures) > 0 {
+		return Result{ID: s.ID(), Name: s.Name(), Status: "fail", Weight: s.Weight(), Message: fmt.Sprintf("FAIL supply chain integrity — %d baseline/security issue(s), %d worktree warning(s)", len(failures), len(warnings)), Issues: issues, Duration: time.Since(start)}
+	}
+	if len(warnings) > 0 {
+		return Result{ID: s.ID(), Name: s.Name(), Status: "warn", Weight: s.Weight(), Message: fmt.Sprintf("WARN supply chain integrity — %d working-tree drift item(s)", len(warnings)), Issues: warnings, Duration: time.Since(start)}
+	}
+	return Result{ID: s.ID(), Name: s.Name(), Status: "pass", Weight: s.Weight(), Message: "PASS supply chain integrity", Duration: time.Since(start)}
+}
+
+func sensitiveCandidateDrift(issue string) bool {
+	path := issue
+	if separator := strings.Index(issue, ": "); separator >= 0 {
+		path = issue[separator+2:]
+	}
+	path = strings.ToLower(filepath.ToSlash(path))
+	if strings.HasPrefix(path, ".ovav/") || strings.HasPrefix(path, "go-runtime/") {
+		return true
+	}
+	switch strings.ToLower(filepath.Ext(path)) {
+	case ".exe", ".dll", ".so", ".dylib":
+		return true
+	}
+	return path == "opencode.json" || path == "requirements.txt" || path == "go.mod" || path == "go.sum" || strings.HasSuffix(path, "/go.mod") || strings.HasSuffix(path, "/go.sum")
+}
+
+// IsSensitiveCandidateDrift exposes the gate classification for CLI reporting.
+func IsSensitiveCandidateDrift(issue string) bool { return sensitiveCandidateDrift(issue) }
+
+func headOrFilesystemFile(root, path string) ([]byte, error) {
+	cmd := exec.Command("git", "show", "HEAD:"+filepath.ToSlash(path))
+	cmd.Dir = root
+	if data, err := cmd.Output(); err == nil {
+		return data, nil
+	}
+	return os.ReadFile(filepath.Join(root, filepath.FromSlash(path)))
+}
+
+func trackedSuspiciousBinaries(root string) []string {
+	cmd := exec.Command("git", "ls-tree", "-r", "--name-only", "HEAD")
+	cmd.Dir = root
+	output, err := cmd.Output()
+	if err != nil {
+		return filesystemSuspiciousBinaries(root)
+	}
+	suspicious := map[string]bool{".exe": true, ".dll": true, ".so": true, ".dylib": true}
+	var paths []string
+	for _, path := range strings.Split(strings.TrimSpace(string(output)), "\n") {
+		if suspicious[strings.ToLower(filepath.Ext(path))] {
+			paths = append(paths, filepath.ToSlash(path))
+		}
+	}
+	sort.Strings(paths)
+	return paths
+}
+
+func filesystemSuspiciousBinaries(root string) []string {
+	suspicious := map[string]bool{".exe": true, ".dll": true, ".so": true, ".dylib": true}
+	var paths []string
+	_ = filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 		if err != nil || info.IsDir() {
 			return nil
 		}
-		rel, _ := filepath.Rel(root, path)
-		if strings.HasPrefix(rel, ".git/") || strings.HasPrefix(rel, "go-runtime/vendor/") || strings.HasPrefix(rel, ".venv/") || strings.HasPrefix(rel, "vendor/") || strings.Contains(rel, "/node_modules/") || strings.HasPrefix(rel, "node_modules/") {
-			return nil
-		}
-		ext := strings.ToLower(filepath.Ext(path))
-		if suspiciousExts[ext] {
-			issues = append(issues, fmt.Sprintf("SUSPICIOUS: Binary file in repo: %s", rel))
+		rel, relErr := filepath.Rel(root, path)
+		if relErr == nil && suspicious[strings.ToLower(filepath.Ext(path))] {
+			paths = append(paths, filepath.ToSlash(rel))
 		}
 		return nil
 	})
-
-	if len(issues) > 0 {
-		return Result{
-			ID: s.ID(), Name: s.Name(), Status: "fail", Weight: s.Weight(),
-			Message: fmt.Sprintf("FAIL supply chain integrity — %d issue(s)", len(issues)),
-			Issues:  issues, Duration: time.Since(start),
-		}
-	}
-	return Result{
-		ID: s.ID(), Name: s.Name(), Status: "pass", Weight: s.Weight(),
-		Message:  "PASS supply chain integrity",
-		Duration: time.Since(start),
-	}
+	sort.Strings(paths)
+	return paths
 }
 
 var _ Validator = (*SupplyChain)(nil)
-
-// allMismatchesVolatile returns true if every mismatch in the list is a
-// known-volatile operational path (sync artifacts, runtime caches, temp files).
-// These represent baseline staleness rather than actual source integrity violations.
-func allMismatchesVolatile(mismatches []string) bool {
-	if len(mismatches) == 0 {
-		return false
-	}
-	volatilePrefixes := []string{
-		".ovav/sync/",    // sync manifest regenerated on every sync operation
-		".ovav/cache/",   // runtime cache files
-		".ovav/runtime/", // runtime state files
-		".ovav/context/", // context packs
-		".ovav/plan/",    // plan files (caps.yaml updated_at drifts with wall clock)
-		".tmp/",          // temp files
-		"tools/cpanel/",  // cPanel TypeScript source: new/modified files in
-		// tracked commits are legitimate source changes, not
-		// integrity violations — SBOM must be regenerated to absorb them.
-	}
-	for _, m := range mismatches {
-		// Format is "MODIFIED: path" or "MISSING: path" or "UNTRACKED: path"
-		path := m
-		if idx := strings.Index(path, " "); idx != -1 {
-			path = path[idx+1:]
-		}
-		isVolatile := false
-		for _, prefix := range volatilePrefixes {
-			if strings.HasPrefix(path, prefix) {
-				isVolatile = true
-				break
-			}
-		}
-		// Intelligent auto-regeneration: new cPanel source files (TS/TSX) in
-		// tracked commits are always legitimate — regenerate SBOM instead of failing.
-		// This handles the case where a developer adds new cPanel components
-		// without manually regenerating the SBOM baseline.
-		if !isVolatile {
-			ext := strings.ToLower(filepath.Ext(path))
-			if ext == ".ts" || ext == ".tsx" {
-				if strings.HasPrefix(path, "tools/cpanel/") {
-					isVolatile = true
-				}
-			}
-		}
-		if !isVolatile {
-			return false
-		}
-	}
-	return true
-}

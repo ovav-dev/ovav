@@ -34,6 +34,10 @@ func main() {
 		deduplicate(memoryDir)
 	case "rebuild":
 		rebuild(memoryDir)
+	case "learn":
+		learn(memoryDir, os.Args[2:])
+	case "insights":
+		insights(memoryDir)
 	default:
 		printUsage()
 		os.Exit(1)
@@ -217,6 +221,100 @@ func rebuild(memoryDir string) {
 	fmt.Println("✅ Index rebuilt successfully")
 }
 
+func learn(memoryDir string, args []string) {
+	query := ""
+	result := ""
+	feedback := 0.5
+	context := ""
+
+	for i := 0; i < len(args); i++ {
+		switch args[i] {
+		case "-query":
+			if i+1 < len(args) {
+				query = args[i+1]
+				i++
+			}
+		case "-result":
+			if i+1 < len(args) {
+				result = args[i+1]
+				i++
+			}
+		case "-feedback":
+			if i+1 < len(args) {
+				fmt.Sscanf(args[i+1], "%f", &feedback)
+				i++
+			}
+		case "-context":
+			if i+1 < len(args) {
+				context = args[i+1]
+				i++
+			}
+		}
+	}
+
+	if query == "" || result == "" {
+		fmt.Fprintln(os.Stderr, "Usage: ovav memory learn -query '...' -result '...' [-feedback 0.5] [-context '...']")
+		os.Exit(1)
+	}
+
+	vs, err := memory.NewVectorStore(filepath.Join(memoryDir, "vectors"))
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error creating vector store: %v\n", err)
+		os.Exit(1)
+	}
+
+	engine := memory.NewLiveLearningEngine(vs)
+	engine.RecordInteraction(query, result, feedback, context)
+
+	fmt.Println("✅ Interaction recorded for learning")
+	fmt.Printf("   Query: %s\n", query)
+	fmt.Printf("   Feedback: %.2f\n", feedback)
+
+	// Show prediction if available
+	if context != "" {
+		prediction := engine.PredictAction(query, context)
+		if prediction != nil {
+			fmt.Printf("\n🧠 AI Prediction:\n")
+			fmt.Printf("   Action: %s\n", prediction.Action)
+			fmt.Printf("   Confidence: %.0f%%\n", prediction.Confidence*100)
+			fmt.Printf("   Reasoning: %s\n", prediction.Reasoning)
+		}
+	}
+}
+
+func insights(memoryDir string) {
+	vs, err := memory.NewVectorStore(filepath.Join(memoryDir, "vectors"))
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error creating vector store: %v\n", err)
+		os.Exit(1)
+	}
+
+	engine := memory.NewLiveLearningEngine(vs)
+	insightsList := engine.GetInsights()
+
+	if len(insightsList) == 0 {
+		fmt.Println("No insights yet. Record more interactions with 'ovav memory learn'.")
+		return
+	}
+
+	fmt.Printf("🧠 Learning Insights (%d found)\n\n", len(insightsList))
+
+	for i, insight := range insightsList {
+		if i >= 10 {
+			break
+		}
+		fmt.Printf("%d. [%s] %s\n", i+1, insight.Type, insight.Description)
+		fmt.Printf("   → %s\n\n", insight.Recommendation)
+	}
+
+	stats := engine.Stats()
+	fmt.Println("📊 Learning Statistics:")
+	fmt.Printf("   Total interactions: %d\n", stats.TotalInteractions)
+	fmt.Printf("   Patterns detected: %d\n", stats.TotalPatterns)
+	fmt.Printf("   High confidence patterns: %d\n", stats.HighConfidencePatterns)
+	fmt.Printf("   Average success rate: %.0f%%\n", stats.AverageSuccessRate*100)
+}
+
 func printUsage() {
 	fmt.Print(`OVAV Memory - Semantic Search System v4.0
 
@@ -230,13 +328,16 @@ Commands:
   stats                  Show vector store statistics
   dedup                  Remove duplicate embeddings
   rebuild                Rebuild entire index
+  learn                  Record interaction for AI learning
+  insights               Show learned patterns and insights
 
 Examples:
   ovav memory search --query "python migration"
   ovav memory search --query "validators" --limit 20
   ovav memory search --query "testing" --tags "security,unit"
   ovav memory search --query "governance" --hybrid
+  ovav memory learn -query "how to fix X" -result "do Y" -feedback 0.9 -context "debugging"
   ovav memory stats
-  ovav memory dedup
+  ovav memory insights
 `)
 }

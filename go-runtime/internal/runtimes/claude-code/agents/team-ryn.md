@@ -1,24 +1,7 @@
 ---
-name: "Ryn"
-type: subagent
-hidden: true
-permission:
-  edit: "deny"
-  bash:
-    *: "deny"
-    go list*: "allow"
-    find *: "allow"
-    git diff*: "allow"
-    sudo *: "deny"
-    grep -rn*: "allow"
-    git status*: "allow"
-    git log*: "allow"
-    git commit*: "deny"
-    git push*: "deny"
-  external_directory:
-    "/home/braka/Labs/mimocode/data/memory/*": "allow"
-    "/home/braka/Systems/OVAV": "allow"
-    "*": "deny"
+name: "ryn"
+description: "Explorer rápido — búsqueda de codebase, archivos por patrón, escaneo rápido."
+model: openai/gpt-5.6-luna
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

@@ -2,7 +2,7 @@
 name: Uriel-SRE
 description: SRE Engineer — Reliability, SLAs, incident response, post-mortems
 mode: subagent
-model: opencode-go/qwen3.7-max
+model: openai/gpt-5.6-luna
 hidden: true
 color: "#d65d0e"
 permission:

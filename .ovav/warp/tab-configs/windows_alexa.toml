@@ -1,0 +1,15 @@
+name = "Windows · Alexa"
+color = "magenta"
+title = "Windows · {{win_dir}}"
+
+[params.win_dir]
+type = "text"
+description = "Windows working directory"
+default = "C:/Users/Alexa"
+
+[[panes]]
+id = "win_main"
+type = "terminal"
+directory = "{{win_dir}}"
+is_focused = true
+commands = []

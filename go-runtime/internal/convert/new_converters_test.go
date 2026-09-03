@@ -12,7 +12,7 @@ func TestNewConverters_Registered(t *testing.T) {
 		TargetAider,
 		TargetGoose,
 	}
-	
+
 	for _, target := range newTargets {
 		t.Run(string(target), func(t *testing.T) {
 			conv, err := GetConverter(target)
@@ -38,7 +38,7 @@ func TestNewConverters_AreasOnly(t *testing.T) {
 		TargetWindsurf, TargetCopilot, TargetContinue,
 		TargetAider, TargetGoose,
 	}
-	
+
 	for _, target := range targets {
 		conv, err := GetConverter(target)
 		if err != nil {
@@ -52,13 +52,16 @@ func TestNewConverters_AreasOnly(t *testing.T) {
 
 func TestNewConverters_OutputDirs(t *testing.T) {
 	expected := map[Target]string{
-		TargetWindsurf:  "runtimes/windsurf/agents",
-		TargetCopilot:   "runtimes/copilot/agents",
-		TargetContinue:  "runtimes/continue/agents",
-		TargetAider:     "runtimes/aider/agents",
-		TargetGoose:     "runtimes/goose/agents",
+		TargetWindsurf: "runtimes/windsurf/agents",
+		TargetCopilot:  ".github/agents",
+		TargetContinue: ".continue/agents",
+		TargetAider:    "runtimes/aider/agents",
+		TargetGoose:    "runtimes/goose",
+		TargetClaude:   "go-runtime/internal/runtimes/claude-code/agents",
+		TargetCursor:   "runtimes/cursor",
+		TargetOpenCode: "go-runtime/internal/runtimes/opencode/agents",
 	}
-	
+
 	for target, expectedDir := range expected {
 		conv, err := GetConverter(target)
 		if err != nil {

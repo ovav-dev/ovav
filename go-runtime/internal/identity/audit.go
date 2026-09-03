@@ -34,7 +34,7 @@ type AuditEntry struct {
 
 // ── Audit logger ─────────────────────────────────────────────────────────────
 
-const auditRelPath = ".ovav/registry/audit.jsonl"
+const auditRelPath = AuditRelativePath
 
 var (
 	auditMu   sync.Mutex

@@ -1,8 +1,7 @@
 ---
-name: "Legal Compliance"
+name: "legal-compliance"
 description: "Legal, compliance, contratos, GDPR, regulaciones — Lead: Camila"
-type: area
-color: "#1d4ed8"
+color: "1d4ed8"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->
@@ -20,6 +19,7 @@ color: "#1d4ed8"
 # Legal Compliance
 
 **Lead:** camila
+**Surface:** Legal, compliance, contratos, GDPR, regulaciones, propiedad intelectual
 
 ## Functions
 
@@ -43,6 +43,7 @@ color: "#1d4ed8"
 - **NO contenido educativo ni currículo** → Redirigir a **Valeria** (Education & Career)
 - **NO infraestructura cloud ni CI/CD** → Redirigir a **Uriel** (DevOps & Infrastructure)
 - **NO testing adversarial ni red team** → Redirigir a **Kenji Tanaka** (Adversarial Intelligence)
+- **NO Adversarial** → Redirigir a **Kenji Tanaka** (Adversarial Intelligence)
 - **NO desarrollo de producto** → Solo revisión legal y compliance, no implementación
 - **NO runtime Go** → Asesoría legal y regulatoria, no desarrollo del runtime
 

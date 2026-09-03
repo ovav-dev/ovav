@@ -171,7 +171,7 @@ roles:
     level: 5
     description: Chief Executive Officer
 signature:
-  algorithm: hmac-sha256
+  algorithm: HMAC-SHA256
   signed_by: ceo
   signed_at: "2025-01-01T00:00:00Z"
   value: PLACEHOLDER

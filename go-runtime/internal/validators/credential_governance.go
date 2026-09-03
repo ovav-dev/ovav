@@ -62,6 +62,7 @@ func (c *CredentialGovernance) Validate(ctx context.Context, root string) Result
 		if err := json.Unmarshal(data, &policy); err != nil {
 			issues = append(issues, "POLICY: permission_authority.json is invalid JSON")
 		} else {
+			isYolo := isYOLOPolicy(root, policy)
 			// Check secrets_vault resource policy
 			rp, _ := policy["resource_policies"].(map[string]interface{})
 			if sv, ok := rp["secrets_vault"].(map[string]interface{}); ok {
@@ -96,7 +97,9 @@ func (c *CredentialGovernance) Validate(ctx context.Context, root string) Result
 
 			if eidren, ok := op["eidren"].(map[string]interface{}); ok {
 				mutate, _ := eidren["repo_local_mutate"].(string)
-				if mutate != "deny_by_default" {
+				if isYolo && mutate != "allow" {
+					issues = append(issues, "POLICY: eidren repo_local_mutate should be allow in canonical YOLO mode")
+				} else if !isYolo && mutate != "deny_by_default" {
 					issues = append(issues, "POLICY: eidren repo_local_mutate should be deny_by_default (scope isolation)")
 				}
 			} else {
