@@ -6,6 +6,11 @@
 # Finish a mouse selection by copying it to the Windows clipboard.
 save_to_clipboard = true
 
+# Explicitly pass an unmodified Enter through to the shell/TUI.
+[[keyboard.bindings]]
+key = "Return"
+chars = "\r"
+
 [[keyboard.bindings]]
 key = "V"
 mods = "Control"

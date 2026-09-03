@@ -120,6 +120,12 @@ elif ! grep -qF "$ALACRITTY_MARKER" "$ALACRITTY_CONFIG" 2>/dev/null; then
     cat "$ALACRITTY_SRC"
   } >> "$ALACRITTY_CONFIG"
   ok "Alacritty Shift+Enter bridge appended (backup available)"
+elif ! grep -qF 'chars = "\r"' "$ALACRITTY_CONFIG" 2>/dev/null; then
+  {
+    printf '\n# Explicitly pass an unmodified Enter through to the shell/TUI.\n'
+    printf '[[keyboard.bindings]]\nkey = "Return"\nchars = "\\r"\n'
+  } >> "$ALACRITTY_CONFIG"
+  ok "Alacritty normal Enter binding appended (backup available)"
 else
   ok "Alacritty keyboard bridge already installed"
 fi

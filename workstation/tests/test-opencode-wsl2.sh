@@ -70,6 +70,8 @@ tmux -L "$socket" -f "$ROOT/workstation/configs/tmux/tmux.conf" new-session -d -
 echo "PASS tmux selection/clipboard policy"
 
 grep -q '^save_to_clipboard = true$' "$ALACRITTY"
+grep -q '^key = "Return"$' "$ALACRITTY"
+grep -q '^chars = "\\r"$' "$ALACRITTY"
 grep -q '^key = "V"$' "$ALACRITTY"
 grep -q '^mods = "Control"$' "$ALACRITTY"
 grep -q '^action = "Paste"$' "$ALACRITTY"
