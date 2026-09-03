@@ -285,32 +285,32 @@ func TestRepositoryOpenCodeConfigUsesWindowsSingletonServices(t *testing.T) {
 	}
 	mcp, ok := config["mcp"].(map[string]any)
 	if !ok {
-		t.Fatal("repository opencode config has no MCP section")
+		mcp = map[string]any{}
 	}
 	tests := []struct {
 		name    string
 		url     string
 		enabled bool
 	}{
-		{name: "ovav-playwright", url: "http://127.0.0.1:8931/mcp", enabled: true},
-		{name: "ovav-memory", url: "http://127.0.0.1:8932/mcp", enabled: true},
+		{name: "ovav-playwright", url: "http://127.0.0.1:8931/mcp", enabled: false},
+		{name: "ovav-memory", url: "http://127.0.0.1:8932/mcp", enabled: false},
 		{name: "ovav-fetch", enabled: false},
 		{name: "atuin", enabled: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			server, ok := mcp[tt.name].(map[string]any)
+			if !tt.enabled {
+				if ok {
+					t.Fatalf("disabled MCP service must be omitted from materialized config: %#v", server)
+				}
+				return
+			}
 			if !ok {
 				t.Fatalf("repository opencode config has no %s entry", tt.name)
 			}
 			if server["enabled"] != tt.enabled {
 				t.Fatalf("enabled = %v, want %v", server["enabled"], tt.enabled)
-			}
-			if !tt.enabled {
-				if len(server) != 1 {
-					t.Fatalf("disabled server = %#v, want enabled-only entry", server)
-				}
-				return
 			}
 			if server["type"] != "remote" || server["url"] != tt.url {
 				t.Fatalf("server = %#v, want remote %s", server, tt.url)
@@ -619,9 +619,8 @@ permissions:
 	if config["small_model"] != "minimax-coding-plan/MiniMax-M3" {
 		t.Errorf("small_model = %v, want minimax-coding-plan/MiniMax-M3", config["small_model"])
 	}
-	server := config["mcp"].(map[string]any)["broken-server"].(map[string]any)
-	if len(server) != 1 || server["enabled"] != false {
-		t.Errorf("disabled MCP projection = %#v, want enabled-only false entry", server)
+	if _, exists := config["mcp"]; exists {
+		t.Errorf("disabled MCP projection unexpectedly present: %#v", config["mcp"])
 	}
 	issues, err := ValidateOpenCodeConfig(dir)
 	if err != nil {

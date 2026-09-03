@@ -97,7 +97,7 @@ OpenCode discovers agents from `CWD/.opencode/agents/*.md`. No registry, no pack
 
 ```json
 {
-  "default_agent": "Platform Engineering",
+  "default_agent": "default",
   "model": "openai/gpt-5.6-luna",
   "small_model": "minimax-coding-plan/MiniMax-M3",
   "instructions": ["opencode_AGENTS.md"]
@@ -110,12 +110,12 @@ OpenCode discovers agents from `CWD/.opencode/agents/*.md`. No registry, no pack
 
 | Server | Purpose | Status |
 |---|---|---|
-| `ovav-git` | Git operations, PR review, issue management | ✅ Enabled |
-| `ovav-memory` | OVAV persistent memory (261 cards) | ✅ Enabled |
-| `ovav-budget` | Token budget tracking and alerts | ✅ Enabled |
-| `ovav-browser` | Headless browser for web research | ✅ Enabled |
-| `ovav-figma` | Figma design token sync | ✅ Enabled |
-| `ovav-design-system` | Design system enforcement | ✅ Enabled |
+| `ovav-git` | Git operations, PR review, issue management | ⏸ Disabled until runtime exists |
+| `ovav-memory` | OVAV persistent memory (261 cards) | ⏸ Opt-in Windows service |
+| `ovav-budget` | Token budget tracking and alerts | ⏸ Disabled until runtime exists |
+| `ovav-browser` | Headless browser for web research | ⏸ Disabled until runtime exists |
+| `ovav-figma` | Figma design token sync | ⏸ Disabled until runtime exists |
+| `ovav-design-system` | Design system enforcement | ⏸ Disabled until runtime exists |
 | `ovav-sqlite` | Project local database | ⏸ Disabled |
 
 ---

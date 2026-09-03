@@ -40,7 +40,7 @@
   "keybinds": {
     "input_paste": {
       "key": "ctrl+v",
-      "preventDefault": false
+      "preventDefault": true
     },
     "input_newline": "shift+return,ctrl+return,alt+return,ctrl+j",
     "messages_copy": "<leader>y",

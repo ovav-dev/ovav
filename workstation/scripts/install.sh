@@ -14,6 +14,10 @@ TMUX_SRC="$WORKSTATION/configs/tmux/tmux.conf"
 TMUX_DEST="$HOME/.tmux.conf"
 ALACRITTY_SRC="$WORKSTATION/configs/alacritty/keybindings.toml"
 ALACRITTY_CONFIG="${ALACRITTY_CONFIG:-/mnt/c/Users/Alexa/AppData/Roaming/alacritty/alacritty.toml}"
+OPENCODE_LAUNCHER_SRC="$WORKSTATION/scripts/opencode-resume-wrapper.sh"
+OPENCODE_LAUNCHER="$HOME/.opencode/bin/opencode"
+CLIPBOARD_BRIDGE_SRC="$WORKSTATION/scripts/ovav-clipboard-bridge.sh"
+XCLIP_BIN="$HOME/.local/bin/xclip"
 
 TS="$(date +%Y%m%d-%H%M%S)"
 BACKUP_DIR="$HOME/.ovav-backups/$TS"
@@ -42,6 +46,8 @@ mkdir -p "$HOME/.config/atuin"
 [ -f "$TMUX_DEST" ] && cp -p "$TMUX_DEST" "$BACKUP_DIR/tmux.conf.bak" && ok "tmux"
 [ -f "$ALACRITTY_CONFIG" ] && cp -p "$ALACRITTY_CONFIG" "$BACKUP_DIR/alacritty.toml.bak" && ok "Alacritty"
 [ -f "$HOME/.config/opencode/tui.json" ] && cp -p "$HOME/.config/opencode/tui.json" "$BACKUP_DIR/opencode-tui.json.bak" && ok "OpenCode TUI"
+[ -f "$OPENCODE_LAUNCHER" ] && cp -p "$OPENCODE_LAUNCHER" "$BACKUP_DIR/opencode-launcher.bak" && ok "OpenCode launcher"
+[ -f "$XCLIP_BIN" ] && ! "$XCLIP_BIN" -version >/dev/null 2>&1 && cp -p "$XCLIP_BIN" "$BACKUP_DIR/xclip.bak" && ok "broken xclip"
 
 # ─── 2. Install bashrc additions ───────────────────────────
 log "Installing OVAV bashrc"
@@ -86,6 +92,13 @@ log "Installing tmux keyboard/clipboard config"
 if [ -f "$TMUX_SRC" ]; then
   cp -p "$TMUX_SRC" "$TMUX_DEST"
   ok "tmux.conf installed (backup available)"
+  # A running tmux server does not reread ~/.tmux.conf automatically.  Apply
+  # the policy in-place so mouse selection and clipboard behavior change
+  # without terminating the user's active OpenCode session.
+  if command -v tmux >/dev/null 2>&1 && tmux list-sessions >/dev/null 2>&1; then
+    tmux source-file "$TMUX_DEST"
+    ok "tmux server configuration reloaded (session preserved)"
+  fi
 else
   warn "tmux source config not found: $TMUX_SRC"
 fi
@@ -123,6 +136,22 @@ cp -p "$WORKSTATION/configs/opencode/tui.json" "$HOME/.config/opencode/tui.json"
 cp -p "$WORKSTATION/configs/opencode/themes/ovav-night.json" "$HOME/.config/opencode/themes/ovav-night.json"
 cp -p "$WORKSTATION/configs/opencode/themes/ovav-day.json" "$HOME/.config/opencode/themes/ovav-day.json"
 ok "opencode tui.json + 2 themes"
+if [ -x "${OPENCODE_LAUNCHER%/*}/opencode.bin" ]; then
+  cp -p "$OPENCODE_LAUNCHER_SRC" "$OPENCODE_LAUNCHER"
+  chmod 0755 "$OPENCODE_LAUNCHER"
+  ok "OpenCode resume launcher installed (binary preserved)"
+fi
+
+# OpenCode's Linux clipboard backend selects xclip before xsel. In WSL2 an
+# xclip binary with an unresolved X11 library fails instead of falling back.
+# Replace only that broken user-local binary; preserve a working installation.
+if [ -f "$XCLIP_BIN" ] && ! "$XCLIP_BIN" -version >/dev/null 2>&1 && command -v powershell.exe >/dev/null 2>&1; then
+  cp -p "$CLIPBOARD_BRIDGE_SRC" "$XCLIP_BIN"
+  chmod 0755 "$XCLIP_BIN"
+  ok "WSL2 xclip clipboard bridge installed (backup available)"
+elif [ -f "$XCLIP_BIN" ] && ! "$XCLIP_BIN" -version >/dev/null 2>&1; then
+  warn "broken xclip detected but powershell.exe is unavailable; clipboard bridge not installed"
+fi
 
 # ─── 6. Legacy terminal surfaces ────────────────────────────
 # Warp and Microsoft Intelligent Terminal are historical artifacts only.
