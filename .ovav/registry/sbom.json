@@ -4,7 +4,7 @@
   "project": "OVAV",
   "hash_algorithm": "sha256",
   "metadata": {
-    "git_identity": "063c5464921b1219e7bb420c7fdd9a2013e351269c742059e55c2e5a4f52508e"
+    "git_identity": "3adf10c403ae26f55be35cd44b949062dc0ec2c057ec64e8631d97d67bd8b438"
   },
   "policy": {
     "version": "tracked-content-v1",
@@ -1305,6 +1305,7 @@
     "config/commands/aliases.fish": "cde50b8533ee49b9a3b97905a8129e351e7b2769661fe79fdde2e4cacefbc157",
     "config/commands/aliases.sh": "b10f658d64f7fe5622fe452e43c129b86af495f5c7320c559411aa77797d7321",
     "config/commands/metadata.yaml": "46f122f30eb1d040710c9919990f6ed651cb7bfddf49e6514ba4e72b2ad21fbe",
+    "config/fish/05-ovav-tmux-session.fish": "a9036864f5eb3dbf8b280565e238aaea4018a534f187b99cfa20c415c7f1e532",
     "config/fish/10-ovav-color-profile.fish": "d3ff9f52935de8e03e0bd902773b02fd1c39ac683630de07e4a993769a6d61a7",
     "config/fish/20-ovav-wezterm-osc7.fish": "4c7be506c036b954998df8984bbdf8bfb6830d80a28f62e1bf01890421952c64",
     "config/fish/25-ovav-wezterm-git.fish": "c358f4671466bf32208e49988e5709cc5f34ea1d38b01eebffbe597074df8e9a",
@@ -1313,10 +1314,10 @@
     "config/fish/41-ovav-syntax-colors.fish": "edcbf743147bc7bf518108261b234fec383ea7f6780a709f0bde795197e9ab2a",
     "config/fish/90-ovav-terminal-auto.fish": "425a55f1104fd853c964584dad6d15cf05957ac47f05748f00508c128946cc3c",
     "config/fish/99-ovav-systems-lock.fish": "1736807f696be7124097889c1a7454440d382407182572ffaf6dae945abd5577",
-    "config/fish/README.md": "04a0959c2d4db569a671c92427f28275d7f2e01738cc0b10f356ed010d8336ff",
+    "config/fish/README.md": "d6ef13c31bfac90fcaf7e5a44c40a9fe9df51d3cb2a3777cbbf24e4713b86545",
     "config/fish/config.fish": "363d06193f92b6450cd507607d3ee6dfcbf3a278e4bbbcd2dd720df514ccbc99",
     "config/fish/fish_prompt.fish": "7adcbbe543802f462c97b698d41d774b6b90bc697f4161556851389b604eaf24",
-    "config/fish/metadata.yaml": "1813ddb36973a263b23806b530d3e4d6606531aff063867bb2e3c3d5ae541db9",
+    "config/fish/metadata.yaml": "118a1228207c9542a3c8a0284382fe472dce41e5ab54333d6b902e4ff315c6f5",
     "config/fish/ovav-thavren-ssh-agent.fish.example": "15d9e7e6dd07e80baf709153e02631e131b3dcc42c66a676dbe0f022e8ca96ac",
     "config/fish/ovav.fish": "2b852346a82b4a14fc72d03d7beeef5924f50f882aa924062b63ab3de35bf77a",
     "config/git/README.md": "0ea50f8a262896c60261e65962d860b98a9e2779d6afadd7ec11b9d375a2d988",
@@ -2992,7 +2993,7 @@
     "web/frontend/tailwind.config.js": "28df76442fbe221316120727c6fb111ec0ec27aabc6e3bcf210f184767a5c6b2",
     "web/frontend/tsconfig.json": "75daa8c513a76f7ccf25abfd264c438e427bc4aaca96e10284fb66f02e4744b1",
     "web/start.sh": "9aa5951e7d3451dab91f478078a6765f18391d8bb68dba56abecf54b5a6a68f6",
-    "workstation/README.md": "6044c76a78654be8eba46de483ecaa542efa629d6ab473ca0c0d7af8d7201eee",
+    "workstation/README.md": "412cfebb7cf49aa213b14b8c31cd7de945f0975f23aa12b4515c66f49bd9f18b",
     "workstation/configs/alacritty/keybindings.toml": "af4a6fc5c092612ac0d5efa53b18a3d6e61ffa0e9758d839b98e3c673ed85fc1",
     "workstation/configs/atuin/config.toml": "922d004ef72a26f150ef1a3ddb87589ef7cb3127b7945b7fefd7f779a2e5f427",
     "workstation/configs/bashrc/ovav.bashrc": "42a2f5f957028018baefaf779af05a75827d21e5feced4303cde60aba9667fe5",
@@ -3016,7 +3017,7 @@
     "workstation/scripts/deploy-it-keybindings.sh": "6654d99840af034ad1b6b2d8ced8bdb1e577e8d17bc9aa01830ca14380179a25",
     "workstation/scripts/fix-bashrc.sh": "7963530a112d55335be3ce49a2cc6a2fe6594dfb0e31016cc0dc957b646e8c83",
     "workstation/scripts/fix-it-guids.sh": "a4ee5c47da04d0ae7caace8706533797eced2f7c6a4051d2e0c4dbf1d8136010",
-    "workstation/scripts/install.sh": "024e16204f761861eb0697e2b66dbe5e742c91e3d640b7432fec88dd658a3ae6",
+    "workstation/scripts/install.sh": "e703fd3eb06703a60dbee25500f42b4efae8d63daa6f39e5cd02ea8ad579eb89",
     "workstation/scripts/it-reload.ps1": "7cc8a50d90b873e9793affc2eeb5fa87ac30bab33816194a5460b5fc5c170e9f",
     "workstation/scripts/normalize-fish-session.sh": "a515d0c9e2b08878b753a9e5cf4c5d52b9e9ff573c23719022bcc837a3811b0e",
     "workstation/scripts/opencode-resume-wrapper.sh": "fa978d6ec36f6f4d68abf31142561ce4ea084456043b56057d6b06061835489f",
@@ -3028,7 +3029,7 @@
     "workstation/scripts/restore-simple.sh": "0cecfcda2c260ecbb3d51fdbd0c8b0ce8b6dced29359777f4ab7afac4d199afc",
     "workstation/scripts/rollback.sh": "aff9d1ee4b2dee4aa4c47543ba2cd8450b07058ee1b33d1f7120c01d50f2c05c",
     "workstation/tests/test-e2e.sh": "f065c957fdcf64bc7b51faf4701151f387b56809e1a1cbceffeb44685c844d49",
-    "workstation/tests/test-fish-session-isolation.sh": "8c81fcd29fc8632ebdacc070a997004f6d499c536483aab7e1897e01c5bdc876",
+    "workstation/tests/test-fish-session-isolation.sh": "366d25ec357185e035a0784b23abc698a0dc0d11d433fbfd9f3c7ecc688be4fd",
     "workstation/tests/test-opencode-wsl2.sh": "2ca378e866f95293a9c561dd73dbd09e4e5c733af9a9377a6e04a18b40596f78",
     "workstation/tests/test-tmux-routes.sh": "be793277a09eeadf357d61e5ae3ce17db773178b4f0e7fcb886761f368b84322",
     "wrangler.toml": "e85b1f57e0ea9aeda30f583984bb257b8f7c4a0832655cb51eede1586459980c"
