@@ -213,7 +213,10 @@ func (a *AgentSurfaceHierarchy) Validate(ctx context.Context, root string) Resul
 			}
 			// Check default_agent
 			if def, ok := config["default_agent"].(string); ok && def != "" {
-				if !areaNames[def] {
+				// OpenCode uses the canonical internal `default` agent as its
+				// entrypoint. Its prompt delegates to the visible OVAV area and
+				// must not be duplicated in opencode.json as an area definition.
+				if def != "default" && !areaNames[def] {
 					issues = append(issues, fmt.Sprintf("default_agent '%s' is not a valid area", def))
 				}
 			}

@@ -491,7 +491,10 @@ func GenerateOpenCodeConfig(root string) error {
 		mcp := make(map[string]any)
 		for name, server := range canonical.MCP {
 			if !server.Enabled {
-				mcp[name] = map[string]any{"enabled": false}
+				// OpenCode still validates the shape of disabled entries and
+				// rejects an entry without a type. Omit disabled services from
+				// the materialized config; the canonical YAML remains the policy
+				// registry and can opt a service in later with a complete shape.
 				continue
 			}
 			mcpEntry := map[string]any{"type": server.Type, "enabled": server.Enabled}
@@ -506,7 +509,9 @@ func GenerateOpenCodeConfig(root string) error {
 			}
 			mcp[name] = mcpEntry
 		}
-		config["mcp"] = mcp
+		if len(mcp) > 0 {
+			config["mcp"] = mcp
+		}
 	}
 
 	// Plugins

@@ -23,43 +23,10 @@
       }
     }
   },
-  "default_agent": "Platform Engineering",
+  "default_agent": "default",
   "instructions": [
     "opencode_AGENTS.md"
   ],
-  "mcp": {
-    "atuin": {
-      "enabled": false
-    },
-    "ovav-budget": {
-      "enabled": false
-    },
-    "ovav-design-system": {
-      "enabled": false
-    },
-    "ovav-fetch": {
-      "enabled": false
-    },
-    "ovav-figma": {
-      "enabled": false
-    },
-    "ovav-git": {
-      "enabled": false
-    },
-    "ovav-memory": {
-      "enabled": true,
-      "type": "remote",
-      "url": "http://127.0.0.1:8932/mcp"
-    },
-    "ovav-playwright": {
-      "enabled": true,
-      "type": "remote",
-      "url": "http://127.0.0.1:8931/mcp"
-    },
-    "ovav-sqlite": {
-      "enabled": false
-    }
-  },
   "model": "openai/gpt-5.6-luna",
   "permission": {
     "*": "allow",
