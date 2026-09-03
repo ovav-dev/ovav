@@ -4,7 +4,7 @@
   "project": "OVAV",
   "hash_algorithm": "sha256",
   "metadata": {
-    "git_identity": "3adf10c403ae26f55be35cd44b949062dc0ec2c057ec64e8631d97d67bd8b438"
+    "git_identity": "9b32bbc10355829d91f0685f85428c270467f1522d6ab5bf6a06b378f1928a3f"
   },
   "policy": {
     "version": "tracked-content-v1",
@@ -2994,7 +2994,7 @@
     "web/frontend/tsconfig.json": "75daa8c513a76f7ccf25abfd264c438e427bc4aaca96e10284fb66f02e4744b1",
     "web/start.sh": "9aa5951e7d3451dab91f478078a6765f18391d8bb68dba56abecf54b5a6a68f6",
     "workstation/README.md": "412cfebb7cf49aa213b14b8c31cd7de945f0975f23aa12b4515c66f49bd9f18b",
-    "workstation/configs/alacritty/keybindings.toml": "af4a6fc5c092612ac0d5efa53b18a3d6e61ffa0e9758d839b98e3c673ed85fc1",
+    "workstation/configs/alacritty/keybindings.toml": "3e69da64a6e18a607b892344f3bfbc1e4f93228a4065c0925db9d62f50ebcc8a",
     "workstation/configs/atuin/config.toml": "922d004ef72a26f150ef1a3ddb87589ef7cb3127b7945b7fefd7f779a2e5f427",
     "workstation/configs/bashrc/ovav.bashrc": "42a2f5f957028018baefaf779af05a75827d21e5feced4303cde60aba9667fe5",
     "workstation/configs/inputrc/DEPLOY_LOG.md": "465acf6d5022c35add74b3014fd83c7d39f7007cb505adb70dc7ebcc21ae30b0",
@@ -3017,7 +3017,7 @@
     "workstation/scripts/deploy-it-keybindings.sh": "6654d99840af034ad1b6b2d8ced8bdb1e577e8d17bc9aa01830ca14380179a25",
     "workstation/scripts/fix-bashrc.sh": "7963530a112d55335be3ce49a2cc6a2fe6594dfb0e31016cc0dc957b646e8c83",
     "workstation/scripts/fix-it-guids.sh": "a4ee5c47da04d0ae7caace8706533797eced2f7c6a4051d2e0c4dbf1d8136010",
-    "workstation/scripts/install.sh": "e703fd3eb06703a60dbee25500f42b4efae8d63daa6f39e5cd02ea8ad579eb89",
+    "workstation/scripts/install.sh": "2a5eca2cbae005cf2f22d6f2744e49efaeea5f68ccc48e126063644cfdf8774c",
     "workstation/scripts/it-reload.ps1": "7cc8a50d90b873e9793affc2eeb5fa87ac30bab33816194a5460b5fc5c170e9f",
     "workstation/scripts/normalize-fish-session.sh": "a515d0c9e2b08878b753a9e5cf4c5d52b9e9ff573c23719022bcc837a3811b0e",
     "workstation/scripts/opencode-resume-wrapper.sh": "fa978d6ec36f6f4d68abf31142561ce4ea084456043b56057d6b06061835489f",
@@ -3028,9 +3028,9 @@
     "workstation/scripts/restore-missing-inits.sh": "be937438d569d14c1925e9c6216e577267331f1935af51ee7d896774308cab8e",
     "workstation/scripts/restore-simple.sh": "0cecfcda2c260ecbb3d51fdbd0c8b0ce8b6dced29359777f4ab7afac4d199afc",
     "workstation/scripts/rollback.sh": "aff9d1ee4b2dee4aa4c47543ba2cd8450b07058ee1b33d1f7120c01d50f2c05c",
-    "workstation/tests/test-e2e.sh": "f065c957fdcf64bc7b51faf4701151f387b56809e1a1cbceffeb44685c844d49",
+    "workstation/tests/test-e2e.sh": "633ebba6d1c3bb2cc44a5dd2e9a0abf543b8aa96d9960711635bfdacc0abce4a",
     "workstation/tests/test-fish-session-isolation.sh": "366d25ec357185e035a0784b23abc698a0dc0d11d433fbfd9f3c7ecc688be4fd",
-    "workstation/tests/test-opencode-wsl2.sh": "2ca378e866f95293a9c561dd73dbd09e4e5c733af9a9377a6e04a18b40596f78",
+    "workstation/tests/test-opencode-wsl2.sh": "dd9815a89b027a926d615340786bca092e3f89b6b6440f703299a0f515fcdb30",
     "workstation/tests/test-tmux-routes.sh": "be793277a09eeadf357d61e5ae3ce17db773178b4f0e7fcb886761f368b84322",
     "wrangler.toml": "e85b1f57e0ea9aeda30f583984bb257b8f7c4a0832655cb51eede1586459980c"
   }
