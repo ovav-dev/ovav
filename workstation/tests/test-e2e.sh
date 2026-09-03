@@ -99,6 +99,14 @@ else
   fail "cannot test tmux routes outside tmux"
 fi
 
+# 6c. Alacritty window isolation
+info "6c. Alacritty window isolation"
+if bash "$OVAV_ROOT/workstation/tests/test-fish-session-isolation.sh" >/dev/null; then
+  pass "new Alacritty windows do not auto-attach tmux main"
+else
+  fail "Fish startup still auto-attaches tmux main"
+fi
+
 # 7. fzf
 info "7. fzf"
 if command -v fzf >/dev/null 2>&1; then

@@ -43,7 +43,7 @@ WSL2 Ubuntu 26.04  (Linux runtime)
  ↓
  tmux 3.6  (multiplexer — session main)
  ↓
- Fish 4.2.1  (shell)
+  Fish 4.2.1  (shell — each new Alacritty window starts independently)
  ↓
 OVAV runtime  (Go CLI — governor layer)
  ↓
@@ -57,6 +57,13 @@ history / context / observability  (feedback to terminal)
 ```
 
 Full architecture details: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+
+### New-window isolation
+
+Fish must not auto-attach a new Alacritty window to tmux session `main`.
+The installer removes only the legacy, exact auto-attach block from the user
+Fish config, creates a timestamped backup first, and validates Fish syntax.
+The existing `main` session is never terminated or reconfigured by this step.
 
 ---
 

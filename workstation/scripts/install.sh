@@ -8,6 +8,8 @@ set -euo pipefail
 
 OVAV_ROOT="${OVAV_ROOT:-/home/braka/Systems/ovav}"
 WORKSTATION="$OVAV_ROOT/workstation"
+FISH_CONFIG="${FISH_CONFIG:-$HOME/.config/fish/config.fish}"
+FISH_NORMALIZER_SRC="$WORKSTATION/scripts/normalize-fish-session.sh"
 WIN_PS_PROFILE_DIR="/mnt/c/Users/Alexa/OneDrive/Documentos/PowerShell"
 WIN_PS_PROFILE="$WIN_PS_PROFILE_DIR/Microsoft.PowerShell_profile.ps1"
 TMUX_SRC="$WORKSTATION/configs/tmux/tmux.conf"
@@ -30,7 +32,7 @@ err()  { printf "\033[1;31m✗\033[0m %s\n" "$*" >&2; }
 
 # ─── Pre-flight ─────────────────────────────────────────────
 log "Pre-flight checks"
-for cmd in bash cp; do
+for cmd in bash cp perl; do
   command -v "$cmd" >/dev/null || { err "missing: $cmd"; exit 1; }
 done
 ok "tools available"
@@ -45,6 +47,7 @@ mkdir -p "$HOME/.config/atuin"
 [ -f "$WIN_PS_PROFILE" ] && cp -p "$WIN_PS_PROFILE" "$BACKUP_DIR/powershell-profile.ps1.bak" && ok "PS profile"
 [ -f "$TMUX_DEST" ] && cp -p "$TMUX_DEST" "$BACKUP_DIR/tmux.conf.bak" && ok "tmux"
 [ -f "$ALACRITTY_CONFIG" ] && cp -p "$ALACRITTY_CONFIG" "$BACKUP_DIR/alacritty.toml.bak" && ok "Alacritty"
+[ -f "$FISH_CONFIG" ] && cp -p "$FISH_CONFIG" "$BACKUP_DIR/fish-config.fish.bak" && ok "Fish config"
 [ -f "$HOME/.config/opencode/tui.json" ] && cp -p "$HOME/.config/opencode/tui.json" "$BACKUP_DIR/opencode-tui.json.bak" && ok "OpenCode TUI"
 [ -f "$OPENCODE_LAUNCHER" ] && cp -p "$OPENCODE_LAUNCHER" "$BACKUP_DIR/opencode-launcher.bak" && ok "OpenCode launcher"
 [ -f "$XCLIP_BIN" ] && ! "$XCLIP_BIN" -version >/dev/null 2>&1 && cp -p "$XCLIP_BIN" "$BACKUP_DIR/xclip.bak" && ok "broken xclip"
@@ -116,6 +119,18 @@ elif ! grep -qF "$ALACRITTY_MARKER" "$ALACRITTY_CONFIG" 2>/dev/null; then
   ok "Alacritty Shift+Enter bridge appended (backup available)"
 else
   ok "Alacritty keyboard bridge already installed"
+fi
+
+# ─── 2e. Remove legacy Fish tmux auto-attach ─────────────────
+log "Isolating new Alacritty Fish sessions"
+if [ -f "$FISH_CONFIG" ] && [ -x "$FISH_NORMALIZER_SRC" ]; then
+  bash "$FISH_NORMALIZER_SRC" "$FISH_CONFIG"
+  if command -v fish >/dev/null 2>&1; then
+    fish -n "$FISH_CONFIG"
+  fi
+  ok "Fish startup checked (active tmux session preserved)"
+else
+  warn "Fish config/normalizer unavailable; no startup changes made"
 fi
 
 # ─── 3. Install Starship ───────────────────────────────────
