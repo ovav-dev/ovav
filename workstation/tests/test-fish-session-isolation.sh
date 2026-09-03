@@ -4,6 +4,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 NORMALIZER="$ROOT/workstation/scripts/normalize-fish-session.sh"
+TMUX_POLICY="$ROOT/config/fish/05-ovav-tmux-session.fish"
 TMP_DIR="$(mktemp -d)"
 trap 'rm -rf "$TMP_DIR"' EXIT
 
@@ -36,6 +37,22 @@ after="$(<"$fixture")"
 [[ "$after" != *"new-session -s main"* ]]
 [[ "$after" != *"Auto-start tmux INSIDE this shell"* ]]
 
+fake_bin="$TMP_DIR/bin"
+mkdir -p "$fake_bin"
+cat > "$fake_bin/tmux" <<'EOF'
+#!/usr/bin/env bash
+printf '%s\n' "$*"
+EOF
+chmod 0755 "$fake_bin/tmux"
+
+tmux_call="$(env -u TMUX PATH="$fake_bin:$PATH" fish -N -ic "source '$TMUX_POLICY'")"
+[[ "$tmux_call" =~ ^new-session\ -s\ alacritty-[0-9]+$ ]]
+[[ "$tmux_call" != *"main"* ]]
+
+if PATH="$fake_bin:$PATH" TMUX=/tmp/tmux-ignored fish -N -ic "source '$TMUX_POLICY'" | grep -q .; then
+  exit 1
+fi
+
 checksum="$(sha256sum "$fixture")"
 bash "$NORMALIZER" "$fixture" >/dev/null
 [[ "$checksum" == "$(sha256sum "$fixture")" ]]
@@ -49,6 +66,7 @@ bash "$NORMALIZER" "$clean" >/dev/null
 if command -v fish >/dev/null 2>&1; then
   fish -n "$fixture"
   fish -n "$clean"
+  fish -n "$TMUX_POLICY"
 fi
 
 printf 'fish session isolation: PASS\n'

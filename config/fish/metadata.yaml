@@ -25,6 +25,7 @@ inject:
 # Files
 files:
   - config.fish
+  - 05-ovav-tmux-session.fish
   - fish_prompt.fish
   - 10-ovav-color-profile.fish
   - 20-ovav-wezterm-osc7.fish

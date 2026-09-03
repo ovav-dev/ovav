@@ -10,6 +10,8 @@ OVAV_ROOT="${OVAV_ROOT:-/home/braka/Systems/ovav}"
 WORKSTATION="$OVAV_ROOT/workstation"
 FISH_CONFIG="${FISH_CONFIG:-$HOME/.config/fish/config.fish}"
 FISH_NORMALIZER_SRC="$WORKSTATION/scripts/normalize-fish-session.sh"
+FISH_TMUX_SRC="$OVAV_ROOT/config/fish/05-ovav-tmux-session.fish"
+FISH_TMUX_DEST="$HOME/.config/fish/conf.d/05-ovav-tmux-session.fish"
 WIN_PS_PROFILE_DIR="/mnt/c/Users/Alexa/OneDrive/Documentos/PowerShell"
 WIN_PS_PROFILE="$WIN_PS_PROFILE_DIR/Microsoft.PowerShell_profile.ps1"
 TMUX_SRC="$WORKSTATION/configs/tmux/tmux.conf"
@@ -48,6 +50,7 @@ mkdir -p "$HOME/.config/atuin"
 [ -f "$TMUX_DEST" ] && cp -p "$TMUX_DEST" "$BACKUP_DIR/tmux.conf.bak" && ok "tmux"
 [ -f "$ALACRITTY_CONFIG" ] && cp -p "$ALACRITTY_CONFIG" "$BACKUP_DIR/alacritty.toml.bak" && ok "Alacritty"
 [ -f "$FISH_CONFIG" ] && cp -p "$FISH_CONFIG" "$BACKUP_DIR/fish-config.fish.bak" && ok "Fish config"
+[ -f "$FISH_TMUX_DEST" ] && cp -p "$FISH_TMUX_DEST" "$BACKUP_DIR/fish-tmux-session.fish.bak" && ok "Fish tmux policy"
 [ -f "$HOME/.config/opencode/tui.json" ] && cp -p "$HOME/.config/opencode/tui.json" "$BACKUP_DIR/opencode-tui.json.bak" && ok "OpenCode TUI"
 [ -f "$OPENCODE_LAUNCHER" ] && cp -p "$OPENCODE_LAUNCHER" "$BACKUP_DIR/opencode-launcher.bak" && ok "OpenCode launcher"
 [ -f "$XCLIP_BIN" ] && ! "$XCLIP_BIN" -version >/dev/null 2>&1 && cp -p "$XCLIP_BIN" "$BACKUP_DIR/xclip.bak" && ok "broken xclip"
@@ -121,14 +124,18 @@ else
   ok "Alacritty keyboard bridge already installed"
 fi
 
-# ─── 2e. Remove legacy Fish tmux auto-attach ─────────────────
-log "Isolating new Alacritty Fish sessions"
+# ─── 2e. Install isolated Fish tmux sessions ─────────────────
+log "Isolating new Alacritty tmux sessions"
 if [ -f "$FISH_CONFIG" ] && [ -x "$FISH_NORMALIZER_SRC" ]; then
   bash "$FISH_NORMALIZER_SRC" "$FISH_CONFIG"
+  mkdir -p "${FISH_TMUX_DEST%/*}"
+  cp -p "$FISH_TMUX_SRC" "$FISH_TMUX_DEST"
+  chmod 0644 "$FISH_TMUX_DEST"
   if command -v fish >/dev/null 2>&1; then
     fish -n "$FISH_CONFIG"
+    fish -n "$FISH_TMUX_DEST"
   fi
-  ok "Fish startup checked (active tmux session preserved)"
+  ok "Fish startup checked (isolated tmux session installed)"
 else
   warn "Fish config/normalizer unavailable; no startup changes made"
 fi
