@@ -14,6 +14,7 @@ not active deployment targets.
 ```bash
 # From OVAV repo root:
 bash workstation/scripts/install.sh        # Idempotent installer
+bash workstation/scripts/reset-wsl2-workstation.sh --dry-run
 bash workstation/tests/test-e2e.sh        # Verify installation
 bash workstation/scripts/benchmark.sh     # Measure performance
 bash workstation/scripts/rollback.sh      # Restore from latest backup
@@ -29,6 +30,11 @@ The installer:
 6. Installs the Alacritty Shift+Enter CSI-u bridge
 7. Skips inactive Warp/Windows Terminal/Intelligent Terminal surfaces
 8. Installs PowerShell profile with PSReadLine Predictive IntelliSense
+
+For a deliberate full reset, run `reset-wsl2-workstation.sh --apply
+--purge-history`. It rebuilds only Fish, isolated tmux, Alacritty, and the
+OpenCode runtime from canonical sources; authentication is preserved, while
+OpenCode history, logs, snapshots, and stale host config are purged.
 
 ---
 

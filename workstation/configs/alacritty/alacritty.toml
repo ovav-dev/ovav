@@ -1,0 +1,28 @@
+# OVAV Alacritty 0.17.x — canonical Windows → WSL2 → Fish entrypoint.
+live_config_reload = true
+
+[terminal.shell]
+program = "wsl.exe"
+args = ["-e", "fish", "-l"]
+
+[selection]
+save_to_clipboard = true
+
+[[keyboard.bindings]]
+key = "Return"
+chars = "\r"
+
+[[keyboard.bindings]]
+key = "V"
+mods = "Control"
+action = "Paste"
+
+[[keyboard.bindings]]
+key = "C"
+mods = "Control|Shift"
+action = "Copy"
+
+[[keyboard.bindings]]
+key = "Return"
+mods = "Shift"
+chars = "\u001b[13;2u"
