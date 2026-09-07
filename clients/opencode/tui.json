@@ -1,4 +1,21 @@
 {
   "$schema": "https://opencode.ai/tui.json",
-  "theme": "ovav"
+  "theme": "ovav",
+  "keybinds": {
+    "input_paste": {
+      "key": "ctrl+v",
+      "preventDefault": true
+    },
+    "input_newline": "shift+return,ctrl+return,alt+return,ctrl+j",
+    "messages_copy": "<leader>y",
+    "input_undo": "ctrl+z,ctrl+-,super+z",
+    "terminal_suspend": "none",
+    "leader": "ctrl+x",
+    "app_exit": "alt+x",
+    "sidebar_toggle": "<leader>b",
+    "session_list": "<leader>l",
+    "session_new": "<leader>n",
+    "session_timeline": "<leader>g"
+  },
+  "leader_timeout": 2000
 }
