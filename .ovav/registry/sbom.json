@@ -4,7 +4,7 @@
   "project": "OVAV",
   "hash_algorithm": "sha256",
   "metadata": {
-    "git_identity": "68316a5365b11b484663e7154027256550c81944d6e9e26354b33d4716c23241"
+    "git_identity": "f356a1771acb06463171d3762da96a3548b650df164ba3a506184ebd20e4b059"
   },
   "policy": {
     "version": "tracked-content-v1",
@@ -628,8 +628,8 @@
     ".ovav/registry/capability_scores.yaml": "79a03ee7232e7699dd3b4cb809a95ac5cd2a969928bd235f933419214d249f77",
     ".ovav/registry/changelog_state.json": "1ab86dd94f9a43545406a13ae0d01b54407fce823f7534765af864c0eb3bbb8e",
     ".ovav/registry/consumers.yaml": "5eede0d33bdd9165af76dbff9c3327c0c50f38c52ec3688912bfcc472d01b7ad",
-    ".ovav/registry/consumers/akrynt-agent/integrity.json": "2d4f70824e5b310f5c6b310b39fcd2e1c9b99df2fce22e3b0ed7834d97acc09b",
-    ".ovav/registry/consumers/akrynt-agent/sbom.json": "7a799ce0907e13150ccd1bd276a1188ff07d2e400ebcf920e6dc483b3de1c9fb",
+    ".ovav/registry/consumers/akrynt-agent/integrity.json": "c6a5f13b3bc93a56a2089e75fd02fe8ee63adb9e2fba5d4d22fc907dbcbe5e7a",
+    ".ovav/registry/consumers/akrynt-agent/sbom.json": "a220092a9b983ef60bee1a3c90a4d5714ea7073371a22340f76b1aee4af24e34",
     ".ovav/registry/contract_manifest.yaml": "615e978ca1d28a1d9fd8526041bd0a9685b4e96084c614402eb8e7f90304a12b",
     ".ovav/registry/decision_graph.yaml": "aaf97535177ee75e34d14b82a2a576b60bb331910edb6e66ae36df0fc1057ac1",
     ".ovav/registry/delegation_rules.yaml": "e302ee59a63506c1cf49df4f6a39a765ded3b15153547d4460f92ca3ff4b55c2",
