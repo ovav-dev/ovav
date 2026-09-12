@@ -132,26 +132,58 @@ func formatExternalSecretFinding(finding secretFinding) string {
 }
 
 func classifyExternalFinding(path, line, label string) secretClassification {
+	// High-confidence credentials are never downgraded by surrounding context.
+	// A test file or a comment can still contain a copied live token.
+	if isHighConfidenceExternalSecret(label) || isExternalEnvFile(path) {
+		return secretReal
+	}
 	if isTranslationLabel(path, line) {
 		return secretFalsePos
 	}
-	fixture := isKnownFixture(line) || isLocalTestDefault(path, line)
-	if fixture && isTestOrLocalContext(path, line) {
-		if isDocumentationLine(line) {
-			return secretFalsePos
-		}
-		return secretFixture
+	if isSemanticErrorCode(line) {
+		return secretFalsePos
 	}
 	if isDynamicSecretExpression(line) {
 		return secretFalsePos
 	}
-	if isDocumentationLine(line) && isKnownFixture(line) {
+	if isDevelopmentDSN(path, line) {
+		return secretFixture
+	}
+	if isTestFixtureSecret(path, line) {
+		return secretFixture
+	}
+	if isDocumentationFixture(line) {
 		return secretFalsePos
 	}
-	// Unknown static credentials and high-confidence token patterns remain A,
-	// including in tests, comments, fixtures, and .env files.
-	_ = label
+	// Unknown static credentials remain A, including in tests, comments,
+	// fixture-looking directories, and environment files.
 	return secretReal
+}
+
+func isHighConfidenceExternalSecret(label string) bool {
+	lower := strings.ToLower(label)
+	for _, marker := range []string{
+		"api key", "auth token", "github", "aws", "stripe", "slack", "jwt",
+		"openai", "cloudflare", "anthropic", "google", "gitlab", "ci/cd",
+		"private key", "service api", "firebase",
+	} {
+		if strings.Contains(lower, marker) {
+			return true
+		}
+	}
+	return false
+}
+
+func isExternalEnvFile(path string) bool {
+	base := strings.ToLower(filepath.Base(path))
+	return base == ".env"
+}
+
+var semanticErrorCodePattern = regexp.MustCompile(`(?i)\b[a-z_][a-z0-9_]*(?:err|error|status|reason|message)[a-z0-9_]*\s*(?:=|:)\s*["'][a-z][a-z0-9]*(?:_[a-z0-9]+)+["']`)
+var weakPasswordCodePattern = regexp.MustCompile(`(?i)\b[a-z_][a-z0-9_]*code[a-z0-9_]*\s*(?:=|:)\s*["']weak_password["']`)
+
+func isSemanticErrorCode(line string) bool {
+	return semanticErrorCodePattern.MatchString(line) || weakPasswordCodePattern.MatchString(line)
 }
 
 func isDynamicSecretExpression(line string) bool {
@@ -161,15 +193,12 @@ func isDynamicSecretExpression(line string) bool {
 	}
 	for _, marker := range []string{"${", "$env:", "os.environ", "os.getenv", "process.env", "read_env_value", "\\getenv"} {
 		if strings.Contains(lower, marker) {
-			// A default operator means a literal fallback is still present. It is
-			// classified as B only when the fallback is an explicit fixture.
-			if strings.Contains(lower, ":-") || strings.Contains(lower, ":=") {
-				return !hasStaticDefault(lower)
-			}
-			return false
+			// A literal fallback is not dynamic by itself. It can become B only
+			// through the narrow test/local fixture checks below.
+			return !hasStaticDefault(lower)
 		}
 	}
-	if bareShellVariablePattern.MatchString(lower) {
+	if commandSubstitutionPattern.MatchString(lower) || bareShellVariablePattern.MatchString(lower) {
 		return true
 	}
 	if strings.Contains(lower, "quote(") || strings.Contains(lower, "f\"") || strings.Contains(lower, "f'") {
@@ -182,11 +211,13 @@ func isDynamicSecretExpression(line string) bool {
 }
 
 var bareShellVariablePattern = regexp.MustCompile(`\$[a-z_][a-z0-9_]*`)
+var commandSubstitutionPattern = regexp.MustCompile(`\$\([^)]*\)|` + "`" + `[^"]+` + "`")
 
 func hasStaticDefault(line string) bool {
 	for _, operator := range []string{":-", ":="} {
 		if index := strings.Index(line, operator); index >= 0 {
 			rest := strings.TrimSpace(line[index+len(operator):])
+			rest = strings.TrimLeft(rest, "\"' })")
 			return rest != "" && !strings.HasPrefix(rest, "$") && !strings.HasPrefix(rest, "{")
 		}
 	}
@@ -206,6 +237,91 @@ var translationLabelPattern = regexp.MustCompile(`(?i)\b[a-z][a-z0-9]*(password|
 func isKnownFixture(line string) bool {
 	lower := strings.ToLower(line)
 	for _, marker := range []string{"tupasswordf12", "fixture-secret", "testpassword", "password123", "admin123", "changeme", "changeit", "dev-secret", "placeholder", "postgres"} {
+		if strings.Contains(lower, marker) {
+			return true
+		}
+	}
+	return false
+}
+
+var externalPasswordAssignmentPattern = regexp.MustCompile(`(?i)\b(?:[a-z_][a-z0-9_]*)?password\b\s*[:=]\s*["']([^"']+)["']|\b(?:passwd|pwd)\b\s*[:=]\s*["']([^"']+)["']`)
+
+func isTestFixtureSecret(path, line string) bool {
+	if !isFixtureContext(path) || isDevelopmentDSN(path, line) {
+		return false
+	}
+	if match := externalPasswordAssignmentPattern.FindStringSubmatch(line); len(match) > 1 {
+		for _, value := range match[1:] {
+			if value != "" {
+				return isSyntheticFixtureValue(value)
+			}
+		}
+	}
+	return isKnownFixture(line)
+}
+
+func isSyntheticFixtureValue(value string) bool {
+	lower := strings.ToLower(value)
+	for _, marker := range []string{"test", "fixture", "synthetic", "dummy", "fake", "example", "sample", "password", "passwd", "secure", "changeme", "changeit", "dev", "local"} {
+		if strings.Contains(lower, marker) {
+			return true
+		}
+	}
+	return false
+}
+
+func isFixtureContext(path string) bool {
+	if isTestPath(path) {
+		return true
+	}
+	normalized := filepath.ToSlash(strings.ToLower(path))
+	if filepath.Base(normalized) == ".env.example" {
+		return true
+	}
+	for _, marker := range []string{"/local/", "-local", "local-", "/dev/", "-dev", "dev-", "cleanup", "bootstrap", "status"} {
+		if strings.Contains(normalized, marker) {
+			return true
+		}
+	}
+	return false
+}
+
+func isTestPath(path string) bool {
+	normalized := filepath.ToSlash(strings.ToLower(path))
+	base := filepath.Base(normalized)
+	if strings.HasSuffix(base, "_test.go") || strings.HasSuffix(base, "_test.py") ||
+		strings.HasSuffix(base, ".test.ts") || strings.HasSuffix(base, ".test.tsx") ||
+		strings.HasSuffix(base, ".test.js") || strings.HasSuffix(base, ".test.jsx") ||
+		strings.HasSuffix(base, ".spec.ts") || strings.HasSuffix(base, ".spec.tsx") ||
+		strings.HasSuffix(base, ".spec.js") || strings.HasSuffix(base, ".spec.jsx") {
+		return true
+	}
+	for _, segment := range strings.Split(normalized, "/") {
+		if segment == "test" || segment == "tests" || segment == "testdata" || segment == "fixtures" || segment == "e2e" || segment == "__tests__" {
+			return true
+		}
+	}
+	return false
+}
+
+func isDevelopmentDSN(path, line string) bool {
+	lower := strings.ToLower(line)
+	if !strings.Contains(lower, "://") || (!strings.Contains(lower, "postgres") && !strings.Contains(lower, "mysql") && !strings.Contains(lower, "redis") && !strings.Contains(lower, "mongodb")) {
+		return false
+	}
+	local := strings.Contains(lower, "localhost") || strings.Contains(lower, "127.0.0.1") || strings.Contains(lower, "::1")
+	if !local || !isFixtureContext(path) {
+		return false
+	}
+	return isKnownFixture(line) || strings.Contains(lower, "test") || strings.Contains(lower, "dev")
+}
+
+func isDocumentationFixture(line string) bool {
+	if !isDocumentationLine(line) {
+		return false
+	}
+	lower := strings.ToLower(line)
+	for _, marker := range []string{"fixture", "example", "placeholder", "synthetic", "dummy", "sample"} {
 		if strings.Contains(lower, marker) {
 			return true
 		}
