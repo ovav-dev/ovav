@@ -80,8 +80,8 @@ func TestRunNodeJSVerificationUsesDeclaredQualityScript(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got := string(args); got != "run lint" {
-		t.Fatalf("pnpm args = %q, want run lint", got)
+	if got := string(args); got != "lint" {
+		t.Fatalf("pnpm args = %q, want direct script invocation %q", got, "lint")
 	}
 }
 
@@ -134,6 +134,28 @@ func TestRunNodeJSVerificationDeclaredQualityFailureBlocks(t *testing.T) {
 	}
 	if !strings.Contains(strings.Join(results[0].Issues, "\n"), "declared-lint-failed") {
 		t.Fatalf("declared lint output was lost: %#v", results[0].Issues)
+	}
+}
+
+func TestRunNodeJSVerificationUsesPnpmScriptDirectly(t *testing.T) {
+	dir := t.TempDir()
+	binDir := t.TempDir()
+	argsFile := filepath.Join(t.TempDir(), "args")
+	writeOWSExecutable(t, filepath.Join(binDir, "pnpm"), "#!/bin/sh\nprintf '%s' \"$*\" > \"$ARGS_FILE\"\n")
+	t.Setenv("PATH", binDir+string(os.PathListSeparator)+os.Getenv("PATH"))
+	t.Setenv("ARGS_FILE", argsFile)
+	writeOWSTestFile(t, filepath.Join(dir, "package.json"), `{"packageManager":"pnpm@11.0.0","scripts":{"test":"vitest run"}}`)
+
+	results := runNodeJSVerification(dir, 2)
+	if len(results) != 2 || !results[0].Pass || !results[1].Pass || results[1].Name != "node test" {
+		t.Fatalf("expected pnpm test script to pass, got %#v", results)
+	}
+	args, err := os.ReadFile(argsFile)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := string(args); got != "test" {
+		t.Fatalf("pnpm args = %q, want direct script invocation %q", got, "test")
 	}
 }
 

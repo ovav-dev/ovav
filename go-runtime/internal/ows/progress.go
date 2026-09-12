@@ -454,7 +454,16 @@ func nodeToolCommand(nodeRoot, manager, tool string, args ...string) (*exec.Cmd,
 
 func nodeScriptCommand(nodeRoot, manager, script string) (*exec.Cmd, error) {
 	switch manager {
-	case "npm", "pnpm", "yarn", "bun":
+	case "pnpm":
+		// pnpm's direct script form is the canonical invocation for consumer
+		// projects. Keep the declared package manager visible in process args;
+		// `pnpm run <script>` is equivalent, but obscures the command selected
+		// by the external profile in OWS diagnostics.
+		cmd := exec.Command(manager, script)
+		cmd.Dir = nodeRoot
+		cmd.Env = append(os.Environ(), "CI=true")
+		return cmd, nil
+	case "npm", "yarn", "bun":
 		cmd := exec.Command(manager, "run", script)
 		cmd.Dir = nodeRoot
 		cmd.Env = append(os.Environ(), "CI=true")
