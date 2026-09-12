@@ -53,7 +53,7 @@ func ExternalRegistry(mode ValidationMode) *Registry {
 func ExternalRegistryForRoot(root string, mode ValidationMode) *Registry {
 	return NewRegistry(
 		NewExternalRegistration(),
-		NewSecretsHygiene(),
+		NewExternalSecretsHygiene(),
 		NewExfilPatterns(),
 		newExternalSupplyChain(mode),
 		NewProtectedBranch(),
