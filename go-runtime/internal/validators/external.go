@@ -312,6 +312,11 @@ func externalProjectID(root string) string {
 }
 
 func canonicalExternalRoot(root string) string {
+	if profile := consumers.Resolve(root); profile.External && profile.Active() {
+		if authorityRoot := profile.AuthorityRoot(); authorityRoot != "" {
+			return authorityRoot
+		}
+	}
 	if resolved, err := filepath.EvalSymlinks(root); err == nil {
 		return filepath.Clean(resolved)
 	}

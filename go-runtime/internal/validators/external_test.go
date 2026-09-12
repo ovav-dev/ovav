@@ -42,6 +42,14 @@ func TestExternalRegistryUsesCentralBaselinesAndNoOVAVSurface(t *testing.T) {
 	if err := WriteExternalBaselines(root); err != nil {
 		t.Fatal(err)
 	}
+	worktree := filepath.Join(filepath.Dir(root), filepath.Base(root)+"-worktree")
+	runGitTest(t, root, "worktree", "add", "-q", worktree, "-b", "feature/external-worktree")
+	if result := newExternalSupplyChain(ValidationGate).Validate(context.Background(), worktree); result.Status != "pass" {
+		t.Fatalf("external worktree supply chain status = %s: %v", result.Status, result.Issues)
+	}
+	if result := newExternalRuntimeIntegrity(ValidationGate).Validate(context.Background(), worktree); result.Status != "pass" {
+		t.Fatalf("external worktree runtime integrity status = %s: %v", result.Status, result.Issues)
+	}
 	if _, err := os.Stat(filepath.Join(root, ".ovav", "registry", "consumers")); !os.IsNotExist(err) {
 		t.Fatal("external baseline leaked into consumer repository")
 	}
