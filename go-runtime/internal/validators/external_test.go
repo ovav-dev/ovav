@@ -70,3 +70,23 @@ func TestExternalRegistryUsesCentralBaselinesAndNoOVAVSurface(t *testing.T) {
 		t.Fatal("external secret scan wrote alert state into consumer repository")
 	}
 }
+
+func TestExternalHeadFilesPreservesUnicodePaths(t *testing.T) {
+	root := t.TempDir()
+	gitInit(t, root)
+	path := "SPEC-REDISEÑO/guía de operación.md"
+	writeTestFile(t, root, path, "contenido\n")
+	runGitTest(t, root, "add", "--", path)
+	runGitTest(t, root, "commit", "-m", "unicode path")
+
+	paths, _, err := externalHeadFiles(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, got := range paths {
+		if got == path {
+			return
+		}
+	}
+	t.Fatalf("external HEAD files do not contain %q: %v", path, paths)
+}
