@@ -63,6 +63,80 @@ func TestRunNodeJSVerificationUsesDeclaredPackageManager(t *testing.T) {
 	}
 }
 
+func TestRunNodeJSVerificationUsesDeclaredQualityScript(t *testing.T) {
+	dir := t.TempDir()
+	binDir := t.TempDir()
+	argsFile := filepath.Join(t.TempDir(), "args")
+	writeOWSExecutable(t, filepath.Join(binDir, "pnpm"), "#!/bin/sh\nprintf '%s' \"$*\" > \"$ARGS_FILE\"\n")
+	t.Setenv("PATH", binDir+string(os.PathListSeparator)+os.Getenv("PATH"))
+	t.Setenv("ARGS_FILE", argsFile)
+	writeOWSTestFile(t, filepath.Join(dir, "package.json"), `{"packageManager":"pnpm@11.0.0","scripts":{"lint":"biome lint src/"}}`)
+
+	results := runNodeJSVerification(dir, 2)
+	if len(results) != 2 || !results[0].Pass || results[0].Name != "node lint" {
+		t.Fatalf("expected declared lint and skipped tests, got %#v", results)
+	}
+	args, err := os.ReadFile(argsFile)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := string(args); got != "run lint" {
+		t.Fatalf("pnpm args = %q, want run lint", got)
+	}
+}
+
+func TestVerifyPhasesUsesNestedGoModuleRoot(t *testing.T) {
+	dir := t.TempDir()
+	backend := filepath.Join(dir, "backend")
+	binDir := t.TempDir()
+	pwdFile := filepath.Join(t.TempDir(), "go-pwd")
+	writeOWSTestFile(t, filepath.Join(backend, "go.mod"), "module example.com/backend\n")
+	writeOWSExecutable(t, filepath.Join(binDir, "go"), "#!/bin/sh\npwd >> \"$GO_PWD_FILE\"\n")
+	writeOWSExecutable(t, filepath.Join(binDir, "gofmt"), "#!/bin/sh\npwd >> \"$GO_PWD_FILE\"\n")
+	t.Setenv("PATH", binDir)
+	t.Setenv("GO_PWD_FILE", pwdFile)
+	oldGo := goBinaryCache
+	goBinaryCache = filepath.Join(binDir, "go")
+	t.Cleanup(func() { goBinaryCache = oldGo })
+
+	results, err := VerifyPhases(dir, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, result := range results {
+		if strings.HasPrefix(result.Name, "go ") || result.Name == "gofmt" {
+			if !result.Pass {
+				t.Fatalf("Go phase failed: %#v", result)
+			}
+		}
+	}
+	pwd, err := os.ReadFile(pwdFile)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, got := range strings.Split(strings.TrimSpace(string(pwd)), "\n") {
+		if got != backend {
+			t.Fatalf("Go gate ran in %q, want %q", got, backend)
+		}
+	}
+}
+
+func TestRunNodeJSVerificationDeclaredQualityFailureBlocks(t *testing.T) {
+	dir := t.TempDir()
+	binDir := t.TempDir()
+	writeOWSExecutable(t, filepath.Join(binDir, "pnpm"), "#!/bin/sh\necho declared-lint-failed >&2\nexit 7\n")
+	t.Setenv("PATH", binDir)
+	writeOWSTestFile(t, filepath.Join(dir, "package.json"), `{"packageManager":"pnpm@11.0.0","scripts":{"lint":"biome lint src/"}}`)
+
+	results := runNodeJSVerification(dir, 2)
+	if len(results) == 0 || results[0].Pass || results[0].Name != "node lint" {
+		t.Fatalf("declared lint failure was not blocking: %#v", results)
+	}
+	if !strings.Contains(strings.Join(results[0].Issues, "\n"), "declared-lint-failed") {
+		t.Fatalf("declared lint output was lost: %#v", results[0].Issues)
+	}
+}
+
 func TestRunNodeJSVerificationConfiguredFailuresBlock(t *testing.T) {
 	tests := []struct {
 		name       string
