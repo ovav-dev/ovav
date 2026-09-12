@@ -100,7 +100,8 @@ func cmdPush(args []string) int {
 	localCommit := strings.TrimSpace(gitCmdOutput(repoRoot, "rev-parse", "HEAD"))
 	remoteCommit := strings.TrimSpace(gitCmdOutput(repoRoot, "rev-parse", fmt.Sprintf("%s/%s", remote, branch)))
 
-	diverged := localCommit != remoteCommit
+	remoteRefExists := remoteCommit != ""
+	diverged := remoteRefExists && localCommit != remoteCommit
 	behind := false
 	ahead := false
 
@@ -138,7 +139,9 @@ func cmdPush(args []string) int {
 		return 1
 	}
 
-	if !diverged {
+	if !remoteRefExists {
+		fmt.Printf("  ✅ Branch is new on %s — ready to publish %s\n", remote, branch)
+	} else if !diverged {
 		fmt.Printf("  ✅ Branch is up-to-date with %s/%s\n", remote, branch)
 	} else if ahead && !behind {
 		fmt.Printf("  ✅ Branch is ahead of %s/%s — %d commit(s) to push\n", remote, branch, countCommitsBetween(repoRoot, remoteCommit, localCommit))
