@@ -21,7 +21,10 @@ const (
 )
 
 // SupplyChain verifies the HEAD-anchored SBOM without mutating it.
-type SupplyChain struct{ mode ValidationMode }
+type SupplyChain struct {
+	mode         ValidationMode
+	externalOnly bool
+}
 
 func NewSupplyChain(modes ...ValidationMode) *SupplyChain {
 	mode := ValidationDeveloper
@@ -29,6 +32,10 @@ func NewSupplyChain(modes ...ValidationMode) *SupplyChain {
 		mode = modes[0]
 	}
 	return &SupplyChain{mode: mode}
+}
+
+func newExternalSupplyChain(mode ValidationMode) *SupplyChain {
+	return &SupplyChain{mode: mode, externalOnly: true}
 }
 
 func (s *SupplyChain) ID() string   { return "supply_chain" }
@@ -42,6 +49,9 @@ func (s *SupplyChain) Weight() int { return 20 }
 func (s *SupplyChain) Mode() ValidationMode { return s.mode }
 
 func (s *SupplyChain) Validate(_ context.Context, root string) Result {
+	if s.externalOnly || isRegisteredExternal(root) {
+		return s.validateExternal(root)
+	}
 	start := time.Now()
 	var failures, warnings []string
 	goSum, err := headOrFilesystemFile(root, "go-runtime/go.sum")

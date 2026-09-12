@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"time"
 
 	"github.com/ovav/ovav/internal/cli"
+	"github.com/ovav/ovav/internal/consumers"
 	"github.com/ovav/ovav/internal/gitflow"
 	"github.com/ovav/ovav/internal/validators"
 )
@@ -74,7 +76,7 @@ func cmdPush(args []string) int {
 	// ── 3. Pre-flight validation ──────────────────────────────────────────
 	fmt.Println("🔍 Pre-flight validation...")
 
-	results, passed := runPushPreflight(context.Background(), repoRoot, governedPushValidators())
+	results, passed := runPushPreflight(context.Background(), repoRoot, validators.GovernedPushValidators(repoRoot))
 	for _, r := range results {
 		icon := "✅"
 		if r.Status == "fail" || r.Status == "error" {
@@ -98,7 +100,8 @@ func cmdPush(args []string) int {
 	localCommit := strings.TrimSpace(gitCmdOutput(repoRoot, "rev-parse", "HEAD"))
 	remoteCommit := strings.TrimSpace(gitCmdOutput(repoRoot, "rev-parse", fmt.Sprintf("%s/%s", remote, branch)))
 
-	diverged := localCommit != remoteCommit
+	remoteRefExists := remoteCommit != ""
+	diverged := remoteRefExists && localCommit != remoteCommit
 	behind := false
 	ahead := false
 
@@ -136,7 +139,9 @@ func cmdPush(args []string) int {
 		return 1
 	}
 
-	if !diverged {
+	if !remoteRefExists {
+		fmt.Printf("  ✅ Branch is new on %s — ready to publish %s\n", remote, branch)
+	} else if !diverged {
 		fmt.Printf("  ✅ Branch is up-to-date with %s/%s\n", remote, branch)
 	} else if ahead && !behind {
 		fmt.Printf("  ✅ Branch is ahead of %s/%s — %d commit(s) to push\n", remote, branch, countCommitsBetween(repoRoot, remoteCommit, localCommit))
@@ -249,13 +254,17 @@ func gitCmd(repoRoot string, args ...string) {
 
 // logPushAudit writes a push event to the push audit log.
 func logPushAudit(repoRoot, branch, remote string, force bool) {
-	logDir := repoRoot + "/.ovav/runtime/logs"
+	logPath, ok := governedPushAuditPath(repoRoot)
+	if !ok {
+		fmt.Fprintln(os.Stderr, "  ⚠️  Audit log path unavailable; no consumer-local fallback permitted")
+		return
+	}
+	logDir := filepath.Dir(logPath)
 	if err := os.MkdirAll(logDir, 0755); err != nil {
 		fmt.Fprintf(os.Stderr, "  ⚠️  Audit log dir failed: %v\n", err)
 		return
 	}
 
-	logPath := logDir + "/push_audit.jsonl"
 	entry := fmt.Sprintf(
 		`{"event":"governed_push","branch":"%s","remote":"%s","force":%v,"timestamp":"%s","operator":"thavren"}`+"\n",
 		branch, remote, force, time.Now().UTC().Format(time.RFC3339),
@@ -264,6 +273,28 @@ func logPushAudit(repoRoot, branch, remote string, force bool) {
 	if err := os.WriteFile(logPath, []byte(entry), 0644); err != nil {
 		fmt.Fprintf(os.Stderr, "  ⚠️  Audit log write failed: %v\n", err)
 	}
+}
+
+// governedPushAuditPath keeps external-consumer audit state outside both the
+// consumer checkout and the tracked OVAV checkout. A registered central ID is
+// required; there is deliberately no project-controlled fallback path.
+func governedPushAuditPath(repoRoot string) (string, bool) {
+	profile := consumers.Resolve(repoRoot)
+	if !profile.External {
+		return filepath.Join(repoRoot, ".ovav", "runtime", "logs", "push_audit.jsonl"), true
+	}
+	if profile.Consumer == nil || profile.Consumer.ID == "" || filepath.Base(profile.Consumer.ID) != profile.Consumer.ID {
+		return "", false
+	}
+	configHome := os.Getenv("XDG_CONFIG_HOME")
+	if configHome == "" {
+		home, err := os.UserHomeDir()
+		if err != nil {
+			return "", false
+		}
+		configHome = filepath.Join(home, ".config")
+	}
+	return filepath.Join(configHome, "ovav", "consumer-runtime", profile.Consumer.ID, "push_audit.jsonl"), true
 }
 
 func printPushHelp() {
