@@ -19,7 +19,32 @@ import (
 // that should be in environment variables or the OVAV vault.
 type SecretsHygiene struct{}
 
+// ExternalSecretsHygiene is the consumer-repository variant of this gate.
+// It preserves fail-closed detection for real material while classifying
+// explicit fixtures and syntax-aware false positives without writing state to
+// the consumer repository.
+type ExternalSecretsHygiene struct{}
+
+type secretClassification string
+
+const (
+	secretReal     secretClassification = "A"
+	secretFixture  secretClassification = "B"
+	secretFalsePos secretClassification = "C"
+)
+
+type secretFinding struct {
+	path           string
+	line           int
+	pattern        secretPattern
+	matched        string
+	classification secretClassification
+}
+
 func NewSecretsHygiene() *SecretsHygiene { return &SecretsHygiene{} }
+func NewExternalSecretsHygiene() *ExternalSecretsHygiene {
+	return &ExternalSecretsHygiene{}
+}
 
 func (s *SecretsHygiene) ID() string   { return "secrets_hygiene" }
 func (s *SecretsHygiene) Name() string { return "Secrets Hygiene" }
@@ -27,6 +52,13 @@ func (s *SecretsHygiene) Description() string {
 	return "Scans codebase for plaintext secrets, tokens, and credentials"
 }
 func (s *SecretsHygiene) Weight() int { return 20 }
+
+func (s *ExternalSecretsHygiene) ID() string   { return "secrets_hygiene" }
+func (s *ExternalSecretsHygiene) Name() string { return "External Secrets Hygiene" }
+func (s *ExternalSecretsHygiene) Description() string {
+	return "Scans consumer repositories and blocks only real secret material"
+}
+func (s *ExternalSecretsHygiene) Weight() int { return 20 }
 
 // secretPattern represents a regex pattern for detecting secrets.
 type secretPattern struct {
@@ -87,17 +119,19 @@ var skipDirs = map[string]bool{
 
 // skipFiles are specific files that are expected to contain secret-like patterns.
 var skipFiles = map[string]bool{
-	".gitleaks.toml":             true,
-	"rego_engine.py":             true,
-	"permission_authority.json":  true,
-	"secrets_hygiene.go":         true, // this file contains patterns
-	"secrets_hygiene_test.go":    true, // test fixtures
-	"validators_test.go":         true, // test fixtures with mock secrets
-	"check_ovav_ssh_profile.py":  true, // test SSH key fixtures
-	"ovav_public_export_gate.py": true, // contains export test key fixture
-	"minimax_direct_env.sh":      true, // placeholder API key template
-	"provider_setup.sh":          true, // placeholder API key template
-	"setup_minimax_direct.sh":    true, // placeholder API key template
+	".gitleaks.toml":                   true,
+	"rego_engine.py":                   true,
+	"permission_authority.json":        true,
+	"secrets_hygiene.go":               true, // this file contains patterns
+	"secrets_hygiene_test.go":          true, // test fixtures
+	"external_secrets_hygiene.go":      true, // external classifier implementation
+	"external_secrets_hygiene_test.go": true, // external classifier fixtures
+	"validators_test.go":               true, // test fixtures with mock secrets
+	"check_ovav_ssh_profile.py":        true, // test SSH key fixtures
+	"ovav_public_export_gate.py":       true, // contains export test key fixture
+	"minimax_direct_env.sh":            true, // placeholder API key template
+	"provider_setup.sh":                true, // placeholder API key template
+	"setup_minimax_direct.sh":          true, // placeholder API key template
 }
 
 // scanExts are file extensions scanned for secrets.
