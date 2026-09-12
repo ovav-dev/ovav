@@ -108,6 +108,7 @@ Commands:
   ovav govern decide   Run decision engine
   ovav govern trust    Verify trust gate on claims
   ovav validate        Run security validators (all | list | <id>)
+  ovav consumer        Govern an independent repository (central-only state)
 	ovav integrity baseline [--plan|--write]
 	ovav terminal windows plan --settings <path> --fragment <path>
 	ovav defend          Defense status dashboard
@@ -1083,7 +1084,7 @@ Usage:
 	}
 	// Protected and release branches use fail-closed gate mode. Feature
 	// worktrees use explicit developer mode so scoped candidate drift is visible.
-	registry := validators.DefaultRegistry(mode)
+	registry := validators.DefaultRegistryForRoot(repoRoot, mode)
 
 	if targetID == "all" {
 		// Run all validators

@@ -74,7 +74,7 @@ func cmdPush(args []string) int {
 	// ── 3. Pre-flight validation ──────────────────────────────────────────
 	fmt.Println("🔍 Pre-flight validation...")
 
-	results, passed := runPushPreflight(context.Background(), repoRoot, governedPushValidators())
+	results, passed := runPushPreflight(context.Background(), repoRoot, validators.GovernedPushValidators(repoRoot))
 	for _, r := range results {
 		icon := "✅"
 		if r.Status == "fail" || r.Status == "error" {

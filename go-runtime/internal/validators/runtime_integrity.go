@@ -15,7 +15,10 @@ import (
 )
 
 // RuntimeIntegrity verifies protected runtime files without creating a baseline.
-type RuntimeIntegrity struct{ mode ValidationMode }
+type RuntimeIntegrity struct {
+	mode         ValidationMode
+	externalOnly bool
+}
 
 const IntegrityBaselineSchema = "ovav.runtime_integrity.v1"
 
@@ -25,6 +28,10 @@ func NewRuntimeIntegrity(modes ...ValidationMode) *RuntimeIntegrity {
 		mode = modes[0]
 	}
 	return &RuntimeIntegrity{mode: mode}
+}
+
+func newExternalRuntimeIntegrity(mode ValidationMode) *RuntimeIntegrity {
+	return &RuntimeIntegrity{mode: mode, externalOnly: true}
 }
 
 func (r *RuntimeIntegrity) ID() string   { return "runtime_integrity" }
@@ -58,6 +65,9 @@ func baselinePath(root string) string {
 }
 
 func (r *RuntimeIntegrity) Validate(ctx context.Context, root string) Result {
+	if r.externalOnly || isRegisteredExternal(root) {
+		return r.validateExternal(root)
+	}
 	start := time.Now()
 	var failures, warnings []string
 	if err := ctx.Err(); err != nil {
