@@ -46,3 +46,25 @@ consumers:
     purpose: >
       Bitel-agent call center project. Registered via INCIDENT-2026-07-16.
       Full OWS access with audit trail. Consumer bridge v2.0.0.
+
+  - id: akrynt-agent
+    aliases: [akrynt]
+    name: AKRYNT
+    display_name: akrynt-agent
+    root_path: /home/braka/Systems/projects/work/akrynt-agent
+    contact: Alexander Salvador
+    state: registered
+    waiver_path: ~/.config/ovav/consumer_waiver_akrynt-agent.yaml
+    registered_at: "2026-09-11T00:00:00Z"
+    bootstrap_version: "external-governance.v1"
+    audit_destination: .ovav/runtime/logs/consumer_audit.jsonl
+    granted_subsystems:
+      - id: push
+        commands: [ovav push]
+        boundaries:
+          git_operations: consumer_root_only
+          audit_required: true
+          self_recovery: disabled
+    purpose: >
+      Independent AKRYNT repository. OVAV validates project security and
+      central baselines without projecting OVAV files into the consumer tree.

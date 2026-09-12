@@ -17,9 +17,11 @@ import (
 // 2. Push URL must match fetch URL (no split remotes)
 // 3. Platform agent must prohibit raw git push
 // 4. No force push or force delete on any surface
-type GitPush struct{}
+type GitPush struct{ externalOnly bool }
 
 func NewGitPush() *GitPush { return &GitPush{} }
+
+func newExternalGitPush() *GitPush { return &GitPush{externalOnly: true} }
 
 func (g *GitPush) ID() string   { return "git_push" }
 func (g *GitPush) Name() string { return "Git Push Gate" }
@@ -32,6 +34,7 @@ func (g *GitPush) Validate(ctx context.Context, root string) Result {
 	start := time.Now()
 	var issues []string
 	var warnings []string
+	external := g.externalOnly || isRegisteredExternal(root)
 
 	// Resolve git config path (handles worktrees where .git is a file)
 	gitConfig := resolveGitPath(root, "config")
@@ -58,40 +61,35 @@ func (g *GitPush) Validate(ctx context.Context, root string) Result {
 		issues = append(issues, "Git push URL must not split from fetch URL (pushurl detected)")
 	}
 
-	// Rule 3: Check platform agent prohibits raw git push
-	platformAgent := filepath.Join(root, "clients", "opencode", "agents", "area-platform-engineering.md")
-	if agentData, err := os.ReadFile(platformAgent); err == nil {
-		agentText := strings.ToLower(string(agentData))
-		if !strings.Contains(agentText, "raw git push") && !strings.Contains(agentText, "force push") {
-			issues = append(issues, "Platform agent missing raw git push prohibition")
+	// Rule 3: OVAV's agent/config/Go wiring is required only for OVAV's own
+	// monorepo. For an independent consumer, the caller is the OVAV binary and
+	// the project must not copy OVAV internals just to satisfy this check.
+	if !external {
+		platformAgent := filepath.Join(root, "clients", "opencode", "agents", "area-platform-engineering.md")
+		if agentData, err := os.ReadFile(platformAgent); err == nil {
+			agentText := strings.ToLower(string(agentData))
+			if !strings.Contains(agentText, "raw git push") && !strings.Contains(agentText, "force push") {
+				issues = append(issues, "Platform agent missing raw git push prohibition")
+			}
+		} else {
+			issues = append(issues, fmt.Sprintf("Cannot read platform agent: %v", err))
 		}
-	} else {
-		issues = append(issues, fmt.Sprintf("Cannot read platform agent: %v", err))
-	}
 
-	// Rule 4: Raw push remains denied in the harness and the Go-native governed
-	// push command is dispatched to its implementation.
-	// OVAV TRUSTED EXECUTION DOMAIN — 2026-08-13:
-	// YOLO mode: bash is 100% allow (no deny rules). The raw push gate is
-	// enforced by the Go push_cli (ovav git push) which routes through the
-	// Go push engine with protected-branch gates. Skip the opencode.json
-	// deny check if YOLO is active.
-	opencodeJSON := filepath.Join(root, "opencode.json")
-	if jsonData, err := os.ReadFile(opencodeJSON); err == nil {
-		text := string(jsonData)
-		isYolo := strings.Contains(text, `"_ovav"`) || strings.Contains(text, `"yolo"`)
-		if !isYolo {
-			if !strings.Contains(text, `"git push*": "deny"`) && !strings.Contains(text, `"git push*":"deny"`) {
+		opencodeJSON := filepath.Join(root, "opencode.json")
+		if jsonData, err := os.ReadFile(opencodeJSON); err == nil {
+			text := string(jsonData)
+			isYolo := strings.Contains(text, `"_ovav"`) || strings.Contains(text, `"yolo"`)
+			if !isYolo && !strings.Contains(text, `"git push*": "deny"`) && !strings.Contains(text, `"git push*":"deny"`) {
 				issues = append(issues, "opencode.json does not deny raw git push")
 			}
+		} else {
+			issues = append(issues, fmt.Sprintf("Cannot read opencode.json: %v", err))
 		}
-	} else {
-		issues = append(issues, fmt.Sprintf("Cannot read opencode.json: %v", err))
-	}
-	pushCLI, pushErr := os.ReadFile(filepath.Join(root, "go-runtime", "cmd", "ovav", "push_cli.go"))
-	dispatch, dispatchErr := os.ReadFile(filepath.Join(root, "go-runtime", "cmd", "ovav", "dispatch.go"))
-	if pushErr != nil || dispatchErr != nil || !strings.Contains(string(pushCLI), "cmdPush") || !strings.Contains(string(pushCLI), "gitflow.Push") || !strings.Contains(string(dispatch), `case "push"`) && !strings.Contains(string(dispatch), "cmdPush") {
-		issues = append(issues, "Go-native governed push command wiring is incomplete")
+		pushCLI, pushErr := os.ReadFile(filepath.Join(root, "go-runtime", "cmd", "ovav", "push_cli.go"))
+		dispatch, dispatchErr := os.ReadFile(filepath.Join(root, "go-runtime", "cmd", "ovav", "dispatch.go"))
+		if pushErr != nil || dispatchErr != nil || !strings.Contains(string(pushCLI), "cmdPush") || !strings.Contains(string(pushCLI), "gitflow.Push") || !strings.Contains(string(dispatch), `case "push"`) && !strings.Contains(string(dispatch), "cmdPush") {
+			issues = append(issues, "Go-native governed push command wiring is incomplete")
+		}
 	}
 
 	// Rule 5: Protected branch must have waiver (migrated from Python)

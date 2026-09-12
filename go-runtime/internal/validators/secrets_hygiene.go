@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/ovav/ovav/internal/alerts"
+	"github.com/ovav/ovav/internal/consumers"
 )
 
 // SecretsHygiene scans the codebase for plaintext secrets.
@@ -81,6 +82,7 @@ var skipDirs = map[string]bool{
 	"data":              true, // runtime data dirs (DNI caches, backups) — always gitignored
 	".mimocode":         true, // MiMo Code runtime workspace
 	".opencode":         true, // OpenCode runtime workspace
+	"alerts":            true, // validator findings — do not recursively rescan
 }
 
 // skipFiles are specific files that are expected to contain secret-like patterns.
@@ -242,25 +244,29 @@ func (s *SecretsHygiene) Validate(ctx context.Context, root string) Result {
 		}
 	}
 
-	// ── Create persistent alerts for detected secrets ──
-	alertMgr := alerts.NewManager(root)
-	for _, issue := range issues {
-		parts := strings.SplitN(issue, ": ", 3)
-		fileName := ""
-		lineNum := 0
-		if len(parts) >= 1 {
-			fileLine := strings.SplitN(parts[0], ":", 2)
-			fileName = fileLine[0]
-			if len(fileLine) > 1 {
-				fmt.Sscanf(fileLine[1], "%d", &lineNum)
+	// Persist alerts only for OVAV's own repository. External projects are
+	// read-only from OVAV's perspective; their findings must not contaminate
+	// the consumer tree. The gate result remains fail-closed either way.
+	if !consumers.Resolve(root).External {
+		alertMgr := alerts.NewManager(root)
+		for _, issue := range issues {
+			parts := strings.SplitN(issue, ": ", 3)
+			fileName := ""
+			lineNum := 0
+			if len(parts) >= 1 {
+				fileLine := strings.SplitN(parts[0], ":", 2)
+				fileName = fileLine[0]
+				if len(fileLine) > 1 {
+					fmt.Sscanf(fileLine[1], "%d", &lineNum)
+				}
 			}
+			title := "Plaintext secret detected"
+			if len(parts) >= 2 {
+				title = parts[1]
+			}
+			// Non-blocking: alert persistence failure must not crash the validator
+			alertMgr.Create(alerts.CatSecrets, alerts.SevCritical, title, issue, fileName, lineNum)
 		}
-		title := "Plaintext secret detected"
-		if len(parts) >= 2 {
-			title = parts[1]
-		}
-		// Non-blocking: alert persistence failure must not crash the validator
-		alertMgr.Create(alerts.CatSecrets, alerts.SevCritical, title, issue, fileName, lineNum)
 	}
 
 	return Result{

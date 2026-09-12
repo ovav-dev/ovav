@@ -43,6 +43,12 @@ func NewWorkspaceSafety() *WorkspaceSafetyValidator {
 	}
 }
 
+// NewWorkspaceSafetyForRoot binds the safety check to the caller's resolved
+// repository. External projects do not have to contain an OVAV marker.
+func NewWorkspaceSafetyForRoot(root string) *WorkspaceSafetyValidator {
+	return &WorkspaceSafetyValidator{repoRoot: root}
+}
+
 // ID returns the unique identifier
 func (v *WorkspaceSafetyValidator) ID() string { return "workspace_safety" }
 

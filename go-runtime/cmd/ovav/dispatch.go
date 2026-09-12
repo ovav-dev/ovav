@@ -122,6 +122,8 @@ func routeCommand(cmd string, args []string) int {
 		return cmdCoverage(args)
 	case "validate":
 		return cmdValidate(args)
+	case "consumer":
+		return cmdConsumer(args)
 	case "monitor":
 		return cmdMonitor(args)
 	case "integrity":
@@ -175,7 +177,7 @@ func knownCommands() []string {
 		"smoke", "fresh-smoke", "dogfood",
 		"detect-env", "gateway",
 		"sync",
-		"resolve-subagent", "resolve_subagent",
+		"resolve-subagent", "resolve_subagent", "consumer",
 		"delegate",
 		"adversarial",
 		"fde",
