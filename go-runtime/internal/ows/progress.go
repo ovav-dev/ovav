@@ -90,12 +90,11 @@ func VerifyPhases(repoRoot string, changedFiles []string) ([]PhaseResult, error)
 	// Determine which verifiers to run based on detected stacks
 	var results []PhaseResult
 
-	// Run Go verification if Go stack detected
+	// Run Go verification if Go stack detected. A consumer may keep its Go
+	// module below the repository root (for example, backend/go.mod); execute
+	// the commands from the module directory, never from the checkout root.
 	if stacks.HasGo() {
-		goRoot := repoRoot
-		if _, err := os.Stat(repoRoot + "/go-runtime/go.mod"); err == nil {
-			goRoot = repoRoot + "/go-runtime"
-		}
+		goRoot := goVerificationRoot(repoRoot, stacks)
 		results = append(results, runGoVerification(goRoot, 3)...)
 	}
 
@@ -170,6 +169,23 @@ func stackDirs(stacks *StackInfo, stackType StackType) []string {
 		dirs = append(dirs, dir)
 	}
 	return dirs
+}
+
+// goVerificationRoot resolves the module root selected by stack detection.
+// The OVAV checkout uses go-runtime, while independent consumers commonly use
+// a nested module such as backend. Keeping this resolution data-driven avoids
+// invoking Go in a directory that has no go.mod.
+func goVerificationRoot(repoRoot string, stacks *StackInfo) string {
+	for _, dir := range stacks.GoDirs() {
+		candidate := repoRoot
+		if dir != "" && dir != "." {
+			candidate = filepath.Join(repoRoot, dir)
+		}
+		if _, err := os.Stat(filepath.Join(candidate, "go.mod")); err == nil {
+			return candidate
+		}
+	}
+	return repoRoot
 }
 
 // runGoVerification runs go vet, gofmt, and go test.
@@ -256,6 +272,22 @@ func runNodeJSVerificationMode(nodeRoot string, phaseCount int, includeTests boo
 	}
 
 	var results []PhaseResult
+	runScript := func(name, script string) {
+		start := time.Now()
+		cmd, cmdErr := nodeScriptCommand(nodeRoot, manager, script)
+		var out []byte
+		if cmdErr == nil {
+			out, cmdErr = cmd.CombinedOutput()
+		}
+		issues := collectIssueLines(string(out), 5)
+		if cmdErr != nil {
+			issues = append(issues, cmdErr.Error())
+		}
+		results = append(results, PhaseResult{
+			Name: name, Pass: cmdErr == nil, Issues: issues, DurMS: time.Since(start).Milliseconds(),
+		})
+		tracker.Increment(name)
+	}
 	runTool := func(name, tool string, args ...string) {
 		start := time.Now()
 		cmd, cmdErr := nodeToolCommand(nodeRoot, manager, tool, args...)
@@ -273,7 +305,12 @@ func runNodeJSVerificationMode(nodeRoot string, phaseCount int, includeTests boo
 		tracker.Increment(name)
 	}
 
-	if hasBiomeConfig(nodeRoot, manifest) {
+	// Prefer the project's declared quality script. This preserves its intended
+	// scope (for example, `pnpm lint` → `biome lint src/`) instead of replacing
+	// it with a repository-wide `biome check .` invocation.
+	if script := declaredNodeQualityScript(manifest); script != "" {
+		runScript("node "+script, script)
+	} else if hasBiomeConfig(nodeRoot, manifest) {
 		runTool("biome check", "biome", "check", ".")
 	} else if hasTypeScriptConfig(nodeRoot) {
 		runTool("tsc", "tsc", "--noEmit")
@@ -308,6 +345,15 @@ func runNodeJSVerificationMode(nodeRoot string, phaseCount int, includeTests boo
 	tracker.Increment("node test")
 
 	return results
+}
+
+func declaredNodeQualityScript(manifest nodePackageManifest) string {
+	for _, name := range []string{"lint", "typecheck", "check"} {
+		if strings.TrimSpace(manifest.Scripts[name]) != "" {
+			return name
+		}
+	}
+	return ""
 }
 
 func hygienePhaseResult(hygiene *HygieneResult) PhaseResult {
