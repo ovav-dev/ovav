@@ -1010,6 +1010,8 @@ func makeListHandler(repoRoot string) func(ctx context.Context, args map[string]
 	return func(ctx context.Context, args map[string]string) error {
 		showHistory := args["history"] == "true" || args["history"] == "1"
 		showJSON := args["json"] == "true" || args["json"] == "1"
+		mineOnly := args["mine"] == "true" || args["mine"] == "1"
+		staleOnly := args["stale"] == "true" || args["stale"] == "1"
 
 		// ── History mode: read audit trail ──
 		if showHistory {
@@ -1020,6 +1022,21 @@ func makeListHandler(repoRoot string) func(ctx context.Context, args map[string]
 		if args["untracked"] == "true" {
 			untrackedHandler := makeUntrackedHandler(repoRoot)
 			return untrackedHandler(ctx, args)
+		}
+
+		// Structured/filter modes must not emit the legacy status and conflict
+		// sections: callers use these modes for scripts and machine inspection.
+		if showJSON || mineOnly || staleOnly {
+			entries, err := inspectWorktreeEntries(repoRoot)
+			if err != nil {
+				return err
+			}
+			entries = filterWorktreeEntries(entries, repoRoot, mineOnly, staleOnly)
+			if showJSON {
+				return encodeWorktreeEntries(entries)
+			}
+			printFilteredWorktreeEntries(entries, mineOnly, staleOnly)
+			return nil
 		}
 
 		// ── Standard: git status + conflict predictions ──
@@ -1097,6 +1114,174 @@ func makeListHandler(repoRoot string) func(ctx context.Context, args map[string]
 			}
 		}
 		return nil
+	}
+}
+
+// worktreeListEntry is the stable machine-readable projection returned by
+// `owl --json`. Git's porcelain output is intentionally normalized here so
+// consumers do not need to understand git worktree internals.
+type worktreeListEntry struct {
+	Path       string `json:"path"`
+	Head       string `json:"head"`
+	Branch     string `json:"branch,omitempty"`
+	Profile    string `json:"profile"`
+	Owner      string `json:"owner,omitempty"`
+	State      string `json:"state"`
+	AgeDays    int    `json:"age_days"`
+	Current    bool   `json:"current"`
+	Detached   bool   `json:"detached"`
+	Locked     bool   `json:"locked"`
+	LockReason string `json:"lock_reason,omitempty"`
+	Prunable   bool   `json:"prunable"`
+	Zombie     bool   `json:"zombie"`
+	Stale      bool   `json:"stale"`
+}
+
+const staleWorktreeAge = 7 * 24 * time.Hour
+
+func inspectWorktreeEntries(repoRoot string) ([]worktreeListEntry, error) {
+	out, err := runGitOutput(repoRoot, "worktree", "list", "--porcelain")
+	if err != nil {
+		return nil, fmt.Errorf("owl: list worktrees: %w", err)
+	}
+
+	metadata := worktreeMetadata(repoRoot)
+	entries := parseWorktreeEntries(out)
+	now := time.Now()
+	for i := range entries {
+		entry := &entries[i]
+		entry.Current = filepath.Clean(entry.Path) == filepath.Clean(repoRoot)
+		entry.Profile = gitflow.DetectProfileFromBranch(entry.Branch).Name
+		if record, ok := metadata[entry.Branch]; ok {
+			entry.Owner = record.Owner
+			entry.State = string(record.State)
+			entry.Locked = entry.Locked || record.Locked
+			if entry.LockReason == "" {
+				entry.LockReason = record.LockReason
+			}
+		}
+		if entry.State == "" {
+			entry.State = "ACTIVE"
+		}
+		if info, statErr := os.Stat(entry.Path); statErr == nil {
+			age := now.Sub(info.ModTime())
+			if age > 0 {
+				entry.AgeDays = int(age / (24 * time.Hour))
+			}
+			entry.Stale = age >= staleWorktreeAge
+		}
+		if entry.Branch != "" && !branchExists(repoRoot, entry.Branch) {
+			entry.Zombie = true
+		}
+	}
+	return entries, nil
+}
+
+func parseWorktreeEntries(out string) []worktreeListEntry {
+	var entries []worktreeListEntry
+	for _, record := range strings.Split(strings.TrimSpace(out), "\n\n") {
+		if strings.TrimSpace(record) == "" {
+			continue
+		}
+		var entry worktreeListEntry
+		for _, line := range strings.Split(record, "\n") {
+			switch {
+			case strings.HasPrefix(line, "worktree "):
+				entry.Path = strings.TrimPrefix(line, "worktree ")
+			case strings.HasPrefix(line, "HEAD "):
+				entry.Head = strings.TrimPrefix(line, "HEAD ")
+			case strings.HasPrefix(line, "branch "):
+				entry.Branch = strings.TrimPrefix(strings.TrimPrefix(line, "branch "), "refs/heads/")
+			case line == "detached":
+				entry.Detached = true
+			case line == "locked":
+				entry.Locked = true
+			case strings.HasPrefix(line, "locked "):
+				entry.Locked = true
+				entry.LockReason = strings.TrimPrefix(line, "locked ")
+			case line == "prunable" || strings.HasPrefix(line, "prunable "):
+				entry.Prunable = true
+			}
+		}
+		if entry.Path != "" {
+			entries = append(entries, entry)
+		}
+	}
+	return entries
+}
+
+func worktreeMetadata(repoRoot string) map[string]WorktreeRecord {
+	metadata := make(map[string]WorktreeRecord)
+	db, err := OpenAudit(repoRoot)
+	if err != nil {
+		return metadata
+	}
+	defer db.Close()
+	records, err := db.ListWorktrees("", "")
+	if err != nil {
+		return metadata
+	}
+	for _, record := range records {
+		if record.Branch != "" {
+			metadata[record.Branch] = record
+		}
+	}
+	return metadata
+}
+
+func currentOWSOwner() string {
+	for _, key := range []string{"OVAV_ACTIVE_LEAD", "USER", "USERNAME"} {
+		if value := strings.TrimSpace(os.Getenv(key)); value != "" {
+			return value
+		}
+	}
+	return ""
+}
+
+func filterWorktreeEntries(entries []worktreeListEntry, repoRoot string, mineOnly, staleOnly bool) []worktreeListEntry {
+	if !mineOnly && !staleOnly {
+		return entries
+	}
+	owner := currentOWSOwner()
+	filtered := make([]worktreeListEntry, 0, len(entries))
+	for _, entry := range entries {
+		mine := entry.Owner != "" && entry.Owner == owner
+		if entry.Current && filepath.Clean(entry.Path) == filepath.Clean(repoRoot) {
+			mine = true
+		}
+		if mineOnly && !mine {
+			continue
+		}
+		if staleOnly && !entry.Stale {
+			continue
+		}
+		filtered = append(filtered, entry)
+	}
+	return filtered
+}
+
+func encodeWorktreeEntries(entries []worktreeListEntry) error {
+	if entries == nil {
+		entries = []worktreeListEntry{}
+	}
+	return json.NewEncoder(os.Stdout).Encode(entries)
+}
+
+func printFilteredWorktreeEntries(entries []worktreeListEntry, mineOnly, staleOnly bool) {
+	label := "Worktrees"
+	if mineOnly {
+		label += " (mine)"
+	}
+	if staleOnly {
+		label += " (stale)"
+	}
+	fmt.Printf("── %s (%d) ──\n", label, len(entries))
+	for _, entry := range entries {
+		state := entry.State
+		if entry.Stale {
+			state = "STALE"
+		}
+		fmt.Printf("  %-30s %-30s %-8s %3dd\n", shorten(entry.Path, 30), entry.Branch, state, entry.AgeDays)
 	}
 }
 
