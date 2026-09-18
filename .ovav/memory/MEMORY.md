@@ -198,3 +198,152 @@ Sin este paso, el Apps Script existe pero `CIMA_SPREADSHEET_ID` no está seteado
 ---
 
 *This file is the human-readable authority for OVAV project state. For runtime continuity, see `checkpoint.md` (pending creation).*
+
+---
+
+## 10. CIMA PROJECT — AUTONOMOUS MODE PROTOCOL (CEO directive 2026-09-18)
+
+**The CEO has explicitly granted autonomous execution authority for ALL CIMA-related work.**
+
+### 10.1 What "autonomous" means
+
+When the next chat opens with "Thavren, retomemos CIMA" (or any variant):
+
+1. **DO NOT ASK** what to do next for CIMA. Pick the highest-leverage task.
+2. **DO NOT ASK** for spreadsheet IDs, script IDs, OAuth client, vault path.
+3. **DO NOT ASK** for trivial decisions (scope, naming, ordering).
+4. **ASSUME** the CEO wants the most impactful thing done now.
+5. **EXECUTE** in the appropriate worktree (see 10.4).
+6. **COMMIT** in atomic, reviewable units.
+7. **REPORT** the work unit (what, why, how to verify).
+
+### 10.2 Pre-loaded context (no need to re-discover)
+
+| Asset | Identifier |
+|---|---|
+| Spreadsheet | `1MQ3wts_cEG_4Dp5U6X4gehEn6u7F61tIl7KHzSzKw0Y` |
+| Spreadsheet URL | https://docs.google.com/spreadsheets/d/1MQ3wts_cEG_4Dp5U6X4gehEn6u7F61tIl7KHzSzKw0Y/edit |
+| Spreadsheet name | `CIMA_2026_PREMIUM_BASE` |
+| Apps Script ID | `1fuA7kJHkWY6_4rM-IQHO9by6OLqVGZMDsSzra6n3D_6XRvMOWda4HQpg` |
+| Apps Script URL | https://script.google.com/u/0/home/projects/1fuA7kJHkWY6_4rM-IQHO9by6OLqVGZMDsSzra6n3D_6XRvMOWda4HQpg/edit |
+| OAuth client_id | `899372363856-sdts1v2me11qvipjefa6sss773b1fach.apps.googleusercontent.com` |
+| GCP project | `gam-project-9wknn` (nº 899372363856) |
+| Workspace account | `hello@ovav.dev` |
+| Vault path | `.ovav/vault/credentials/google_oauth.enc` |
+| Vault key | `.ovav/vault/vault.key` (AES-256-GCM, PBKDF2 200k iter) |
+| Allowed scopes | `spreadsheets`, `script.projects`, `drive.readonly` |
+| Apps Script API status | enabled (project + user level) |
+| Allowlist path | `.ovav/vault/sheets_allowlist.yaml` |
+
+### 10.3 Code locations (already on disk — just `cd` and run)
+
+| What | Path |
+|---|---|
+| Sheets bridge source | `go-runtime/cmd/sheets/` |
+| Sheets bridge launcher | `go-runtime/cmd/sheets/launch-mcp.sh` |
+| Sheets bridge binary | `go build -o /tmp/ovav-sheets ./go-runtime/cmd/sheets/` |
+| Apps Script pulled code | `docs/cima-stack/appsscript/Codigo.gs` |
+| Apps Script pulled manifest | `docs/cima-stack/appsscript/manifest.json` |
+| CIMA stack analysis | `docs/cima-stack/README.md` |
+| Snapshot safety net | `.ovav/vault/snapshots/` |
+| Audit log | `.ovav/registry/audit/sheets/` |
+
+### 10.4 Worktree discipline for CIMA work
+
+| Task type | Worktree |
+|---|---|
+| Edit data in spreadsheet (writes to cells, rows, tabs) | `feat-sheets-mcp` (existing) |
+| Tweak bridge Go code (small changes) | `feat-sheets-mcp` (existing) |
+| Add feature to Sheets bridge (chart, image, etc.) | NEW `feat-cima-<feature>` from develop |
+| Add feature to Apps Script (webapp HTML, new function) | NEW `feat-cima-script-<feature>` from develop |
+| Hotfix to bridge in production | NEW `hotfix-cima-<desc>` from develop |
+| Big restructuring of CIMA architecture | Discuss with CEO first (high-blast-radius) |
+
+**Default worktree for any new CIMA work:** create with `git worktree add .ovav/worktrees/<name> develop` from the main repo, then `cd` into it.
+
+### 10.5 Decision matrix — what needs CEO OK vs. autonomous
+
+| Decision | Authority |
+|---|---|
+| Which CIMA feature to work on | **Autonomous** — pick highest leverage |
+| Cell-level data edits in spreadsheet | **Autonomous** — owner of data |
+| Create/delete tabs in spreadsheet | **Autonomous** — backed by snapshot |
+| Edit Apps Script code | **Autonomous** — push with diff preview |
+| Create Apps Script versions (immutable snapshots) | **Autonomous** |
+| Modify CONFIG (rules, horarios, OT max) | **Autonomous** — snapshot+audit always |
+| Add OAuth team members | **NEED CEO OK** — adds OAuth consent screen entry |
+| Delete Apps Script code/file | **NEED CEO OK** — irreversible without backup |
+| Deploy Apps Script webapp to URL | **NEED CEO OK** — affects external access |
+| Push to origin/* | **NEED CEO OK** — affects remote history |
+| Merge feature → develop | **NEED CEO OK** — affects main branch |
+| Delete the feat-sheets-mcp branch | **NEED CEO OK** — irreversible |
+
+### 10.6 Pre-loaded troubleshooting playbook
+
+| Symptom | Likely cause | Fix |
+|---|---|---|
+| `script: HTTP 404 HTML` on `:run` | Apps Script API not enabled for user | Visit https://script.google.com/home/usersettings → toggle ON |
+| `script: NOT_FOUND storage` on `:run` | Bound script — `:run` not supported | Use editor to install, then triggers work |
+| `sheets: HTTP 400 Unknown name "a1Range"` | Field requires GridRange not a1Range | Use `a1ToGrid()` helper in format.go |
+| `script: User has not enabled the Apps Script API` | Project-level not enabled | Visit console.cloud.google.com/apis/library/script.googleapis.com?project=gam-project-9wknn |
+| `script: Project contents must include appsscript` | Push tried to delete manifest | PushFromDir now preserves existing files |
+| Every `:run` returns null silently | JSON parsing missing `error` field | RunFunction now surfaces `error.message` |
+
+### 10.7 Known gaps to address (CEO wants advancement, not perfection)
+
+| Gap | Severity | Priority |
+|---|---|---|
+| CEO must click `installCima` manually | medium | HIGH — should be automatic |
+| Charts via API (chartSource schema) | low | medium — defer if no charts needed |
+| Images via API (insertImage) | low | low — defer |
+| HTML files `Index.html`/`Admin.html` missing | medium | HIGH — webapp incomplete without them |
+| Timezone mismatch (Bogota vs Lima) | medium | HIGH — affects dailyClose scheduling |
+| Webapp `executeAs = USER_DEPLOYING` | medium | HIGH — admin check uses wrong email |
+| Webapp access `ANYONE_ANONYMOUS` | high | HIGH — if deployed, public access |
+| Team OAuth extension | medium | LOW — no team members added yet |
+| Multi-spreadsheet allowlist tested with only 1 | low | LOW |
+
+### 10.8 Operational check sequence (run on every CIMA session start)
+
+```bash
+# 1. Verify connectivity
+cd /home/braka/Systems/ovav
+go run ./go-runtime/cmd/sheets list --spreadsheet 1MQ3wts_cEG_4Dp5U6X4gehEn6u7F61tIl7KHzSzKw0Y 2>&1 | head -10
+
+# 2. Read latest CIMA dashboard
+go run ./go-runtime/cmd/sheets read --range "'CIMA'!A1:H8" --spreadsheet 1MQ3wts_cEG_4Dp5U6X4gehEn6u7F61tIl7KHzSzKw0Y
+
+# 3. Check audit log for recent activity
+tail -20 .ovav/registry/audit/sheets/*.jsonl
+
+# 4. Check Apps Script code drift
+diff docs/cima-stack/appsscript/Codigo.gs <(go run ./go-runtime/cmd/sheets scripts pull --id 1fuA7kJHkWY6_4rM-IQHO9by6OLqVGZMDsSzra6n3D_6XRvMOWda4HQpg --out /tmp/cima-drift-check 2>&1 && cat /tmp/cima-drift-check/Codigo.gs)
+```
+
+### 10.9 The 1-click manual install (the only remaining gap)
+
+```bash
+# Cannot be automated: Apps Script :run doesn't support bound scripts.
+# CEO must do this once:
+echo "
+1. Open https://docs.google.com/spreadsheets/d/1MQ3wts_cEG_4Dp5U6X4gehEn6u7F61tIl7KHzSzKw0Y/edit
+2. Extensions → Apps Script
+3. Menu: CIMA → Instalar / reparar triggers
+4. Verify: run diagnoseCima() — should show installed=true
+"
+```
+
+---
+
+## 11. New CRIT entries from this session
+
+| ID | Rule |
+|---|---|
+| CRIT-020 | Apps Script API `:run` is NOT supported for BOUND scripts. Use editor or webapp for execution. |
+| CRIT-021 | Sheets API v4 requires `GridRange {sheetId, indices}` for almost every range field, NOT `a1Range`. |
+| CRIT-022 | **NEW (CEO directive)** For CIMA work: autonomous execution. NO questions on what to do, IDs, secrets, paths. Pre-loaded context in §10. Only need CEO OK for: add OAuth members, delete Apps Script code, deploy webapp, push to origin, merge feature → develop, delete branch. |
+| CRIT-023 | **NEW** Worktree selection for CIMA: `feat-sheets-mcp` for sheet edits + bridge tweaks; new `feat-cima-*` worktrees for new features from develop. |
+
+---
+
+*Last updated: 2026-09-18 — CEO directive: autonomous CIMA mode registered.*
