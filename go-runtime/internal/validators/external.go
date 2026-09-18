@@ -1,6 +1,7 @@
 package validators
 
 import (
+	"bytes"
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
@@ -259,7 +260,7 @@ func planExternalIntegrity(root string) (externalIntegrityBaseline, error) {
 }
 
 func externalHeadFiles(root string) ([]string, string, error) {
-	cmd := exec.Command("git", "ls-tree", "-r", "--name-only", "HEAD")
+	cmd := exec.Command("git", "ls-tree", "-r", "-z", "--name-only", "HEAD")
 	cmd.Dir = root
 	out, err := cmd.Output()
 	if err != nil {
@@ -272,9 +273,9 @@ func externalHeadFiles(root string) ([]string, string, error) {
 		return nil, "", fmt.Errorf("read project HEAD: %w", err)
 	}
 	var paths []string
-	for _, path := range strings.Split(strings.TrimSpace(string(out)), "\n") {
-		if path != "" {
-			paths = append(paths, filepath.ToSlash(path))
+	for _, rawPath := range bytes.Split(out, []byte{0}) {
+		if len(rawPath) != 0 {
+			paths = append(paths, filepath.ToSlash(string(rawPath)))
 		}
 	}
 	sort.Strings(paths)

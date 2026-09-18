@@ -62,3 +62,52 @@ func TestExternalRegistryUsesCentralBaselinesAndNoOVAVSurface(t *testing.T) {
 		t.Fatal("external secret scan wrote alert state into consumer repository")
 	}
 }
+
+func TestExternalBaselinesPreserveUnicodePaths(t *testing.T) {
+	root := t.TempDir()
+	gitInit(t, root)
+	path := "docs/SPEC-REDISEÑO-LOGIN-DASHBOARD.md"
+	contents := "# Login dashboard\n"
+	writeTestFile(t, root, path, contents)
+	runGitTest(t, root, "config", "core.quotePath", "true")
+	runGitTest(t, root, "add", path)
+	runGitTest(t, root, "commit", "-m", "unicode path baseline fixture")
+
+	paths, commit, err := externalHeadFiles(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	found := false
+	for _, gotPath := range paths {
+		if gotPath == path {
+			found = true
+			break
+		}
+	}
+	if !found || commit == "" {
+		t.Fatalf("HEAD listing lost exact Unicode path %q: paths=%v commit=%q", path, paths, commit)
+	}
+
+	baseline, err := planExternalSBOM(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got, ok := baseline.Files[path]; !ok || got == "" {
+		t.Fatalf("SBOM missing exact Unicode path %q: %v", path, baseline.Files)
+	}
+
+	integrity, err := planExternalIntegrity(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, ok := integrity.Files[path]; ok {
+		t.Fatal("documentation path unexpectedly included in integrity security surface")
+	}
+	data, err := gitBlob(root, path)
+	if err != nil {
+		t.Fatalf("read Unicode HEAD path: %v", err)
+	}
+	if string(data) != contents {
+		t.Fatalf("Unicode HEAD content = %q, want %q", data, contents)
+	}
+}
