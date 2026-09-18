@@ -45,9 +45,9 @@ alias ovv "ovav validate"
 alias ovd "ovav doctor"
 
 # Worktree shortcuts
-alias owc "git worktree add"
-alias owl "git worktree list"
-alias owv "git worktree remove"
+alias owc "ovav worktree create"
+alias owl "ovav worktree list"
+alias owv "ovav worktree verify"
 
 # Utility shortcuts
 alias ll "ls -la"

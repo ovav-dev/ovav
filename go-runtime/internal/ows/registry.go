@@ -316,6 +316,7 @@ var ProfileRegistry = map[string]ProfileConfig{
 // It tries longest prefix match first ("ovav worktree create" before "ovav worktree").
 // Tier access is checked against OVAV_CONSUMER_TIER env var (defaults to "free").
 func Dispatch(ctx context.Context, repoRoot string, args []string) error {
+	args = resolveShortCommandArgs(args)
 	if len(args) == 0 {
 		return fmt.Errorf("no command provided. Run 'ovav help' for usage.")
 	}
@@ -386,6 +387,27 @@ func Dispatch(ctx context.Context, repoRoot string, args []string) error {
 	}
 
 	return fmt.Errorf("unknown command: %s — use owc, owd, owl, owv, ows, owx, owa, owr, owu, owlk, owm, or owclean", args[0])
+}
+
+// resolveShortCommandArgs expands an OWS short name in the position occupied
+// by the worktree subcommand. The registry stores canonical command keys while
+// the CLI documents short names such as "owc"; normalizing here keeps both
+// forms on the same dispatch path.
+func resolveShortCommandArgs(args []string) []string {
+	if len(args) < 3 || args[0] != "ovav" || args[1] != "worktree" {
+		return args
+	}
+
+	cmd, ok := FindByShortName(args[2])
+	if !ok {
+		return args
+	}
+
+	canonical := strings.Fields(cmd.Name)
+	resolved := make([]string, 0, len(canonical)+len(args)-3)
+	resolved = append(resolved, canonical...)
+	resolved = append(resolved, args[3:]...)
+	return resolved
 }
 
 // parseArgs parses positional arguments and --key value flags against the command's Arg definitions.
