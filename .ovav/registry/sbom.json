@@ -4,7 +4,7 @@
   "project": "OVAV",
   "hash_algorithm": "sha256",
   "metadata": {
-    "git_identity": "23712470d2089372db1eeac84b67050b229c773ddb2a33eb37b4937557b18255"
+    "git_identity": "f9b239b1e0e3bb419bf3eba9023eb7fc5eae625a4a67e04b2ec81dc5faa8058f"
   },
   "policy": {
     "version": "tracked-content-v1",
@@ -1626,7 +1626,7 @@
     "go-runtime/cmd/ovav/governor_cli.go": "b28d1e4df9c91c35ecbb96679e0f5481b67fbe3aa2d8e5f3b14ab0ab92bd73dd",
     "go-runtime/cmd/ovav/hooks_cli.go": "c46a97475297c80f317398e1b130b317168f4b3da1ad4b9a03e8757d346b12d4",
     "go-runtime/cmd/ovav/hooks_cli_test.go": "aa60ea7bea774c4f6b479104a5d41cea9ac470ed57da1adbf78ff4f5ec1a510d",
-    "go-runtime/cmd/ovav/integrity_cli.go": "bb7b218499c08bcf068c6dd2f229ab6c3b4fc023fa2d11208189edba5ed9dcae",
+    "go-runtime/cmd/ovav/integrity_cli.go": "53a5ee7b4da1d7e4175ee785c4169b119c032573e4663d7dbd8a19f9d6db80dc",
     "go-runtime/cmd/ovav/it_cli.go": "589e292a8f33b47df84681e10a6a5fc8d545712ac266a46bddbfc9b33b2133f5",
     "go-runtime/cmd/ovav/it_test.go": "5e3ae8da97fb5cf4a8fbf7f562340518665d8edbaa082379484de5276e7d7944",
     "go-runtime/cmd/ovav/launch_cli.go": "a9ad9aa5c25cbefc5ffb5231639f9fece639bb2b6d66d42ec8c45494e7861176",
@@ -2463,7 +2463,8 @@
     "go-runtime/internal/validators/registry_validator.go": "429ff9c6f445a6cbc09ddd02b9d414362c4cade508bbbaf3828ed039e830c50d",
     "go-runtime/internal/validators/rego_policies.go": "362851ac1a279c7e760ad924b4f3244db29fdeda301774b9ecfe1a31be058f52",
     "go-runtime/internal/validators/release_gate.go": "a400227be32e71362956a3efba87f97c3a23cf0f01976de98c8fb3e55d02fb7a",
-    "go-runtime/internal/validators/runtime_integrity.go": "a247b9342f8511bc26b8bcd0b12744e4a4bbdbd0e657080d1868056a4fb99728",
+    "go-runtime/internal/validators/runtime_integrity.go": "cfaac59effb2347085877d98afca57e24a300876694c95c9eb893bd891cdb48e",
+    "go-runtime/internal/validators/runtime_integrity_pin_test.go": "ec315b356a9af453373a972113e7550e1aaffd7468c5a88b997d2eba7f4b2a51",
     "go-runtime/internal/validators/runtime_wiring.go": "59d8e1a05f4d35749bc2e04954980b045b8a1e3b513d86fd863205ecafa80f3c",
     "go-runtime/internal/validators/safe_read_linux.go": "ee02c9f6b8f7740b0044d39a467fa1b02896fc39a182db7804b8373f542ffa11",
     "go-runtime/internal/validators/safe_read_other.go": "b797a87660d02a98199316e828c34911192ab4a81329ab21108a61d6e3560074",
