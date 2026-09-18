@@ -70,6 +70,18 @@ func main() {
 		exitOn(runRollback(args))
 	case "scripts":
 		exitOn(runScriptsCmd(repoRoot, args))
+	case "format":
+		exitOn(runFormatCmd(repoRoot, args))
+	case "validate":
+		exitOn(runValidateCmd(repoRoot, args))
+	case "protect":
+		exitOn(runProtectCmd(repoRoot, args))
+	case "name-range":
+		exitOn(runNameRangeCmd(repoRoot, args))
+	case "chart":
+		exitOn(runChartCmd(repoRoot, args))
+	case "image":
+		exitOn(runImageCmd(repoRoot, args))
 	case "xlsx-in":
 		exitOn(runXlsxIn(repoRoot, args))
 	case "xlsx-out":
@@ -101,12 +113,22 @@ Writes:
   append       Append row to a table (--tab, --json or --k=v)
   update       Update rows where column=value (--tab, --where col=val, --set col=val)
   create-tab   Create a new tab (--title)
+  delete-tab   Delete a tab (--sheet-id)
+Formatting & rules (v0.4.0):
+  format         Conditional formatting (--range, --when, --value, --bg, --fg, --bold)
+  validate       Data validation (--range, --type ONE_OF_LIST, --values A,B,C)
+  protect        Protected ranges (--range, --description, --editor email, --warning-only)
+  name-range     Named ranges (--name, --range)
+  chart          Insert chart (--tab, --range, --type BAR/LINE/PIE, --title)
+  image          Insert image (--tab, --url, --anchor)
 Safety:
   snapshots    List captured snapshots (--spreadsheet, --tab)
   rollback     Restore a snapshot (--id)
 Excel:
   xlsx-in      Import a .xlsx file into a tab (--tab, --path)
   xlsx-out     Export a tab to .xlsx (--tab, --path)
+Apps Script (v0.3.0):
+  scripts list/find/pull/push/versions/snapshot
 Tools:
   mcp          Run MCP server on stdio (JSON-RPC 2.0)
   demo         Create a tab named after the user, write a header cell
@@ -992,3 +1014,382 @@ func ternary(cond bool, a, b string) string {
 	return b
 }
 
+// keep
+
+// ── formatting / validation / protected ranges / charts / images ────
+
+func runFormatCmd(repoRoot string, args []string) error {
+	id := pickSpreadsheetID(args)
+	rng := flagValue(args, "--range", "")
+	when := flagValue(args, "--when", "TEXT_CONTAINS")
+	value := flagValue(args, "--value", "")
+	bg := flagValue(args, "--bg", "FFEB9C")
+	fg := flagValue(args, "--fg", "")
+	bold := false
+	for _, a := range args {
+		if a == "--bold" {
+			bold = true
+		}
+	}
+	if rng == "" || value == "" {
+		return fmt.Errorf("format: --range and --value required")
+	}
+	if err := assertAllowed(id); err != nil {
+		return err
+	}
+	store := NewCredStore(repoRoot)
+	creds, err := store.Load()
+	if err != nil {
+		return err
+	}
+	cl := NewClient(creds, id)
+	if err := cl.AddConditionalRule(ConditionalFormatRule{
+		Range: rng, When: when, Value: value,
+		BGColor: bg, FGColor: fg, Bold: bold,
+	}); err != nil {
+		return err
+	}
+	audit(repoRoot, id, "", "format_rule", map[string]any{
+		"range": rng, "when": when, "value": value,
+	}, 1)
+	fmt.Printf("✅ format rule applied to %s (%s %s)\n", rng, when, value)
+	return nil
+}
+
+func runValidateCmd(repoRoot string, args []string) error {
+	id := pickSpreadsheetID(args)
+	rng := flagValue(args, "--range", "")
+	ruleType := flagValue(args, "--type", "ONE_OF_LIST")
+	strict := false
+	var values any
+	for i := 0; i < len(args); i++ {
+		switch args[i] {
+		case "--values":
+			if i+1 < len(args) {
+				list := strings.Split(args[i+1], ",")
+				values = list
+				i++
+			}
+		case "--strict":
+			strict = true
+		}
+	}
+	if rng == "" {
+		return fmt.Errorf("validate: --range required")
+	}
+	if ruleType == "ONE_OF_LIST" && values == nil {
+		return fmt.Errorf("validate: --values required for ONE_OF_LIST")
+	}
+	if err := assertAllowed(id); err != nil {
+		return err
+	}
+	store := NewCredStore(repoRoot)
+	creds, err := store.Load()
+	if err != nil {
+		return err
+	}
+	cl := NewClient(creds, id)
+	if err := cl.SetDataValidation(rng, ruleType, values, strict); err != nil {
+		return err
+	}
+	audit(repoRoot, id, "", "data_validation", map[string]any{
+		"range": rng, "type": ruleType, "values": values,
+	}, 1)
+	fmt.Printf("✅ validation %s on %s\n", ruleType, rng)
+	return nil
+}
+
+func runProtectCmd(repoRoot string, args []string) error {
+	id := pickSpreadsheetID(args)
+	rng := flagValue(args, "--range", "")
+	desc := flagValue(args, "--description", "OVAV protected")
+	warning := false
+	for _, a := range args {
+		if a == "--warning-only" {
+			warning = true
+		}
+	}
+	var editors []string
+	for i := 0; i < len(args); i++ {
+		if args[i] == "--editor" && i+1 < len(args) {
+			editors = append(editors, args[i+1])
+			i++
+		}
+	}
+	if rng == "" {
+		return fmt.Errorf("protect: --range required")
+	}
+	if err := assertAllowed(id); err != nil {
+		return err
+	}
+	store := NewCredStore(repoRoot)
+	creds, err := store.Load()
+	if err != nil {
+		return err
+	}
+	cl := NewClient(creds, id)
+	if err := cl.AddProtectedRange(rng, desc, editors, warning); err != nil {
+		return err
+	}
+	audit(repoRoot, id, "", "protect", map[string]any{
+		"range": rng, "editors": editors, "warning_only": warning,
+	}, 1)
+	fmt.Printf("✅ protected %s (editors=%v, warning_only=%v)\n", rng, editors, warning)
+	return nil
+}
+
+func runNameRangeCmd(repoRoot string, args []string) error {
+	id := pickSpreadsheetID(args)
+	name := flagValue(args, "--name", "")
+	rng := flagValue(args, "--range", "")
+	if name == "" || rng == "" {
+		return fmt.Errorf("name-range: --name and --range required")
+	}
+	if err := assertAllowed(id); err != nil {
+		return err
+	}
+	store := NewCredStore(repoRoot)
+	creds, err := store.Load()
+	if err != nil {
+		return err
+	}
+	cl := NewClient(creds, id)
+	if err := cl.AddNamedRange(name, rng); err != nil {
+		return err
+	}
+	audit(repoRoot, id, "", "name_range", map[string]any{
+		"name": name, "range": rng,
+	}, 1)
+	fmt.Printf("✅ named range %q → %s\n", name, rng)
+	return nil
+}
+
+func runChartCmd(repoRoot string, args []string) error {
+	id := pickSpreadsheetID(args)
+	tab := flagValue(args, "--tab", "")
+	rng := flagValue(args, "--range", "")
+	chartType := flagValue(args, "--type", "BAR")
+	title := flagValue(args, "--title", "Chart")
+	if tab == "" || rng == "" {
+		return fmt.Errorf("chart: --tab and --range required")
+	}
+	if err := assertAllowed(id); err != nil {
+		return err
+	}
+	store := NewCredStore(repoRoot)
+	creds, err := store.Load()
+	if err != nil {
+		return err
+	}
+	cl := NewClient(creds, id)
+	if err := cl.AddChart(tab, rng, chartType, title); err != nil {
+		return err
+	}
+	audit(repoRoot, id, tab, "chart", map[string]any{
+		"type": chartType, "range": rng, "title": title,
+	}, 1)
+	fmt.Printf("✅ %s chart added to %s (%s)\n", chartType, tab, rng)
+	return nil
+}
+
+func runImageCmd(repoRoot string, args []string) error {
+	id := pickSpreadsheetID(args)
+	tab := flagValue(args, "--tab", "")
+	url := flagValue(args, "--url", "")
+	anchor := flagValue(args, "--anchor", "A1")
+	if tab == "" || url == "" {
+		return fmt.Errorf("image: --tab and --url required")
+	}
+	if err := assertAllowed(id); err != nil {
+		return err
+	}
+	store := NewCredStore(repoRoot)
+	creds, err := store.Load()
+	if err != nil {
+		return err
+	}
+	cl := NewClient(creds, id)
+	if err := cl.InsertImage(tab, anchor, url); err != nil {
+		return err
+	}
+	audit(repoRoot, id, tab, "image", map[string]any{
+		"url": url, "anchor": anchor,
+	}, 1)
+	fmt.Printf("✅ image added to %s @ %s\n", tab, anchor)
+	return nil
+}
+
+// ── Triggers + Properties via Apps Script wrapper ────────────────────
+
+func runTriggerCmd(repoRoot string, args []string) error {
+	if len(args) == 0 {
+		return runTriggersHelp()
+	}
+	id := flagValue(args, "--id", "")
+	if id == "" {
+		// Pull from script_id via diagnostics
+		id = "1fuA7kJHkWY6_4rM-IQHO9by6OLqVGZMDsSzra6n3D_6XRvMOWda4HQpg"
+	}
+	store := NewCredStore(repoRoot)
+	creds, err := store.Load()
+	if err != nil {
+		return err
+	}
+	sc := NewScriptClient(creds)
+	switch args[0] {
+	case "list":
+		out, err := sc.RunFunction(id, "_ovavListTriggers", nil)
+		if err != nil {
+			return err
+		}
+		text, _ := json.MarshalIndent(out, "", "  ")
+		fmt.Println(string(text))
+	case "install":
+		out, err := sc.RunFunction(id, "_ovavInstallTriggers", nil)
+		if err != nil {
+			return err
+		}
+		audit(repoRoot, "", id, "triggers_install", nil, 0)
+		text, _ := json.MarshalIndent(out, "", "  ")
+		fmt.Println(string(text))
+	case "delete":
+		handler := flagValue(args, "--handler", "")
+		if handler == "" {
+			return fmt.Errorf("trigger delete: --handler required")
+		}
+		out, err := sc.RunFunction(id, "_ovavDeleteTrigger", map[string]any{"handlerName": handler})
+		if err != nil {
+			return err
+		}
+		audit(repoRoot, "", id, "trigger_delete", map[string]any{"handler": handler}, 0)
+		text, _ := json.MarshalIndent(out, "", "  ")
+		fmt.Println(string(text))
+	default:
+		return runTriggersHelp()
+	}
+	return nil
+}
+
+func runTriggersHelp() error {
+	fmt.Fprintln(os.Stderr, `trigger subcommands:
+  list                List installed triggers (via _ovavListTriggers)
+  install             Install dailyClose (via _ovavInstallTriggers)
+  delete --handler X  Delete trigger by handler name`)
+	return nil
+}
+
+func runPropsCmd(repoRoot string, args []string) error {
+	if len(args) == 0 {
+		return runPropsHelp()
+	}
+	id := flagValue(args, "--id", "")
+	if id == "" {
+		id = "1fuA7kJHkWY6_4rM-IQHO9by6OLqVGZMDsSzra6n3D_6XRvMOWda4HQpg"
+	}
+	store := NewCredStore(repoRoot)
+	creds, err := store.Load()
+	if err != nil {
+		return err
+	}
+	sc := NewScriptClient(creds)
+	switch args[0] {
+	case "list":
+		out, err := sc.RunFunction(id, "_ovavGetProps", nil)
+		if err != nil {
+			return err
+		}
+		text, _ := json.MarshalIndent(out, "", "  ")
+		fmt.Println(string(text))
+	case "get":
+		key := flagValue(args, "--key", "")
+		if key == "" {
+			return fmt.Errorf("props get: --key required")
+		}
+		out, err := sc.RunFunction(id, "_ovavGetProps", map[string]any{"key": key})
+		if err != nil {
+			return err
+		}
+		text, _ := json.MarshalIndent(out, "", "  ")
+		fmt.Println(string(text))
+	case "set":
+		key := flagValue(args, "--key", "")
+		value := flagValue(args, "--value", "")
+		scope := flagValue(args, "--scope", "script")
+		if key == "" {
+			return fmt.Errorf("props set: --key and --value required")
+		}
+		out, err := sc.RunFunction(id, "_ovavSetProp", map[string]any{
+			"key": key, "value": value, "scope": scope,
+		})
+		if err != nil {
+			return err
+		}
+		audit(repoRoot, "", id, "props_set", map[string]any{"key": key, "scope": scope}, 0)
+		text, _ := json.MarshalIndent(out, "", "  ")
+		fmt.Println(string(text))
+	case "delete":
+		key := flagValue(args, "--key", "")
+		scope := flagValue(args, "--scope", "script")
+		if key == "" {
+			return fmt.Errorf("props delete: --key required")
+		}
+		out, err := sc.RunFunction(id, "_ovavDeleteProp", map[string]any{
+			"key": key, "scope": scope,
+		})
+		if err != nil {
+			return err
+		}
+		audit(repoRoot, "", id, "props_delete", map[string]any{"key": key, "scope": scope}, 0)
+		text, _ := json.MarshalIndent(out, "", "  ")
+		fmt.Println(string(text))
+	default:
+		return runPropsHelp()
+	}
+	return nil
+}
+
+func runPropsHelp() error {
+	fmt.Fprintln(os.Stderr, `props subcommands:
+  list                       List all script properties
+  get --key X                Get one property
+  set --key X --value Y      Set one property (--scope script|user|document)
+  delete --key X             Delete property`)
+	return nil
+}
+
+// ── OVAV bootstrap ────────────────────────────────────────────────────
+
+func runOvavInstall(repoRoot string, args []string) error {
+	id := flagValue(args, "--id", "")
+	sid := flagValue(args, "--spreadsheet", "")
+	if id == "" {
+		id = "1fuA7kJHkWY6_4rM-IQHO9by6OLqVGZMDsSzra6n3D_6XRvMOWda4HQpg"
+	}
+	if sid == "" {
+		sid = "1MQ3wts_cEG_4Dp5U6X4gehEn6u7F61tIl7KHzSzKw0Y"
+	}
+	store := NewCredStore(repoRoot)
+	creds, err := store.Load()
+	if err != nil {
+		return err
+	}
+	sc := NewScriptClient(creds)
+	out, err := sc.RunFunction(id, "_ovavInstallCimaById", map[string]any{
+		"spreadsheetId": sid,
+	})
+	if err != nil {
+		return err
+	}
+	audit(repoRoot, sid, "", "ovav_install", map[string]any{"script_id": id}, 1)
+	text, _ := json.MarshalIndent(out, "", "  ")
+ 	fmt.Printf("✅ CIMA instalado via wrapper:\n%s\n", string(text))
+	return nil
+}
+
+func runDebug() error {
+	store := NewCredStore("/home/braka/Systems/ovav/.ovav/worktrees/feat-sheets-mcp")
+	c, err := store.Load()
+	if err != nil { fmt.Println("err:", err); return err }
+	fmt.Println("token:", c.AccessToken)
+	return nil
+}

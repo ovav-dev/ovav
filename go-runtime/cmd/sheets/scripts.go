@@ -48,16 +48,18 @@ type ScriptProject struct {
 }
 
 // ScriptFile is one file inside a script project (.gs, .html, .json).
+//
+// Note: LastModifyUser is read-only metadata from the API and is
+// never serialized when pushing back — putting the field back would
+// trigger "Unknown name time at lastModifyUser" because the schema
+// expects name/email/domain/photoUrl not time/user.
 type ScriptFile struct {
-	Name        string `json:"name"`
-	Type        string `json:"type"` // "SERVER_JS", "HTML", "JSON"
-	Source      string `json:"source,omitempty"`
-	SourceRaw   string `json:"-"`
-	Extension   string `json:"-"`
-	LastModify  struct {
-		Time         string `json:"time"`
-		User         string `json:"user"`
-	} `json:"lastModifyUser,omitempty"`
+	Name          string                 `json:"name"`
+	Type          string                 `json:"type"` // "SERVER_JS", "HTML", "JSON"
+	Source        string                 `json:"source,omitempty"`
+	SourceRaw     string                 `json:"-"`
+	Extension     string                 `json:"-"`
+	LastModifyRaw map[string]interface{} `json:"-"`
 }
 
 type scriptContentResp struct {
@@ -199,10 +201,10 @@ type ScriptManifest struct {
 }
 
 // PushFromDir uploads every file under inDir to the script project.
-// `force=true` skips the diff preview (NOT recommended — default is
-// to print a plan and ask for confirmation).
+// Always preserves existing files (Apps Script requires the manifest);
+// inDir is treated as the authoritative source for any file present there.
+// `confirm=true` skips the plan print and applies directly (NOT recommended).
 func (sc *ScriptClient) PushFromDir(scriptID, inDir string, confirm bool) (*ScriptManifest, error) {
-	// Read existing content as the diff baseline.
 	existing, err := sc.GetContent(scriptID)
 	if err != nil {
 		return nil, err
@@ -212,13 +214,12 @@ func (sc *ScriptClient) PushFromDir(scriptID, inDir string, confirm bool) (*Scri
 		existingMap[f.Name] = f
 	}
 
-	// Walk dir.
 	entries, err := os.ReadDir(inDir)
 	if err != nil {
 		return nil, fmt.Errorf("script: read dir: %w", err)
 	}
-	var plan []ScriptFile
-	var adds, mods, dels int
+	// Build a name-keyed map of new files.
+	newMap := map[string]ScriptFile{}
 	for _, e := range entries {
 		if e.IsDir() || e.Name() == "MANIFEST.json" {
 			continue
@@ -236,29 +237,43 @@ func (sc *ScriptClient) PushFromDir(scriptID, inDir string, confirm bool) (*Scri
 		if err != nil {
 			return nil, err
 		}
-		new := ScriptFile{Name: base, Type: fType, Source: string(body)}
-		old, ok := existingMap[base]
-		if !ok {
-			adds++
-		} else if old.Source != new.Source {
-			mods++
-		}
-		plan = append(plan, new)
+		newMap[base] = ScriptFile{Name: base, Type: fType, Source: string(body)}
 	}
-	// Detect deletions: any file in existingMap not in plan.
+
+	// Build plan: for every existing file, replace with newMap if
+	// present; otherwise keep existing. Then append newMap entries
+	// that don't already exist. This guarantees the manifest is never
+	// accidentally deleted.
+	plan := []ScriptFile{}
 	planNames := map[string]bool{}
-	for _, p := range plan {
-		planNames[p.Name] = true
-	}
 	for _, f := range existing.Files {
-		if !planNames[f.Name] {
-			dels++
+		if n, ok := newMap[f.Name]; ok {
+			plan = append(plan, n)
+		} else {
+			// Keep existing untouched (preserves manifest, etc).
+			plan = append(plan, ScriptFile{Name: f.Name, Type: f.Type, Source: f.Source})
+		}
+		planNames[f.Name] = true
+	}
+	for name, n := range newMap {
+		if !planNames[name] {
+			plan = append(plan, n)
 		}
 	}
 
-	// Always print plan before any mutation.
+	// Compute diff counts vs. existing.
+	var adds, mods int
+	for _, p := range plan {
+		old, ok := existingMap[p.Name]
+		if !ok {
+			adds++
+		} else if old.Source != p.Source {
+			mods++
+		}
+	}
+
 	fmt.Printf("Push plan for script %s\n", scriptID)
-	fmt.Printf("  + %d new  ~ %d modified  - %d deleted\n", adds, mods, dels)
+	fmt.Printf("  + %d new  ~ %d modified  (= preserved: %d)\n", adds, mods, len(existing.Files)-mods)
 	for _, p := range plan {
 		old, ok := existingMap[p.Name]
 		status := "+"
@@ -271,18 +286,12 @@ func (sc *ScriptClient) PushFromDir(scriptID, inDir string, confirm bool) (*Scri
 		}
 		fmt.Printf("  %s %s  (%s, %d bytes)\n", status, p.Name, p.Type, len(p.Source))
 	}
-	for _, f := range existing.Files {
-		if !planNames[f.Name] {
-			fmt.Printf("  - %s  (%s, %d bytes) — will be REMOVED\n", f.Name, f.Type, len(f.Source))
-		}
-	}
 
 	if !confirm {
 		fmt.Println("\n  pass --confirm to apply")
 		return &ScriptManifest{ScriptID: scriptID, PulledAt: time.Now().UTC()}, nil
 	}
 
-	// Apply.
 	body, _ := json.Marshal(map[string]any{"files": plan})
 	u := fmt.Sprintf("%s/projects/%s/content", appsScriptAPIBase, scriptID)
 	req, _ := http.NewRequest(http.MethodPut, u, bytes.NewReader(body))
@@ -296,8 +305,6 @@ func (sc *ScriptClient) PushFromDir(scriptID, inDir string, confirm bool) (*Scri
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("script: push HTTP %d: %s", resp.StatusCode, truncate(string(rb), 320))
 	}
-
-	// Re-read and rebuild manifest on disk.
 	return sc.PullToDir(scriptID, inDir)
 }
 
@@ -324,13 +331,35 @@ func (sc *ScriptClient) RunFunction(scriptID, function string, params map[string
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("script: run HTTP %d: %s", resp.StatusCode, truncate(string(rb), 320))
 	}
+	// Apps Script :run returns { done: bool, response: { result, error? } }
+	// or on script-level error: { done: bool, error: {...} }.
 	var out struct {
-		Response struct {
+		Done     bool `json:"done"`
+		Response *struct {
 			Result any `json:"result"`
 		} `json:"response"`
+		Error *struct {
+			Code    int    `json:"code"`
+			Message string `json:"message"`
+			Details []struct {
+				Type      string `json:"@type"`
+				ScriptStackTraceElements []map[string]any `json:"scriptStackTraceElements"`
+				ErrorMessage string `json:"errorMessage"`
+			} `json:"details"`
+		} `json:"error,omitempty"`
 	}
 	if err := json.Unmarshal(rb, &out); err != nil {
 		return nil, fmt.Errorf("script: parse run: %w", err)
+	}
+	if out.Error != nil {
+		msg := out.Error.Message
+		if len(out.Error.Details) > 0 && out.Error.Details[0].ErrorMessage != "" {
+			msg += ": " + out.Error.Details[0].ErrorMessage
+		}
+		return nil, fmt.Errorf("script: %s() %s", function, msg)
+	}
+	if out.Response == nil {
+		return nil, nil
 	}
 	return out.Response.Result, nil
 }
