@@ -23,7 +23,10 @@ func (cl *Client) updateCells(ranges []string, values [][]any) error {
 		return fmt.Errorf("sheets: updateCells range/value count mismatch")
 	}
 	// Resolve each range into (sheetId, row, col).
-	type loc struct{ sheetID int64; row, col int }
+	type loc struct {
+		sheetID  int64
+		row, col int
+	}
 	locs := make([]loc, 0, len(ranges))
 	for _, r := range ranges {
 		sheetID, row, col, err := cl.resolveA1(r)

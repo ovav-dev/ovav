@@ -166,8 +166,8 @@ func AuthorizedClient(c *Creds) *http.Client {
 }
 
 type tokenTransport struct {
-	base   http.RoundTripper
-	creds  *Creds
+	base    http.RoundTripper
+	creds   *Creds
 	retried bool
 }
 

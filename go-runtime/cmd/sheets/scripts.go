@@ -153,9 +153,9 @@ func (sc *ScriptClient) PullToDir(scriptID, outDir string) (*ScriptManifest, err
 		return nil, fmt.Errorf("script: mkdir %s: %w", outDir, err)
 	}
 	mf := &ScriptManifest{
-		ScriptID:  scriptID,
-		PulledAt:  time.Now().UTC(),
-		Files:     make([]ScriptFileMeta, 0, len(content.Files)),
+		ScriptID: scriptID,
+		PulledAt: time.Now().UTC(),
+		Files:    make([]ScriptFileMeta, 0, len(content.Files)),
 	}
 	for _, f := range content.Files {
 		ext := ".gs"
@@ -195,9 +195,9 @@ type ScriptFileMeta struct {
 
 // ScriptManifest is the result of a Pull (written to MANIFEST.json).
 type ScriptManifest struct {
-	ScriptID  string           `json:"script_id"`
-	PulledAt  time.Time        `json:"pulled_at"`
-	Files     []ScriptFileMeta `json:"files"`
+	ScriptID string           `json:"script_id"`
+	PulledAt time.Time        `json:"pulled_at"`
+	Files    []ScriptFileMeta `json:"files"`
 }
 
 // PushFromDir uploads every file under inDir to the script project.
@@ -315,9 +315,9 @@ func (sc *ScriptClient) RunFunction(scriptID, function string, params map[string
 		return nil, err
 	}
 	body, _ := json.Marshal(map[string]any{
-		"function": function,
+		"function":   function,
 		"parameters": params,
-		"devMode":   true,
+		"devMode":    true,
 	})
 	u := fmt.Sprintf("%s/scripts/%s:run", appsScriptAPIBase, scriptID)
 	req, _ := http.NewRequest(http.MethodPost, u, bytes.NewReader(body))
@@ -342,9 +342,9 @@ func (sc *ScriptClient) RunFunction(scriptID, function string, params map[string
 			Code    int    `json:"code"`
 			Message string `json:"message"`
 			Details []struct {
-				Type      string `json:"@type"`
+				Type                     string           `json:"@type"`
 				ScriptStackTraceElements []map[string]any `json:"scriptStackTraceElements"`
-				ErrorMessage string `json:"errorMessage"`
+				ErrorMessage             string           `json:"errorMessage"`
 			} `json:"details"`
 		} `json:"error,omitempty"`
 	}

@@ -21,12 +21,12 @@ import (
 // of real-world rules: CONDITION_FORMATTING_HIGHLIGHT and
 // BOOLEAN_RULE.
 type ConditionalFormatRule struct {
-	Range    string // A1 notation, e.g. "CIMA!A5:B5"
-	When     string // "TEXT_EQ" | "TEXT_CONTAINS" | "CUSTOM_FORMULA" | "NUMBER_LESS" | ...
-	Value    string // comparison value (or formula if When == CUSTOM_FORMULA)
-	BGColor  string // hex without #, e.g. "FFEB9C" (yellow)
-	FGColor  string // hex without #
-	Bold     bool
+	Range   string // A1 notation, e.g. "CIMA!A5:B5"
+	When    string // "TEXT_EQ" | "TEXT_CONTAINS" | "CUSTOM_FORMULA" | "NUMBER_LESS" | ...
+	Value   string // comparison value (or formula if When == CUSTOM_FORMULA)
+	BGColor string // hex without #, e.g. "FFEB9C" (yellow)
+	FGColor string // hex without #
+	Bold    bool
 }
 
 func (cl *Client) AddConditionalRule(r ConditionalFormatRule) error {
@@ -77,32 +77,32 @@ func buildConditionalRule(r ConditionalFormatRule, gridRange map[string]any) map
 	switch r.When {
 	case "TEXT_EQ":
 		booleanRule = map[string]any{
-			"type": "TEXT_EQ",
+			"type":   "TEXT_EQ",
 			"values": []map[string]any{{"userEnteredValue": r.Value}},
 		}
 	case "TEXT_CONTAINS":
 		booleanRule = map[string]any{
-			"type": "TEXT_CONTAINS",
+			"type":   "TEXT_CONTAINS",
 			"values": []map[string]any{{"userEnteredValue": r.Value}},
 		}
 	case "NUMBER_LESS":
 		booleanRule = map[string]any{
-			"type": "NUMBER_LESS",
+			"type":   "NUMBER_LESS",
 			"values": []map[string]any{{"userEnteredValue": r.Value}},
 		}
 	case "NUMBER_GREATER":
 		booleanRule = map[string]any{
-			"type": "NUMBER_GREATER",
+			"type":   "NUMBER_GREATER",
 			"values": []map[string]any{{"userEnteredValue": r.Value}},
 		}
 	case "CUSTOM_FORMULA":
 		booleanRule = map[string]any{
-			"type": "CUSTOM_FORMULA",
+			"type":   "CUSTOM_FORMULA",
 			"values": []map[string]any{{"userEnteredValue": r.Value}},
 		}
 	default:
 		booleanRule = map[string]any{
-			"type": "TEXT_CONTAINS",
+			"type":   "TEXT_CONTAINS",
 			"values": []map[string]any{{"userEnteredValue": r.Value}},
 		}
 	}
@@ -263,10 +263,10 @@ func (cl *Client) AddChart(tabName, a1Range, chartType, title string) error {
 		"requests": []map[string]any{
 			{"addChart": map[string]any{
 				"chart": map[string]any{
-					"spec":   spec,
+					"spec": spec,
 					"position": map[string]any{
 						"overlayPosition": map[string]any{
-							"anchorCell": map[string]any{"sheetId": tab, "rowIndex": 1, "columnIndex": 8},
+							"anchorCell":   map[string]any{"sheetId": tab, "rowIndex": 1, "columnIndex": 8},
 							"widthPixels":  600,
 							"heightPixels": 360,
 						},
@@ -286,8 +286,8 @@ func buildChartSpec(chartType, title, a1Range string) map[string]any {
 			"title": title,
 			"pieChart": map[string]any{
 				"legendPosition": "RIGHT_LEGEND",
-				"domain":        chartSource(a1Range, 0)["domain"],
-				"series":        chartSource(a1Range, 1)["domain"],
+				"domain":         chartSource(a1Range, 0)["domain"],
+				"series":         chartSource(a1Range, 1)["domain"],
 			},
 		}
 	case "LINE":
@@ -340,13 +340,13 @@ func (cl *Client) InsertImage(tabName, anchorCell, imageURL string) error {
 	body, _ := json.Marshal(map[string]any{
 		"requests": []map[string]any{
 			{"insertImage": map[string]any{
-				"uri":    imageURL,
+				"uri": imageURL,
 				"overlayPosition": map[string]any{
-					"anchorCell": map[string]any{"sheetId": tab, "rowIndex": 0, "columnIndex": 0},
+					"anchorCell":    map[string]any{"sheetId": tab, "rowIndex": 0, "columnIndex": 0},
 					"offsetXPixels": 0,
 					"offsetYPixels": 0,
-					"widthPixels":    300,
-					"heightPixels":   200,
+					"widthPixels":   300,
+					"heightPixels":  200,
 				},
 			}},
 		},

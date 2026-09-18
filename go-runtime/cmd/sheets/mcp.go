@@ -288,7 +288,9 @@ func dispatchTool(repoRoot, name string, args json.RawMessage) (any, error) {
 	case "sheets_list_spreadsheets":
 		return globalAllowlist.entries, nil
 	case "sheets_list_tabs":
-		var p struct{ SpreadsheetID string `json:"spreadsheet_id"` }
+		var p struct {
+			SpreadsheetID string `json:"spreadsheet_id"`
+		}
 		_ = json.Unmarshal(args, &p)
 		return mcpListTabs(repoRoot, p.SpreadsheetID)
 	case "sheets_read":

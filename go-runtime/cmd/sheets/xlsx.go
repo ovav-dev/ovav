@@ -30,8 +30,8 @@ type XlsxCell struct {
 
 // XlsxSheet is one tab.
 type XlsxSheet struct {
-	Name  string
-	Cells []XlsxCell
+	Name           string
+	Cells          []XlsxCell
 	MaxRow, MaxCol int
 }
 
@@ -171,9 +171,9 @@ type sheetXML struct {
 	Rows []struct {
 		R     int `xml:"r,attr"`
 		Cells []struct {
-			R string `xml:"r,attr"`
-			T string `xml:"t,attr"` // type ("s","str","n","b",...)
-			V string `xml:"v"`
+			R  string `xml:"r,attr"`
+			T  string `xml:"t,attr"` // type ("s","str","n","b",...)
+			V  string `xml:"v"`
 			Is struct {
 				T string `xml:"t"`
 			} `xml:"is>t"`
@@ -383,13 +383,13 @@ func WriteXlsx(sheetName string, cells []XlsxCell, maxRow, maxCol int) ([]byte, 
 	buf := &bytes.Buffer{}
 	zw := zip.NewWriter(buf)
 	files := map[string][]byte{
-		"[Content_Types].xml":                 []byte(contentTypes),
-		"_rels/.rels":                          []byte(rootRels),
-		"xl/workbook.xml":                      []byte(workbookXML),
-		"xl/_rels/workbook.xml.rels":           []byte(wbRels),
-		"xl/styles.xml":                        []byte(stylesXML),
-		"xl/sharedStrings.xml":                 []byte(ssXML.String()),
-		"xl/worksheets/sheet1.xml":             []byte(sheetXML.String()),
+		"[Content_Types].xml":        []byte(contentTypes),
+		"_rels/.rels":                []byte(rootRels),
+		"xl/workbook.xml":            []byte(workbookXML),
+		"xl/_rels/workbook.xml.rels": []byte(wbRels),
+		"xl/styles.xml":              []byte(stylesXML),
+		"xl/sharedStrings.xml":       []byte(ssXML.String()),
+		"xl/worksheets/sheet1.xml":   []byte(sheetXML.String()),
 	}
 	for name, body := range files {
 		w, err := zw.Create(name)

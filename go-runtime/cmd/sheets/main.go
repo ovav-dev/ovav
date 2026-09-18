@@ -1,11 +1,12 @@
 // sheets CLI — entry point for `go run -C go-runtime ./cmd/sheets`.
 //
 // Subcommands:
-//   auth   — exchange OAuth2 code for refresh_token (interactive, 1-shot)
-//   demo   — create a tab named after the current user + write a 2x2 header
-//   list   — list tabs in the bound spreadsheet
-//   read   — read a range
-//   write  — write a range (USER_ENTERED by default)
+//
+//	auth   — exchange OAuth2 code for refresh_token (interactive, 1-shot)
+//	demo   — create a tab named after the current user + write a 2x2 header
+//	list   — list tabs in the bound spreadsheet
+//	read   — read a range
+//	write  — write a range (USER_ENTERED by default)
 //
 // Default spreadsheet ID is taken from OVAV_SHEETS_SPREADSHEET env var,
 // falling back to the allowlist first entry.
@@ -27,10 +28,12 @@ import (
 	"strings"
 	"time"
 )
+
 const (
 	defaultSpreadsheetID = "1MQ3wts_cEG_4Dp5U6X4gehEn6u7F61tIl7KHzSzKw0Y"
-	defaultRedirectURI    = "http://127.0.0.1:9876/callback"
+	defaultRedirectURI   = "http://127.0.0.1:9876/callback"
 )
+
 func main() {
 	if len(os.Args) < 2 {
 		usage()
@@ -163,17 +166,23 @@ func runAuth(repoRoot string, args []string) error {
 	for i := 0; i < len(args); i++ {
 		switch args[i] {
 		case "--client-id":
-			i++; clientID = args[i]
+			i++
+			clientID = args[i]
 		case "--client-secret":
-			i++; clientSecret = args[i]
+			i++
+			clientSecret = args[i]
 		case "--project-id":
-			i++; projectID = args[i]
+			i++
+			projectID = args[i]
 		case "--redirect-uri":
-			i++; redirectURI = args[i]
+			i++
+			redirectURI = args[i]
 		case "--code":
-			i++; manualCode = args[i]
+			i++
+			manualCode = args[i]
 		case "--scopes":
-			i++; scopesArg = args[i]
+			i++
+			scopesArg = args[i]
 		case "--from-stdin":
 			b, err := readJSONCreds()
 			if err != nil {
@@ -253,7 +262,7 @@ func runList(repoRoot string, args []string) error {
 	if err != nil {
 		return err
 	}
-		fmt.Printf("Spreadsheet: %s (%s)\n", id, allowlistName(id))
+	fmt.Printf("Spreadsheet: %s (%s)\n", id, allowlistName(id))
 	fmt.Printf("Tabs (%d):\n", len(sheets2))
 	for _, s := range sheets2 {
 		fmt.Printf("  • %s  [sheetId=%d  %dx%d]\n", s.Title, s.SheetID, s.Rows, s.Cols)
@@ -310,6 +319,7 @@ func runWrite(repoRoot string, args []string) error {
 		ur.UpdatedCells, ur.UpdatedRows, ur.UpdatedColumns, ur.UpdatedRange)
 	return nil
 }
+
 // runDemo is the end-to-end proof: add a tab named after the user,
 // write a header row, log every step.
 func runDemo(repoRoot string, args []string) error {
@@ -362,6 +372,7 @@ func runDemo(repoRoot string, args []string) error {
 	fmt.Println("🎉 DEMO OK — open the spreadsheet to see the new tab.")
 	return nil
 }
+
 // ── v0.2 commands ───────────────────────────────────────────────────
 func runReadTable(repoRoot string, args []string) error {
 	id := pickSpreadsheetID(args)
@@ -800,6 +811,7 @@ func runXlsxOut(repoRoot string, args []string) error {
 	fmt.Printf("✅ wrote %d cells to %s\n", len(cells), path)
 	return nil
 }
+
 // parseKVArgs turns --key value pairs (or --json '{...}') into a map.
 // `reserved` lists flags that belong to the command (not the data row)
 // and should be ignored when harvesting key/value pairs.
@@ -838,6 +850,7 @@ func parseKVArgs(args []string, reserved ...string) (map[string]string, error) {
 	}
 	return out, nil
 }
+
 // ── helpers ─────────────────────────────────────────────────────────
 func pickSpreadsheetID(args []string) string {
 	if v := flagValue(args, "--spreadsheet", ""); v != "" {
@@ -897,6 +910,7 @@ func parseMatrix(s string) ([][]string, error) {
 	}
 	return m, nil
 }
+
 // openBrowser tries to launch a browser on the host OS. Best effort.
 func openBrowser(u string) error {
 	var cmd *exec.Cmd
@@ -912,6 +926,7 @@ func openBrowser(u string) error {
 	}
 	return cmd.Start()
 }
+
 // awaitCallback starts an HTTP server on the loopback address of
 // redirectURI (e.g. 127.0.0.1:9876), waits up to timeout for Google to
 // deliver ?code=…&state=…, validates state, and returns the code.
@@ -1382,14 +1397,17 @@ func runOvavInstall(repoRoot string, args []string) error {
 	}
 	audit(repoRoot, sid, "", "ovav_install", map[string]any{"script_id": id}, 1)
 	text, _ := json.MarshalIndent(out, "", "  ")
- 	fmt.Printf("✅ CIMA instalado via wrapper:\n%s\n", string(text))
+	fmt.Printf("✅ CIMA instalado via wrapper:\n%s\n", string(text))
 	return nil
 }
 
 func runDebug() error {
 	store := NewCredStore("/home/braka/Systems/ovav/.ovav/worktrees/feat-sheets-mcp")
 	c, err := store.Load()
-	if err != nil { fmt.Println("err:", err); return err }
+	if err != nil {
+		fmt.Println("err:", err)
+		return err
+	}
 	fmt.Println("token:", c.AccessToken)
 	return nil
 }

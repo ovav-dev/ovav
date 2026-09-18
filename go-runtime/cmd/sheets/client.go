@@ -21,9 +21,9 @@ const sheetsAPIBase = "https://sheets.googleapis.com/v4/spreadsheets"
 
 // Client is a thin wrapper around Sheets API v4 with one spreadsheet bound.
 type Client struct {
-	c            *Creds
+	c             *Creds
 	spreadsheetID string
-	http         *http.Client
+	http          *http.Client
 }
 
 // NewClient binds a spreadsheet ID. spreadsheetID must be in the

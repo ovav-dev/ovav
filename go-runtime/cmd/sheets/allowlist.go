@@ -30,10 +30,10 @@ type AllowlistFile struct {
 }
 
 type allowlistCache struct {
-	mu      sync.RWMutex
-	entries map[string]AllowEntry // by ID
+	mu       sync.RWMutex
+	entries  map[string]AllowEntry // by ID
 	defaults []string              // IDs marked default
-	path    string
+	path     string
 }
 
 var globalAllowlist = &allowlistCache{entries: map[string]AllowEntry{}}
