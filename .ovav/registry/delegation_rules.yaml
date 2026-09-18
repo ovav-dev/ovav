@@ -1,4 +1,6 @@
 delegation_rules:
+  reviewed_at: "2026-09-18"
+  reviewed_by: thavren
   rules_version: BUILD21_runtime_governed_delegation
   allowed_modes:
     - lead_only

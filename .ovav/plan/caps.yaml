@@ -4,8 +4,8 @@
 # Authority: Thavren (Platform Engineering Lead)
 # =============================================================================
 #
-# VERSIÓN ACTUAL: v104.0
-# FECHA: 2026-09-02
+# VERSIÓN ACTUAL: v105.0
+# FECHA: 2026-09-18
 # CAPA: 11
 # AUTORIDAD TEMPORAL: git HEAD (resuelta en runtime; no se fija un hash aquí)
 # RAMA: resuelta desde git en runtime
@@ -15,17 +15,17 @@
 # =============================================================================
 
 canonical: true
-version: "104.0"
-plan_version: "104.0"
+version: "105.0"
+plan_version: "105.0"
 capa: 11
-updated_at: "2026-09-02T13:19:56-05:00"
+updated_at: "2026-09-18T16:00:46-05:00"
 updated_by: "thavren"
-build_date: "2026-09-02"
+build_date: "2026-09-18"
 git_head: "git HEAD is the canonical temporal authority; resolve dynamically"
 git_branch: "resolve dynamically from git"
 status: "production_ready"
 next_phase: "Q1 2027 — Phase 5 commercial launch (GA promotion, community engagement, roadmap execution). See docs/architecture/ADR-005-anti-drift-2026.md for completed 2026 plan."
-layer_status: "terminal_runtime_alignment_pending_integrity_baseline"
+layer_status: "terminal_runtime_alignment_integrity_baseline_pinned"
 
 # ── Active runtime projection (2026-09-02) ─────────────────────────────────
 active_runtime:
@@ -556,6 +556,10 @@ issues:
       issue: "GPG key 3DAC13769287AC80 inalcanzable tras formateo de laptop — bloqueaba commits firmados"
       resolution: "Nueva GPG ED25519 generada para Alexander Salvador <alexander_mya@outlook.com>. Primary fingerprint 1D70BE0236928C49921A781F5F384C5B35CDD0F8, signing subkey 7DE5923582A84DBB. Identidad CEO regenerada con `ovav login --recover-ceo` tras autenticación GraphQL contra Alexander-Salvador (ID 97975177) ADMIN en ovav-dev/ovav (ID 1328456440). Clave debe añadirse a https://github.com/settings/keys para mantener badge Verified."
 
+    - date: "2026-09-18"
+      issue: "Cierre local OWS e integridad runtime pendientes de reflejar en el plan canónico"
+      resolution: "OWS fue integrado en develop, la limpieza local quedó cerrada, se regeneró SBOM y baseline de integridad, y se añadió `ovav integrity pin --approve` con operación atómica y cobertura de tests. La publicación y limpieza remota quedan pendientes de autenticación GitHub renovada."
+
     - date: "2026-08-06"
       issue: ".owav/ y OVAV_IDENTITY.md no estaban en .gitignore"
       resolution: "Agregados a .gitignore."
@@ -590,7 +594,7 @@ current_state:
   system_status: production_ready
   layer: 11
   posture: source_local_candidate
-  runtime_integrity: baseline_pending
+  runtime_integrity: baseline_pinned
   gate_mode: verified_production_ready
   active_features:
     - OWS worktree management (incl. own/nuke command)
@@ -603,7 +607,7 @@ current_state:
     - context_firewall_v2 — scope-filtered URL validation with parent-domain matching
     - CONVERT lead intelligence merge — areas ARE the full lead brain
     - OpenCode source/runtime converter wiring with governed delegation guidance
-  last_major_update: 2026-08-13
+  last_major_update: 2026-09-18
 
 # ── Matriz canónica de subsistemas ─────────────────────────────────────────
 

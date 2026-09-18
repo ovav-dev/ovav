@@ -1,4 +1,6 @@
 tool_policy:
+  reviewed_at: "2026-09-18"
+  reviewed_by: thavren
   authority:
     canonical_source: .ovav/policy/permission_authority.json
     host_configs_are: projections

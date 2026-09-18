@@ -1,5 +1,7 @@
 lead_work_method_contract:
   version: 1
+  reviewed_at: "2026-09-18"
+  reviewed_by: thavren
   purpose: >-
     Define a shared, adaptable professional work method for all OVAV LEADs.
     The method keeps behavior consistent while allowing role-specific tone,

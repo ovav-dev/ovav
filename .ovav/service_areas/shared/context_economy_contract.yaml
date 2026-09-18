@@ -1,5 +1,7 @@
 context_economy_contract:
   version: 1
+  reviewed_at: "2026-09-18"
+  reviewed_by: thavren
   purpose: >-
     Keep OVAV context-efficient by loading only what the user's intent, risk,
     missing evidence and closure requirements justify.
