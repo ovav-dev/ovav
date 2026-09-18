@@ -27,6 +27,16 @@
   "instructions": [
     "opencode_AGENTS.md"
   ],
+  "mcp": {
+    "ovav-sheets": {
+      "command": [
+        "bash",
+        "go-runtime/cmd/sheets/launch-mcp.sh"
+      ],
+      "enabled": true,
+      "type": "local"
+    }
+  },
   "model": "openai/gpt-5.6-luna",
   "permission": {
     "*": "allow",
