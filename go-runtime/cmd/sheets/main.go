@@ -23,6 +23,7 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -61,10 +62,14 @@ func main() {
 		exitOn(runUpdate(repoRoot, args))
 	case "create-tab":
 		exitOn(runCreateTab(repoRoot, args))
+	case "delete-tab":
+		exitOn(runDeleteTab(repoRoot, args))
 	case "snapshots":
 		exitOn(runSnapshots(repoRoot, args))
 	case "rollback":
 		exitOn(runRollback(args))
+	case "scripts":
+		exitOn(runScriptsCmd(repoRoot, args))
 	case "xlsx-in":
 		exitOn(runXlsxIn(repoRoot, args))
 	case "xlsx-out":
@@ -132,6 +137,7 @@ func allowlistName(id string) string {
 func runAuth(repoRoot string, args []string) error {
 	var clientID, clientSecret, projectID, redirectURI string
 	var manualCode string
+	var scopesArg string
 	for i := 0; i < len(args); i++ {
 		switch args[i] {
 		case "--client-id":
@@ -144,6 +150,8 @@ func runAuth(repoRoot string, args []string) error {
 			i++; redirectURI = args[i]
 		case "--code":
 			i++; manualCode = args[i]
+		case "--scopes":
+			i++; scopesArg = args[i]
 		case "--from-stdin":
 			b, err := readJSONCreds()
 			if err != nil {
@@ -151,6 +159,9 @@ func runAuth(repoRoot string, args []string) error {
 			}
 			clientID, clientSecret, projectID = b.ID, b.Secret, b.Project
 		}
+	}
+	if scopesArg == "" {
+		scopesArg = "sheets"
 	}
 	if clientID == "" || clientSecret == "" {
 		return fmt.Errorf("auth: --client-id and --client-secret required (or --from-stdin)")
@@ -161,7 +172,7 @@ func runAuth(repoRoot string, args []string) error {
 	stateBytes := make([]byte, 16)
 	_, _ = rand.Read(stateBytes)
 	state := hex.EncodeToString(stateBytes)
-	authURL := AuthCodeURL(clientID, redirectURI, state)
+	authURL := AuthCodeURL(clientID, redirectURI, state, resolveScopes(scopesArg))
 	fmt.Println("=========================================================")
 	fmt.Println(" OVAV Sheets — OAuth2 consent (1-shot)")
 	fmt.Println("=========================================================")
@@ -195,6 +206,7 @@ func runAuth(repoRoot string, args []string) error {
 	tok.ClientSecret = clientSecret
 	tok.ProjectID = projectID
 	tok.RedirectURI = redirectURI
+	tok.Scopes = strings.Fields(resolveScopes(scopesArg))
 	store := NewCredStore(repoRoot)
 	if err := store.Save(tok); err != nil {
 		return err
@@ -451,6 +463,40 @@ func runCreateTab(repoRoot string, args []string) error {
 	fmt.Printf("✅ created tab %q [sheetId=%d]\n", title, shID)
 	return nil
 }
+
+func runDeleteTab(repoRoot string, args []string) error {
+	id := pickSpreadsheetID(args)
+	sheetID := flagValue(args, "--sheet-id", "")
+	if sheetID == "" {
+		return fmt.Errorf("delete-tab: --sheet-id required (run `list` to find IDs)")
+	}
+	if err := assertAllowed(id); err != nil {
+		return err
+	}
+	store := NewCredStore(repoRoot)
+	creds, err := store.Load()
+	if err != nil {
+		return err
+	}
+	cl := NewClient(creds, id)
+	sid, err := strconv.ParseInt(sheetID, 10, 64)
+	if err != nil {
+		return fmt.Errorf("delete-tab: --sheet-id must be numeric, got %q", sheetID)
+	}
+	// Snapshot the entire workbook first as a safety net.
+	if pre, err := cl.ReadRange("A1:Z10000"); err == nil {
+		if b, err := json.Marshal(pre); err == nil {
+			_, _ = cl.Capture(repoRoot, "delete-tab-pre", fmt.Sprintf("before deleting sheetId=%d", sid), "global", b)
+		}
+	}
+	if err := cl.DeleteSheet(sid); err != nil {
+		return err
+	}
+	audit(repoRoot, id, "*", "delete_tab", map[string]any{"sheet_id": sid}, 1)
+	fmt.Printf("✅ deleted sheetId=%d\n", sid)
+	return nil
+}
+
 func runSnapshots(repoRoot string, args []string) error {
 	id := flagValue(args, "--spreadsheet", "")
 	tab := flagValue(args, "--tab", "")
@@ -465,6 +511,178 @@ func runSnapshots(repoRoot string, args []string) error {
 	}
 	return nil
 }
+func runScriptsCmd(repoRoot string, args []string) error {
+	if len(args) == 0 {
+		return runScriptsHelp()
+	}
+	store := NewCredStore(repoRoot)
+	creds, err := store.Load()
+	if err != nil {
+		return err
+	}
+	sc := NewScriptClient(creds)
+	switch args[0] {
+	case "list":
+		return runScriptsList(sc)
+	case "find":
+		container := flagValue(args[1:], "--container", "")
+		if container == "" {
+			return fmt.Errorf("scripts find: --container required")
+		}
+		return runScriptsFind(sc, container)
+	case "pull":
+		id := flagValue(args[1:], "--id", "")
+		outDir := flagValue(args[1:], "--out", "")
+		if id == "" || outDir == "" {
+			return fmt.Errorf("scripts pull: --id and --out required")
+		}
+		return runScriptsPull(sc, id, outDir, repoRoot)
+	case "push":
+		id := flagValue(args[1:], "--id", "")
+		inDir := flagValue(args[1:], "--from", "")
+		confirm := false
+		for _, a := range args[1:] {
+			if a == "--confirm" {
+				confirm = true
+			}
+		}
+		if id == "" || inDir == "" {
+			return fmt.Errorf("scripts push: --id and --from required")
+		}
+		return runScriptsPush(sc, id, inDir, confirm, repoRoot)
+	case "run":
+		id := flagValue(args[1:], "--id", "")
+		fn := flagValue(args[1:], "--function", "")
+		if id == "" || fn == "" {
+			return fmt.Errorf("scripts run: --id and --function required")
+		}
+		return runScriptsRun(sc, id, fn, repoRoot)
+	case "versions":
+		id := flagValue(args[1:], "--id", "")
+		if id == "" {
+			return fmt.Errorf("scripts versions: --id required")
+		}
+		return runScriptsVersions(sc, id)
+	case "snapshot":
+		id := flagValue(args[1:], "--id", "")
+		desc := flagValue(args[1:], "--description", "")
+		if id == "" || desc == "" {
+			return fmt.Errorf("scripts snapshot: --id and --description required")
+		}
+		return runScriptsSnapshot(sc, id, desc, repoRoot)
+	}
+	return fmt.Errorf("scripts: unknown subcommand %q", args[0])
+}
+
+func runScriptsHelp() error {
+	fmt.Fprintln(os.Stderr, `scripts subcommands:
+  list                              List every Apps Script project you own
+  find    --container <id>          Find the script bound to a container (sheet/folder ID)
+  pull    --id <sid> --out <dir>    Download every file to <dir>
+  push    --id <sid> --from <dir> [--confirm]   Upload (prints plan; --confirm applies)
+  run     --id <sid> --function <fn>             Run a server-side function
+  versions --id <sid>                            List immutable versions
+  snapshot --id <sid> --description <text>      Create a new version`)
+	return nil
+}
+
+func runScriptsList(sc *ScriptClient) error {
+	projects, err := sc.ListProjects()
+	if err != nil {
+		return err
+	}
+	fmt.Printf("Apps Script projects (%d):\n", len(projects))
+	for _, p := range projects {
+		fmt.Printf("  • %s [%s]  parent=%s  updated=%s\n",
+			p.Title, p.ScriptID, p.ParentID, p.UpdateTime)
+	}
+	return nil
+}
+
+func runScriptsFind(sc *ScriptClient, container string) error {
+	p, err := sc.FindByContainer(container)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("Bound script:\n")
+	fmt.Printf("  title    : %s\n", p.Title)
+	fmt.Printf("  scriptId : %s\n", p.ScriptID)
+	fmt.Printf("  parentId : %s\n", p.ParentID)
+	fmt.Printf("  creator  : %s <%s>\n", p.Creator.Name, p.Creator.Email)
+	fmt.Printf("  updated  : %s\n", p.UpdateTime)
+	return nil
+}
+
+func runScriptsPull(sc *ScriptClient, id, outDir, repoRoot string) error {
+	mf, err := sc.PullToDir(id, outDir)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("✅ pulled %d files to %s\n", len(mf.Files), outDir)
+	for _, f := range mf.Files {
+		fmt.Printf("  • %s  (%s, %d bytes, sha256=%s…)\n",
+			f.Path, f.Type, f.SizeBytes, f.SHA256[:12])
+	}
+	audit(repoRoot, "", id, "scripts_pull", map[string]any{
+		"out_dir": outDir, "files": len(mf.Files),
+	}, len(mf.Files))
+	return nil
+}
+
+func runScriptsPush(sc *ScriptClient, id, inDir string, confirm bool, repoRoot string) error {
+	if pre, err := sc.GetContent(id); err == nil {
+		preBytes, _ := json.Marshal(pre)
+		_, _ = sc.CaptureForScript(repoRoot, id, "scripts-push-pre", preBytes)
+	}
+	mf, err := sc.PushFromDir(id, inDir, confirm)
+	if err != nil {
+		return err
+	}
+	if !confirm {
+		return nil
+	}
+	audit(repoRoot, "", id, "scripts_push", map[string]any{
+		"in_dir": inDir, "files": len(mf.Files),
+	}, len(mf.Files))
+	fmt.Printf("✅ applied changes; manifest updated\n")
+	return nil
+}
+
+func runScriptsRun(sc *ScriptClient, id, fn, repoRoot string) error {
+	result, err := sc.RunFunction(id, fn, nil)
+	if err != nil {
+		return err
+	}
+	out, _ := json.MarshalIndent(result, "", "  ")
+	audit(repoRoot, "", id, "scripts_run", map[string]any{"function": fn}, 1)
+	fmt.Printf("✅ function %s() returned:\n%s\n", fn, string(out))
+	return nil
+}
+
+func runScriptsVersions(sc *ScriptClient, id string) error {
+	vs, err := sc.ListVersions(id)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("Versions of %s (%d):\n", id, len(vs))
+	for _, v := range vs {
+		fmt.Printf("  v%d  %s  — %s\n", v.VersionNumber, v.CreateTime, v.Description)
+	}
+	return nil
+}
+
+func runScriptsSnapshot(sc *ScriptClient, id, desc, repoRoot string) error {
+	n, err := sc.CreateVersion(id, desc)
+	if err != nil {
+		return err
+	}
+	audit(repoRoot, "", id, "scripts_snapshot", map[string]any{
+		"description": desc, "version": n,
+	}, 1)
+	fmt.Printf("✅ version v%d created\n", n)
+	return nil
+}
+
 func runRollback(args []string) error {
 	repoRoot, err := findRepoRoot()
 	if err != nil {
@@ -773,3 +991,4 @@ func ternary(cond bool, a, b string) string {
 	}
 	return b
 }
+

@@ -70,7 +70,7 @@ mcp:
   # Allowlist is in .ovav/vault/sheets_allowlist.yaml — additions require CEO approval.
   ovav-sheets:
     type: local
-    command: ["./bin/ovav-sheets-mcp"]
+    command: ["bash", "go-runtime/cmd/sheets/launch-mcp.sh"]
     enabled: true
 plugins:
 - .opencode/plugins/ovav-monitor.js

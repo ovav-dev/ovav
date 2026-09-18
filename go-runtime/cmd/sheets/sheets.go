@@ -23,17 +23,53 @@ import (
 const (
 	googleAuthURL  = "https://accounts.google.com/o/oauth2/auth"
 	googleTokenURL = "https://oauth2.googleapis.com/token"
-	scopeSheets    = "https://www.googleapis.com/auth/spreadsheets"
 )
+
+// Scope aliases — short names that map to OAuth2 URLs.
+// Use --scopes <alias>,<alias> to request multiple on auth.
+var scopeAliases = map[string]string{
+	"sheets":       "https://www.googleapis.com/auth/spreadsheets",
+	"spreadsheets": "https://www.googleapis.com/auth/spreadsheets",
+	"script":       "https://www.googleapis.com/auth/script.projects",
+	"script-ro":    "https://www.googleapis.com/auth/script.projects.readonly",
+	"drive":        "https://www.googleapis.com/auth/drive",
+	"drive-file":   "https://www.googleapis.com/auth/drive.file",
+	"drive-ro":     "https://www.googleapis.com/auth/drive.readonly",
+}
+
+// resolveScopes turns comma-separated aliases into a space-joined
+// OAuth scope string. Unknown aliases pass through verbatim (Google
+// URLs) so power users can still request custom scopes.
+func resolveScopes(spec string) string {
+	parts := strings.Split(spec, ",")
+	out := make([]string, 0, len(parts))
+	for _, p := range parts {
+		p = strings.TrimSpace(p)
+		if p == "" {
+			continue
+		}
+		if v, ok := scopeAliases[p]; ok {
+			out = append(out, v)
+		} else {
+			out = append(out, p)
+		}
+	}
+	if len(out) == 0 {
+		return scopeAliases["sheets"]
+	}
+	return strings.Join(out, " ")
+}
 
 // AuthCodeURL builds the URL the user must open in a browser to grant
 // the offline refresh_token scope. State is a CSRF nonce echoed back.
-func AuthCodeURL(clientID, redirectURI, state string) string {
+// `scopes` is a space-joined OAuth scope list — pass multiple to
+// request them all in one consent screen.
+func AuthCodeURL(clientID, redirectURI, state, scopes string) string {
 	v := url.Values{}
 	v.Set("client_id", clientID)
 	v.Set("redirect_uri", redirectURI)
 	v.Set("response_type", "code")
-	v.Set("scope", scopeSheets)
+	v.Set("scope", scopes)
 	v.Set("access_type", "offline")
 	v.Set("prompt", "consent")
 	v.Set("include_granted_scopes", "true")

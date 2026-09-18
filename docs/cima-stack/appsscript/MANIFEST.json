@@ -1,0 +1,18 @@
+{
+  "script_id": "1fuA7kJHkWY6_4rM-IQHO9by6OLqVGZMDsSzra6n3D_6XRvMOWda4HQpg",
+  "pulled_at": "2026-09-18T16:13:43Z",
+  "files": [
+    {
+      "name": "appsscript",
+      "type": "JSON",
+      "size_bytes": 206,
+      "sha256": "5fb836b65a4aee0c01260e46f24633344ba808c6122a95f38e18a9607ad45fd3"
+    },
+    {
+      "name": "C\u00f3digo",
+      "type": "SERVER_JS",
+      "size_bytes": 25101,
+      "sha256": "57f5b2c0e6b8db6389e9e46a1b80281ff136bac0fa960857fdc31e321f25cd62"
+    }
+  ]
+}

@@ -1,8 +1,10 @@
 # OVAV Sheets Bridge
 
-Power-tool bridge between OVAV and Google Sheets / Excel — stdlib-only Go, AES-256-GCM credentials, MCP-ready, snapshot-safe.
+Power-tool bridge between OVAV and Google Sheets / Excel — stdlib-only Go, AES-256-GCM credentials, MCP-ready, snapshot-safe. With full **Apps Script** control as of v0.3.0.
 
 ## What it does
+
+### Sheets
 
 - **Reads** any tab in any approved spreadsheet, with auto header detection.
 - **Writes** new tabs, values, rows by header-keyed maps, and conditional updates (`UPDATE WHERE col=val SET col=val`).
@@ -11,16 +13,34 @@ Power-tool bridge between OVAV and Google Sheets / Excel — stdlib-only Go, AES
 - **Audit log** JSONL with hash chain at `.ovav/registry/audit/sheets/YYYY-MM-DD.jsonl`.
 - **MCP server** (`go run ./cmd/sheets mcp`) speaks JSON-RPC 2.0 on stdio so OpenCode / Claude / Cursor can invoke every operation as a native tool.
 
-## Setup (one-time)
+### Apps Script (new in v0.3.0)
+
+- **List** all Apps Script projects visible to your OAuth identity.
+- **Find** a script bound to a spreadsheet.
+- **Pull** every `.gs`/`.html` file to a local directory with `MANIFEST.json` (sha256 + timestamp).
+- **Push** local edits back — prints a full diff first, only applies with `--confirm`.
+- **Run** a server-side function via the Apps Script API.
+- **Versions** list and create immutable versions (with descriptions).
+- Every mutation goes through snapshot + audit + hash chain.
+
+## Setup
+
+### 1. Auth (multi-scope)
+
+The first auth uses minimal scopes; for Apps Script you need to re-auth with broader scopes:
 
 ```bash
 cd go-runtime
-go run ./cmd/sheets auth --client-id <ID> --client-secret <SECRET> --project-id <PID>
+go run ./cmd/sheets auth \
+  --client-id <ID> --client-secret <SECRET> --project-id <PID> \
+  --scopes 'sheets,script,drive-ro'
 ```
 
-This opens your browser, captures the OAuth2 consent, encrypts the refresh token in `.ovav/vault/credentials/google_oauth.enc`, and registers an AES-256-GCM key at `.ovav/vault/vault.key` (0600).
+This opens your browser, captures the OAuth2 consent (3 scopes), encrypts the refresh token in `.ovav/vault/credentials/google_oauth.enc`, and registers an AES-256-GCM key at `.ovav/vault/vault.key` (0600).
 
-## Allowlist
+**Available scope aliases:** `sheets`, `script`, `script-ro`, `drive`, `drive-file`, `drive-ro`. Pass `--scopes 'a,b,c'`.
+
+### 2. Allowlist spreadsheets
 
 `.ovav/vault/sheets_allowlist.yaml` lists every spreadsheet the bridge is allowed to touch. The bridge REFUSES anything not listed:
 
@@ -31,6 +51,8 @@ go run ./cmd/sheets allowlist remove --id <SPREADSHEET_ID>
 ```
 
 ## CLI quick reference
+
+### Sheets
 
 | Command | Purpose |
 |---|---|
@@ -43,13 +65,28 @@ go run ./cmd/sheets allowlist remove --id <SPREADSHEET_ID>
 | `append --tab MyTab --sku A1 --qty 5` | Append a row by header → value |
 | `update --tab MyTab --where-col sku --where-val A1 --set-col qty --set-val 99` | Update by condition |
 | `create-tab --title NewTab` | Add a new tab |
+| `delete-tab --sheet-id <id>` | Remove a tab (requires numeric sheetId, snapshots first) |
 | `snapshots [--tab MyTab]` | List captured snapshots |
 | `rollback --id <snapshot-id>` | Restore a snapshot |
 | `xlsx-in --tab MyTab --path ./file.xlsx` | Import Excel file |
 | `xlsx-out --tab MyTab --path ./file.xlsx` | Export tab to Excel |
 | `mcp` | Run MCP stdio server |
 
+### Apps Script
+
+| Command | Purpose |
+|---|---|
+| `scripts list` | List every Apps Script project you own |
+| `scripts find --container <id>` | Find the script bound to a sheet/folder |
+| `scripts pull --id <sid> --out <dir>` | Download every file to `<dir>` |
+| `scripts push --id <sid> --from <dir> [--confirm]` | Upload (prints plan; `--confirm` applies) |
+| `scripts run --id <sid> --function <fn>` | Run a server-side function |
+| `scripts versions --id <sid>` | List immutable versions |
+| `scripts snapshot --id <sid> --description <text>` | Create a new version |
+
 ## MCP tools (auto-published via `tools/list`)
+
+### Sheets (11)
 
 | Tool | Args |
 |---|---|
@@ -73,7 +110,7 @@ Already wired in `.ovav/source/opencode/config.yaml`:
 mcp:
   ovav-sheets:
     type: local
-    command: ["./bin/ovav-sheets-mcp"]
+    command: ["bash", "go-runtime/cmd/sheets/launch-mcp.sh"]
     enabled: true
 ```
 
@@ -95,14 +132,14 @@ Launch the Cockpit or any agent — `ovav-sheets` will appear as native tool fam
 go test ./cmd/sheets -count=1 -v
 ```
 
-Covers: column letter math, allowlist round-trip, xlsx round-trip, snapshot encrypt/decrypt, audit append, sanitization.
+Covers: column letter math, allowlist round-trip, xlsx round-trip, snapshot encrypt/decrypt, audit append, sanitization, indexOf.
 
 ## Files
 
 | File | Purpose |
 |---|---|
-| `main.go` | CLI entry (auth, list, read, write, append, update, mcp, …) |
-| `sheets.go` | OAuth2 + token transport |
+| `main.go` | CLI entry (auth, list, read, write, append, update, mcp, scripts, …) |
+| `sheets.go` | OAuth2 (multi-scope) + token transport |
 | `sheets_crypto.go` | Vault-aware credential storage |
 | `client.go` | Sheets API v4 client |
 | `tables.go` | Header-aware table ops (append, update where, find) |
@@ -112,4 +149,5 @@ Covers: column letter math, allowlist round-trip, xlsx round-trip, snapshot encr
 | `allowlist.go` | YAML-backed spreadsheet allowlist |
 | `audit.go` | Append-only audit log with hash chain |
 | `mcp.go` | JSON-RPC 2.0 MCP server |
+| `scripts.go` | Apps Script API v1 client (list, get, push, run, versions) |
 | `util.go` | JSON / stdin helpers |

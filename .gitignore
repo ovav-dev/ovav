@@ -431,3 +431,4 @@ bin/
 # Redirect-file artifact (e.g. accidental `> =1` in bash)
 /=1
 .ovav/registry/audit/
+.ovav/vault/scripts/

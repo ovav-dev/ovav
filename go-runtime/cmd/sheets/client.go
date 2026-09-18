@@ -178,9 +178,6 @@ type AddSheetRequest struct {
 // AddSheet appends a new tab with the given title. Returns the new sheetId.
 // Color via RGB {red,green,blue} with values in 0.0-1.0; pass nil for default.
 func (cl *Client) AddSheet(title string, rgb map[string]float64) (int64, error) {
-	if err := EnsureFresh(cl.c); err != nil {
-		return 0, err
-	}
 	props := map[string]any{"title": title}
 	if rgb != nil {
 		props["tabColor"] = map[string]any{
@@ -239,4 +236,35 @@ func (cl *Client) AddSheet(title string, rgb map[string]float64) (int64, error) 
 		return 0, fmt.Errorf("sheets: parse addSheet.properties: %w", err)
 	}
 	return addSheet.Properties.SheetID, nil
+}
+
+// DeleteSheet removes a tab by sheetId. The operation is irreversible
+// from the API side; callers should snapshot first if there's any
+// doubt. We require the caller to pass the sheetId explicitly so a
+// typo can never wipe the wrong tab.
+func (cl *Client) DeleteSheet(sheetID int64) error {
+	if err := EnsureFresh(cl.c); err != nil {
+		return err
+	}
+	body, err := json.Marshal(map[string]any{
+		"requests": []map[string]any{
+			{"deleteSheet": map[string]any{"sheetId": sheetID}},
+		},
+	})
+	if err != nil {
+		return fmt.Errorf("sheets: marshal deleteSheet: %w", err)
+	}
+	u := fmt.Sprintf("%s/%s:batchUpdate", sheetsAPIBase, cl.spreadsheetID)
+	req, _ := http.NewRequest(http.MethodPost, u, bytes.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := cl.http.Do(req)
+	if err != nil {
+		return fmt.Errorf("sheets: deleteSheet: %w", err)
+	}
+	defer resp.Body.Close()
+	rb, _ := io.ReadAll(resp.Body)
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("sheets: deleteSheet HTTP %d: %s", resp.StatusCode, truncate(string(rb), 240))
+	}
+	return nil
 }

@@ -24,14 +24,15 @@ const (
 // Creds is the on-disk credential bundle. All fields except ProjectID are
 // secrets; the vault key encrypts the whole struct before write.
 type Creds struct {
-	ClientID     string `json:"client_id"`
-	ClientSecret string `json:"client_secret"`
-	ProjectID    string `json:"project_id"`
-	RefreshToken string `json:"refresh_token,omitempty"`
-	AccessToken  string `json:"access_token,omitempty"`
-	TokenExpiry  int64  `json:"token_expiry_unix,omitempty"`
-	Scope        string `json:"scope"`
-	RedirectURI  string `json:"redirect_uri"`
+	ClientID     string   `json:"client_id"`
+	ClientSecret string   `json:"client_secret"`
+	ProjectID    string   `json:"project_id"`
+	RefreshToken string   `json:"refresh_token,omitempty"`
+	AccessToken  string   `json:"access_token,omitempty"`
+	TokenExpiry  int64    `json:"token_expiry_unix,omitempty"`
+	Scope        string   `json:"scope"`
+	Scopes       []string `json:"scopes,omitempty"`
+	RedirectURI  string   `json:"redirect_uri"`
 }
 
 type credStore struct {
