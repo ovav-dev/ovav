@@ -18,6 +18,11 @@ type integrityOptions struct {
 	help  bool
 }
 
+type integrityPinOptions struct {
+	approve bool
+	help    bool
+}
+
 // integrityGateOptions captures CLI flags for the `integrity gate refresh`
 // subcommand. We intentionally keep the option set minimal — auth is gated
 // on session_marker OR --ceowaiver, both checked at dispatch time.
@@ -34,6 +39,8 @@ func cmdIntegrity(args []string) int {
 	switch args[0] {
 	case "baseline":
 		return cmdIntegrityBaseline(args[1:])
+	case "pin":
+		return cmdIntegrityPin(args[1:])
 	case "gate":
 		return cmdIntegrityGate(args[1:])
 	case "help", "--help", "-h":
@@ -44,6 +51,48 @@ func cmdIntegrity(args []string) int {
 		printIntegrityHelp()
 		return 2
 	}
+}
+
+func cmdIntegrityPin(args []string) int {
+	options, err := parseIntegrityPinArgs(args)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "OVAV integrity pin: %v\n", err)
+		return 2
+	}
+	if options.help {
+		printIntegrityHelp()
+		return 0
+	}
+	if !options.approve {
+		fmt.Fprintln(os.Stderr, "OVAV integrity pin: refused — pass --approve for explicit CEO approval")
+		return 1
+	}
+	root, err := cli.FindRepoRoot()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "OVAV integrity pin: %v\n", err)
+		return 1
+	}
+	if err := validators.PinIntegrityBaseline(root); err != nil {
+		fmt.Fprintf(os.Stderr, "OVAV integrity pin: %v\n", err)
+		return 1
+	}
+	fmt.Println("Pinned .ovav/integrity_backups/baseline.pinned.json (CEO approval)")
+	return 0
+}
+
+func parseIntegrityPinArgs(args []string) (integrityPinOptions, error) {
+	options := integrityPinOptions{}
+	for _, arg := range args {
+		switch arg {
+		case "--approve":
+			options.approve = true
+		case "--help", "-h":
+			options.help = true
+		default:
+			return integrityPinOptions{}, fmt.Errorf("unknown option %s", arg)
+		}
+	}
+	return options, nil
 }
 
 // ── baseline ────────────────────────────────────────────────────────────────
@@ -241,6 +290,7 @@ func appendGateRefreshAudit(root, authReason, prev, next string) error {
 func printIntegrityHelp() {
 	data, _ := json.Marshal(map[string]string{
 		"baseline":     "ovav integrity baseline [--plan|--write]",
+		"pin":          "ovav integrity pin --approve (CEO approval required)",
 		"gate_refresh": "ovav integrity gate refresh [--ceowaiver]",
 		"gate_help":    "ovav integrity gate refresh needs .ovav/runtime/.session_marker OR --ceowaiver",
 	})

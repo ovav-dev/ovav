@@ -197,6 +197,51 @@ func WriteIntegrityBaseline(root string) (IntegrityBaseline, error) {
 	return baseline, nil
 }
 
+// PinIntegrityBaseline records the current runtime baseline as the
+// CEO-approved reference used by PinnedBaselineDrift. Authorization belongs
+// to the CLI command; this function only performs the atomic file operation.
+func PinIntegrityBaseline(root string) error {
+	baseline, err := loadIntegrityBaseline(root)
+	if err != nil {
+		return fmt.Errorf("load current integrity baseline: %w", err)
+	}
+	data, err := json.MarshalIndent(baseline, "", "  ")
+	if err != nil {
+		return fmt.Errorf("encode pinned integrity baseline: %w", err)
+	}
+	data = append(data, '\n')
+
+	dir := filepath.Join(root, ".ovav", "integrity_backups")
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		return fmt.Errorf("create integrity baseline directory: %w", err)
+	}
+	tmp, err := os.CreateTemp(dir, "baseline.pinned.json.tmp-")
+	if err != nil {
+		return fmt.Errorf("create pinned baseline temporary file: %w", err)
+	}
+	tmpPath := tmp.Name()
+	defer os.Remove(tmpPath)
+	if err := tmp.Chmod(0o644); err != nil {
+		_ = tmp.Close()
+		return fmt.Errorf("set pinned baseline permissions: %w", err)
+	}
+	if _, err := tmp.Write(data); err != nil {
+		_ = tmp.Close()
+		return fmt.Errorf("write pinned baseline: %w", err)
+	}
+	if err := tmp.Sync(); err != nil {
+		_ = tmp.Close()
+		return fmt.Errorf("sync pinned baseline: %w", err)
+	}
+	if err := tmp.Close(); err != nil {
+		return fmt.Errorf("close pinned baseline: %w", err)
+	}
+	if err := os.Rename(tmpPath, filepath.Join(dir, "baseline.pinned.json")); err != nil {
+		return fmt.Errorf("install pinned baseline: %w", err)
+	}
+	return nil
+}
+
 func requireSafeBaselineCandidate(root string) error {
 	unstaged := exec.Command("git", "diff", "--quiet", "--")
 	unstaged.Dir = root
