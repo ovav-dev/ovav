@@ -84,21 +84,34 @@ func ProfileForName(name string) Profile {
 	profile := Profile{Name: name, Prefix: prefix}
 
 	switch name {
-	case "hotfix", "emergency":
+	case "emergency":
 		profile.Base = "main"
 		profile.MergeTo = "main+develop"
+		profile.Compliance = "maximum"
+	case "hotfix":
+		profile.Base = "main"
+		profile.MergeTo = "main+develop"
+		profile.Compliance = "strict"
 	case "release":
 		profile.Base = "develop"
 		profile.MergeTo = "main"
+		profile.Compliance = "strict"
 	case "patch":
 		profile.Base = "main"
 		profile.MergeTo = "main+develop"
+		profile.Compliance = "strict"
 	case "spike", "research":
 		profile.Base = "develop"
 		profile.MergeTo = "none"
+		profile.Compliance = "quick"
+	case "enterprise":
+		profile.Base = "develop"
+		profile.MergeTo = "develop"
+		profile.Compliance = "strict"
 	default:
 		profile.Base = "develop"
 		profile.MergeTo = "develop"
+		profile.Compliance = "standard"
 	}
 	return profile
 }

@@ -772,15 +772,19 @@ func TestDetectProfileFromBranch(t *testing.T) {
 		branch     string
 		wantName   string
 		wantPrefix string
+		wantLevel  string
 	}{
-		{"feature/login-ui", "feature", "feature/"},
-		{"hotfix/critical-bug", "hotfix", "hotfix/"},
-		{"hotfix/panic-fix", "hotfix", "hotfix/"},
-		{"emergency/critical-0day", "emergency", "emergency/"},
-		{"release/v3.0", "release", "release/"},
-		{"patch/oauth-fix", "patch", "patch/"},
-		{"fix/header-style", "fix", "fix/"},
-		{"unknown-branch", "feature", "feature/"}, // default
+		{"feature/login-ui", "feature", "feature/", "standard"},
+		{"hotfix/critical-bug", "hotfix", "hotfix/", "strict"},
+		{"hotfix/panic-fix", "hotfix", "hotfix/", "strict"},
+		{"emergency/critical-0day", "emergency", "emergency/", "maximum"},
+		{"release/v3.0", "release", "release/", "strict"},
+		{"patch/oauth-fix", "patch", "patch/", "strict"},
+		{"fix/header-style", "fix", "fix/", "standard"},
+		{"spike/prototype", "spike", "spike/", "quick"},
+		{"research/benchmark", "research", "research/", "quick"},
+		{"enterprise/rollout", "enterprise", "enterprise/", "strict"},
+		{"unknown-branch", "feature", "feature/", "standard"}, // default
 	}
 
 	for _, tt := range tests {
@@ -791,6 +795,9 @@ func TestDetectProfileFromBranch(t *testing.T) {
 			}
 			if p.Prefix != tt.wantPrefix {
 				t.Errorf("Prefix: got %q, want %q", p.Prefix, tt.wantPrefix)
+			}
+			if p.Compliance != tt.wantLevel {
+				t.Errorf("Compliance: got %q, want %q", p.Compliance, tt.wantLevel)
 			}
 		})
 	}
