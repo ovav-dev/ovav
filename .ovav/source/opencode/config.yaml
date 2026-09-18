@@ -65,6 +65,13 @@ mcp:
   # Atuin shell/history remains installed; its WSL MCP process is disabled.
   atuin:
     enabled: false
+  # OVAV Sheets bridge — local stdio MCP server backed by go-runtime/cmd/sheets.
+  # Credentials live in .ovav/vault/credentials/google_oauth.enc (AES-256-GCM).
+  # Allowlist is in .ovav/vault/sheets_allowlist.yaml — additions require CEO approval.
+  ovav-sheets:
+    type: local
+    command: ["./bin/ovav-sheets-mcp"]
+    enabled: true
 plugins:
 - .opencode/plugins/ovav-monitor.js
 - .opencode/plugins/ovav-atuin-bridge.js

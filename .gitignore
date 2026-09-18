@@ -430,3 +430,4 @@ bin/
 .ovav-ux-convergence/backups/*.bak-*
 # Redirect-file artifact (e.g. accidental `> =1` in bash)
 /=1
+.ovav/registry/audit/
