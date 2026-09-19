@@ -4,7 +4,7 @@
   "project": "OVAV",
   "hash_algorithm": "sha256",
   "metadata": {
-    "git_identity": "f1e03e71c0ed4c14e1664c1238e80ff520fba1ce239832e0299d6dbfe9f07353"
+    "git_identity": "6e79051f927d2b22903cbb940e690270f9cbc6e335ce8e825426cfa07864e201"
   },
   "policy": {
     "version": "tracked-content-v1",
@@ -2708,7 +2708,6 @@
     "systemd/ovav-backend.service": "48784bd9eda2d9df3802250183b0c9af4366f543cd2bafb169500ca22275c1cc",
     "systemd/ovav-frontend.service": "f96f58856cd572fe01aca189d313e424f0a462caac105be1ee94412d27e80106",
     "systemd/ovav-web@.service": "b3f61537f4f4f6aa8e864388121be57dd6c3d03846f3ff08aca632e77b3ffce5",
-    "test-owd.txt": "a1dae179412e532d3b354791673e771816298af4ad360d78a0c196a50db9aff9",
     "tests/_legacy_broken_imports/test_benchmark_matrix.py": "eb22f5b0a544ad32dfa614067a519ec931b62c29c367eca7a908ae2d203a48de",
     "tests/_legacy_broken_imports/test_c3_profile.py": "056a626c7512b12f2a86bc695e99be970d29ec28a7c517b8848b53848ae1e8b0",
     "tests/_legacy_broken_imports/test_c3_update.py": "afc0762a247cb76afb41accde7b975b67b94882fe036dd8b9fe444f7665af213",
