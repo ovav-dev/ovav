@@ -179,9 +179,8 @@ func StartWithProfile(repoRoot, featureName string, profile Profile) error {
 	author := DetectAuthor(repoRoot)
 	baseBranch := profile.Base
 
-	// Fetch latest base branch — capture to suppress verbose output
-	_ = getGitOutput(repoRoot, "fetch", "origin", baseBranch)
-
+	// NOTE: fetch removed — caused 10+ min hang on slow/offline networks.
+	// Branch creation uses local develop which is always up-to-date locally.
 	// Create branch from LOCAL base branch — guard against existing branch
 	if out := getGitOutput(repoRoot, "branch", "--list", branchName); out != "" {
 		_ = runGit(repoRoot, "branch", "-D", branchName)
