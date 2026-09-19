@@ -7,22 +7,43 @@ function owc --description 'Create OVAV worktree from develop'
         return 1
     end
 
-    set output (ovav worktree create $argv 2>&1)
-    set exit_code $status
-    printf '%s\n' $output
+    # Verify ovav is available
+    if not command -v ovav > /dev/null 2>&1
+        echo "owc: 'ovav' not found — check PATH or reinstall"
+        return 1
+    end
+
+    # Capture output with 60s timeout to prevent indefinite hangs
+    set -l tmpfile (mktemp)
+    command timeout 60 ovav worktree create $argv > $tmpfile 2>&1
+    set -l exit_code $status
+
+    # Print output regardless of exit code
+    if test -s $tmpfile
+        cat $tmpfile
+    end
+
+    # Handle timeout
+    if test $exit_code -eq 124 -o $exit_code -eq 143
+        echo "owc: timeout (>60s) — check network or disk"
+        rm -f $tmpfile
+        return 1
+    end
+
+    # Extract WORKTREE path before deleting tmpfile
+    set -l wt_path (grep 'WORKTREE:' $tmpfile 2>/dev/null | string replace 'WORKTREE:' '' | string trim)
+    rm -f $tmpfile
+
     if test $exit_code -ne 0
         return $exit_code
     end
 
-    for line in $output
-        if string match -q 'WORKTREE:*' -- "$line"
-            set wt_path (string replace 'WORKTREE:' '' -- "$line")
-            if test -d "$wt_path"
-                cd "$wt_path"
-                echo "→ $wt_path"
-            end
-            break
-        end
+    # Change into worktree if it exists
+    if test -n "$wt_path" -a -d "$wt_path"
+        cd $wt_path
+        echo "→ $wt_path"
+    else if test -n "$wt_path"
+        echo "owc: worktree not found at: $wt_path"
     end
 end
 
