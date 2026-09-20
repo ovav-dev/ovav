@@ -1,7 +1,9 @@
 package ows
 
 import (
+	"bytes"
 	"context"
+	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -1245,5 +1247,194 @@ func TestDispatch_TierCheck_Route_FreeTier(t *testing.T) {
 	}
 	if err != nil && strings.Contains(err.Error(), "tier") {
 		t.Errorf("free tier should not get tier error for route: %v", err)
+	}
+}
+
+// ── Premium UX — formatWorktreeTable + formatters ───────────────────────
+
+func TestPremiumTable_RendersFullPath(t *testing.T) {
+	// The PATH column must always contain the full path — never truncated.
+	entries := []worktreeListEntry{
+		{Path: "/home/braka/Systems/ovav/.ovav/worktrees/feature-c1ma-desing", Head: "abc123", Branch: "feature/c1ma-desing", Profile: "feature", State: "ACTIVE", AgeDays: 1, Current: false},
+	}
+	out := formatWorktreeTable(entries, false, false, false)
+	if !strings.Contains(out, "/home/braka/Systems/ovav/.ovav/worktrees/feature-c1ma-desing") {
+		t.Errorf("full path must appear in output; got:\n%s", out)
+	}
+	if strings.Contains(out, "...rktrees/") {
+		t.Errorf("output must NOT contain truncated '...rktrees/...' style paths; got:\n%s", out)
+	}
+}
+
+func TestPremiumTable_EmptyShowsHint(t *testing.T) {
+	out := formatWorktreeTable(nil, false, false, false)
+	if !strings.Contains(out, "no worktrees matched") {
+		t.Errorf("empty table should hint '(no worktrees matched)'; got:\n%s", out)
+	}
+}
+
+func TestPremiumShell_QuoteSafeForEvaluation(t *testing.T) {
+	entries := []worktreeListEntry{
+		{Path: "/tmp/path with spaces/repo", Branch: "feature/spaces"},
+		{Path: `/tmp/path'with'quotes/repo`, Branch: "feature/quotes"},
+	}
+	out := formatWorktreeShell(entries)
+	// Each entry must be a single-line `cd 'PATH'` suitable for eval.
+	lines := strings.Split(strings.TrimSpace(out), "\n")
+	if len(lines) != 2 {
+		t.Fatalf("expected 2 lines, got %d:\n%s", len(lines), out)
+	}
+	for _, l := range lines {
+		if !strings.HasPrefix(l, "cd '") || !strings.HasSuffix(l, "'") {
+			t.Errorf("line must wrap in single quotes: %q", l)
+		}
+	}
+	// Quote-escape check: inner single-quote must be escaped as '\''
+	if !strings.Contains(out, `'\''`) {
+		t.Errorf("inner single quote must be shell-escaped as '\\\\'\"'\"\\\\''; got:\n%s", out)
+	}
+}
+
+func TestPremiumMarkdown_TableShape(t *testing.T) {
+	entries := []worktreeListEntry{
+		{Path: "/tmp/repoA", Branch: "develop", Profile: "feature", State: "ACTIVE", AgeDays: 2, Owner: "alex"},
+		{Path: "/tmp/repoB", Branch: "feat/x", Profile: "feature", State: "STALE", AgeDays: 14, Stale: true},
+	}
+	out := formatWorktreeMarkdown(entries)
+	if !strings.HasPrefix(out, "| Branch |") {
+		t.Errorf("must start with markdown header; got:\n%s", out)
+	}
+	if !strings.Contains(out, "/tmp/repoA") {
+		t.Errorf("full path must appear in markdown cell; got:\n%s", out)
+	}
+	if !strings.Contains(out, "⏰ STALE") {
+		t.Errorf("stale entries must show as '⏰ STALE'; got:\n%s", out)
+	}
+}
+
+func TestPremiumTree_GroupsByBase(t *testing.T) {
+	entries := []worktreeListEntry{
+		{Path: "/tmp/repo-main", Branch: "hotfix/critical", Profile: "hotfix", AgeDays: 0},
+		{Path: "/tmp/repo-feat", Branch: "feature/x", Profile: "feature", AgeDays: 1},
+	}
+	out := formatWorktreeTree(entries)
+	if !strings.Contains(out, "── Worktree tree ──") {
+		t.Errorf("must announce tree header; got:\n%s", out)
+	}
+	// Two groups present: main + develop
+	if !strings.Contains(out, "main/") {
+		t.Errorf("hotfix profile must group under main/; got:\n%s", out)
+	}
+	if !strings.Contains(out, "develop/") {
+		t.Errorf("feature profile must group under develop/; got:\n%s", out)
+	}
+}
+
+func TestEmitWorktreeFormat_Dispatches(t *testing.T) {
+	entries := []worktreeListEntry{
+		{Path: "/tmp/r", Branch: "feature/x", Profile: "feature", State: "ACTIVE"},
+	}
+	cases := []struct {
+		format   string
+		mustHave string
+	}{
+		{"", "── Worktrees"},
+		{"table", "── Worktrees"},
+		{"shell", "cd '/tmp/r'"},
+		{"md", "| Branch |"},
+		{"markdown", "| Branch |"},
+		{"tree", "── Worktree tree ──"},
+	}
+	for _, c := range cases {
+		t.Run("format="+c.format, func(t *testing.T) {
+			// Capture stdout
+			old := os.Stdout
+			r, w, _ := os.Pipe()
+			os.Stdout = w
+			err := emitWorktreeFormat(c.format, entries, false, false, false)
+			w.Close()
+			os.Stdout = old
+			var buf bytes.Buffer
+			io.Copy(&buf, r)
+			out := buf.String()
+			if err != nil {
+				t.Fatalf("format=%q returned error: %v", c.format, err)
+			}
+			if !strings.Contains(out, c.mustHave) {
+				t.Errorf("format=%q must produce %q; got:\n%s", c.format, c.mustHave, out)
+			}
+		})
+	}
+}
+
+func TestEmitWorktreeFormat_UnknownRejected(t *testing.T) {
+	err := emitWorktreeFormat("xml", nil, false, false, false)
+	if err == nil {
+		t.Error("expected error for unknown format 'xml'")
+	}
+}
+
+func TestTruncateRunes_MultibyteSafe(t *testing.T) {
+	cases := []struct {
+		name   string
+		in     string
+		n      int
+		expect string
+	}{
+		{"short_under_n", "short", 10, "short"},
+		// n=8 → keep first 5 runes + "..." = "toolo..." (8 total)
+		{"long_truncates_with_ellipsis", "toolongname", 8, "toolo..."},
+		{"multibyte_safe", "héllo-wörld", 8, "héllo..."},
+		{"n_zero_empty", "x", 0, ""},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			got := truncateRunes(tc.in, tc.n)
+			if got != tc.expect {
+				t.Errorf("truncateRunes(%q,%d) = %q, want %q", tc.in, tc.n, got, tc.expect)
+			}
+		})
+	}
+}
+
+func TestProfileBaseFor(t *testing.T) {
+	// Authoritative source: registry.go ProfileRegistry
+	cases := map[string]string{
+		"hotfix":    "main",     // BaseBranch: main
+		"patch":     "main",     // BaseBranch: main
+		"emergency": "main",     // BaseBranch: main
+		"feature":   "develop",  // BaseBranch: develop
+		"refactor":  "develop",
+		"docs":      "develop",
+		"migration": "develop",
+		"enterprise": "develop",
+		"fix":       "develop",
+		// "release" intentionally omitted — release has BaseBranch=develop in our registry
+		// (the MergeTo="main" distinction belongs to the merge step, not the base).
+	}
+	for prof, wantBase := range cases {
+		got := profileBaseFor(prof)
+		if got != wantBase {
+			t.Errorf("profileBaseFor(%q) = %q, want %q", prof, got, wantBase)
+		}
+	}
+}
+
+func TestPrintFilteredWorktreeEntries_StillRoutes(t *testing.T) {
+	// Back-compat: legacy callers that imported printFilteredWorktreeEntries
+	// must still get the premium output (it's now a thin wrapper).
+	entries := []worktreeListEntry{
+		{Path: "/tmp/repo", Branch: "feature/x", Profile: "feature", State: "ACTIVE", AgeDays: 1},
+	}
+	old := os.Stdout
+	r, w, _ := os.Pipe()
+	os.Stdout = w
+	printFilteredWorktreeEntries(entries, false, false)
+	w.Close()
+	os.Stdout = old
+	var buf bytes.Buffer
+	io.Copy(&buf, r)
+	if !strings.Contains(buf.String(), "/tmp/repo") {
+		t.Errorf("legacy printFilteredWorktreeEntries must show full path; got:\n%s", buf.String())
 	}
 }

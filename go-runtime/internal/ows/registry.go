@@ -232,7 +232,33 @@ Run 'ovav worktree <command> --help' for detailed help on a specific command.`,
 		Name:      "ovav worktree list",
 		ShortName: "owl",
 		Short:     "Inventory of all worktrees with ownership, state, and health",
-		Long:      "Lists all worktrees with: state, owner, age, ahead/behind, policy version, health, conflict predictions (⚠️). Supports --mine, --all, --stale, --json.",
+		Long: `Inventory of every worktree with state, owner, age, policy version, health, and conflict predictions.
+
+The PATH column is always rendered in full so you can copy/paste it directly into cd.
+
+Usage:
+  owl                                  Premium table (default — full paths, ready to copy)
+  owl --format=shell                   One 'cd "PATH"' line per worktree (scriptable)
+  owl --format=md | markdown           Markdown table (paste into PRs / docs)
+  owl --format=tree                    ASCII tree grouped by base branch
+  owl --format=json                    Stable JSON for scripts (same as --json)
+  owl --mine                           Only show worktrees owned by current user
+  owl --stale                          Only show stale worktrees (>=7d inactive)
+  owl --zombie-only                    Only show zombies (branch deleted but path exists)
+  owl --history                        Show the audit trail (recent activity)
+
+Examples:
+  eval "$(ovav worktree owl --format=shell)"   # jump to first listed worktree
+  ovav worktree owl --format=md > WTs.md       # snapshot for a PR
+
+Flags:
+  --format=<table|shell|md|tree|json>  Output format (default: table)
+  --mine                               Filter to current user's worktrees
+  --stale                              Filter to stale worktrees (>=7d)
+  --zombie-only                        Filter to zombie worktrees
+  --history                            Show audit trail instead of inventory
+  --json                               Shorthand for --format=json`,
+		Args:      []Arg{{Name: "format", Default: "table"}, {Name: "mine", Default: "false"}, {Name: "stale", Default: "false"}, {Name: "zombie-only", Default: "false"}, {Name: "history", Default: "false"}, {Name: "json", Default: "false"}},
 		OfflineOK: true,
 		Handler:   nil,
 	},
