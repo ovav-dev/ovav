@@ -1400,15 +1400,15 @@ func TestTruncateRunes_MultibyteSafe(t *testing.T) {
 func TestProfileBaseFor(t *testing.T) {
 	// Authoritative source: registry.go ProfileRegistry
 	cases := map[string]string{
-		"hotfix":    "main",     // BaseBranch: main
-		"patch":     "main",     // BaseBranch: main
-		"emergency": "main",     // BaseBranch: main
-		"feature":   "develop",  // BaseBranch: develop
-		"refactor":  "develop",
-		"docs":      "develop",
-		"migration": "develop",
+		"hotfix":     "main",    // BaseBranch: main
+		"patch":      "main",    // BaseBranch: main
+		"emergency":  "main",    // BaseBranch: main
+		"feature":    "develop", // BaseBranch: develop
+		"refactor":   "develop",
+		"docs":       "develop",
+		"migration":  "develop",
 		"enterprise": "develop",
-		"fix":       "develop",
+		"fix":        "develop",
 		// "release" intentionally omitted — release has BaseBranch=develop in our registry
 		// (the MergeTo="main" distinction belongs to the merge step, not the base).
 	}
