@@ -2,6 +2,50 @@
 
 Registro automático de cambios generado desde git history.
 
+## Tools Registry & Baseline Stabilization (2026-08-14)
+
+**6 commits: `9b9ef44` → `026cc48` — `ovav validate`: 67 PASS / 4 warned / 0 failed (71 total)**
+
+Resolves the architectural drift where the OVAV tool registry still referenced removed Python helpers while the actual filesystem contained only Go-runtime validators. All hardcoded paths in workstation maintenance scripts were externalized to environment variables. Supply chain integrity baseline was regenerated and now includes the formally registered workstation scripts.
+
+### 🎯 Stabilization commits
+
+- `9b9ef44` **fix(governance):** resync `tool_configs` + workstation policy with Go-runtime reality
+- `fd84907` **feat(workstation):** register 3 maintenance scripts as `ovav_workstation_scripts` profile
+- `3794a83` **refactor(workstation):** externalize ALL hardcoded paths and dependencies from 3 scripts
+- `5c7e243` **chore(sbom):** regenerate baseline after workstation scripts registration
+- `2849065` **chore(gitignore):** exclude root-level `worktrees/` directory
+- `026cc48` **chore(sbom):** regenerate baseline after `.gitignore` update
+
+### 🔒 Security & Stability improvements
+
+| Concern | Resolution |
+|---------|-----------|
+| Supply Chain Integrity FAIL (7 issues) | → PASS (67/71 overall) |
+| Stale Python path refs in `tool_configs.yaml` | → Removed, pointing to Go validators |
+| Stale Python path refs in workstation policy | → Removed, pointing to Go validators |
+| 6 stale feature/fix branches (0-ahead of develop) | → Archived (4 local) + 1 remote |
+| 3 unexpected-tracked scripts in SBOM | → Registered as `ovav_workstation_scripts` profile |
+| 4 hardcoded `/mnt/c/Users/Alexa/...` Windows paths | → Externalized to `OVAV_IT_SETTINGS` env var |
+| Hardcoded `$HOME/.ovav-backups/` | → Configurable via `OVAV_BACKUP_DIR` |
+| Hardcoded GUID namespace `"ovav.it.profile.*"` | → Configurable via `OVAV_GUID_NAMESPACE` |
+| Hardcoded sibling script path | → Derived from `BASH_SOURCE` |
+
+### 🛠️ New env-var contracts
+
+| Env var | Default | Required | Used by |
+|---------|---------|----------|---------|
+| `OVAV_IT_SETTINGS` | — | YES | All 3 scripts |
+| `OVAV_IT_STATE` | — | YES (cache-clean) | `ovav-it-cache-clean.sh` |
+| `OVAV_BACKUP_DIR` | `$HOME/.ovav-backups` | No | `fix-it-guids.sh`, `ovav-it-cache-clean.sh` |
+| `OVAV_GUID_NAMESPACE` | `ovav.intelligent-terminal` | No | `fix-it-guids.sh` |
+| `OVAV_AUDIT_MODE` | `audit-only` | No | `audit-it-guids.sh` |
+| `OVAV_POWERSHELL` | `powershell.exe` | No | `ovav-it-cache-clean.sh` |
+
+### 📚 Reference docs
+
+- See `docs/architecture/ADR-001-tools-registry-stabilization.md` for the architectural decision rationale.
+
 ## Unreleased (since v2.1.0) (2026-07-15)
 
 **334 commits en 9b9ebbb (merge-base v2.1.0) → HEAD.**

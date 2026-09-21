@@ -1,0 +1,10 @@
+# Uses the Ubuntu-26.04 default shell selected by the user in Warp's UI.
+name = "OVAV WSL"
+title = "OVAV WSL"
+color = "blue"
+
+[[panes]]
+id = "main"
+type = "terminal"
+directory = "~"
+is_focused = true

@@ -278,7 +278,7 @@ func handleSBOM(w http.ResponseWriter, r *http.Request) {
 		"source":       "go-native",
 		"schema":       s.SchemaVersion,
 		"generated_at": s.GeneratedAt,
-		"git_commit":   s.Metadata.GitCommit,
+		"git_identity": s.Metadata.GitIdentity,
 		"dependencies": map[string]interface{}{
 			"go_count":     len(s.Dependencies.Go),
 			"python_count": len(s.Dependencies.Python),

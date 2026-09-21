@@ -1,0 +1,13 @@
+# OVAV gitconfig — include path para ~/.gitconfig
+# Añade aliases y configuración OVAV sobre la base existente
+
+[include]
+    path = ~/.config/git/aliases.gitconfig
+
+
+[core]
+    editor = vim
+    autocrlf = input
+
+[pull]
+    rebase = false

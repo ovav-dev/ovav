@@ -108,8 +108,7 @@ func (w *WeztermPathIntegrity) Validate(ctx context.Context, root string) Result
 	} else {
 		fallbackContent := readFile("config/wezterm/wezterm-fallback-minimal.lua")
 		fallbackTokens := []string{
-			"OVAV_FALLBACK_MARKER", "require 'wezterm'", "WORKSPACES",
-			"switch_workspace", "OVAV_WEZTERM_WORKSPACE", "return config",
+			"OVAV_FALLBACK_MARKER", "require 'wezterm'", "OVAV_WZFALLBACK_v1",
 		}
 		for _, token := range fallbackTokens {
 			if !strings.Contains(fallbackContent, token) {

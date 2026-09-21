@@ -117,6 +117,36 @@ func TestRoute_Patch_Success(t *testing.T) {
 	}
 }
 
+func TestRoute_Patch_FastForwardPreservesHistory(t *testing.T) {
+	repo := setupRouteRepo(t)
+
+	result, err := Route(context.Background(), repo, "feature/route-test", "main", RoutePatch)
+	if err != nil {
+		t.Fatalf("Route fast-forward patch: %v", err)
+	}
+	if !result.Success {
+		t.Fatalf("fast-forward patch should succeed: conflicts=%v", result.Conflicts)
+	}
+	if len(result.Commits) != 3 {
+		t.Fatalf("Commits = %d, want 3", len(result.Commits))
+	}
+
+	mainHead, err := runGitOutput(repo, "rev-parse", "main")
+	if err != nil {
+		t.Fatalf("read main head: %v", err)
+	}
+	featureHead, err := runGitOutput(repo, "rev-parse", "feature/route-test")
+	if err != nil {
+		t.Fatalf("read feature head: %v", err)
+	}
+	if mainHead != featureHead {
+		t.Fatalf("main head = %s, want source head %s", mainHead, featureHead)
+	}
+	if branch, err := runGitOutput(repo, "branch", "--show-current"); err != nil || branch != "develop" {
+		t.Fatalf("current branch = %q, want develop (err=%v)", branch, err)
+	}
+}
+
 func TestRoute_Patch_ConflictDoesNotApply(t *testing.T) {
 	repo := setupRouteRepo(t)
 

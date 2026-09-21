@@ -1,7 +1,9 @@
 package ows
 
 import (
+	"bytes"
 	"context"
+	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -802,6 +804,173 @@ func TestMatchSecretPatterns_WildcardSecret(t *testing.T) {
 	}
 }
 
+// ── Allowlist fixes (false positives from feature/fix-full-activation) ─────
+//
+// Background: the candidate branch ships a public GPG subkey fingerprint
+// (`GPG_KEY="7DE5923582A84DBB"` in `.ovav/ovav-commit-wrapper`) and a
+// structural const in truststore.go whose identifier ends in `Key`
+// (`worktreeHeadsKey = ".ovav/runtime/worktree_heads.json"`). The regex
+// `(SECRET|TOKEN|KEY|PASSWORD|CREDENTIAL) = ["']...["']` matched both
+// because the keyword sits at the END of a longer identifier and the
+// value is 16+ chars.
+//
+// These tests pin the allowlist behaviour and verify real secrets are
+// still caught.
+
+func TestMatchSecretPatterns_SkipsGPGKeyInCommitWrapper(t *testing.T) {
+	// File-level allowlist: ovav-commit-wrapper holds the public subkey
+	// fingerprint (rotated 2026-08-13 after laptop reformat). Even though
+	// the value is 16 chars and the regex shape matches, the file is
+	// fully exempt from the OWS pre-merge scanner.
+	findings := matchSecretPatterns(".ovav/ovav-commit-wrapper", 26,
+		`GPG_KEY="7DE5923582A84DBB"`)
+	if len(findings) != 0 {
+		t.Errorf("FAIL: GPG public subkey fingerprint should be skipped by file-level allowlist, got: %+v", findings)
+	}
+}
+
+func TestMatchSecretPatterns_SkipsWorktreeHeadsKey(t *testing.T) {
+	// Suffix-keyword identifier with a file-path value — the const exists
+	// to name a runtime JSON path, NOT to store a credential.
+	line := `	worktreeHeadsKey = ".ovav/runtime/worktree_heads.json"`
+	findings := matchSecretPatterns("go-runtime/internal/truststore/truststore.go", 32, line)
+	if len(findings) != 0 {
+		t.Errorf("FAIL: worktreeHeadsKey const should be skipped by name allowlist, got: %+v", findings)
+	}
+}
+
+func TestMatchSecretPatterns_SkipsStateFile(t *testing.T) {
+	// Same shape as worktreeHeadsKey — defensive entry in the allowlist.
+	line := `	stateFile = ".ovav/runtime/gate_state.json"`
+	findings := matchSecretPatterns("go-runtime/internal/truststore/truststore.go", 31, line)
+	if len(findings) != 0 {
+		t.Errorf("FAIL: stateFile const should be skipped, got: %+v", findings)
+	}
+}
+
+func TestMatchSecretPatterns_SkipsLastGitOpReflogStructTag(t *testing.T) {
+	// Struct field declaration with snake_case JSON tag — the tag value
+	// "last_git_op_reflog" is a field NAME, not a secret.
+	line := `	LastGitOpReflog  string ` + "`json:\"last_git_op_reflog\"`" + `  // Reflog entry`
+	findings := matchSecretPatterns("go-runtime/internal/truststore/truststore.go", 43, line)
+	if len(findings) != 0 {
+		t.Errorf("FAIL: struct field with snake_case JSON tag should be skipped, got: %+v", findings)
+	}
+}
+
+func TestMatchSecretPatterns_SkipsGateSHA256StructTag(t *testing.T) {
+	// Struct field with a non-suffix-keyword name but still a snake_case
+	// JSON tag identifier.
+	line := `	GateSHA256       string ` + "`json:\"gate_sha256\"`" + ``
+	findings := matchSecretPatterns("go-runtime/internal/truststore/truststore.go", 41, line)
+	if len(findings) != 0 {
+		t.Errorf("FAIL: struct field with snake_case JSON tag should be skipped, got: %+v", findings)
+	}
+}
+
+func TestMatchSecretPatterns_SkipsReflogKeyNameToken(t *testing.T) {
+	// Whole-word token from secretNameAllowlist.
+	line := `var reflogKey = LAST_GIT_OP_REFLOG // metadata, not a credential`
+	findings := matchSecretPatterns("go-runtime/internal/truststore/truststore.go", 79, line)
+	if len(findings) != 0 {
+		t.Errorf("FAIL: line containing LAST_GIT_OP_REFLOG should be skipped, got: %+v", findings)
+	}
+}
+
+func TestMatchSecretPatterns_StillCatchesLiveAPIKey(t *testing.T) {
+	// Regression guard: real API keys must still be detected.
+	findings := matchSecretPatterns("config.go", 1, `API_KEY="sk-live-abcdefghijklmnopqrstuvwxyz"`)
+	if len(findings) == 0 {
+		t.Error("FAIL: live API key MUST be detected")
+	}
+}
+
+func TestMatchSecretPatterns_StillCatchesGenericSecret(t *testing.T) {
+	// Regression guard: the wild-card pattern must still catch real secrets.
+	findings := matchSecretPatterns("config.env", 1, `SECRET="abcdefghij1234567890"`)
+	if len(findings) == 0 {
+		t.Error("FAIL: bare SECRET=... must still be detected")
+	}
+}
+
+func TestMatchSecretPatterns_StillCatchesNPMToken(t *testing.T) {
+	// Regression guard: NPM_TOKEN suffix-keyword env var with real value
+	// (matches the dedicated NPM_TOKEN|GITHUB_TOKEN|DOCKER_PASSWORD pattern).
+	findings := matchSecretPatterns("ci.yml", 1, `NPM_TOKEN = "npm_abc12345678901234567890"`)
+	if len(findings) == 0 {
+		t.Error("FAIL: NPM_TOKEN with real value must still be detected")
+	}
+}
+
+func TestMatchSecretPatterns_StillCatchesDockerPassword(t *testing.T) {
+	// Regression guard: DOCKER_PASSWORD suffix-keyword must still match.
+	findings := matchSecretPatterns("ci.yml", 1, `DOCKER_PASSWORD = "supersecretpassword"`)
+	if len(findings) == 0 {
+		t.Error("FAIL: DOCKER_PASSWORD with real value must still be detected")
+	}
+}
+
+func TestMatchSecretPatterns_StructTagWithSecretValueStillFlagged(t *testing.T) {
+	// Counter-example for goStructTagIdentifier: a struct field whose
+	// JSON tag value is NOT a snake_case identifier — the tag value
+	// looks credential-shaped. The struct-tag allowlist must NOT match
+	// (value fails `[a-z][a-z0-9_]*`).
+	//
+	// Note: this line is NOT detected by the env-style secret regex
+	// because there is no `KEY = "..."` shape (no `=` after Key). It
+	// only verifies that goStructTagIdentifier does NOT over-skip.
+	line := `	APIKey  string ` + "`json:\"sk-live-supersecretvalue\"`" + ``
+	if goStructTagIdentifier.MatchString(line) {
+		t.Error("FAIL: struct tag with non-snake_case value MUST NOT match goStructTagIdentifier")
+	}
+}
+
+func TestContainsAllowedName(t *testing.T) {
+	tests := []struct {
+		line string
+		want bool
+	}{
+		{`GPG_KEY="7DE5923582A84DBB"`, true},
+		{`export GPG_KEY="$GPG_KEY"`, true},
+		{`gpg_key="something"`, true}, // case-insensitive
+		{`LastGitOpReflog = LAST_GIT_OP_REFLOG`, true},
+		{`MY_SECRET = "abcdefghij1234567890"`, false},
+		{`worktreeHeadsKey = ".ovav/runtime/worktree_heads.json"`, true},
+		{`MY_GPG_KEY_BACKUP = "real_secret_value"`, false}, // _ before GPG_KEY
+		{`unknown = "x"`, false},
+	}
+	for _, tc := range tests {
+		got := containsAllowedName(tc.line)
+		if got != tc.want {
+			t.Errorf("containsAllowedName(%q) = %v, want %v", tc.line, got, tc.want)
+		}
+	}
+}
+
+func TestGoStructTagIdentifier(t *testing.T) {
+	tests := []struct {
+		line string
+		want bool
+	}{
+		// Struct fields with snake_case JSON tag — should match.
+		{`	LastGitOpReflog  string ` + "`json:\"last_git_op_reflog\"`", true},
+		{`	GateSHA256       string ` + "`json:\"gate_sha256\"`", true},
+		{`	LastGitOpTime    int64  ` + "`json:\"last_git_op_time\"`", true},
+		// Tag value with non-snake-case content — must NOT match.
+		{`	APIKey  string ` + "`json:\"sk-live-supersecretvalue\"`", false},
+		// No backtick — must NOT match.
+		{`	LastGitOpReflog  string`, false},
+		// No struct tag — must NOT match.
+		{`	worktreeHeadsKey = ".ovav/runtime/worktree_heads.json"`, false},
+	}
+	for _, tc := range tests {
+		got := goStructTagIdentifier.MatchString(tc.line)
+		if got != tc.want {
+			t.Errorf("goStructTagIdentifier(%q) = %v, want %v", tc.line, got, tc.want)
+		}
+	}
+}
+
 // ── Forbidden files: more patterns ───────────────────────────────────────
 
 func TestScanForbiddenFiles_BlocksBinary(t *testing.T) {
@@ -1078,5 +1247,194 @@ func TestDispatch_TierCheck_Route_FreeTier(t *testing.T) {
 	}
 	if err != nil && strings.Contains(err.Error(), "tier") {
 		t.Errorf("free tier should not get tier error for route: %v", err)
+	}
+}
+
+// ── Premium UX — formatWorktreeTable + formatters ───────────────────────
+
+func TestPremiumTable_RendersFullPath(t *testing.T) {
+	// The PATH column must always contain the full path — never truncated.
+	entries := []worktreeListEntry{
+		{Path: "/home/braka/Systems/ovav/.ovav/worktrees/feature-c1ma-desing", Head: "abc123", Branch: "feature/c1ma-desing", Profile: "feature", State: "ACTIVE", AgeDays: 1, Current: false},
+	}
+	out := formatWorktreeTable(entries, false, false, false)
+	if !strings.Contains(out, "/home/braka/Systems/ovav/.ovav/worktrees/feature-c1ma-desing") {
+		t.Errorf("full path must appear in output; got:\n%s", out)
+	}
+	if strings.Contains(out, "...rktrees/") {
+		t.Errorf("output must NOT contain truncated '...rktrees/...' style paths; got:\n%s", out)
+	}
+}
+
+func TestPremiumTable_EmptyShowsHint(t *testing.T) {
+	out := formatWorktreeTable(nil, false, false, false)
+	if !strings.Contains(out, "no worktrees matched") {
+		t.Errorf("empty table should hint '(no worktrees matched)'; got:\n%s", out)
+	}
+}
+
+func TestPremiumShell_QuoteSafeForEvaluation(t *testing.T) {
+	entries := []worktreeListEntry{
+		{Path: "/tmp/path with spaces/repo", Branch: "feature/spaces"},
+		{Path: `/tmp/path'with'quotes/repo`, Branch: "feature/quotes"},
+	}
+	out := formatWorktreeShell(entries)
+	// Each entry must be a single-line `cd 'PATH'` suitable for eval.
+	lines := strings.Split(strings.TrimSpace(out), "\n")
+	if len(lines) != 2 {
+		t.Fatalf("expected 2 lines, got %d:\n%s", len(lines), out)
+	}
+	for _, l := range lines {
+		if !strings.HasPrefix(l, "cd '") || !strings.HasSuffix(l, "'") {
+			t.Errorf("line must wrap in single quotes: %q", l)
+		}
+	}
+	// Quote-escape check: inner single-quote must be escaped as '\''
+	if !strings.Contains(out, `'\''`) {
+		t.Errorf("inner single quote must be shell-escaped as '\\\\'\"'\"\\\\''; got:\n%s", out)
+	}
+}
+
+func TestPremiumMarkdown_TableShape(t *testing.T) {
+	entries := []worktreeListEntry{
+		{Path: "/tmp/repoA", Branch: "develop", Profile: "feature", State: "ACTIVE", AgeDays: 2, Owner: "alex"},
+		{Path: "/tmp/repoB", Branch: "feat/x", Profile: "feature", State: "STALE", AgeDays: 14, Stale: true},
+	}
+	out := formatWorktreeMarkdown(entries)
+	if !strings.HasPrefix(out, "| Branch |") {
+		t.Errorf("must start with markdown header; got:\n%s", out)
+	}
+	if !strings.Contains(out, "/tmp/repoA") {
+		t.Errorf("full path must appear in markdown cell; got:\n%s", out)
+	}
+	if !strings.Contains(out, "⏰ STALE") {
+		t.Errorf("stale entries must show as '⏰ STALE'; got:\n%s", out)
+	}
+}
+
+func TestPremiumTree_GroupsByBase(t *testing.T) {
+	entries := []worktreeListEntry{
+		{Path: "/tmp/repo-main", Branch: "hotfix/critical", Profile: "hotfix", AgeDays: 0},
+		{Path: "/tmp/repo-feat", Branch: "feature/x", Profile: "feature", AgeDays: 1},
+	}
+	out := formatWorktreeTree(entries)
+	if !strings.Contains(out, "── Worktree tree ──") {
+		t.Errorf("must announce tree header; got:\n%s", out)
+	}
+	// Two groups present: main + develop
+	if !strings.Contains(out, "main/") {
+		t.Errorf("hotfix profile must group under main/; got:\n%s", out)
+	}
+	if !strings.Contains(out, "develop/") {
+		t.Errorf("feature profile must group under develop/; got:\n%s", out)
+	}
+}
+
+func TestEmitWorktreeFormat_Dispatches(t *testing.T) {
+	entries := []worktreeListEntry{
+		{Path: "/tmp/r", Branch: "feature/x", Profile: "feature", State: "ACTIVE"},
+	}
+	cases := []struct {
+		format   string
+		mustHave string
+	}{
+		{"", "── Worktrees"},
+		{"table", "── Worktrees"},
+		{"shell", "cd '/tmp/r'"},
+		{"md", "| Branch |"},
+		{"markdown", "| Branch |"},
+		{"tree", "── Worktree tree ──"},
+	}
+	for _, c := range cases {
+		t.Run("format="+c.format, func(t *testing.T) {
+			// Capture stdout
+			old := os.Stdout
+			r, w, _ := os.Pipe()
+			os.Stdout = w
+			err := emitWorktreeFormat(c.format, entries, false, false, false)
+			w.Close()
+			os.Stdout = old
+			var buf bytes.Buffer
+			io.Copy(&buf, r)
+			out := buf.String()
+			if err != nil {
+				t.Fatalf("format=%q returned error: %v", c.format, err)
+			}
+			if !strings.Contains(out, c.mustHave) {
+				t.Errorf("format=%q must produce %q; got:\n%s", c.format, c.mustHave, out)
+			}
+		})
+	}
+}
+
+func TestEmitWorktreeFormat_UnknownRejected(t *testing.T) {
+	err := emitWorktreeFormat("xml", nil, false, false, false)
+	if err == nil {
+		t.Error("expected error for unknown format 'xml'")
+	}
+}
+
+func TestTruncateRunes_MultibyteSafe(t *testing.T) {
+	cases := []struct {
+		name   string
+		in     string
+		n      int
+		expect string
+	}{
+		{"short_under_n", "short", 10, "short"},
+		// n=8 → keep first 5 runes + "..." = "toolo..." (8 total)
+		{"long_truncates_with_ellipsis", "toolongname", 8, "toolo..."},
+		{"multibyte_safe", "héllo-wörld", 8, "héllo..."},
+		{"n_zero_empty", "x", 0, ""},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			got := truncateRunes(tc.in, tc.n)
+			if got != tc.expect {
+				t.Errorf("truncateRunes(%q,%d) = %q, want %q", tc.in, tc.n, got, tc.expect)
+			}
+		})
+	}
+}
+
+func TestProfileBaseFor(t *testing.T) {
+	// Authoritative source: registry.go ProfileRegistry
+	cases := map[string]string{
+		"hotfix":     "main",    // BaseBranch: main
+		"patch":      "main",    // BaseBranch: main
+		"emergency":  "main",    // BaseBranch: main
+		"feature":    "develop", // BaseBranch: develop
+		"refactor":   "develop",
+		"docs":       "develop",
+		"migration":  "develop",
+		"enterprise": "develop",
+		"fix":        "develop",
+		// "release" intentionally omitted — release has BaseBranch=develop in our registry
+		// (the MergeTo="main" distinction belongs to the merge step, not the base).
+	}
+	for prof, wantBase := range cases {
+		got := profileBaseFor(prof)
+		if got != wantBase {
+			t.Errorf("profileBaseFor(%q) = %q, want %q", prof, got, wantBase)
+		}
+	}
+}
+
+func TestPrintFilteredWorktreeEntries_StillRoutes(t *testing.T) {
+	// Back-compat: legacy callers that imported printFilteredWorktreeEntries
+	// must still get the premium output (it's now a thin wrapper).
+	entries := []worktreeListEntry{
+		{Path: "/tmp/repo", Branch: "feature/x", Profile: "feature", State: "ACTIVE", AgeDays: 1},
+	}
+	old := os.Stdout
+	r, w, _ := os.Pipe()
+	os.Stdout = w
+	printFilteredWorktreeEntries(entries, false, false)
+	w.Close()
+	os.Stdout = old
+	var buf bytes.Buffer
+	io.Copy(&buf, r)
+	if !strings.Contains(buf.String(), "/tmp/repo") {
+		t.Errorf("legacy printFilteredWorktreeEntries must show full path; got:\n%s", buf.String())
 	}
 }

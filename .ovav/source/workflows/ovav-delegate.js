@@ -18,7 +18,7 @@
  *     agent_id: "lead-eidren",   // o "team-clara", "team-marco", etc.
  *     task: "Descripción del task...",
  *     context: "state" | "full" | "none",
- *     model?: "opencode-go/deepseek-v4-pro"
+ *     model?: "openai/gpt-5.6-luna" // MiniMax is the fallback
  *   })
  */
 

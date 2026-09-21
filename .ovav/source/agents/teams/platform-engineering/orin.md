@@ -2,7 +2,7 @@
 name: Orin
 description: Orin — Explorer Deep del equipo OVAV. Exploración profunda de repositorio, mapeo de dependencias y context packs para decisiones complejas.
 mode: subagent
-model: opencode-go/mimo-v2.5-pro
+model: openai/gpt-5.6-luna
 hidden: true
 color: "#b8bb26"
 permission:

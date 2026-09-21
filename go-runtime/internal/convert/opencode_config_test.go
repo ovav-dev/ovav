@@ -4,14 +4,17 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"reflect"
 	"testing"
+
+	"github.com/ovav/ovav/internal/permissions"
 )
 
 func TestValidateOpenCodeConfig_ValidConfig(t *testing.T) {
 	dir := t.TempDir()
 	config := map[string]any{
 		"$schema":       "https://opencode.ai/config.json",
-		"model":         "opencode-go/deepseek-v4-pro",
+		"model":         "openai/gpt-5.6-luna",
 		"instructions":  []string{"AGENTS.md"},
 		"default_agent": "Platform Engineering",
 		"agent":         map[string]any{},
@@ -40,7 +43,7 @@ func TestValidateOpenCodeConfig_LegacyMCPFormat(t *testing.T) {
 	dir := t.TempDir()
 	config := map[string]any{
 		"$schema":      "https://opencode.ai/config.json",
-		"model":        "opencode-go/deepseek-v4-pro",
+		"model":        "openai/gpt-5.6-luna",
 		"instructions": []string{"AGENTS.md"},
 		"agent":        map[string]any{},
 		"mcp": map[string]any{
@@ -76,7 +79,7 @@ func TestValidateOpenCodeConfig_AgentSectionHasOVAVAgent(t *testing.T) {
 	dir := t.TempDir()
 	config := map[string]any{
 		"$schema":      "https://opencode.ai/config.json",
-		"model":        "opencode-go/deepseek-v4-pro",
+		"model":        "openai/gpt-5.6-luna",
 		"instructions": []string{"AGENTS.md"},
 		"agent": map[string]any{
 			"Platform Engineering": map[string]any{
@@ -105,7 +108,7 @@ func TestValidateOpenCodeConfig_AgentSectionHasOVAVAgent(t *testing.T) {
 func TestValidateOpenCodeConfig_MissingSchema(t *testing.T) {
 	dir := t.TempDir()
 	config := map[string]any{
-		"model":        "opencode-go/deepseek-v4-pro",
+		"model":        "openai/gpt-5.6-luna",
 		"instructions": []string{"AGENTS.md"},
 	}
 	writeJSON(t, filepath.Join(dir, "opencode.json"), config)
@@ -130,7 +133,7 @@ func TestSyncOpenCodeConfig_LegacyFix(t *testing.T) {
 	dir := t.TempDir()
 	config := map[string]any{
 		"$schema":      "https://opencode.ai/config.json",
-		"model":        "opencode-go/deepseek-v4-pro",
+		"model":        "openai/gpt-5.6-luna",
 		"instructions": []string{"AGENTS.md"},
 		"mcp": map[string]any{
 			"ovav-budget": map[string]any{
@@ -193,7 +196,7 @@ func TestSyncOpenCodeConfig_AlreadyValid(t *testing.T) {
 	dir := t.TempDir()
 	config := map[string]any{
 		"$schema":      "https://opencode.ai/config.json",
-		"model":        "opencode-go/deepseek-v4-pro",
+		"model":        "openai/gpt-5.6-luna",
 		"instructions": []string{"AGENTS.md"},
 		"mcp": map[string]any{
 			"ovav-budget": map[string]any{
@@ -218,7 +221,7 @@ func TestValidateOpenCodeConfig_NoMCP(t *testing.T) {
 	dir := t.TempDir()
 	config := map[string]any{
 		"$schema":      "https://opencode.ai/config.json",
-		"model":        "opencode-go/deepseek-v4-pro",
+		"model":        "openai/gpt-5.6-luna",
 		"instructions": []string{"AGENTS.md"},
 	}
 	writeJSON(t, filepath.Join(dir, "opencode.json"), config)
@@ -269,6 +272,77 @@ func TestSyncOpenCodeConfig_InvalidJSON(t *testing.T) {
 	}
 }
 
+func TestRepositoryOpenCodeConfigUsesWindowsSingletonServices(t *testing.T) {
+	repoRoot := filepath.Clean(filepath.Join("..", "..", ".."))
+	data, err := os.ReadFile(filepath.Join(repoRoot, "opencode.json"))
+	if err != nil {
+		t.Fatalf("read repository opencode config: %v", err)
+	}
+
+	var config map[string]any
+	if err := json.Unmarshal(data, &config); err != nil {
+		t.Fatalf("parse repository opencode config: %v", err)
+	}
+	mcp, ok := config["mcp"].(map[string]any)
+	if !ok {
+		mcp = map[string]any{}
+	}
+	tests := []struct {
+		name    string
+		url     string
+		enabled bool
+	}{
+		{name: "ovav-playwright", url: "http://127.0.0.1:8931/mcp", enabled: false},
+		{name: "ovav-memory", url: "http://127.0.0.1:8932/mcp", enabled: false},
+		{name: "ovav-fetch", enabled: false},
+		{name: "atuin", enabled: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			server, ok := mcp[tt.name].(map[string]any)
+			if !tt.enabled {
+				if ok {
+					t.Fatalf("disabled MCP service must be omitted from materialized config: %#v", server)
+				}
+				return
+			}
+			if !ok {
+				t.Fatalf("repository opencode config has no %s entry", tt.name)
+			}
+			if server["enabled"] != tt.enabled {
+				t.Fatalf("enabled = %v, want %v", server["enabled"], tt.enabled)
+			}
+			if server["type"] != "remote" || server["url"] != tt.url {
+				t.Fatalf("server = %#v, want remote %s", server, tt.url)
+			}
+			if _, exists := server["command"]; exists {
+				t.Fatal("remote Windows service must not contain a WSL command")
+			}
+		})
+	}
+	forbidden := []string{"npx", "chrome-linux", "LD_LIBRARY_PATH", "@modelcontextprotocol/server-fetch"}
+	for _, value := range forbidden {
+		if contains(string(data), value) {
+			t.Errorf("materialized config contains forbidden WSL MCP value %q", value)
+		}
+	}
+
+	canonical, err := os.ReadFile(filepath.Join(repoRoot, ".ovav", "source", "opencode", "config.yaml"))
+	if err != nil {
+		t.Fatalf("read canonical opencode config: %v", err)
+	}
+	for _, value := range []string{"http://127.0.0.1:8931/mcp", "http://127.0.0.1:8932/mcp"} {
+		if !contains(string(canonical), value) {
+			t.Errorf("canonical opencode config does not contain %q", value)
+		}
+	}
+	for _, value := range []string{"npx", "chrome-linux", "LD_LIBRARY_PATH"} {
+		if contains(string(canonical), value) {
+			t.Errorf("canonical config contains forbidden WSL MCP value %q", value)
+		}
+	}
+}
+
 // ── Helpers ─────────────────────────────────────────────────────────────
 
 func writeJSON(t *testing.T, path string, v any) {
@@ -309,16 +383,16 @@ func TestGenerateOpenCodeConfig_FullGeneration(t *testing.T) {
 	canonical := `version: "1.0"
 schema: "https://opencode.ai/config.json"
 runtime:
-  model: "opencode-go/deepseek-v4-pro"
-  small_model: "opencode-go/deepseek-v4-flash"
+  model: "openai/gpt-5.6-luna"
+  small_model: "minimax-coding-plan/MiniMax-M3"
   default_agent: "Platform Engineering"
   instructions:
     - "AGENTS.md"
   agent: {}
 mcp:
   test-server:
-    type: local
-    command: ["python3", "test.py"]
+    type: remote
+    url: "http://127.0.0.1:8931/mcp"
     enabled: true
 plugins:
   - ".opencode/plugins/test.js"
@@ -368,7 +442,7 @@ user:
 	if config["$schema"] != "https://opencode.ai/config.json" {
 		t.Errorf("schema mismatch: %v", config["$schema"])
 	}
-	if config["model"] != "opencode-go/deepseek-v4-pro" {
+	if config["model"] != "openai/gpt-5.6-luna" {
 		t.Errorf("model mismatch")
 	}
 	if config["username"] != "Test User" {
@@ -377,11 +451,46 @@ user:
 
 	mcp := config["mcp"].(map[string]any)
 	server := mcp["test-server"].(map[string]any)
-	if server["type"] != "local" {
+	if server["type"] != "remote" {
 		t.Errorf("mcp type: %v", server["type"])
+	}
+	if server["url"] != "http://127.0.0.1:8931/mcp" {
+		t.Errorf("mcp url: %v", server["url"])
+	}
+	if _, exists := server["command"]; exists {
+		t.Errorf("remote MCP unexpectedly contains command: %#v", server["command"])
 	}
 	if server["enabled"] != true {
 		t.Errorf("mcp enabled: %v", server["enabled"])
+	}
+}
+
+func TestValidateCanonicalOpenCodeConfigMCPShape(t *testing.T) {
+	tests := []struct {
+		name    string
+		server  canonicalMCPServer
+		wantErr bool
+	}{
+		{name: "local command", server: canonicalMCPServer{Type: "local", Command: []string{"server"}, Enabled: true}},
+		{name: "remote URL", server: canonicalMCPServer{Type: "remote", URL: "http://127.0.0.1:8931/mcp", Enabled: true}},
+		{name: "remote missing URL", server: canonicalMCPServer{Type: "remote", Enabled: true}, wantErr: true},
+		{name: "remote command forbidden", server: canonicalMCPServer{Type: "remote", URL: "http://127.0.0.1:8931/mcp", Command: []string{"npx"}, Enabled: true}, wantErr: true},
+		{name: "local URL forbidden", server: canonicalMCPServer{Type: "local", URL: "http://127.0.0.1:8931/mcp", Command: []string{"server"}, Enabled: true}, wantErr: true},
+		{name: "disabled shape ignored", server: canonicalMCPServer{Enabled: false}},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			config := CanonicalOpenCodeConfig{
+				Schema:  "https://opencode.ai/config.json",
+				Runtime: canonicalRuntime{Model: "openai/gpt-5.6-luna"},
+				MCP:     map[string]canonicalMCPServer{"test": tt.server},
+			}
+			err := validateCanonicalOpenCodeConfig(config)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
 	}
 }
 
@@ -396,8 +505,8 @@ func TestGenerateOpenCodeConfig_OverwriteIdempotent(t *testing.T) {
 	canonical := `version: "1.0"
 schema: "https://opencode.ai/config.json"
 runtime:
-  model: "opencode-go/deepseek-v4-pro"
-  small_model: "opencode-go/deepseek-v4-flash"
+  model: "openai/gpt-5.6-luna"
+  small_model: "minimax-coding-plan/MiniMax-M3"
   default_agent: "Test"
   instructions: ["TEST.md"]
   agent: {}
@@ -432,7 +541,7 @@ user:
 	if err := json.Unmarshal(data, &config); err != nil {
 		t.Fatalf("parse after overwrite: %v", err)
 	}
-	if config["model"] != "opencode-go/deepseek-v4-pro" {
+	if config["model"] != "openai/gpt-5.6-luna" {
 		t.Errorf("model lost after overwrite: %v", config["model"])
 	}
 }
@@ -457,5 +566,241 @@ func TestGenerateOpenCodeConfig_InvalidYAML(t *testing.T) {
 	err := GenerateOpenCodeConfig(dir)
 	if err == nil {
 		t.Fatal("expected error for invalid YAML")
+	}
+}
+
+func TestGenerateOpenCodeConfig_UsesSupportedSchemaSurface(t *testing.T) {
+	dir := t.TempDir()
+	sourceDir := filepath.Join(dir, ".ovav", "source", "opencode")
+	if err := os.MkdirAll(sourceDir, 0o755); err != nil {
+		t.Fatalf("mkdir source: %v", err)
+	}
+	canonical := `version: "1.0"
+schema: "https://opencode.ai/config.json"
+runtime:
+  model: "openai/gpt-5.6-luna"
+  small_model: "minimax-coding-plan/MiniMax-M3"
+  default_agent: "Platform Engineering"
+  instructions: ["AGENTS.md"]
+  agent: {}
+mcp:
+  broken-server:
+    enabled: false
+plugins:
+  - ".opencode/plugins/ovav-monitor.js"
+permissions:
+  edit: allow
+  bash:
+    "*": allow
+    "git push*": deny
+    "gh pr create*": allow
+`
+	if err := os.WriteFile(filepath.Join(sourceDir, "config.yaml"), []byte(canonical), 0o644); err != nil {
+		t.Fatalf("write canonical config: %v", err)
+	}
+
+	if err := GenerateOpenCodeConfig(dir); err != nil {
+		t.Fatalf("GenerateOpenCodeConfig() error = %v", err)
+	}
+	data, err := os.ReadFile(filepath.Join(dir, "opencode.json"))
+	if err != nil {
+		t.Fatalf("read generated config: %v", err)
+	}
+	var config map[string]any
+	if err := json.Unmarshal(data, &config); err != nil {
+		t.Fatalf("parse generated config: %v", err)
+	}
+	if _, exists := config["theme"]; exists {
+		t.Error("generated config contains unsupported top-level theme")
+	}
+	if config["model"] != "openai/gpt-5.6-luna" {
+		t.Errorf("model = %v, want openai/gpt-5.6-luna", config["model"])
+	}
+	if config["small_model"] != "minimax-coding-plan/MiniMax-M3" {
+		t.Errorf("small_model = %v, want minimax-coding-plan/MiniMax-M3", config["small_model"])
+	}
+	if _, exists := config["mcp"]; exists {
+		t.Errorf("disabled MCP projection unexpectedly present: %#v", config["mcp"])
+	}
+	issues, err := ValidateOpenCodeConfig(dir)
+	if err != nil {
+		t.Fatalf("ValidateOpenCodeConfig() error = %v", err)
+	}
+	for _, issue := range issues {
+		if issue.Severity == "critical" {
+			t.Errorf("generated config critical issue: %s: %s", issue.Field, issue.Message)
+		}
+	}
+}
+
+func TestValidateOpenCodeConfig_RejectsUnsupportedTopLevelTheme(t *testing.T) {
+	dir := t.TempDir()
+	writeJSON(t, filepath.Join(dir, "opencode.json"), map[string]any{
+		"$schema":      "https://opencode.ai/config.json",
+		"model":        "openai/gpt-5.6-luna",
+		"instructions": []string{"AGENTS.md"},
+		"theme": map[string]any{
+			"name": "ovav",
+			"path": ".opencode/themes/ovav-dark.json",
+		},
+	})
+
+	issues, err := ValidateOpenCodeConfig(dir)
+	if err != nil {
+		t.Fatalf("ValidateOpenCodeConfig() error = %v", err)
+	}
+	for _, issue := range issues {
+		if issue.Field == "theme" && issue.Severity == "critical" {
+			return
+		}
+	}
+	t.Fatal("expected critical issue for unsupported top-level theme")
+}
+
+func TestValidateOpenCodeConfig_RejectsUnavailableModels(t *testing.T) {
+	tests := []struct {
+		name  string
+		field string
+		model string
+	}{
+		{name: "unsupported primary", field: "model", model: "openai/retired-model"},
+		{name: "unsupported small", field: "small_model", model: "minimax-coding-plan/retired-model"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			dir := t.TempDir()
+			config := map[string]any{
+				"$schema":      "https://opencode.ai/config.json",
+				"model":        "openai/gpt-5.6-luna",
+				"small_model":  "minimax-coding-plan/MiniMax-M3",
+				"instructions": []string{"AGENTS.md"},
+			}
+			config[tt.field] = tt.model
+			writeJSON(t, filepath.Join(dir, "opencode.json"), config)
+
+			issues, err := ValidateOpenCodeConfig(dir)
+			if err != nil {
+				t.Fatalf("ValidateOpenCodeConfig() error = %v", err)
+			}
+			for _, issue := range issues {
+				if issue.Field == tt.field && issue.Severity == "critical" {
+					return
+				}
+			}
+			t.Fatalf("expected critical issue for unavailable %s %q", tt.field, tt.model)
+		})
+	}
+}
+
+func TestCanonicalOpenCodeConfigMatchesMaterializedTarget(t *testing.T) {
+	repoRoot, err := filepath.Abs(filepath.Join("..", "..", ".."))
+	if err != nil {
+		t.Fatalf("resolve repository root: %v", err)
+	}
+
+	issues, err := ValidateOpenCodeConfig(repoRoot)
+	if err != nil {
+		t.Fatalf("validate materialized config: %v", err)
+	}
+	for _, issue := range issues {
+		if issue.Severity == "critical" {
+			t.Errorf("materialized config critical issue: %s: %s", issue.Field, issue.Message)
+		}
+	}
+
+	tempRoot := t.TempDir()
+	tempSourceDir := filepath.Join(tempRoot, ".ovav", "source", "opencode")
+	if err := os.MkdirAll(tempSourceDir, 0o755); err != nil {
+		t.Fatalf("create temp source directory: %v", err)
+	}
+	source, err := os.ReadFile(filepath.Join(repoRoot, ".ovav", "source", "opencode", "config.yaml"))
+	if err != nil {
+		t.Fatalf("read canonical source: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(tempSourceDir, "config.yaml"), source, 0o644); err != nil {
+		t.Fatalf("write temp canonical source: %v", err)
+	}
+	policyDir := filepath.Join(tempRoot, ".ovav", "policy")
+	if err := os.MkdirAll(policyDir, 0o755); err != nil {
+		t.Fatalf("create temp policy directory: %v", err)
+	}
+	policy, err := os.ReadFile(filepath.Join(repoRoot, ".ovav", "policy", "permission_authority.json"))
+	if err != nil {
+		t.Fatalf("read canonical permission authority: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(policyDir, "permission_authority.json"), policy, 0o644); err != nil {
+		t.Fatalf("write temp permission authority: %v", err)
+	}
+	if err := GenerateOpenCodeConfig(tempRoot); err != nil {
+		t.Fatalf("generate temp config: %v", err)
+	}
+
+	generated, err := os.ReadFile(filepath.Join(tempRoot, "opencode.json"))
+	if err != nil {
+		t.Fatalf("read generated temp config: %v", err)
+	}
+	materialized, err := os.ReadFile(filepath.Join(repoRoot, "opencode.json"))
+	if err != nil {
+		t.Fatalf("read materialized config: %v", err)
+	}
+	var generatedConfig map[string]any
+	if err := json.Unmarshal(generated, &generatedConfig); err != nil {
+		t.Fatalf("parse generated temp config: %v", err)
+	}
+	var materializedConfig map[string]any
+	if err := json.Unmarshal(materialized, &materializedConfig); err != nil {
+		t.Fatalf("parse materialized config: %v", err)
+	}
+	if !reflect.DeepEqual(generatedConfig, materializedConfig) {
+		t.Error("opencode.json differs from canonical generation")
+	}
+}
+
+func TestEffectiveOpenCodeAgentPermissionsPreserveCanonicalProtectedDenies(t *testing.T) {
+	repoRoot, err := filepath.Abs(filepath.Join("..", "..", ".."))
+	if err != nil {
+		t.Fatal(err)
+	}
+	authority := permissions.NewPermissionAuthority(repoRoot)
+	host, err := authority.MaterializePermissionBlock()
+	if err != nil {
+		t.Fatal(err)
+	}
+	areas, leads, teams, err := LoadCanonicalAgents(filepath.Join(repoRoot, "go-runtime", "internal", "agents"))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	type projectedAgent struct {
+		name       string
+		permission *PermissionBlock
+	}
+	agents := make([]projectedAgent, 0, len(areas)+len(leads)+len(teams))
+	for _, area := range areas {
+		agents = append(agents, projectedAgent{area.ID, area.Permission})
+	}
+	for _, lead := range leads {
+		agents = append(agents, projectedAgent{lead.ID, lead.Permission})
+	}
+	for _, team := range teams {
+		agents = append(agents, projectedAgent{team.ID, team.Permission})
+	}
+
+	for _, agent := range agents {
+		effective := mergeOpenCodeProtectedDenies(agent.permission, host)
+		if effective == nil {
+			continue // No frontmatter override: the top-level policy remains authoritative.
+		}
+		for pattern, decision := range host.Bash {
+			if decision == "deny" && effective.Bash[pattern] != decision {
+				t.Errorf("%s effective bash permission loses host deny %q", agent.name, pattern)
+			}
+		}
+		for pattern, decision := range host.ExternalDirectory {
+			if decision == "deny" && effective.ExternalDirectory[pattern] != decision {
+				t.Errorf("%s effective external-directory permission loses host deny %q", agent.name, pattern)
+			}
+		}
 	}
 }

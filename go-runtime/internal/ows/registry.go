@@ -232,7 +232,33 @@ Run 'ovav worktree <command> --help' for detailed help on a specific command.`,
 		Name:      "ovav worktree list",
 		ShortName: "owl",
 		Short:     "Inventory of all worktrees with ownership, state, and health",
-		Long:      "Lists all worktrees with: state, owner, age, ahead/behind, policy version, health, conflict predictions (⚠️). Supports --mine, --all, --stale, --json.",
+		Long: `Inventory of every worktree with state, owner, age, policy version, health, and conflict predictions.
+
+The PATH column is always rendered in full so you can copy/paste it directly into cd.
+
+Usage:
+  owl                                  Premium table (default — full paths, ready to copy)
+  owl --format=shell                   One 'cd "PATH"' line per worktree (scriptable)
+  owl --format=md | markdown           Markdown table (paste into PRs / docs)
+  owl --format=tree                    ASCII tree grouped by base branch
+  owl --format=json                    Stable JSON for scripts (same as --json)
+  owl --mine                           Only show worktrees owned by current user
+  owl --stale                          Only show stale worktrees (>=7d inactive)
+  owl --zombie-only                    Only show zombies (branch deleted but path exists)
+  owl --history                        Show the audit trail (recent activity)
+
+Examples:
+  eval "$(ovav worktree owl --format=shell)"   # jump to first listed worktree
+  ovav worktree owl --format=md > WTs.md       # snapshot for a PR
+
+Flags:
+  --format=<table|shell|md|tree|json>  Output format (default: table)
+  --mine                               Filter to current user's worktrees
+  --stale                              Filter to stale worktrees (>=7d)
+  --zombie-only                        Filter to zombie worktrees
+  --history                            Show audit trail instead of inventory
+  --json                               Shorthand for --format=json`,
+		Args:      []Arg{{Name: "format", Default: "table"}, {Name: "mine", Default: "false"}, {Name: "stale", Default: "false"}, {Name: "zombie-only", Default: "false"}, {Name: "history", Default: "false"}, {Name: "json", Default: "false"}},
 		OfflineOK: true,
 		Handler:   nil,
 	},
@@ -316,6 +342,7 @@ var ProfileRegistry = map[string]ProfileConfig{
 // It tries longest prefix match first ("ovav worktree create" before "ovav worktree").
 // Tier access is checked against OVAV_CONSUMER_TIER env var (defaults to "free").
 func Dispatch(ctx context.Context, repoRoot string, args []string) error {
+	args = resolveShortCommandArgs(args)
 	if len(args) == 0 {
 		return fmt.Errorf("no command provided. Run 'ovav help' for usage.")
 	}
@@ -386,6 +413,27 @@ func Dispatch(ctx context.Context, repoRoot string, args []string) error {
 	}
 
 	return fmt.Errorf("unknown command: %s — use owc, owd, owl, owv, ows, owx, owa, owr, owu, owlk, owm, or owclean", args[0])
+}
+
+// resolveShortCommandArgs expands an OWS short name in the position occupied
+// by the worktree subcommand. The registry stores canonical command keys while
+// the CLI documents short names such as "owc"; normalizing here keeps both
+// forms on the same dispatch path.
+func resolveShortCommandArgs(args []string) []string {
+	if len(args) < 3 || args[0] != "ovav" || args[1] != "worktree" {
+		return args
+	}
+
+	cmd, ok := FindByShortName(args[2])
+	if !ok {
+		return args
+	}
+
+	canonical := strings.Fields(cmd.Name)
+	resolved := make([]string, 0, len(canonical)+len(args)-3)
+	resolved = append(resolved, canonical...)
+	resolved = append(resolved, args[3:]...)
+	return resolved
 }
 
 // parseArgs parses positional arguments and --key value flags against the command's Arg definitions.

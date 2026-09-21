@@ -1,27 +1,96 @@
-# ADR-003: Validator Migration Python → Go
+# ADR-003: OVAV Monitoring & Auto-Remediation System (OMARS)
 
-**Date:** 2026-06-17  
-**Status:** In Progress  
+**Date:** 2026-08-09
+**Status:** Active
 **Decider:** Thavren
 
 ## Context
 
-79 total validators. Migration from Python to Go for performance and OS-native execution.
+El sistema de validators (81 validators) tenía problemas fundamentales:
 
-## Progress
+1. **Duplicación**: Muchos validators medían lo mismo (e.g., `merge_readiness` + `release_gate`)
+2. **Fragilidad**: Comparaban archivos uno a uno, cualquier espacio = FAIL
+3. **Bloqueo**: Fallas bloqueaban trabajo aunque no eran críticas
+4. **OWS overlap**: OWS ya hacía hygiene checks pero validators los重复
+5. **Sin auto-fix**: El humano tenía que手动 fixear todo
 
-| Batch | Validators | Status |
-|-------|-----------|--------|
-| Batch 1 | secrets_hygiene, exfil_patterns, supply_chain, protected_branch, workspace_safety | ✅ Done |
-| Batch 2 | git_push, permission_drift, contract_freshness, runtime_integrity | ✅ Done |
-| Batch 3 | config_syntax, config_integrity, agent_governance, plugin_security, merge_readiness, release_gate, living_integrity, registry_drift, runtime_wiring, handoff_sync, zero_trust, single_authority | ✅ Done |
-| Batch 4 | architecture_compliance (F1), contract_enforcement (F2), architecture_governance (F3) | ✅ Done |
-| Batch 5 | context_firewall, credential_governance, network_hardening, security_hardening, advanced_hardening, install_verification | ✅ Merged |
+## Decision
 
-**Current:** 30/79 (38%) migrated.
+Crear OMARS: OVAV Monitoring & Auto-Remediation System
+
+### Arquitectura
+
+```
+Monitor → Alert → Dispatcher → [AutoFix | Human | Archive]
+```
+
+**Monitores implementados:**
+- `HygieneMonitor` — Wraps OWS hygiene scan (10 checks)
+- `AgentProjectionMonitor` — Count + timestamp checks para agent sync
+
+**Sistema de alertas:**
+- Cola en `.ovav/runtime/alerts/{queue,auto_fixed,acknowledged,archived}.jsonl`
+- 4 niveles: CRIT (bloquea) / ERROR (auto-fix) / WARN / INFO
+
+**Auto-fix runbooks:**
+- `fix_generated_drift` — `ovav project sync`
+- `fix_stale_locks` — Expira locks >24h
+- `fix_agent_projection` — `ovav convert --agents`
+- `fix_sbom_baseline` — `sbom_regen` + baseline
+- `fix_runtime_integrity` — Crea/actualiza baseline
+
+### Validator Deprecation
+
+Reducido de 81 → 71 validators en DefaultRegistry.
+
+**Eliminados:**
+- `ContextFirewallV2` (duplicado)
+- `MergeReadiness` → OMARS HygieneMonitor
+- `ReleaseGate` → OMARS HygieneMonitor
+- `HandoffSync` → OMARS HygieneMonitor
+- `HeadIntegrity` → Eliminado (hash drift normal)
+- `ArchitectureGuardian` → WARN only
+- `CapsChronosAlignment` → WARN only (stale no es error)
+- `CrossTargetConsistency` → OMARS AgentProjectionMonitor
 
 ## Consequences
 
-- Python validators remain as operational governance layer
-- Go validators run as native binaries (no Python runtime needed for product)
-- Performance improvement: sub-ms validation vs 50-200ms Python
+**Positivo:**
+- Alertas no bloquean trabajo
+- Auto-fix ejecuta en 60s
+- count-based checks no se rompen por espacios
+- OWS es source de verdad para hygiene
+
+**Negativo:**
+- Validator count reducido
+- Algunos checks ahora son WARN en lugar de FAIL
+
+## Migration Path
+
+**Phase 1** (Actual): Dual operation
+- OMARS corriendo con monitors básicos
+- Validators aún registran (71 ahora vs 81 antes)
+
+**Phase 2** (Post-merge): Soft migration
+- Más validators migrados a monitors
+- Validators emiten WARN en lugar de FAIL
+
+**Phase 3** (Futuro): Monitor-only
+- OMARS es el único source de verdad
+- `ovav validate` → `ovav monitor`
+
+## Commands
+
+```bash
+# Run monitors manually
+ovav monitor run
+
+# Check status
+ovav monitor status
+
+# View history
+ovav monitor history
+
+# Start background loop
+ovav monitor start
+```

@@ -45,6 +45,16 @@ func (m Model) renderCurrentView() string {
 		return m.renderQuit()
 	case ViewHelp:
 		return m.renderHelp()
+	case ViewTesting:
+		return m.renderTesting()
+	case ViewDelegation:
+		return m.renderDelegation()
+	case ViewResearch:
+		return m.renderResearch()
+	case ViewAdversarial:
+		return m.renderAdversarial()
+	case ViewPerformance:
+		return m.renderPerformance()
 	default:
 		return m.renderWelcome()
 	}

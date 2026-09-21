@@ -1,0 +1,71 @@
+WARP RUNTIME BASELINE — 2026-08-18
+==================================
+
+===WARP INSTALL (Windows side)===
+Location: /mnt/c/Program Files/Warp/
+Binaries: bin/, conpty.dll, dxcompiler.dll, dxil.dll, icon.ico, resources/
+Sub-tools: oz.cmd (Warp CLI shim)
+
+===WARP USER CONFIG (Windows side)===
+AppData Local: /mnt/c/Users/Alexa/AppData/Local/warp/Warp/
+AppData Roaming: /mnt/c/Users/Alexa/AppData/Roaming/warp/Warp/
+settings.toml: 169 lines, see warp-settings.toml.baseline
+
+===WSL2 DISTRO (from WSL side)===
+PRETTY_NAME="Ubuntu 26.04 LTS"
+
+===FISH LOGIN SHELL===
+Path: /usr/bin/fish
+User braka login shell: /usr/bin/fish
+SHELL env (this session): /bin/bash (OpenCode runs in bash, not Fish)
+
+===OVAV GO RUNTIME (this worktree)===
+Branch: feature/feat-warp-2026-master-plan
+HEAD: 49c6769 (docs/plan commit ahead of develop)
+Commits ahead of develop: 4
+Integrity: 100%
+Governor: active
+Memory: —
+Capsule: removed (v2.0)
+
+===KEY FINDINGS vs MASTER PLAN §42===
+
+ALIGNED:
+✓ Warp Stable installed
+✓ WSL2 native (Ubuntu 26.04)
+✓ Fish is login shell
+✓ [session] wsl = "Ubuntu-26.04" present
+✓ honor_ps1 = false
+✓ theme = "dracula"
+✓ font_name = "CaskaydiaCove Nerd Font Mono", 13pt/14pt
+✓ zoom_level = 110
+✓ cursor_display_type = "bar"
+✓ vertical_tabs.enabled = true
+✓ show_code_review_button = true
+✓ show_project_explorer = true
+✓ show_global_search = true
+✓ cloud_conversation_storage_enabled = true
+✓ context_window_limit = 1000000
+✓ nld_in_terminal_enabled = false (NLD off)
+✓ ai_auto_detection_enabled = false (AI auto-detect off)
+✓ telemetry_enabled = true
+✓ crash_reporting_enabled = true
+✓ show_agent_notifications = true
+✓ Custom secret regex list extensive (20 patterns)
+
+GAPS (require P2-P10 work):
+✗ [session.new_session_shell_override] exists — plan §2 says remove
+✗ show_warning_before_quitting = false — plan §6 says true
+✗ show_panel_in_restored_windows = false — plan §4 says true
+✗ input_box_type_setting = "universal" — plan §6 says Terminal/Agent native modes
+✗ base_model = "auto-genius" — plan §23 says MiniMax-M3
+✗ apply_code_diffs = "always_ask" — plan §12 BUILD profile needs always_allow
+✗ command_denylist is broad (shells blocked entirely) — plan §13 says rebuild granular
+✗ git worktree * NOT in denylist — plan §14 says block direct git worktree
+✗ 4 execution profiles do not exist (only "Default") — plan §12 says create 4
+� Warp Workflows do not exist yet — plan §17 says create 9
+✗ .agents/skills/ does not exist — plan §11 says create 9 skills
+✗ mise.toml/mise.lock do not exist — plan §7-§8 says create
+✗ MiniMax custom endpoint not configured in Warp — plan §23 says configure
+✗ @warp-dot-dev/opencode-warp plugin not in opencode.json — plan §20 says add
+✗ Warp Code Review not gated in OWS workflow — plan §16 says integrate

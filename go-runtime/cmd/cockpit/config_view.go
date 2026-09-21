@@ -114,11 +114,11 @@ func (m Model) getConfigMaxCursor(section ConfigSection) int {
 	case SectionOverview:
 		return 4
 	case SectionModels:
-		return 6
+		return 1
 	case SectionSecurity:
 		return 5
 	case SectionProviders:
-		return 3
+		return 1
 	}
 	return 0
 }
@@ -340,13 +340,8 @@ func (m Model) renderModelsSection(cursor int) string {
 		use   string
 		tier  string
 	}{
-		{"Default", "mimo/mimo-auto", "Free", "Conversation, exploration", "free"},
-		{"Coding", "deepseek-v4-pro", "$0.55/$2.19", "Go implementation, refactors", "premium"},
-		{"Review", "claude-sonnet-4", "$3.00/$15.00", "Code review, security audit", "premium"},
-		{"Architecture", "gpt-5.5", "$3.75/$15.00", "Final design decisions", "ultra"},
-		{"Quick", "claude-haiku-3.5", "$0.80/$4.00", "Classification, transforms", "budget"},
-		{"Bulk", "deepseek-v4-flash", "$0.14/$0.55", "Large-scale search", "budget"},
-		{"Matrix", "qwen3.5-plus", "$0.80/$1.60", "Tables, reports", "budget"},
+		{"Primary", "openai/gpt-5.6-luna", "configured", "Conversation, exploration, implementation, review, architecture", "primary"},
+		{"Fallback", "minimax-coding-plan/MiniMax-M3", "configured", "Quick tasks and configured fallback", "fallback"},
 	}
 
 	for i, model := range models {
@@ -363,18 +358,12 @@ func (m Model) renderModelsSection(cursor int) string {
 		tierIcon := "○"
 		tierStyle := styles.MutedFg
 		switch model.tier {
-		case "free":
+		case "primary":
 			tierIcon = "●"
 			tierStyle = styles.GreenFg
-		case "budget":
+		case "fallback":
 			tierIcon = "◐"
-			tierStyle = styles.CyanFg
-		case "premium":
-			tierIcon = "◑"
 			tierStyle = styles.YellowFg
-		case "ultra":
-			tierIcon = "◉"
-			tierStyle = styles.RedFg
 		}
 
 		line := fmt.Sprintf("%s%s %s %-12s  %s  %s",
@@ -488,10 +477,8 @@ func (m Model) renderProvidersSection(cursor int) string {
 		models string
 		note   string
 	}{
-		{"Xiaomi (MiMo)", "active", "🟢", "mimo-auto, mimo-v2.5-pro", "Free tier"},
-		{"OpenCode Go", "subscribed", "🟢", "DeepSeek, GPT, Claude, Qwen", "Full access"},
-		{"Anthropic", "via-opencode", "🔵", "Sonnet 4, Haiku 3.5", "Indirect"},
-		{"OpenAI", "via-opencode", "🔵", "GPT-5.5, GPT-4o", "Indirect"},
+		{"OpenAI", "primary", "🔵", "openai/gpt-5.6-luna", "Primary API"},
+		{"MiniMax API", "fallback", "🟠", "minimax-coding-plan/MiniMax-M3", "Fallback / small model"},
 	}
 
 	for i, p := range providers {
@@ -506,10 +493,10 @@ func (m Model) renderProvidersSection(cursor int) string {
 
 		statusStyle := styles.MutedFg
 		switch p.status {
-		case "active", "subscribed":
+		case "primary":
 			statusStyle = styles.GreenFg
-		case "via-opencode":
-			statusStyle = styles.BlueFg
+		case "fallback":
+			statusStyle = styles.YellowFg
 		}
 
 		line := fmt.Sprintf("%s%s %-20s  %s  %s",
@@ -528,7 +515,7 @@ func (m Model) renderProvidersSection(cursor int) string {
 	}
 
 	sb.WriteString("\n")
-	sb.WriteString(styles.MutedFg.Render("  4 providers  •  8 models  •  1 active"))
+	sb.WriteString(styles.MutedFg.Render("  2 providers  •  2 models  •  1 primary  •  1 fallback"))
 	sb.WriteString("\n")
 
 	return sb.String()

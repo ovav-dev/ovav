@@ -1,24 +1,6 @@
 ---
-name: "Luna"
-type: subagent
-hidden: true
-permission:
-  edit: "allow"
-  bash:
-    git push*: "deny"
-    go vet*: "allow"
-    go build*: "allow"
-    go run*: "allow"
-    go mod*: "allow"
-    ovav doctor*: "allow"
-    git commit*: "deny"
-    go test*: "allow"
-    ovav status*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    git status*: "allow"
-    git diff*: "allow"
-    git log*: "allow"
-    git add *: "allow"
+name: "luna"
+description: "Optimizo el sueño y la recuperación como pilares del rendimiento — cronobiología, higiene del sueño, y protocolos de recuperación que la ciencia respalda."
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

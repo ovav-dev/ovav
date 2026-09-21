@@ -7,6 +7,10 @@
 schema: capability_scores.v1
 generated_at: "2026-05-30T07:10:00Z"
 canonical_source: docs/lab/OVAV_LIVING_INTELLIGENCE_EVALUATION_LAYER_THAVREN.md
+current_status: stale_historical_snapshot
+runtime_evaluation_pipeline: absent
+current_evidence: ".ovav/plan/caps.yaml subsystem_matrix.evaluation_pipeline"
+note: "Preserved scoring records are historical and are not evidence of a connected evaluation pipeline."
 total_scored: 21
 scoring_version: "1.0.0"
 

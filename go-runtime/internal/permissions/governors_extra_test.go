@@ -66,14 +66,43 @@ func TestT12BashCheck_DeniedCommands(t *testing.T) {
 	}
 }
 
-func TestT12BashCheck_DefaultDeny_Unmatched(t *testing.T) {
+func TestT12BashCheck_YOLODefaultAllow_Unmatched(t *testing.T) {
 	g := NewBashCommandGovernor()
 	d := g.Check("rm -rf /", "thavren")
 	if d.Allowed {
-		t.Error("unmatched command should be default-deny")
+		t.Error("catastrophic command should match a permanent deny")
 	}
-	if d.MatchedRule != "" {
-		t.Errorf("unmatched should have empty MatchedRule, got %q", d.MatchedRule)
+	if d.MatchedRule != "destructive_root_delete" {
+		t.Errorf("catastrophic command matched %q", d.MatchedRule)
+	}
+	allowed := g.Check("custom-tool inspect", "thavren")
+	if !allowed.Allowed || allowed.MatchedRule != "" {
+		t.Errorf("unmatched YOLO command should default allow: %#v", allowed)
+	}
+}
+
+func TestPermanentDeniesRejectVariantsAndCompoundCommands(t *testing.T) {
+	g := NewBashCommandGovernor()
+	g.CEOActive = true
+	commands := []string{
+		"git status; rm -rf /",
+		"git -C /tmp/repo push origin main",
+		"rm -fr /etc",
+		"rm -r -f /var/tmp",
+		"rm --recursive --force /home",
+		"/sbin/mkfs.ext4 /dev/sda",
+		"dd if=/tmp/image of=/dev/sda",
+		"bash -c 'sudo id'",
+		"bash -lc 'echo ok'",
+		"echo a & echo b",
+	}
+	for _, command := range commands {
+		t.Run(command, func(t *testing.T) {
+			decision := g.CheckWithCEO(command, "test")
+			if decision.Allowed {
+				t.Fatalf("permanent deny bypassed: %#v", decision)
+			}
+		})
 	}
 }
 
@@ -232,18 +261,18 @@ func TestT12ClaimDecision_Fields(t *testing.T) {
 
 // ── CEO Bypass ─────────────────────────────────────────────────────────────
 
-func TestT12CEOBypass_DenyRuleBypassed(t *testing.T) {
+func TestT12CEOBypass_PermanentDenyNotBypassed(t *testing.T) {
 	g := NewBashCommandGovernor()
 	g.CEOActive = true
 
 	// git push --force is DENY rule "git_push_force"
 	decision := g.CheckWithCEO("git push --force origin main", "shell")
 
-	if !decision.Allowed {
-		t.Error("CEO active: DENY rule should be bypassed (ALLOW)")
+	if decision.Allowed {
+		t.Error("CEO active must not bypass permanent raw-push deny")
 	}
-	if !strings.Contains(decision.Reason, "[CEO-BYPASS]") {
-		t.Error("CEO bypass decision should contain [CEO-BYPASS] marker")
+	if strings.Contains(decision.Reason, "[CEO-BYPASS]") {
+		t.Error("permanent deny must not contain [CEO-BYPASS] marker")
 	}
 	if decision.MatchedRule != "git_push_force" {
 		t.Errorf("MatchedRule should be git_push_force, got %s", decision.MatchedRule)
@@ -287,10 +316,7 @@ func TestT12CEOBypass_SudoAlwaysBlocked(t *testing.T) {
 	// sudo is permanently blocked even for CEO (no bypass)
 	decision := g.CheckWithCEO("sudo rm -rf /", "shell")
 
-	// CEO bypass applies to all DENY rules... but sudo is still blocked by Check()
-	// because Check() itself doesn't implement per-rule exceptions.
-	// This is the current behavior: CEO bypass is blanket on DENY rules.
-	if !decision.Allowed {
-		t.Log("Note: sudo is currently blanket-DENY even with CEO active (no per-rule exceptions)")
+	if decision.Allowed {
+		t.Fatal("sudo must remain blocked during CEO sessions")
 	}
 }

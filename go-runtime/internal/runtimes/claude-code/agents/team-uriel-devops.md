@@ -1,24 +1,6 @@
 ---
-name: "Uriel Devops"
-type: subagent
-hidden: true
-permission:
-  edit: "allow"
-  bash:
-    ovav doctor*: "allow"
-    ovav status*: "allow"
-    git status*: "allow"
-    git diff*: "allow"
-    git add *: "allow"
-    go vet*: "allow"
-    go test*: "allow"
-    go run*: "allow"
-    go mod*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    git log*: "allow"
-    git commit*: "deny"
-    git push*: "deny"
-    go build*: "allow"
+name: "uriel-devops"
+description: "Mantengo la infraestructura de CI/CD, Docker y monitoreo del área de producto digital — si el pipeline falla o los contenedores no levantan, es mi responsabilidad."
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

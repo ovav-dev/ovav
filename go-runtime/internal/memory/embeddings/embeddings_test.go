@@ -149,7 +149,7 @@ func TestIndex_Deduplicate(t *testing.T) {
 	// Add similar cards
 	idx.Add("card-1", "python programming language")
 	idx.Add("card-2", "python programming language") // Duplicate
-	idx.Add("card-3", "go programming language")  // Different
+	idx.Add("card-3", "go programming language")     // Different
 
 	initialSize := idx.Size()
 

@@ -16,7 +16,7 @@ activation:
   router: Delegation Router
 
 model_body:
-  primary: "openai/gpt-4o"
+  primary: "openai/gpt-5.6-luna"
 
 lanes:
   - architecture_contracts

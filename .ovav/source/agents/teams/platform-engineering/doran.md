@@ -2,7 +2,7 @@
 name: Doran
 description: Doran — Install Engineer del equipo OVAV. Planificación de instalación, backup/rollback, y transición source-to-global con seguridad.
 mode: subagent
-model: opencode-go/qwen3.7-max
+model: openai/gpt-5.6-luna
 hidden: true
 color: "#d65d0e"
 permission:

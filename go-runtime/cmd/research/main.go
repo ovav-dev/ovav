@@ -4,10 +4,12 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 	"text/tabwriter"
 	"time"
 
 	"github.com/ovav/ovav/internal/autonomous/engine"
+	"github.com/ovav/ovav/internal/autonomous/scheduler"
 )
 
 const exampleDir = "/tmp/ovav-research"
@@ -45,6 +47,8 @@ func main() {
 		findings(eng)
 	case "targets":
 		targets(eng)
+	case "analyze":
+		analyze(eng)
 	default:
 		printUsage()
 		os.Exit(1)
@@ -135,8 +139,99 @@ func targets(eng *engine.Engine) {
 	w.Flush()
 }
 
+func analyze(eng *engine.Engine) {
+	fmt.Println("🧠 Running AI-Powered Analysis...")
+	fmt.Println()
+
+	intel := eng.GetIntelligenceLayer()
+
+	findings, err := eng.ListFindings()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error loading findings: %v\n", err)
+		os.Exit(1)
+	}
+
+	if len(findings) == 0 {
+		fmt.Println("No findings to analyze. Run 'ovav research run' first.")
+		return
+	}
+
+	// Predictive analysis
+	predictions, err := intel.PredictiveAnalysis(findings)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error in predictive analysis: %v\n", err)
+		os.Exit(1)
+	}
+
+	if len(predictions) > 0 {
+		fmt.Println("📈 Predictive Analysis:")
+		fmt.Println()
+		w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
+		fmt.Fprintf(w, "Category\tTrend\tConfidence\tActions\n")
+		fmt.Fprintf(w, "--------\t-----\t----------\t-------\n")
+		for _, p := range predictions {
+			actions := strings.Join(p.Actions, ", ")
+			if len(actions) > 50 {
+				actions = actions[:47] + "..."
+			}
+			fmt.Fprintf(w, "%s\t%s\t%.0f%%\t%s\n", p.Category, p.Direction, p.Confidence*100, actions)
+		}
+		w.Flush()
+		fmt.Println()
+	}
+
+	// Correlations
+	correlations := intel.CorrelateFindings(findings)
+	if len(correlations) > 0 {
+		fmt.Printf("🔗 Found %d correlations between findings:\n", len(correlations))
+		fmt.Println()
+		for i, c := range correlations {
+			if i >= 5 {
+				break
+			}
+			fmt.Printf("  • %s ↔ %s (strength: %.0f%%, type: %s)\n",
+				c.Finding1, c.Finding2, c.Strength*100, c.Type)
+		}
+		fmt.Println()
+	}
+
+	// Target prioritization
+	st := eng.Status()
+	var targets []scheduler.Target
+	for _, t := range st.Targets {
+		targets = append(targets, scheduler.Target{
+			ID:        t.ID,
+			Name:      t.Name,
+			URL:       t.URL,
+			Frequency: t.Frequency,
+			LastRun:   t.LastRun,
+			NextRun:   t.NextRun,
+			Enabled:   t.Enabled,
+		})
+	}
+
+	prioritized := intel.PrioritizeTargets(targets, findings)
+	if len(prioritized) > 0 {
+		fmt.Println("🎯 Prioritized Research Targets:")
+		fmt.Println()
+		w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
+		fmt.Fprintf(w, "Rank\tTarget\tScore\tPriority\n")
+		fmt.Fprintf(w, "----\t------\t-----\t--------\n")
+		for _, pt := range prioritized {
+			priority := "Normal"
+			if pt.Score > 1.5 {
+				priority = "High"
+			} else if pt.Score > 1.0 {
+				priority = "Medium"
+			}
+			fmt.Fprintf(w, "#%d\t%s\t%.2f\t%s\n", pt.Rank, pt.Target.Name, pt.Score, priority)
+		}
+		w.Flush()
+	}
+}
+
 func printUsage() {
-	fmt.Println(`OVAV Research - Autonomous Research System
+	fmt.Print(`OVAV Research - Autonomous Research System
 
 Usage:
   ovav research <command>
@@ -151,5 +246,5 @@ Examples:
   ovav research run       # Run full research cycle
   ovav research status    # Check system status
   ovav research findings  # View all findings
-`)
+` + "\n")
 }

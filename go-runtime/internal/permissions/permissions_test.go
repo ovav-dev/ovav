@@ -193,7 +193,7 @@ func TestBashCommandGovernor_AllowRules(t *testing.T) {
 		{"git push --force", false},
 		{"sudo rm -rf /", false},
 		{"pip install malware", false},
-		{"unknown_command", false},
+		{"unknown_command", true},
 	}
 
 	for _, tc := range tests {
@@ -213,14 +213,14 @@ func TestBashCommandGovernor_Summary(t *testing.T) {
 	allowed := summary["allowed"].(int)
 	denied := summary["denied"].(int)
 
-	if total != 16 {
-		t.Errorf("Expected 16 total rules, got %d", total)
+	if total != 19 {
+		t.Errorf("Expected 19 total rules, got %d", total)
 	}
 	if allowed != 9 {
 		t.Errorf("Expected 9 allow rules, got %d", allowed)
 	}
-	if denied != 7 {
-		t.Errorf("Expected 7 deny rules, got %d", denied)
+	if denied != 10 {
+		t.Errorf("Expected 10 deny rules, got %d", denied)
 	}
 }
 
@@ -347,8 +347,8 @@ func TestPermissionAuthority_Materialize(t *testing.T) {
 		"schema_version": "ovav.permission_authority.v1",
 		"materialized_targets": []string{
 			"opencode.json",
-			"clients/opencode/agents/area-platform-engineering.md",
-			"clients/opencode/agents/lead-thavren.md",
+			".opencode/agents/area-platform-engineering.md",
+			".opencode/agents/lead-thavren.md",
 		},
 	}
 	policyJSON, _ := json.Marshal(policy)
@@ -423,16 +423,15 @@ permission:
     "git push --force *": deny
     "gh auth token*": deny
     "sudo *": deny
-    "python3 tools/github/ovav_git_push_gate.py*": allow
-    "python3 tools/permissions/ovav_permission_authority.py*": allow
-    "python3 tools/permissions/materialize.py*": allow
+    "go run -C go-runtime ./cmd/ovav validate*": allow
+    "go run -C go-runtime ./internal/validators/cmd/validate*": allow
     "git commit*": allow
     "git ls-remote *": allow
-    "gh pr create*": ask
+    "gh pr create*": allow
     "*": allow
   external_directory:
-    "/tmp/opencode/*": allow
-    "*": deny
+    "*": allow
+# OVAV TRUSTED DOMAIN — 2026-08-13: external_directory is allow-by-default.
 # OVAV_PERMISSION_AUTHORITY: .ovav/policy/permission_authority.json
 ---
 # Agent body

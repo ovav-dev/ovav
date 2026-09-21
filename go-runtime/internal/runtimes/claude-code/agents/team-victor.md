@@ -1,24 +1,6 @@
 ---
-name: "Victor"
-type: subagent
-hidden: true
-permission:
-  edit: "allow"
-  bash:
-    git status*: "allow"
-    git diff*: "allow"
-    git commit*: "deny"
-    go test*: "allow"
-    ovav status*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    git log*: "allow"
-    git add *: "allow"
-    git push*: "deny"
-    go vet*: "allow"
-    go build*: "allow"
-    go run*: "allow"
-    go mod*: "allow"
-    ovav doctor*: "allow"
+name: "victor"
+description: "Modelo los datos que alimentan la experiencia de aprendizaje — esquemas, migraciones, y relaciones que permiten a los assessments y al contenido funcionar con datos limpios."
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

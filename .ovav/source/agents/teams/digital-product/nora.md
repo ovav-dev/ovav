@@ -2,7 +2,7 @@
 name: Nora
 description: Nora — API Security Engineer del equipo Digital Product. API design (REST/GraphQL), autenticación, autorización, OWASP compliance, encryption, secrets management.
 mode: subagent
-model: opencode-go/deepseek-v4-pro
+model: openai/gpt-5.6-luna
 hidden: true
 color: "#5c5c8a"
 permission:

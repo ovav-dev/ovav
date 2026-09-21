@@ -1,0 +1,49 @@
+# Fish Config Metadata
+version: "1.0.0"
+tool: fish
+platform: wsl2-linux
+
+# Canonical source: .ovav/source/configs/fish/
+
+# Deploy target (ovav convert)
+deploy:
+  - path: config/fish/
+    description: Fish shell config directory
+
+# Home injection (ovav convert --inject)
+inject:
+  - path: config/fish/config.fish
+    target: ~/.config/fish/config.fish
+    description: Fish main config
+  - path: config/fish/fish_prompt.fish
+    target: ~/.config/fish/fish_prompt.fish
+    description: Fish prompt
+  - path: config/fish/
+    target: ~/.config/fish/conf.d/
+    description: Fish function snippets (conf.d/*.fish)
+
+# Files
+files:
+  - config.fish
+  - fish_prompt.fish
+  - 10-ovav-color-profile.fish
+  - 20-ovav-wezterm-osc7.fish
+  - 25-ovav-wezterm-git.fish
+  - 30-ovav-runtime-tools.fish
+  - 35-ovav-wt-tsk.fish
+  - 41-ovav-syntax-colors.fish
+  - 90-ovav-terminal-auto.fish
+  - 99-ovav-systems-lock.fish
+
+# Dependencies
+dependencies:
+  - fish shell >= 3.6
+  - wezterm (for OSC7/terminal integration)
+
+# Features
+features:
+  - OVAV color profile
+  - WezTerm OSC7 support
+  - Git integration
+  - Runtime tools shortcuts
+  - Worktree shortcuts

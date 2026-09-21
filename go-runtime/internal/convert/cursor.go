@@ -5,38 +5,68 @@ import (
 	"strings"
 )
 
-// CursorConverter transforms OVAV canonical agents into Cursor .cursorrules format.
+// CursorConverter transforms OVAV canonical agents into Cursor rules.
 //
-// Cursor uses .cursor/rules/ directory with .mdc files.
-// The format embeds agent instructions as markdown rules that Cursor's AI can reference.
+// Cursor uses .md files with YAML frontmatter in .cursor/rules/.
+//
+// Verified format: https://cursor.com/docs/customcursor
+//
+// Frontmatter fields for rules (.mdc):
+//
+//	description, alwaysApply (bool), globs (string array)
+//
+// Frontmatter fields for agents (.cursor/agents/*.md):
+//
+//	name, description, model, readonly (bool), is_background (bool)
+//
+// Since OVAV generates areas as rules AND leads/teams as agents,
+// we output everything as .md files with the appropriate frontmatter.
+// The frontmatter `name` field distinguishes agents from rules (rules
+// omit it, agents include it).
 type CursorConverter struct{}
 
-func (c *CursorConverter) FileExtension() string { return ".mdc" }
-func (c *CursorConverter) OutputDir() string     { return "runtimes/cursor/rules" }
+func (c *CursorConverter) FileExtension() string { return ".md" }
+func (c *CursorConverter) OutputDir() string     { return "runtimes/cursor" }
 
-// AreasOnly returns false: Cursor rules are applied through .mdc files where
-// the hierarchy (area / lead / subagent) is flattened into rule content. The
-// full hierarchy is needed to compose the rule bodies.
+// AreasOnly returns false: leads and teams are generated as agents.
 func (c *CursorConverter) AreasOnly() bool { return false }
 
+// ConvertArea generates a Cursor rule (.md file).
 func (c *CursorConverter) ConvertArea(area *Area, _ map[string]*Lead) ([]byte, error) {
 	var b strings.Builder
 
 	b.WriteString("---\n")
 	b.WriteString(fmt.Sprintf("description: %q\n", area.Description))
 	b.WriteString("alwaysApply: false\n")
-	// Permission block
+	// Permission block — Cursor permission format
 	if area.Permission != nil {
-		writePermissionBlock(&b, area.Permission)
+		b.WriteString("permission:\n")
+		b.WriteString(fmt.Sprintf("  edit: %q\n", area.Permission.Edit))
+		if len(area.Permission.Bash) > 0 {
+			b.WriteString("  bash:\n")
+			for k, v := range area.Permission.Bash {
+				if strings.ContainsAny(k, " *:") {
+					b.WriteString(fmt.Sprintf("    %q: %q\n", k, v))
+				} else {
+					b.WriteString(fmt.Sprintf("    %s: %q\n", k, v))
+				}
+			}
+		}
+		if len(area.Permission.ExternalDirectory) > 0 {
+			b.WriteString("  external_directory:\n")
+			for k, v := range area.Permission.ExternalDirectory {
+				b.WriteString(fmt.Sprintf("    %q: %q\n", k, v))
+			}
+		}
 	}
 	b.WriteString("---\n\n")
-	// OVAV Identity Guard — HTML comments work in .mdc format
+
 	WriteIdentityGuard(&b, area.Name)
 	b.WriteString("\n")
 
 	b.WriteString(fmt.Sprintf("# OVAV Area: %s\n\n", area.Name))
 	b.WriteString(fmt.Sprintf("Lead: %s\n\n", area.Lead))
-	b.WriteString("## Authorized Functions\n\n")
+	b.WriteString("## Functions\n\n")
 	for _, fn := range area.Functions {
 		b.WriteString(fmt.Sprintf("- %s\n", fn))
 	}
@@ -51,25 +81,47 @@ func (c *CursorConverter) ConvertArea(area *Area, _ map[string]*Lead) ([]byte, e
 	return []byte(b.String()), nil
 }
 
+// ConvertLead generates a Cursor agent (.md file).
 func (c *CursorConverter) ConvertLead(lead *Lead) ([]byte, error) {
 	var b strings.Builder
 
 	b.WriteString("---\n")
-	b.WriteString(fmt.Sprintf("description: \"%s — %s\"\n", lead.Name, lead.DisplayName))
-	b.WriteString("alwaysApply: false\n")
+	b.WriteString(fmt.Sprintf("name: %q\n", lead.ID))
+	b.WriteString(fmt.Sprintf("description: %q\n", lead.Description))
+	b.WriteString("readonly: false\n")
+	b.WriteString("is_background: false\n")
 	// Permission block
 	if lead.Permission != nil {
-		writePermissionBlock(&b, lead.Permission)
+		b.WriteString("permission:\n")
+		b.WriteString(fmt.Sprintf("  edit: %q\n", lead.Permission.Edit))
+		if len(lead.Permission.Bash) > 0 {
+			b.WriteString("  bash:\n")
+			for k, v := range lead.Permission.Bash {
+				if strings.ContainsAny(k, " *:") {
+					b.WriteString(fmt.Sprintf("    %q: %q\n", k, v))
+				} else {
+					b.WriteString(fmt.Sprintf("    %s: %q\n", k, v))
+				}
+			}
+		}
+		if len(lead.Permission.ExternalDirectory) > 0 {
+			b.WriteString("  external_directory:\n")
+			for k, v := range lead.Permission.ExternalDirectory {
+				b.WriteString(fmt.Sprintf("    %q: %q\n", k, v))
+			}
+		}
 	}
 	b.WriteString("---\n\n")
 
-	// OVAV Identity Guard
 	WriteIdentityGuard(&b, lead.Name)
 	b.WriteString("\n")
 
 	b.WriteString(fmt.Sprintf("# %s — %s\n\n", lead.Name, lead.DisplayName))
-	b.WriteString(fmt.Sprintf("Origin: %s\n\n", lead.Origin))
-	b.WriteString("## Authorized Functions\n\n")
+	b.WriteString(fmt.Sprintf("Origin: %s\n", lead.Origin))
+	if lead.Authority != "" {
+		b.WriteString(fmt.Sprintf("Authority: %s\n", lead.Authority))
+	}
+	b.WriteString("\n## Authorized Functions\n\n")
 	for _, fn := range lead.Functions {
 		b.WriteString(fmt.Sprintf("- %s\n", fn))
 	}
@@ -81,7 +133,6 @@ func (c *CursorConverter) ConvertLead(lead *Lead) ([]byte, error) {
 	b.WriteString(lead.HardStop)
 	b.WriteString("\n")
 
-	// GAP-3: CRITERIA from .ovav/service_areas/
 	if lead.Criteria != "" {
 		b.WriteString("\n## Decision Criteria\n\n")
 		b.WriteString(lead.Criteria)
@@ -91,22 +142,45 @@ func (c *CursorConverter) ConvertLead(lead *Lead) ([]byte, error) {
 	return []byte(b.String()), nil
 }
 
+// ConvertTeam generates a Cursor team agent (.md file).
 func (c *CursorConverter) ConvertTeam(team *TeamMember) ([]byte, error) {
 	var b strings.Builder
 
 	b.WriteString("---\n")
-	b.WriteString(fmt.Sprintf("description: \"Team: %s — %s\"\n", team.Name, team.Country))
-	b.WriteString("alwaysApply: false\n")
+	b.WriteString(fmt.Sprintf("name: %q\n", team.ID))
+	b.WriteString(fmt.Sprintf("description: %q\n", team.Function))
+	b.WriteString("readonly: true\n")
+	b.WriteString("is_background: false\n")
+	if team.Model != "" {
+		b.WriteString(fmt.Sprintf("model: %q\n", team.Model))
+	}
+	// Permission block
 	if team.Permission != nil {
-		writePermissionBlock(&b, team.Permission)
+		b.WriteString("permission:\n")
+		b.WriteString(fmt.Sprintf("  edit: %q\n", team.Permission.Edit))
+		if len(team.Permission.Bash) > 0 {
+			b.WriteString("  bash:\n")
+			for k, v := range team.Permission.Bash {
+				if strings.ContainsAny(k, " *:") {
+					b.WriteString(fmt.Sprintf("    %q: %q\n", k, v))
+				} else {
+					b.WriteString(fmt.Sprintf("    %s: %q\n", k, v))
+				}
+			}
+		}
+		if len(team.Permission.ExternalDirectory) > 0 {
+			b.WriteString("  external_directory:\n")
+			for k, v := range team.Permission.ExternalDirectory {
+				b.WriteString(fmt.Sprintf("    %q: %q\n", k, v))
+			}
+		}
 	}
 	b.WriteString("---\n\n")
 
-	// OVAV Identity Guard
 	WriteIdentityGuard(&b, team.Name)
 	b.WriteString("\n")
 
-	b.WriteString(fmt.Sprintf("# Team: %s\n\n", team.Name))
+	b.WriteString(fmt.Sprintf("# %s\n\n", team.Name))
 	b.WriteString(fmt.Sprintf("Country: %s\n", team.Country))
 	b.WriteString(fmt.Sprintf("Reports to: %s\n", team.Lead))
 	b.WriteString(fmt.Sprintf("Area: %s\n\n", team.Area))

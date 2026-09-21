@@ -133,12 +133,16 @@ func FindRepoRoot() (string, error) {
 			}
 		}
 
-		// Secondary: .ovav/ + go-runtime/go.mod (ensures true OVAV root)
+		// Secondary: canonical plan + go-runtime/go.mod. A runtime checkout may
+		// contain its own .ovav/ directory, so the plan is the root discriminator.
 		ovavPath := filepath.Join(dir, ".ovav")
+		capsPath := filepath.Join(dir, ".ovav", "plan", "caps.yaml")
 		goModPath := filepath.Join(dir, "go-runtime", "go.mod")
 		if info, err := os.Stat(ovavPath); err == nil && info.IsDir() {
-			if _, err := os.Stat(goModPath); err == nil {
-				return dir, nil
+			if _, capsErr := os.Stat(capsPath); capsErr == nil {
+				if _, goModErr := os.Stat(goModPath); goModErr == nil {
+					return dir, nil
+				}
 			}
 		}
 

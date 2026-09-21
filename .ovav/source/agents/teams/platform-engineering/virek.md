@@ -2,7 +2,7 @@
 name: Virek
 description: Virek — Code Reviewer del equipo OVAV. Validación pre-commit, detección de secretos, análisis de patrones y consistencia de estilo.
 mode: subagent
-model: opencode-go/glm-5.1
+model: openai/gpt-5.6-luna
 hidden: true
 color: "#d79921"
 permission:

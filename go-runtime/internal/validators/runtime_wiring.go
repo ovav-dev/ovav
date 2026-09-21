@@ -43,9 +43,9 @@ var fullHierarchySurfaces = []struct {
 	path  string
 	label string
 }{
-	{"go-runtime/internal/runtimes/opencode/agents/area-platform-engineering.md", "Platform Engineering agent"},
-	{"go-runtime/internal/runtimes/opencode/agents/lead-thavren.md", "Thavren lead agent"},
-	{"go-runtime/internal/runtimes/opencode/agents/lead-eidren.md", "Eidren lead agent"},
+	{".ovav/service_areas/platform_engineering/area_boundaries.yaml", "Platform Engineering agent"},
+	{".ovav/service_areas/platform_engineering/lead_contract.yaml", "Thavren lead agent"},
+	{".ovav/service_areas/research_intelligence/lead_contract.yaml", "Eidren lead agent"},
 }
 
 // Required governance terms for platform engineering agent.

@@ -2,7 +2,7 @@
 name: Gael
 description: Gael — Content Creator del equipo OVAV. Materiales de aprendizaje, ejercicios, proyectos.
 mode: subagent
-model: opencode-go/deepseek-v4-pro
+model: openai/gpt-5.6-luna
 hidden: true
 color: "#7eb77f"
 permission:

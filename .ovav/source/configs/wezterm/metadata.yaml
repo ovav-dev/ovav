@@ -1,0 +1,46 @@
+# WezTerm Config Metadata
+version: "2.0.0"
+tool: wezterm
+platform: windows-wsl2
+min_version: "20260805"
+
+# Canonical source: .ovav/source/configs/wezterm/
+
+# User-customizable variables (top of wezterm.lua)
+user_variables:
+  - wsl_username
+  - wsl_distro
+  - wsl_domain_label
+  - paths.home
+  - paths.system
+  - paths.ovav
+
+# Deploy target (ovav convert)
+deploy:
+  - path: config/wezterm/wezterm.lua
+    description: WezTerm Lua config (OVAV managed)
+
+# Home injection (ovav convert --inject)
+inject:
+  - path: config/wezterm/wezterm.lua
+    target: ~/.wezterm.lua
+    description: User WezTerm config
+
+# Dependencies
+dependencies:
+  runtime:
+    - wezterm >= 20260805
+    - fish shell
+    - WSL2 Ubuntu-24.04
+  fonts:
+    - Cascadia Code
+    - Symbols Nerd Font Mono
+
+# Features
+features:
+  - Workspace switching (ALT+1/2/3)
+  - WSL2 domain
+  - OVAV color palette
+  - Tab bar accents
+  - Status bar
+  - Hyperlinks to GitHub issues/PRs

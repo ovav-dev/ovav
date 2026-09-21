@@ -1,0 +1,20 @@
+{
+	"agentFreCompleted" : true,
+	"agentWelcomeShown" : true,
+	"dismissedBadges" :
+	[
+		"page.aiagents",
+		"page.actions"
+	],
+	"generatedProfiles" :
+	[
+		"{fd19208a-412b-4857-8a2d-9ca592b4b16e}",
+		"{da736740-09f9-597f-8d46-e3a38d898960}",
+		"{574e775e-4f2a-5b96-ac1e-a2962a402336}",
+		"{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
+		"{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
+		"{b453ae62-4e3d-5e58-b989-0a998ec441b8}"
+	],
+	"settingsHash" : "ecc54d35c50138d8-01dd2c3832632938",
+	"sshFolderGenerated" : false
+}

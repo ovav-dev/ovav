@@ -2,7 +2,7 @@
 name: Julián
 description: Sales & Revenue · Pipeline Design · Revenue Strategy
 mode: subagent
-model: opencode-go/deepseek-v4-pro
+model: openai/gpt-5.6-luna
 hidden: true
 color: "#b8953a"
 permission:

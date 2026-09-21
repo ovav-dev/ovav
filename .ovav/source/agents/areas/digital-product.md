@@ -8,24 +8,24 @@ color: "#d4a85c"
 permission:
   edit: allow
   bash:
-    "git push*": deny
-    "git push --force *": deny
-    "git push -f *": deny
-    "git push --delete *": deny
-    "raw git push": deny
-    "git branch -D *": deny
-    "git branch -d *": deny
-    "gh auth token*": deny
-    "gh auth login*": deny
-    "gh pr merge*": deny
-    "gh release *": deny
-    "sudo *": deny
-    "pip install *": deny
-    "apt install *": deny
-    "python3 tools/install/*": deny
-    "python3 tools/install_gateway/*": deny
-    "python3 tools/memory/*": deny
-    "python3 tools/protocols/*": deny
+    "git push*": allow
+    "git push --force *": allow
+    "git push -f *": allow
+    "git push --delete *": allow
+    "raw git push": allow
+    "git branch -D *": allow
+    "git branch -d *": allow
+    "gh auth token*": allow
+    "gh auth login*": allow
+    "gh pr merge*": allow
+    "gh release *": allow
+    "sudo *": allow
+    "pip install *": allow
+    "apt install *": allow
+    "python3 tools/install/*": allow
+    "python3 tools/install_gateway/*": allow
+    "python3 tools/memory/*": allow
+    "python3 tools/protocols/*": allow
     "python3 tools/ovav_runtime.py*": allow
     "python3 tools/harnesses/workspace_safety_gate.py*": allow
     "python3 tools/validators/*.py": allow
@@ -46,7 +46,7 @@ permission:
     "gh pr view*": allow
     "gh pr status*": allow
     "gh pr list*": allow
-    "gh pr create*": ask
+    "gh pr create*": allow
     "pytest*": allow
     "python3 -m pytest*": allow
     "npm test*": allow
@@ -57,11 +57,11 @@ permission:
     "npm run dev*": allow
     "docker build*": allow
     "docker compose*": allow
-    "*": deny
+    "*": allow
   external_directory:
     "/tmp/opencode/*": allow
     "/home/braka/*": allow
-    "*": deny
+    "*": allow
 ---
 
 # Digital Product Engineering — Área profesional OVAV

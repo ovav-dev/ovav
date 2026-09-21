@@ -3,6 +3,7 @@ package ows
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -58,6 +59,44 @@ func TestCommandRegistry_ShortNames(t *testing.T) {
 		if cmd.Name != tt.full {
 			t.Errorf("short %q → name %q, want %q", tt.short, cmd.Name, tt.full)
 		}
+	}
+}
+
+func TestResolveShortCommandArgs(t *testing.T) {
+	tests := []struct {
+		name string
+		args []string
+		want []string
+	}{
+		{
+			name: "create alias",
+			args: []string{"ovav", "worktree", "owc", "feat-cima"},
+			want: []string{"ovav", "worktree", "create", "feat-cima"},
+		},
+		{
+			name: "alias preserves flags",
+			args: []string{"ovav", "worktree", "owc", "--profile=fix", "feat-cima"},
+			want: []string{"ovav", "worktree", "create", "--profile=fix", "feat-cima"},
+		},
+		{
+			name: "canonical command unchanged",
+			args: []string{"ovav", "worktree", "create", "feat-cima"},
+			want: []string{"ovav", "worktree", "create", "feat-cima"},
+		},
+		{
+			name: "unknown command unchanged",
+			args: []string{"ovav", "worktree", "unknown", "feat-cima"},
+			want: []string{"ovav", "worktree", "unknown", "feat-cima"},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := resolveShortCommandArgs(tt.args)
+			if strings.Join(got, " ") != strings.Join(tt.want, " ") {
+				t.Fatalf("resolveShortCommandArgs() = %v, want %v", got, tt.want)
+			}
+		})
 	}
 }
 

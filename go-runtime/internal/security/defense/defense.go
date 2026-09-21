@@ -503,7 +503,14 @@ func DetectSecrets(repoRoot string) []string {
 		`sk-[a-zA-Z0-9]{48}`,          // OpenAI API key
 		`xox[baprs]-[a-zA-Z0-9]{10,}`, // Slack tokens
 		// Real credential values (20+ chars, not short test strings)
-		`(password|secret|api_key|apikey)\s*[:=]\s*['"][a-zA-Z0-9+/=_\-]{20,}['""]`,
+		// Simplified pattern - avoids nested quantifiers that cause backtracking
+		`(?:password|secret|api_key|apikey)\s*[:=]\s*['"][a-zA-Z0-9+/=_\-]{20,}['""]`,
+	}
+
+	// Pre-compile all regex patterns once to avoid repeated compilation overhead
+	compiledPatterns := make([]*regexp.Regexp, 0, len(patterns))
+	for _, pat := range patterns {
+		compiledPatterns = append(compiledPatterns, regexp.MustCompile(pat))
 	}
 
 	cmd := exec.Command("git", "-C", repoRoot, "ls-files")
@@ -551,8 +558,8 @@ func DetectSecrets(repoRoot string) []string {
 			continue
 		}
 		content := string(data)
-		for _, pat := range patterns {
-			if regexp.MustCompile(pat).MatchString(content) {
+		for _, re := range compiledPatterns {
+			if re.MatchString(content) {
 				found = append(found, f)
 				break
 			}

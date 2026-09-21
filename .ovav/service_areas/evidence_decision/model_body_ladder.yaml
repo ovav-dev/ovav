@@ -1,52 +1,9 @@
-# Research Intelligence — Model Body Ladder
-# v1.0.0
-
 model_body_ladder:
-  version: "1.0.0"
+  version: "2.0.0"
   area: evidence_decision
-
-  default_model: "opencode-go/deepseek-v4-pro"
-
+  strategy: dual_provider
+  default_model: "openai/gpt-5.6-luna"
+  small_model: "minimax-coding-plan/MiniMax-M3"
   ladder:
-    - tier: primary
-      model: "opencode-go/deepseek-v4-pro"
-      provider: "deepseek"
-      use_case: "Deep research, multi-source synthesis, decision briefs"
-      context_window: 128000
-      priority: 1
-
-    - tier: secondary
-      model: "opencode-go/mimo-v2.5-pro"
-      provider: "mimo"
-      use_case: "Benchmark scoring, evidence evaluation, source verification"
-      context_window: 128000
-      priority: 2
-
-    - tier: emergency
-      model: "opencode-go/deepseek-v4-flash-free"
-      provider: "deepseek"
-      use_case: "Quick lookup, simple verification, cache refresh"
-      context_window: 32000
-      priority: 3
-
-  task_routing:
-    deep_research:
-      preferred: primary
-      fallback: secondary
-    benchmark_scoring:
-      preferred: secondary
-      fallback: primary
-    quick_lookup:
-      preferred: emergency
-      fallback: primary
-    decision_brief:
-      preferred: primary
-      fallback: secondary
-
-  switch_triggers:
-    - condition: "credit_exhaustion"
-      action: "switch to next available tier"
-    - condition: "repeated_errors"
-      action: "switch to emergency tier"
-    - condition: "latency >10s"
-      action: "switch to emergency tier for quick tasks"
+    - {tier: primary, model: "openai/gpt-5.6-luna", provider: openai, use_case: "Evidence evaluation and decision analysis", priority: 1}
+    - {tier: fallback, model: "minimax-coding-plan/MiniMax-M3", provider: minimax-coding-plan, use_case: "Scoring, summarization and quick verification", priority: 2}

@@ -1,24 +1,6 @@
 ---
-name: "Oliver"
-type: subagent
-hidden: true
-permission:
-  edit: "allow"
-  bash:
-    go test*: "allow"
-    go build*: "allow"
-    go mod*: "allow"
-    ovav doctor*: "allow"
-    ovav status*: "allow"
-    git status*: "allow"
-    git commit*: "deny"
-    go vet*: "allow"
-    go run*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    git diff*: "allow"
-    git log*: "allow"
-    git add *: "allow"
-    git push*: "deny"
+name: "oliver"
+description: "Construyo alianzas estratégicas que multiplican el alcance de OVAV — partnerships con plataformas, comunidades, y empresas que aceleran nuestro crecimiento."
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

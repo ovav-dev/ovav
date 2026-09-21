@@ -1,7 +1,38 @@
+# Squad: Cloud Squad
+# Lead contract team member — delegated by uriel
+# Auto-upgraded to v3.0.0 baseline 2026-08-19
+
 squad:
   id: squad_cloud
-  name: "Cloud Squad"
   area: devops_infrastructure
   lead: uriel
-  scope: "Cloud infrastructure, networking, cost optimization, Vercel/Railway/Neon/Cloudflare"
+  scope: Cloud infrastructure, networking, cost optimization, Vercel/Railway/Neon/Cloudflare
   status: active
+  display_name: Cloud Squad
+  role_id: cloud_architect
+  role: Cloud infrastructure, networking, cost optimization, Vercel/Railway/Neon/Cloudflare
+  version: 3.0.0
+activation:
+  modes:
+  - focused_squad
+  never_default: true
+  router: Delegation Router
+model_body:
+  primary: openai/gpt-5.6-luna
+  secondary: minimax-coding-plan/MiniMax-M3
+lanes:
+- cloud_infra
+capabilities:
+- Architecture design
+- Cost modeling
+- Multi-region setup
+- IaC review
+constraints: &id001
+- No drift allowed
+- Right-sizing quarterly
+authority:
+  can:
+  - execute capabilities within lead scope
+  cannot: *id001
+last_review: '2026-08-19'
+next_review: '2026-11-19'

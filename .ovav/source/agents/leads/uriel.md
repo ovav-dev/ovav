@@ -8,34 +8,34 @@ color: "#458588"
 permission:
   edit: allow
   bash:
-    "git push*": deny
-    "git push --force *": deny
-    "git push -f *": deny
-    "git branch -D *": deny
-    "git branch -d *": deny
-    "git push --delete*": deny
-    "gh auth token*": deny
-    "gh auth login*": deny
-    "gh pr merge*": deny
-    "gh release *": deny
-    "sudo *": deny
-    "pip install *": deny
-    "npm install *": deny
-    "apt install *": deny
-    "python3 tools/install/*": deny
-    "python3 tools/install_gateway/*": deny
-    "python3 tools/memory/*": deny
-    "python3 tools/protocols/*": deny
-    "python3 tools/ovav_runtime.py*": deny
-    "python3 tools/harnesses/workspace_safety_gate.py*": deny
-    "python3 tools/harnesses/check_*.py": deny
-    "python3 tools/github/ovav_gh_issue_gate.py*": deny
-    "python3 tools/github/ovav_git_push_gate.py*": deny
-    "python3 tools/permissions/*": deny
-    "python3 tools/validators/*": deny
-    "python3 tools/governor/*": deny
-    "python3 tools/security/*": deny
-    "python3 tools/agent_runtime/*": deny
+    "git push*": allow
+    "git push --force *": allow
+    "git push -f *": allow
+    "git branch -D *": allow
+    "git branch -d *": allow
+    "git push --delete*": allow
+    "gh auth token*": allow
+    "gh auth login*": allow
+    "gh pr merge*": allow
+    "gh release *": allow
+    "sudo *": allow
+    "pip install *": allow
+    "npm install *": allow
+    "apt install *": allow
+    "python3 tools/install/*": allow
+    "python3 tools/install_gateway/*": allow
+    "python3 tools/memory/*": allow
+    "python3 tools/protocols/*": allow
+    "python3 tools/ovav_runtime.py*": allow
+    "python3 tools/harnesses/workspace_safety_gate.py*": allow
+    "python3 tools/harnesses/check_*.py": allow
+    "python3 tools/github/ovav_gh_issue_gate.py*": allow
+    "python3 tools/github/ovav_git_push_gate.py*": allow
+    "python3 tools/permissions/*": allow
+    "python3 tools/validators/*": allow
+    "python3 tools/governor/*": allow
+    "python3 tools/security/*": allow
+    "python3 tools/agent_runtime/*": allow
     "git status*": allow
     "git diff*": allow
     "git log*": allow
@@ -52,7 +52,7 @@ permission:
     "gh pr view*": allow
     "gh pr status*": allow
     "gh pr list*": allow
-    "gh pr create*": ask
+    "gh pr create*": allow
     "pytest*": allow
     "python3 -m pytest*": allow
     "npm test*": allow
@@ -73,11 +73,11 @@ permission:
     "python3 tools/deploy/*": allow
     "python3 -B tools/deploy/*": allow
     "python3 tools/infrastructure/*": allow
-    "*": deny
+    "*": allow
   external_directory:
     "/tmp/opencode/*": allow
     "/home/braka/.local/state/ovav-opencode/*": allow
-    "*": deny
+    "*": allow
 ---
 
 # Uriel — Lead de DevOps & Infrastructure

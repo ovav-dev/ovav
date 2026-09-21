@@ -2,28 +2,36 @@
 name: "Clara"
 description: "Diseño y ejecuto tests que rompen cosas antes que los usuarios — mi trabajo es encontrar regresiones, edge cases, y comportamientos inesperados que nadie más vio."
 mode: subagent
-model: opencode-go/qwen3.7-plus
+model: openai/gpt-5.6-luna
 hidden: true
 permission:
   edit: "allow"
   bash:
-    "git add *": "allow"
-    "sudo *": "deny"
-    "go vet*": "allow"
-    "go run*": "allow"
-    "ovav doctor*": "allow"
-    "git commit*": "deny"
-    "git push*": "deny"
     "*": "deny"
-    "go test*": "allow"
-    "python3 tools/ovav_runtime.py*": "allow"
-    "git status*": "allow"
-    "git diff*": "allow"
-    "git log*": "allow"
+    apt install *: "deny"
+    dd *of=/dev/*: "deny"
+    git add *: "allow"
+    "git branch --delete *": "deny"
+    "git branch -D *": "deny"
+    git commit*: "deny"
+    git diff*: "allow"
+    git log*: "allow"
+    git push*: "deny"
+    git status*: "allow"
+    go run*: "allow"
+    go test*: "allow"
+    go vet*: "allow"
+    mkfs*: "deny"
+    npm install *: "deny"
+    ovav doctor*: "allow"
+    pip install *: "deny"
+    python3 tools/ovav_runtime.py*: "allow"
+    "rm -rf /*": "deny"
+    sudo *: "deny"
   external_directory:
+    "*": "deny"
     "/home/braka/Labs/mimocode/data/memory/*": "allow"
     "/home/braka/Systems/OVAV": "allow"
-    "*": "deny"
 steps: 12
 ---
 

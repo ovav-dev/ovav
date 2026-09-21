@@ -15,8 +15,8 @@ import "math"
 type Embedding struct {
 	ID      string    `json:"id"`
 	Vector  []float64 `json:"vector"`
-	Text    string    `json:"text"`     // Original text for debugging
-	Created int64     `json:"created"`  // Unix timestamp
+	Text    string    `json:"text"`    // Original text for debugging
+	Created int64     `json:"created"` // Unix timestamp
 }
 
 // Embedder generates embeddings for text.

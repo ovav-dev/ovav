@@ -12,14 +12,14 @@ import "time"
 
 // ResearchTarget represents a data source to research.
 type ResearchTarget struct {
-	ID          string        `yaml:"id"`
-	Name        string        `yaml:"name"`
-	URL         string        `yaml:"url"`
-	Frequency   string        `yaml:"frequency"` // daily, weekly
-	LastRun     time.Time     `yaml:"last_run"`
-	NextRun     time.Time     `yaml:"next_run"`
-	Enabled     bool          `yaml:"enabled"`
-	Credentials *Credentials  `yaml:"credentials,omitempty"`
+	ID          string       `yaml:"id"`
+	Name        string       `yaml:"name"`
+	URL         string       `yaml:"url"`
+	Frequency   string       `yaml:"frequency"` // daily, weekly
+	LastRun     time.Time    `yaml:"last_run"`
+	NextRun     time.Time    `yaml:"next_run"`
+	Enabled     bool         `yaml:"enabled"`
+	Credentials *Credentials `yaml:"credentials,omitempty"`
 }
 
 // Credentials holds API keys or auth tokens for research targets.
@@ -30,13 +30,13 @@ type Credentials struct {
 
 // ResearchResult represents the output of a research cycle.
 type ResearchResult struct {
-	TargetID    string                 `yaml:"target_id"`
-	Timestamp   time.Time              `yaml:"timestamp"`
-	URLsScraped []string               `yaml:"urls_scraped"`
-	Findings    []Finding               `yaml:"findings"`
-	Changes     []Change                `yaml:"changes"`
-	Errors      []string                `yaml:"errors,omitempty"`
-	DurationMs  int64                  `yaml:"duration_ms"`
+	TargetID    string    `yaml:"target_id"`
+	Timestamp   time.Time `yaml:"timestamp"`
+	URLsScraped []string  `yaml:"urls_scraped"`
+	Findings    []Finding `yaml:"findings"`
+	Changes     []Change  `yaml:"changes"`
+	Errors      []string  `yaml:"errors,omitempty"`
+	DurationMs  int64     `yaml:"duration_ms"`
 }
 
 // Finding represents a discovered piece of intelligence.
@@ -47,9 +47,9 @@ type Finding struct {
 	Source      string            `yaml:"source"`
 	URL         string            `yaml:"url"`
 	Severity    string            `yaml:"severity"` // info, warning, critical
-	Category    string            `yaml:"category"`  // model, pricing, security, feature
+	Category    string            `yaml:"category"` // model, pricing, security, feature
 	Metadata    map[string]string `yaml:"metadata,omitempty"`
-	Discovered  time.Time        `yaml:"discovered"`
+	Discovered  time.Time         `yaml:"discovered"`
 }
 
 // Change represents a detected change from previous research.
@@ -65,10 +65,10 @@ type Change struct {
 
 // ResearchStatus represents the current state of the research system.
 type ResearchStatus struct {
-	LastFullRun  time.Time            `yaml:"last_full_run"`
-	NextScheduled time.Time           `yaml:"next_scheduled"`
-	Targets      []ResearchTarget     `yaml:"targets"`
-	TotalFindings int                `yaml:"total_findings"`
-	TotalChanges  int                `yaml:"total_changes"`
-	Running       bool                `yaml:"running"`
+	LastFullRun   time.Time        `yaml:"last_full_run"`
+	NextScheduled time.Time        `yaml:"next_scheduled"`
+	Targets       []ResearchTarget `yaml:"targets"`
+	TotalFindings int              `yaml:"total_findings"`
+	TotalChanges  int              `yaml:"total_changes"`
+	Running       bool             `yaml:"running"`
 }

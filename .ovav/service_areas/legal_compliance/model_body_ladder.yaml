@@ -1,13 +1,16 @@
 model_body_ladder:
-  version: "1.0.0"
+  version: "2.0.0"
   area: legal_compliance
+  strategy: dual_provider
+  default_model: "openai/gpt-5.6-luna"
+  small_model: "minimax-coding-plan/MiniMax-M3"
   tiers:
     ultra:
-      models: ["opencode-go/deepseek-v4-pro"]
+      models: ["openai/gpt-5.6-luna"]
       use_cases: ["complex_contract_review", "regulatory_analysis", "risk_assessment"]
     standard:
-      models: ["opencode-go/deepseek-v4-pro", "minimax-coding-plan/MiniMax-M3"]
+      models: ["openai/gpt-5.6-luna", "minimax-coding-plan/MiniMax-M3"]
       use_cases: ["standard_contract_drafting", "compliance_check", "ip_review"]
     lite:
-      models: ["opencode-go/deepseek-v4-flash"]
+      models: ["minimax-coding-plan/MiniMax-M3"]
       use_cases: ["quick_license_check", "tos_review"]

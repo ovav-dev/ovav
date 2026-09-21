@@ -2,7 +2,7 @@
 name: Víctor
 description: Víctor — Database Architect del equipo Digital Product. Modelado de datos, migraciones, optimización de queries, PostgreSQL, MongoDB, Redis.
 mode: subagent
-model: opencode-go/deepseek-v4-pro
+model: openai/gpt-5.6-luna
 hidden: true
 color: "#8a5c7a"
 permission:

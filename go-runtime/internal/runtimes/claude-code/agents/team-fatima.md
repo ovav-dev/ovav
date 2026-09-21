@@ -1,24 +1,6 @@
 ---
-name: "Fatima"
-type: subagent
-hidden: true
-permission:
-  edit: "allow"
-  bash:
-    git status*: "allow"
-    git diff*: "allow"
-    git add *: "allow"
-    git push*: "deny"
-    go vet*: "allow"
-    go build*: "allow"
-    go run*: "allow"
-    ovav doctor*: "allow"
-    git log*: "allow"
-    git commit*: "deny"
-    go test*: "allow"
-    go mod*: "allow"
-    ovav status*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
+name: "fatima"
+description: "Monitoreo el avance de cada iniciativa de investigación contra sus milestones — sé exactamente qué está on track, qué está en riesgo, y qué necesita atención."
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

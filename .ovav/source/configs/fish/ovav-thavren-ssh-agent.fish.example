@@ -1,0 +1,87 @@
+# OVAV / Thavren SSH agent bootstrap for fish + WSL2
+#
+# Source-local template only. Do not install automatically.
+# Intended install target, after explicit approval only:
+#   ~/.config/fish/conf.d/ovav-thavren-ssh-agent.fish
+#
+# Purpose:
+# - reuse one ssh-agent per WSL user session;
+# - prompt for the OVAV key only when missing or expired;
+# - keep OVAV GitHub access separated through the github-ovav-thavren alias;
+# - avoid storing passphrases, tokens or private keys in OVAV source.
+
+set -gx OVAV_SSH_HOST_ALIAS github-ovav-thavren
+set -gx OVAV_SSH_KEY_PATH "$HOME/.ssh/ovav_thavren_ed25519"
+set -gx OVAV_SSH_KEY_COMMENT ovav-thavren-github
+set -gx OVAV_SSH_AGENT_ENV "$HOME/.ssh/ovav-thavren-agent.env"
+
+# Recommended OVAV/BAB lifetime: 24h.
+# This allows one passphrase prompt per work day, then automatic reuse through ssh-agent.
+# The user can lower this for stricter security.
+set -gx OVAV_SSH_AGENT_LIFETIME 24h
+
+function __ovav_load_agent_env --description "Load persisted OVAV ssh-agent environment"
+    if test -f "$OVAV_SSH_AGENT_ENV"
+        source "$OVAV_SSH_AGENT_ENV" >/dev/null 2>&1
+    end
+end
+
+function __ovav_agent_alive --description "Check whether current ssh-agent is usable"
+    if set -q SSH_AUTH_SOCK
+        ssh-add -l >/dev/null 2>&1
+        set -l code $status
+        test $code -eq 0 -o $code -eq 1
+        return $status
+    end
+    return 1
+end
+
+function __ovav_start_agent --description "Start a scoped ssh-agent for OVAV"
+    mkdir -p "$HOME/.ssh"
+    ssh-agent -c | string replace -r '^echo .*$' '' > "$OVAV_SSH_AGENT_ENV"
+    chmod 600 "$OVAV_SSH_AGENT_ENV"
+    source "$OVAV_SSH_AGENT_ENV" >/dev/null 2>&1
+end
+
+function ovav_ssh_status --description "Show OVAV SSH agent status without exposing secrets"
+    echo "OVAV SSH host alias: $OVAV_SSH_HOST_ALIAS"
+    if __ovav_agent_alive
+        echo "OVAV ssh-agent: active"
+    else
+        echo "OVAV ssh-agent: inactive"
+    end
+
+    if test -f "$OVAV_SSH_KEY_PATH.pub"
+        echo "OVAV public key: present"
+    else
+        echo "OVAV public key: missing"
+    end
+end
+
+function ovav_ssh_unlock --description "Unlock OVAV SSH key for the configured lifetime"
+    __ovav_load_agent_env
+    if not __ovav_agent_alive
+        __ovav_start_agent
+    end
+
+    if not test -f "$OVAV_SSH_KEY_PATH"
+        echo "OVAV SSH key missing: $OVAV_SSH_KEY_PATH"
+        echo "Create it manually after approval: ssh-keygen -t ed25519 -f $OVAV_SSH_KEY_PATH -C ovav-thavren-github"
+        return 1
+    end
+
+    ssh-add -l | string match -q "*$OVAV_SSH_KEY_COMMENT*"
+    if test $status -eq 0
+        echo "OVAV SSH key already loaded."
+        return 0
+    end
+
+    ssh-add -t "$OVAV_SSH_AGENT_LIFETIME" "$OVAV_SSH_KEY_PATH"
+end
+
+function ovav_ssh_test_github --description "Test GitHub SSH auth through OVAV alias"
+    ssh -T "$OVAV_SSH_HOST_ALIAS"
+end
+
+# Intentionally not auto-unlocking on shell startup.
+# The user or a governed OVAV install flow should call ovav_ssh_unlock when needed.

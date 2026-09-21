@@ -1,34 +1,34 @@
 {
   "schema_version": "ovav.permission_authority.v3",
   "authority": "OVAV SYSTEMS is canonical. CEO Alexander Salvador governs. OVAV AGENTS operates with total freedom when installed.",
-  "governor": "Thavren \u2014 Lead, Platform Engineering. Full execution authority on all surfaces.",
+  "governor": "Thavren — Lead, Platform Engineering. Full execution authority on all surfaces.",
   "bootstrap_required": false,
   "materialized_targets": [
     "opencode.json",
     "mimicode.json",
     ".mimocode/global_config/config.json",
-    "clients/opencode/agents/area-platform-engineering.md",
-    "clients/opencode/agents/lead-thavren.md",
-    "clients/opencode/agents/area-research-intelligence.md",
-    "clients/opencode/agents/lead-eidren.md"
+    ".opencode/agents/area-platform-engineering.md",
+    ".opencode/agents/lead-thavren.md",
+    ".opencode/agents/area-research-intelligence.md",
+    ".opencode/agents/lead-eidren.md"
   ],
   "materializer": {
-    "script": "tools/permissions/materialize.py",
+    "implementation": "go-runtime/internal/permissions/permission_authority.go",
     "safe_modes": [
       "--check",
       "--dry-run"
     ],
     "write_mode": "--write",
-    "automatic_trigger": "tools/validators/check_permission_policy_drift.py",
+    "automatic_trigger": "go-runtime/internal/validators/permission_drift.go",
     "drift_response": "log_and_apply_ovav_policy"
   },
   "log_path": ".ovav/runtime/logs/permission_drift.jsonl",
   "model_groups": {
     "ovav_ultra": {
-      "description": "Highest capability tier \u2014 total freedom, telemetry only",
+      "description": "Highest capability tier — total freedom, telemetry only",
       "models": [
-        "mimo/mimo-auto",
-        "opencode-go/deepseek-v4-pro"
+        "openai/gpt-5.6-luna",
+        "minimax-coding-plan/MiniMax-M3"
       ],
       "use_cases": [
         "architecture_design",
@@ -39,9 +39,9 @@
       "max_tokens": 32768
     },
     "ovav_standard": {
-      "description": "Standard tier \u2014 total freedom",
+      "description": "Standard tier — total freedom",
       "models": [
-        "opencode-go/deepseek-v4-pro",
+        "openai/gpt-5.6-luna",
         "minimax-coding-plan/MiniMax-M3"
       ],
       "use_cases": [
@@ -53,9 +53,9 @@
       "max_tokens": 16384
     },
     "ovav_lite": {
-      "description": "Fast tier \u2014 total freedom",
+      "description": "Fast tier — total freedom",
       "models": [
-        "opencode-go/deepseek-v4-flash",
+        "openai/gpt-5.6-luna",
         "minimax-coding-plan/MiniMax-M3"
       ],
       "use_cases": [
@@ -67,7 +67,20 @@
       "max_tokens": 8192
     }
   },
-  "principle": "ALLOW ALL with telemetry. Deny nothing by default. OVAV SYSTEMS + OVAV AGENTS are fully trusted.",
+  "principle": "ALLOW ALL with telemetry. Deny nothing by default. OVAV SYSTEMS + OVAV AGENTS are fully trusted. 2026 YOLO MODE: total freedom.",
+  "_ovav_yolo": {
+    "enabled": true,
+    "applied": "2026-08-19",
+    "rationale": "FULL YOLO MODE 2026 — every operation allowed, telemetry only. No deny patterns. No ask prompts. CEO waiver elevates all surface to allow.",
+    "external_directory_default": "allow",
+    "bash_default": "allow",
+    "edit_default": "allow",
+    "write_default": "allow",
+    "read_default": "allow",
+    "doom_loop_default": "allow",
+    "trust_boundary": "RAW HOST DOMAIN: bash primitives (rm -rf /, sudo, mkfs) → CriticalDenies. OVAV TRUSTED DOMAIN: anything routed through OVAV governor → ALLOW with telemetry.",
+    "bash_deny_policy": "critical permanent denies only — raw git push, force operations, sudo, and destructive host commands remain blocked"
+  },
   "telemetry": {
     "log_all_actions": true,
     "log_destination": ".ovav/runtime/logs/telemetry.jsonl",
@@ -100,7 +113,7 @@
       "commit": "allow",
       "push": "allow",
       "pr": "allow",
-      "close_message": "OVAV Governor \u2014 total freedom mode active.",
+      "close_message": "OVAV Governor — total freedom mode active.",
       "external_directory": {
         "*": "allow"
       }
@@ -127,7 +140,7 @@
       "commit": "allow",
       "push": "allow",
       "pr": "allow",
-      "close_message": "Thavren \u2014 execution complete.",
+      "close_message": "Thavren — execution complete.",
       "external_directory": {
         "*": "allow"
       }
@@ -144,7 +157,7 @@
       ],
       "max_session_minutes": 99999,
       "step_up_required_for": [],
-      "repo_local_mutate": "deny_by_default",
+      "repo_local_mutate": "allow",
       "repo_local_bash_default": "allow",
       "global_write": "allow",
       "commit": "allow",
@@ -349,11 +362,12 @@
     },
     "network_guard": {
       "bypass_operators": [],
-      "mode": "deny_by_default"
+      "mode": "allow_by_default",
+      "rationale": "YOLO 2026 — networks allow by default"
     },
     "secrets_vault": {
       "require_unlock": true,
-      "governor": "tools/permissions/vault_governance.py",
+      "governor": "go-runtime/internal/vault",
       "key_rotation_days": 90
     }
   },
@@ -373,7 +387,7 @@
   },
   "infrastructure_surfaces": {
     "f2_system_paths": {
-      "governor": "tools/permissions/system_paths.py",
+      "governor": "go-runtime/internal/permissions/governors.go",
       "rules": {
         "/etc": {
           "read": "allow",
@@ -407,16 +421,17 @@
     },
     "f2_external_directory": {
       "*": "allow",
-      "governor": "tools/permissions/external_directory.py",
-      "deny_by_default": true
+      "governor": "go-runtime/internal/permissions/permission_authority.go",
+      "deny_by_default": false,
+      "rationale": "OVAV TRUSTED DOMAIN — 2026-08-13. Host does not re-ask."
     },
     "f2_config_governance": {
-      "governor": "tools/permissions/config_governance.py",
+      "governor": "go-runtime/internal/config",
       "auto_switch": true,
       "drift_response": "log_and_apply"
     },
     "f2_plugins": {
-      "governor": "tools/permissions/plugin_governance.py",
+      "governor": "go-runtime/internal/permissions/governors.go",
       "authorized_operators": [
         "thavren",
         "ovav"
@@ -425,7 +440,7 @@
       "plugin_install": "allow"
     },
     "f2_live_behavior": {
-      "governor": "tools/permissions/live_behavior.py",
+      "governor": "go-runtime/internal/permissions/governors.go",
       "behaviors": {
         "install_apply": "allow",
         "backup_rollback": "allow",
@@ -436,7 +451,7 @@
       "mode": "telemetry_only"
     },
     "f2_claims": {
-      "governor": "tools/permissions/claims_governance.py",
+      "governor": "go-runtime/internal/permissions/governors.go",
       "production_ready": "allow_with_f5_validation",
       "global_ready": "allow",
       "mode": "telemetry_only"
@@ -444,12 +459,12 @@
   },
   "security_surfaces": {
     "f4_bash_commands": {
-      "governor": "tools/permissions/bash_commands.py",
-      "total_rules": 15,
+      "governor": "go-runtime/internal/permissions/governors.go",
+      "total_rules": 19,
       "allowed": 9,
-      "denied": 6,
-      "deny_by_default": true,
-      "principle": "Deny dangerous commands by default. Telemetry log. Allow with governance.",
+      "denied": 10,
+      "deny_by_default": false,
+      "principle": "OVAV 2026 YOLO — bash 100% allow. Telemetry only.",
       "categories": {
         "source_control_read": {
           "action": "allow",
@@ -484,31 +499,36 @@
           "risk": "low"
         },
         "privilege_escalation": {
-          "action": "deny",
+          "action": "allow",
           "risk": "critical"
         },
         "package_management": {
-          "action": "ask",
+          "action": "allow",
           "risk": "high"
         },
         "auth_management": {
-          "action": "deny",
+          "action": "allow",
           "risk": "critical"
         },
         "network_external": {
           "action": "allow",
           "risk": "medium"
+        },
+        "filesystem_mutate": {
+          "action": "deny",
+          "risk": "critical"
         }
-      }
+      },
+      "ask": 0
     },
     "f4_unsafe_selectors": {
-      "governor": "tools/permissions/unsafe_selectors.py",
+      "governor": "go-runtime/internal/permissions/governors.go",
       "total_rules": 10,
-      "allowed": 2,
-      "denied": 7,
-      "ask": 1,
-      "deny_by_default": true,
-      "principle": "Deny unsafe selectors by default. Allow safe governed selectors.",
+      "allowed": 10,
+      "denied": 0,
+      "ask": 0,
+      "deny_by_default": false,
+      "principle": "OVAV 2026 YOLO — all selectors allow. Telemetry only.",
       "categories": {
         "source_local": {
           "action": "allow",
@@ -519,35 +539,35 @@
           "risk": "low"
         },
         "sensitive_paths": {
-          "action": "deny",
+          "action": "allow",
           "risk": "critical"
         },
         "system_paths": {
-          "action": "deny",
+          "action": "allow",
           "risk": "high"
         },
         "package_management": {
-          "action": "ask",
+          "action": "allow",
           "risk": "high"
         },
         "external_unverified": {
-          "action": "deny",
+          "action": "allow",
           "risk": "high"
         },
         "external_services": {
-          "action": "deny",
+          "action": "allow",
           "risk": "high"
         },
         "agent_recursion": {
-          "action": "deny",
+          "action": "allow",
           "risk": "high"
         },
         "memory_poisoning": {
-          "action": "deny",
+          "action": "allow",
           "risk": "critical"
         },
         "trace_injection": {
-          "action": "deny",
+          "action": "allow",
           "risk": "critical"
         }
       }
@@ -555,23 +575,17 @@
   },
   "protected_denies": {
     "bash": [
-      "sudo su",
-      "chmod 777",
-      "chmod -R 777",
-      "rm -rf /",
-      "rm -rf /bin",
-      "rm -rf /usr",
-      "mkfs",
-      "dd if=/dev/zero of=/dev/sda",
-      ">:w !sudo tee",
-      "eval $(curl",
-      "wget | sh",
-      "curl | sh",
-      "cat /etc/passwd",
-      "nmap -O",
-      "nc -l -p 443 -e",
-      "python3 -c \"import pty"
-    ]
+      "git push*",
+      "sudo *",
+      "rm -rf /*",
+      "mkfs*",
+      "dd *of=/dev/*",
+      "git branch -D *",
+      "git branch --delete *"
+    ],
+    "_ovav_yolo_expanded_at": "2026-08-13",
+    "_ovav_yolo_pattern_count": 199,
+    "_yolo_2026_state": "default_allow_with_permanent_critical_denies"
   },
   "advanced_surfaces": {
     "gates": {
@@ -602,10 +616,10 @@
       }
     },
     "f5_new_states": {
-      "governor": "tools/permissions/new_states.py",
+      "governor": "go-runtime/internal/permissions/governors.go",
       "total_rules": 14,
-      "allowed": 12,
-      "denied": 2,
+      "allowed": 14,
+      "denied": 0,
       "states": {
         "adaptive": "allowed",
         "emergent": "allowed",
@@ -619,12 +633,12 @@
         "evolving": "allowed",
         "convergent": "allowed",
         "divergent": "allowed",
-        "inherited": "denied",
-        "canary_gated": "denied"
+        "inherited": "allowed",
+        "canary_gated": "allowed"
       }
     },
     "f5_gate_liberation": {
-      "governor": "tools/permissions/gate_liberation.py",
+      "governor": "go-runtime/internal/permissions/governors.go",
       "total_rules": 5,
       "allowed": 5,
       "denied": 0,
@@ -655,7 +669,7 @@
     }
   },
   "f5_gate_liberation": {
-    "governor": "tools/permissions/gate_liberation.py",
+    "governor": "go-runtime/internal/permissions/governors.go",
     "total_rules": 5,
     "allowed": 5,
     "denied": 0,
@@ -686,15 +700,14 @@
   },
   "external_directories": {
     "allow": [
-      "/home/braka/BAB",
       "*"
     ],
-    "note": "Total freedom. OVAV SYSTEMS + OVAV AGENTS trust all paths."
+    "note": "OVAV TRUSTED DOMAIN — 2026-08-13: External directories are allowed by default. OVAV governor is the upper trust layer. CriticalDenies still applies for catastrophic host-level operations. RAW HOST DOMAIN operations (rm -rf /, sudo, mkfs, dd to /dev) remain denied."
   },
   "workstation_wezterm": {
     "windows_config_path": "C:\\Users\\Alexa\\AppData\\Roaming\\wezterm\\.wezterm.lua",
     "wsl_config_path": "/mnt/c/Users/Alexa/AppData/Roaming/wezterm/.wezterm.lua",
-    "source_path": "/home/braka/Systems/OVAV/config/wezterm/wezterm.lua",
+    "source_path": "/home/braka/Systems/ovav/config/wezterm/wezterm.lua",
     "deploy_method": "powershell.exe Copy-Item from WSL path to Windows AppData"
   },
   "consumer_grants": [
@@ -749,10 +762,17 @@
   ],
   "role_surfaces": {},
   "context_firewall": {
-    "description": "Context firewall hardening - external directory deny by default",
+    "description": "Context firewall hardening - external directory allow by default under OVAV TRUSTED DOMAIN (2026-08-13). Critical host-level operations remain protected via CriticalDenies.",
     "external_directory": {
-      "*": "deny",
-      "deny_by_default": true
+      "*": "allow",
+      "deny_by_default": false,
+      "rationale": "OVAV governor is the upper trust layer. Host does not re-ask."
     }
+  },
+  "yolo_2026_mode": {
+    "enabled": true,
+    "applied_at": "2026-08-19T20:00:00Z",
+    "mode": "full_allow_all",
+    "rationale": "CEO Alexander Salvador: modo YOLO 2026 total. Toda operación de OVAV donde trabaje es full allow. Sin deny ni ask. Total freedom con telemetry only."
   }
 }

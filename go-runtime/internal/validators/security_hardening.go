@@ -6,8 +6,9 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 	"time"
+
+	"github.com/ovav/ovav/internal/permissions"
 )
 
 // SecurityHardening validates F4 security hardening: bash command governance,
@@ -44,6 +45,7 @@ func (s *SecurityHardening) Validate(ctx context.Context, root string) Result {
 			Message: "FAIL: permission_authority.json is invalid JSON", Duration: time.Since(start),
 		}
 	}
+	isYolo := isYOLOPolicy(root, policy)
 
 	// 1. Validate security_surfaces section exists
 	sec, ok := policy["security_surfaces"].(map[string]interface{})
@@ -65,23 +67,34 @@ func (s *SecurityHardening) Validate(ctx context.Context, root string) Result {
 		denied := intVal(bash, "denied")
 		denyDefault := boolVal(bash, "deny_by_default")
 		governor := strVal(bash, "governor")
+		goSummary := permissions.NewBashCommandGovernor().GetSummary()
+		expectedTotal, _ := goSummary["total_rules"].(int)
+		expectedAllowed, _ := goSummary["allowed"].(int)
+		expectedDenied, _ := goSummary["denied"].(int)
 
-		if total != 15 {
-			issues = append(issues, fmt.Sprintf("F4.1: bash_commands total_rules expected 15, got %d", total))
+		if total != expectedTotal {
+			issues = append(issues, fmt.Sprintf("F4.1: bash_commands total_rules expected %d from Go governor, got %d", expectedTotal, total))
 		}
-		if allowed != 9 {
-			issues = append(issues, fmt.Sprintf("F4.1: bash_commands allowed expected 9, got %d", allowed))
+		if allowed != expectedAllowed {
+			issues = append(issues, fmt.Sprintf("F4.1: bash_commands allowed expected %d from Go governor, got %d", expectedAllowed, allowed))
 		}
-		if denied != 6 {
-			issues = append(issues, fmt.Sprintf("F4.1: bash_commands denied expected 6, got %d", denied))
+		if denied != expectedDenied {
+			issues = append(issues, fmt.Sprintf("F4.1: bash_commands denied expected %d from Go governor, got %d", expectedDenied, denied))
 		}
-		if !denyDefault {
+		if allowed+denied != total {
+			issues = append(issues, fmt.Sprintf("F4.1: bash_commands allowed(%d) + denied(%d) != total(%d)", allowed, denied, total))
+		}
+		if isYolo && denyDefault {
+			issues = append(issues, "F4.1: YOLO bash_commands deny_by_default must be false")
+		} else if !isYolo && !denyDefault {
 			issues = append(issues, "F4.1: bash_commands deny_by_default must be true")
 		}
 		if governor == "" {
 			issues = append(issues, "F4.1: bash_commands governor path missing")
-		} else if !strings.HasSuffix(governor, "bash_commands.py") {
+		} else if governor != "go-runtime/internal/permissions/governors.go" {
 			issues = append(issues, fmt.Sprintf("F4.1: bash_commands governor path mismatch: %s", governor))
+		} else if _, err := os.Stat(filepath.Join(root, governor)); err != nil {
+			issues = append(issues, fmt.Sprintf("F4.1: bash_commands governor unavailable: %v", err))
 		}
 
 		// Validate categories exist
@@ -90,13 +103,22 @@ func (s *SecurityHardening) Validate(ctx context.Context, root string) Result {
 			"source_control_read", "source_control_mutate", "ovav_internal",
 			"filesystem_read", "interpreted_execution", "github_read",
 			"governed_git", "testing", "privilege_escalation",
-			"package_management", "auth_management", "network_external",
+			"package_management", "auth_management", "network_external", "filesystem_mutate",
 		}
 		for _, cat := range requiredCats {
 			if _, ok := cats[cat]; !ok {
 				issues = append(issues, fmt.Sprintf("F4.1: missing bash category: %s", cat))
 			}
 		}
+
+		// OVAV TRUSTED EXECUTION DOMAIN — 2026-08-13:
+		// YOLO mode: bash is 100% allow. deny_by_default=false is intentional.
+		// The historical F4 invariant of "deny_by_default must be true" is
+		// relaxed under YOLO doctrine — bash safety is enforced by the
+		// Governor (decision_engine + trust_gate) and HMAC-signed CEO waivers,
+		// not by host-level string matching.
+		// The validador should NOT fail on YOLO mode if the policy has a
+		// `_ovav_yolo` marker indicating YOLO is active.
 	}
 
 	// 3. Validate F4.2 unsafe_selectors governance
@@ -114,20 +136,36 @@ func (s *SecurityHardening) Validate(ctx context.Context, root string) Result {
 		if total != 10 {
 			issues = append(issues, fmt.Sprintf("F4.2: unsafe_selectors total_rules expected 10, got %d", total))
 		}
-		if allowed != 2 {
+		if !isYolo && allowed != 2 {
 			issues = append(issues, fmt.Sprintf("F4.2: unsafe_selectors allowed expected 2, got %d", allowed))
 		}
-		if denied != 7 {
+		if isYolo && allowed != total {
+			issues = append(issues, fmt.Sprintf("F4.2: YOLO unsafe_selectors allowed must equal total_rules(%d), got %d", total, allowed))
+		}
+		if isYolo && denied != 0 {
+			issues = append(issues, fmt.Sprintf("F4.2: YOLO unsafe_selectors denied must be 0, got %d", denied))
+		} else if !isYolo && denied != 7 {
 			issues = append(issues, fmt.Sprintf("F4.2: unsafe_selectors denied expected 7, got %d", denied))
 		}
-		if ask != 1 {
+		if isYolo && ask != 0 {
+			issues = append(issues, fmt.Sprintf("F4.2: YOLO unsafe_selectors ask must be 0, got %d", ask))
+		} else if !isYolo && ask != 1 {
 			issues = append(issues, fmt.Sprintf("F4.2: unsafe_selectors ask expected 1, got %d", ask))
 		}
-		if !denyDefault {
+		if isYolo && denyDefault {
+			issues = append(issues, "F4.2: YOLO unsafe_selectors deny_by_default must be false")
+		} else if !isYolo && !denyDefault {
 			issues = append(issues, "F4.2: unsafe_selectors deny_by_default must be true")
+		}
+		if allowed+denied+ask != total {
+			issues = append(issues, fmt.Sprintf("F4.2: unsafe_selectors allowed(%d) + denied(%d) + ask(%d) != total(%d)", allowed, denied, ask, total))
 		}
 		if governor == "" {
 			issues = append(issues, "F4.2: unsafe_selectors governor path missing")
+		} else if governor != "go-runtime/internal/permissions/governors.go" {
+			issues = append(issues, fmt.Sprintf("F4.2: unsafe_selectors governor path mismatch: %s", governor))
+		} else if _, err := os.Stat(filepath.Join(root, governor)); err != nil {
+			issues = append(issues, fmt.Sprintf("F4.2: unsafe_selectors governor unavailable: %v", err))
 		}
 
 		// Validate categories
@@ -145,22 +183,39 @@ func (s *SecurityHardening) Validate(ctx context.Context, root string) Result {
 	}
 
 	// 4. Validate protected_denies section enforces deny-by-default
+	// OVAV TRUSTED EXECUTION DOMAIN — 2026-08-13:
+	// YOLO mode allows 0 deny rules in protected_denies.bash. Skip the
+	// ">= 10 deny rules" check when YOLO is active.
 	pd, _ := policy["protected_denies"].(map[string]interface{})
 	if bashDenies, ok := pd["bash"].([]interface{}); ok {
-		if len(bashDenies) < 10 {
+		if len(bashDenies) < 10 && !isYolo {
 			issues = append(issues, "F4: protected_denies.bash should have >= 10 deny rules")
 		}
 	} else {
 		issues = append(issues, "F4: protected_denies.bash section missing")
 	}
 
+	// 6. Verify hard-deny behavior in the current Go governor, not just declarations.
+	governor := permissions.NewBashCommandGovernor()
+	for _, command := range []string{"git push origin main", "git push --force origin main", "sudo id", "rm -rf /"} {
+		if decision := governor.Check(command, "validator"); decision.Allowed {
+			issues = append(issues, fmt.Sprintf("F4 behavioral hard deny allowed command %q", command))
+		}
+		governor.CEOActive = true
+		if decision := governor.CheckWithCEO(command, "validator"); decision.Allowed {
+			issues = append(issues, fmt.Sprintf("F4 CEO bypass crossed permanent hard deny for %q", command))
+		}
+	}
+
 	// 5. Cross-validate: protected_denies.bash should cover at least bash_commands denies
 	// (they're different scopes: protected_denies covers ALL bash denies including F0-F5,
 	// while f4_bash_commands is F4-specific)
+	// OVAV YOLO mode: when YOLO is active and bash is 100% allow (denied=0),
+	// the cross-validation trivially passes.
 	if bashDenies, ok := pd["bash"].([]interface{}); ok {
 		if bash, ok := sec["f4_bash_commands"].(map[string]interface{}); ok {
 			denied := intVal(bash, "denied")
-			if denied > len(bashDenies) {
+			if denied > len(bashDenies) && !isYolo {
 				issues = append(issues, fmt.Sprintf("F4.1: bash_commands.denied(%d) > protected_denies.bash(%d) — F4 denies not covered",
 					denied, len(bashDenies)))
 			}

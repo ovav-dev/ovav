@@ -78,7 +78,18 @@ func Sync(root string, verbose bool) error {
 		fmt.Printf("  ✓ mimocode: %d artifacts projected\n", mimocodeCount)
 	}
 
-	// 5. OpenCode config generation — canonical YAML → opencode.json (OVERWRITE)
+	// 5. Harness AGENTS projection — opencode_AGENTS.md + mimocode_AGENTS.md
+	agentsCount, err := projectHarnessAgents(root, verbose)
+	if err != nil {
+		if verbose {
+			fmt.Fprintf(os.Stderr, "  ✗ harness_agents: FAILED — %v\n", err)
+		}
+		totalFailed++
+	} else if verbose {
+		fmt.Printf("  ✓ harness_agents: %d harness AGENTS files projected\n", agentsCount)
+	}
+
+	// 6. OpenCode config generation — canonical YAML → opencode.json (OVERWRITE)
 	//    OVAV es la fuente autoritativa. Genera el config completo desde cero.
 	if err := convert.GenerateOpenCodeConfig(root); err != nil {
 		if verbose {
@@ -89,7 +100,7 @@ func Sync(root string, verbose bool) error {
 		fmt.Println("  ✓ config: generated from .ovav/source/opencode/config.yaml")
 	}
 
-	// 5. Validate generated config
+	// 7. Validate generated config
 	configIssues, configErr := convert.ValidateOpenCodeConfig(root)
 	if configErr != nil {
 		if verbose {
@@ -121,12 +132,12 @@ func Sync(root string, verbose bool) error {
 // projectAgentsSimple generates CLI agent files from canonical OVAV YAML
 // using the convert engine — pure Go, no raw file copies.
 //
-//	Canonical source: ovav/agents/{areas,leads,teams}/*.yaml
-//	CLI targets:      runtimes/{opencode,claude-code,cursor}/agents|rules/*.md|.mdc
+//	Canonical source: go-runtime/internal/agents/{areas,leads,teams}/*.yaml
+//	CLI targets:      go-runtime/internal/runtimes/{opencode,claude-code,cursor}/agents/*.md
 //
 // Replaces: tools/agents/project_opencode.py (removed python3 dependency)
 func projectAgentsSimple(root string, verbose bool) (cleaned int, created int, err error) {
-	canonicalRoot := filepath.Join(root, "ovav", "agents")
+	canonicalRoot := filepath.Join(root, "go-runtime", "internal", "agents")
 	targets := convert.AvailableTargets()
 
 	// Clean old generated files across all target output directories
@@ -438,22 +449,15 @@ func projectVisual(root string, verbose bool) (count int, err error) {
 		return 0, fmt.Errorf("parse theme.yaml: %w", err)
 	}
 
-	themeJSONDark := generateOpenCodeTheme(&theme, "dark")
-	themeDarkTarget := filepath.Join(root, ".opencode", "themes", "ovav-dark.json")
-	themeJSONLight := generateOpenCodeTheme(&theme, "light")
-	themeLightTarget := filepath.Join(root, ".opencode", "themes", "ovav-light.json")
-	if err := os.MkdirAll(filepath.Dir(themeDarkTarget), 0755); err != nil {
+	themeJSON := generateOpenCodeTheme(&theme)
+	themeTarget := filepath.Join(root, ".opencode", "themes", "ovav.json")
+	if err := os.MkdirAll(filepath.Dir(themeTarget), 0755); err != nil {
 		return 0, fmt.Errorf("mkdir themes: %w", err)
 	}
-	themeBytesDark, _ := json.MarshalIndent(themeJSONDark, "", "  ")
-	if err := os.WriteFile(themeDarkTarget, append(themeBytesDark, '\n'), 0644); err != nil {
-		return 0, fmt.Errorf("write ovav-dark.json: %w", err)
+	themeBytes, _ := json.MarshalIndent(themeJSON, "", "  ")
+	if err := os.WriteFile(themeTarget, append(themeBytes, '\n'), 0644); err != nil {
+		return 0, fmt.Errorf("write ovav.json: %w", err)
 	}
-	themeBytesLight, _ := json.MarshalIndent(themeJSONLight, "", "  ")
-	if err := os.WriteFile(themeLightTarget, append(themeBytesLight, '\n'), 0644); err != nil {
-		return 0, fmt.Errorf("write ovav-light.json: %w", err)
-	}
-	count++
 	count++
 
 	// ── 2. Monitor Plugin JS ───────────────────────────────────────────
@@ -520,92 +524,58 @@ func projectVisual(root string, verbose bool) (count int, err error) {
 	return count, nil
 }
 
-// generateOpenCodeTheme converts OVAV theme.yaml to a flat OpenCode theme JSON.
-// themeType must be "dark" or "light" - generates standalone theme files.
-func generateOpenCodeTheme(t *themeRaw, themeType string) map[string]interface{} {
-	s := t.Surfaces[themeType]
-	sem := t.Semantic
+// generateOpenCodeTheme converts OVAV theme.yaml to one adaptive OpenCode theme.
+func generateOpenCodeTheme(t *themeRaw) map[string]interface{} {
+	dark := t.Surfaces["dark"]
+	light := t.Surfaces["light"]
 	syntax := t.Syntax
-	diff := t.Diff
-	brand := t.Brand
-
-	name := "OVAV Dark"
-	if themeType == "light" {
-		name = "OVAV Light"
+	pair := func(darkValue, lightValue string) map[string]string {
+		return map[string]string{"dark": darkValue, "light": lightValue}
 	}
 
 	return map[string]interface{}{
 		"$schema": "https://opencode.ai/theme.json",
-		"name":    name,
-		"type":   themeType,
 		"defs": map[string]string{
-			// Brand
-			"ovav_teal":   brand["thavren"],
-			"ovav_green":  brand["eidren"],
-			"ovav_blue":   brand["ovav_core"],
-			"ovav_rose":   brand["ovav_accent"],
-			// Semantic
-			"ovav_success": sem["success"],
-			"ovav_error":  sem["error"],
-			"ovav_warning": sem["warning"],
-			"ovav_info":   sem["info"],
-			// Surfaces (theme-specific)
-			"ovav_bg":      s["bg_root"],
-			"ovav_panel":   s["bg_panel"],
-			"ovav_element": s["bg_element"],
-			"ovav_border":  s["border"],
-			"ovav_text":    s["text_primary"],
-			"ovav_text_secondary": s["text_secondary"],
-			"ovav_text_muted":    s["text_muted"],
-			// Syntax
-			"ovav_syn_keyword":  syntax["keyword"],
-			"ovav_syn_string":   syntax["string"],
-			"ovav_syn_comment":  syntax["comment"],
-			"ovav_syn_function": syntax["function"],
-			"ovav_syn_type":     syntax["type"],
-			// Diff
-			"ovav_diff_added":   diff["added"],
-			"ovav_diff_removed": diff["removed"],
-			"ovav_diff_context": diff["context"],
+			"syntax_keyword": syntax["keyword"],
+			"syntax_string":  syntax["string"],
+			"syntax_number":  syntax["number"],
 		},
-		"theme": map[string]string{
-			// Primary / Secondary
-			"primary":   "ovav_teal",
-			"secondary": "ovav_green",
-			"accent":    "ovav_rose",
-			// Semantic
-			"error":   "ovav_error",
-			"warning": "ovav_warning",
-			"success": "ovav_success",
-			"info":    "ovav_info",
-			// Text
-			"text":         "ovav_text",
-			"textMuted":    "ovav_text_muted",
-			"textSecondary": "ovav_text_secondary",
-			// Backgrounds
-			"background":        "ovav_bg",
-			"backgroundPanel":    "ovav_panel",
-			"backgroundElement":  "ovav_element",
-			// Borders
-			"border":       "ovav_border",
-			"borderActive": "ovav_teal",
-			"borderSubtle": "ovav_element",
-			// Scrollbar
-			"scrollbar":      "ovav_border",
-			"scrollbarHover": "ovav_text_muted",
-			// Input - proper contrast
-			"inputBackground":  "ovav_element",
-			"inputForeground": "ovav_text",
-			"inputPlaceholder": "ovav_text_muted",
-			// Diff
-			"diffAdded":          "ovav_diff_added",
-			"diffRemoved":        "ovav_diff_removed",
-			"diffContext":        "ovav_diff_context",
-			"diffHunkHeader":     "ovav_blue",
-			"diffHighlightAdded":   "ovav_diff_added",
-			"diffHighlightRemoved": "ovav_diff_removed",
-			"diffAddedBg":   "#1e2a1e",
-			"diffRemovedBg": "#2a1e1e",
+		"theme": map[string]interface{}{
+			"primary":              pair(dark["primary"], light["primary"]),
+			"secondary":            pair(dark["secondary"], light["secondary"]),
+			"accent":               pair(dark["accent"], light["accent"]),
+			"error":                pair(dark["error"], light["error"]),
+			"warning":              pair(dark["warning"], light["warning"]),
+			"success":              pair(dark["success"], light["success"]),
+			"info":                 pair(dark["info"], light["info"]),
+			"text":                 pair(dark["text_primary"], light["text_primary"]),
+			"textMuted":            pair(dark["text_muted"], light["text_muted"]),
+			"textSecondary":        pair(dark["text_secondary"], light["text_secondary"]),
+			"background":           pair(dark["bg_root"], light["bg_root"]),
+			"backgroundPanel":      pair(dark["bg_panel"], light["bg_panel"]),
+			"backgroundElement":    pair(dark["bg_element"], light["bg_element"]),
+			"border":               pair(dark["border"], light["border"]),
+			"borderActive":         pair(dark["border_active"], light["border_active"]),
+			"borderSubtle":         pair(dark["bg_element"], light["bg_element"]),
+			"diffAdded":            pair(dark["diff_added"], light["diff_added"]),
+			"diffRemoved":          pair(dark["diff_removed"], light["diff_removed"]),
+			"diffContext":          pair(dark["diff_context"], light["diff_context"]),
+			"diffHunkHeader":       pair(dark["diff_hunk"], light["diff_hunk"]),
+			"diffHighlightAdded":   pair(dark["diff_added"], light["diff_added"]),
+			"diffHighlightRemoved": pair(dark["diff_removed"], light["diff_removed"]),
+			"diffAddedBg":          pair(dark["diff_added_bg"], light["diff_added_bg"]),
+			"diffRemovedBg":        pair(dark["diff_removed_bg"], light["diff_removed_bg"]),
+			"diffContextBg":        pair(dark["bg_panel"], light["bg_panel"]),
+			"markdownText":         pair(dark["text_primary"], light["text_primary"]),
+			"markdownHeading":      pair(dark["primary"], light["primary"]),
+			"markdownLink":         pair(dark["info"], light["info"]),
+			"markdownCode":         pair(dark["success"], light["success"]),
+			"syntaxComment":        pair(dark["text_muted"], light["text_muted"]),
+			"syntaxKeyword":        pair(dark["accent"], light["accent"]),
+			"syntaxFunction":       pair(dark["primary"], light["primary"]),
+			"syntaxVariable":       pair(dark["text_primary"], light["text_primary"]),
+			"syntaxString":         pair(dark["secondary"], light["secondary"]),
+			"syntaxNumber":         pair(dark["accent"], light["accent"]),
 		},
 	}
 }
@@ -838,6 +808,60 @@ func syncPluginRegistry(root string) (int, error) {
 	return len(existing), nil
 }
 
+// ── Projector 4b: Harness AGENTS Projection ──────────────────────────────
+
+// projectHarnessAgents projects harness-specific AGENTS.md files from OVAV
+// canonical sources to the repository root.
+//
+// opencode_AGENTS.md:  Source → .ovav/source/opencode/AGENTS.md
+//
+//	Target → {root}/opencode_AGENTS.md
+//
+// mimocode_AGENTS.md:  Source → .ovav/source/mimocode/AGENTS.md
+//
+//	Target → {root}/mimocode_AGENTS.md
+//
+// crush_AGENTS.md:     Source → .ovav/source/crush/AGENTS.md
+//
+//	Target → {root}/crush_AGENTS.md
+//
+// These are the harness-specific instruction overlays that supersede the
+// generic AGENTS.md for OpenCode, MiMoCode, and Crush users respectively.
+func projectHarnessAgents(root string, verbose bool) (count int, err error) {
+	agents := []struct {
+		sourceRel string // relative to .ovav/source/
+		target    string // absolute target path
+	}{
+		{filepath.Join("opencode", "AGENTS.md"), filepath.Join(root, "opencode_AGENTS.md")},
+		{filepath.Join("mimocode", "AGENTS.md"), filepath.Join(root, "mimocode_AGENTS.md")},
+		{filepath.Join("crush", "AGENTS.md"), filepath.Join(root, "crush_AGENTS.md")},
+	}
+
+	for _, a := range agents {
+		src := filepath.Join(root, ".ovav", "source", a.sourceRel)
+		if _, statErr := os.Stat(src); os.IsNotExist(statErr) {
+			if verbose {
+				fmt.Printf("    · %s: source not found, skipping\n", filepath.Base(a.target))
+			}
+			continue
+		}
+		if filesEqual(src, a.target) {
+			if verbose {
+				fmt.Printf("    · %s: up to date\n", filepath.Base(a.target))
+			}
+			continue
+		}
+		if copyErr := copyFile(src, a.target); copyErr != nil {
+			return count, fmt.Errorf("copy %s: %w", a.target, copyErr)
+		}
+		count++
+		if verbose {
+			fmt.Printf("    ✅ %s: projected\n", filepath.Base(a.target))
+		}
+	}
+	return count, nil
+}
+
 // ── Projector 4: MiMo Code Projection ────────────────────────────────────
 
 // projectToMimocode projects skills, plugins, and workflows from OVAV canonical
@@ -1038,4 +1062,9 @@ func SyncVisual(root string, verbose bool) (count int, err error) {
 // SyncMiMoCode runs the MiMo Code projection step.
 func SyncMiMoCode(root string, verbose bool) (count int, err error) {
 	return projectToMimocode(root, verbose)
+}
+
+// SyncHarnessAgents runs the harness AGENTS projection step.
+func SyncHarnessAgents(root string, verbose bool) (count int, err error) {
+	return projectHarnessAgents(root, verbose)
 }

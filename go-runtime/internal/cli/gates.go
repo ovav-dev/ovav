@@ -12,10 +12,13 @@
 package cli
 
 import (
+	"bufio"
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -98,6 +101,7 @@ func DefaultManagedSurfaces() []ManagedSurface {
 func SurfacesCheck(repoRoot string) map[string]interface{} {
 	surfaces := DefaultManagedSurfaces()
 	var results []map[string]interface{}
+	requiredPassed := true
 
 	for _, s := range surfaces {
 		fullPath := filepath.Join(repoRoot, s.Path)
@@ -105,6 +109,10 @@ func SurfacesCheck(repoRoot string) map[string]interface{} {
 		status := "ok"
 		if !exists {
 			status = "missing"
+			if s.Required {
+				status = "missing_required"
+				requiredPassed = false
+			}
 		}
 		results = append(results, map[string]interface{}{
 			"path":     s.Path,
@@ -118,6 +126,7 @@ func SurfacesCheck(repoRoot string) map[string]interface{} {
 	return map[string]interface{}{
 		"schema_version": "ovav.surface_manager.v1",
 		"command":        "status",
+		"passed":         requiredPassed,
 		"generated_at":   time.Now().UTC().Format(time.RFC3339),
 		"surfaces":       results,
 	}
@@ -161,21 +170,32 @@ func SurfacesRepairPlan(repoRoot string) map[string]interface{} {
 	return map[string]interface{}{
 		"schema_version":         "ovav.surface_manager.v1",
 		"command":                "repair-plan",
+		"passed":                 totalRequiredMissing == 0,
 		"generated_at":           time.Now().UTC().Format(time.RFC3339),
 		"surfaces":               check["surfaces"],
 		"repair_actions":         repairActions,
 		"total_missing":          totalMissing,
 		"total_required_missing": totalRequiredMissing,
-		"writes_required":        true,
+		"writes_required":        len(repairActions) > 0,
 		"consent_required":       true,
 	}
 }
 
 // ── Public Export Gate (ovav_public_export_gate.py) ──────────────────────────
 
-var secretPatterns = []string{
-	"sk-", "ghp_", "github_pat_", "AIza", "sk-or-", "xoxb-", "xoxp-",
-	"-----BEGIN " + "RSA PRIVATE KEY-----", "-----BEGIN " + "OPENSSH PRIVATE KEY-----",
+var exportSecretPatterns = []struct {
+	re    *regexp.Regexp
+	label string
+}{
+	{regexp.MustCompile(`ghp_[A-Za-z0-9]{36}`), "GitHub personal access token"},
+	{regexp.MustCompile(`gho_[A-Za-z0-9]{36}`), "GitHub OAuth token"},
+	{regexp.MustCompile(`github_pat_[A-Za-z0-9_]{40,}`), "GitHub fine-grained token"},
+	{regexp.MustCompile(`sk-(proj-)?[A-Za-z0-9_-]{32,}`), "OpenAI/LLM API key"},
+	{regexp.MustCompile(`sk-ant-[A-Za-z0-9_-]{32,}`), "Anthropic API key"},
+	{regexp.MustCompile(`AIza[0-9A-Za-z_-]{35}`), "Google API key"},
+	{regexp.MustCompile(`xox[baprs]-[0-9A-Za-z-]{10,}`), "Slack token"},
+	{regexp.MustCompile(`AKIA[0-9A-Z]{16}`), "AWS access key ID"},
+	{regexp.MustCompile(`-----BEGIN\s+(RSA|EC|DSA|OPENSSH)\s+PRIVATE\s+KEY-----`), "private key block"},
 }
 
 var forbiddenFiles = []string{
@@ -262,22 +282,34 @@ func scanForSecrets(repoRoot string) []map[string]interface{} {
 			if !strings.HasSuffix(path, ".py") {
 				return nil
 			}
-			content, err := os.ReadFile(path)
+			rel, _ := filepath.Rel(repoRoot, path)
+			if isSecretFixturePath(rel) {
+				return nil
+			}
+			file, err := os.Open(path)
 			if err != nil {
 				return nil
 			}
-			for _, pattern := range secretPatterns {
-				if strings.Contains(string(content), pattern) {
-					rel, _ := filepath.Rel(repoRoot, path)
-					truncated := pattern
-					if len(truncated) > 20 {
-						truncated = truncated[:20]
+			defer file.Close()
+			scanner := bufio.NewScanner(file)
+			scanner.Buffer(make([]byte, 0, 64*1024), 1024*1024)
+			lineNumber := 0
+			for scanner.Scan() {
+				lineNumber++
+				line := scanner.Text()
+				if strings.HasPrefix(strings.TrimSpace(line), "#") {
+					continue
+				}
+				for _, pattern := range exportSecretPatterns {
+					if pattern.re.MatchString(line) {
+						findings = append(findings, map[string]interface{}{
+							"file":     rel,
+							"line":     lineNumber,
+							"type":     pattern.label,
+							"severity": "high",
+						})
+						break
 					}
-					findings = append(findings, map[string]interface{}{
-						"file":     rel,
-						"pattern":  truncated,
-						"severity": "high",
-					})
 				}
 			}
 			return nil
@@ -288,6 +320,14 @@ func scanForSecrets(repoRoot string) []map[string]interface{} {
 		findings = []map[string]interface{}{}
 	}
 	return findings
+}
+
+func isSecretFixturePath(path string) bool {
+	path = filepath.ToSlash(path)
+	base := filepath.Base(path)
+	return strings.HasSuffix(base, "_test.py") || strings.Contains(path, "/tests/") ||
+		strings.Contains(path, "/test/") || strings.Contains(path, "/fixtures/") ||
+		strings.Contains(path, "/mocks/")
 }
 
 func checkForbiddenFiles(repoRoot string) []string {
@@ -464,7 +504,7 @@ func ReleasePackageCheck(repoRoot string) map[string]interface{} {
 		},
 		{
 			"name":   "version_consistency",
-			"passed": len(versionInfo) >= 1,
+			"passed": versionInfo.Passed(),
 			"detail": versionInfo,
 		},
 		{
@@ -493,7 +533,8 @@ func ReleasePackageCheck(repoRoot string) map[string]interface{} {
 		"uncommitted_files":   uncommittedFiles,
 		"tag_exists":          latestTag != "",
 		"latest_tag":          latestTag,
-		"version_sources":     versionInfo,
+		"version_sources":     versionInfo.Sources,
+		"version_issues":      versionInfo.Issues,
 		"checks":              checks,
 		"generated_at":        time.Now().UTC().Format(time.RFC3339),
 	}
@@ -515,30 +556,121 @@ func checkUncommitted(repoRoot string) (bool, []string) {
 	return len(lines) == 0, lines
 }
 
-func checkVersionConsistency(repoRoot string) map[string]string {
-	sources := map[string]string{}
-	files := map[string]string{
-		"AGENTS.md": "AGENTS.md",
-		"README.md": "README.md",
+type versionConsistency struct {
+	Sources map[string]string `json:"sources"`
+	Issues  []string          `json:"issues"`
+}
+
+func (v versionConsistency) Passed() bool {
+	return len(v.Sources) > 0 && len(v.Issues) == 0
+}
+
+func checkVersionConsistency(repoRoot string) versionConsistency {
+	result := versionConsistency{Sources: map[string]string{}, Issues: []string{}}
+	readVersionFile(repoRoot, "VERSION", true, &result)
+	readVersionFile(repoRoot, "go-runtime/VERSION", pathExists(filepath.Join(repoRoot, "go-runtime")), &result)
+	readVersionFile(repoRoot, "ovav-systems/pi-memory/VERSION", pathExists(filepath.Join(repoRoot, "ovav-systems", "pi-memory")), &result)
+	readGoVersion(repoRoot, "go-runtime/cmd/cpanel/shared.go", &result)
+	readPackageVersion(repoRoot, "package.json", &result)
+	readPackageVersion(repoRoot, "ovav-systems/pi-memory/package.json", &result)
+	readCapsProductVersion(repoRoot, &result)
+
+	systemVersion := result.Sources["VERSION"]
+	for _, source := range []string{"go-runtime/VERSION", "ovav-systems/pi-memory/VERSION", "go-runtime/cmd/cpanel/shared.go"} {
+		if value, ok := result.Sources[source]; ok && systemVersion != "" && value != systemVersion {
+			result.Issues = append(result.Issues, fmt.Sprintf("system version mismatch: %s is %q, want %q", source, value, systemVersion))
+		}
 	}
-	for key, relPath := range files {
-		full := filepath.Join(repoRoot, relPath)
-		content, err := os.ReadFile(full)
-		if err != nil {
+	if memoryVersion, ok := result.Sources["ovav-systems/pi-memory/VERSION"]; ok {
+		if packageVersion, packageOK := result.Sources["ovav-systems/pi-memory/package.json"]; packageOK && packageVersion != memoryVersion {
+			result.Issues = append(result.Issues, fmt.Sprintf("package version mismatch: ovav-systems/pi-memory/package.json is %q, want %q", packageVersion, memoryVersion))
+		}
+	}
+	if productVersion, ok := result.Sources[".ovav/plan/caps.yaml product.version"]; ok {
+		if packageVersion, packageOK := result.Sources["package.json"]; packageOK && packageVersion != productVersion {
+			result.Issues = append(result.Issues, fmt.Sprintf("product version mismatch: package.json is %q, want %q", packageVersion, productVersion))
+		}
+	}
+	return result
+}
+
+func readVersionFile(repoRoot, relPath string, required bool, result *versionConsistency) {
+	data, err := os.ReadFile(filepath.Join(repoRoot, filepath.FromSlash(relPath)))
+	if err != nil {
+		if required {
+			result.Issues = append(result.Issues, relPath+" is missing")
+		}
+		return
+	}
+	value := strings.TrimSpace(string(data))
+	result.Sources[relPath] = value
+	if value == "" {
+		result.Issues = append(result.Issues, relPath+" is empty")
+	}
+}
+
+func readPackageVersion(repoRoot, relPath string, result *versionConsistency) {
+	data, err := os.ReadFile(filepath.Join(repoRoot, filepath.FromSlash(relPath)))
+	if err != nil {
+		return
+	}
+	var manifest struct {
+		Version string `json:"version"`
+	}
+	if err := json.Unmarshal(data, &manifest); err != nil {
+		result.Issues = append(result.Issues, relPath+" has invalid JSON")
+		return
+	}
+	manifest.Version = strings.TrimSpace(manifest.Version)
+	result.Sources[relPath] = manifest.Version
+	if manifest.Version == "" {
+		result.Issues = append(result.Issues, relPath+" version is empty")
+	}
+}
+
+func readGoVersion(repoRoot, relPath string, result *versionConsistency) {
+	data, err := os.ReadFile(filepath.Join(repoRoot, filepath.FromSlash(relPath)))
+	if err != nil {
+		return
+	}
+	matches := regexp.MustCompile(`(?m)^\s*Version\s*=\s*"([^"]*)"`).FindStringSubmatch(string(data))
+	if len(matches) != 2 {
+		result.Issues = append(result.Issues, relPath+" Version is missing")
+		return
+	}
+	value := strings.TrimSpace(matches[1])
+	result.Sources[relPath] = value
+	if value == "" {
+		result.Issues = append(result.Issues, relPath+" Version is empty")
+	}
+}
+
+func readCapsProductVersion(repoRoot string, result *versionConsistency) {
+	const source = ".ovav/plan/caps.yaml product.version"
+	data, err := os.ReadFile(filepath.Join(repoRoot, ".ovav", "plan", "caps.yaml"))
+	if err != nil {
+		return
+	}
+	inProduct := false
+	for _, line := range strings.Split(string(data), "\n") {
+		if strings.TrimSpace(line) == "product:" && !strings.HasPrefix(line, " ") {
+			inProduct = true
 			continue
 		}
-		for _, line := range strings.Split(string(content), "\n") {
-			if strings.Contains(strings.ToLower(line), "version") && hasDigit(line) {
-				truncated := strings.TrimSpace(line)
-				if len(truncated) > 80 {
-					truncated = truncated[:80]
-				}
-				sources[key] = truncated
-				break
+		if inProduct && line != "" && !strings.HasPrefix(line, " ") {
+			break
+		}
+		if inProduct && strings.HasPrefix(line, "  version:") {
+			value := strings.TrimSpace(strings.TrimPrefix(line, "  version:"))
+			value = strings.Trim(value, `"'`)
+			result.Sources[source] = value
+			if value == "" {
+				result.Issues = append(result.Issues, source+" is empty")
 			}
+			return
 		}
 	}
-	return sources
+	result.Issues = append(result.Issues, source+" is missing")
 }
 
 func getLatestTag(repoRoot string) string {

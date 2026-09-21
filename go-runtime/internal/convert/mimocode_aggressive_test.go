@@ -11,11 +11,11 @@ import (
 // of the mimocode agent generation against the OpenCode baseline.
 //
 // Contract enforced (post AreasOnly refactor):
-//   - Both mimocode and opencode publish ONLY area-*.md to the runtime
-//     directory (TAB picker). Leads and teams remain in the canonical
-//     tree (ovav/agents/leads, ovav/agents/teams) and are NOT leaked
-//     into the user-facing picker. claude-code/cursor still get the
-//     full hierarchy — that's tested separately in convert_test.go.
+//   - Both runtimes publish to isolated runtime directories. MiMoCode publishes
+//     only area-*.md plus the central ovav.md governor; OpenCode publishes its
+//     full hierarchy.
+//     claude-code/cursor still get the full hierarchy — that's tested
+//     separately in convert_test.go.
 //   - Every area file has: mode: primary, hidden: false, name, description,
 //     lead reference, color, governance contracts, authorized functions,
 //     limitations, and a hard stop.
@@ -40,7 +40,12 @@ func TestMimocodeBrain_CompleteValidation(t *testing.T) {
 	for _, rt := range []string{"mimocode", "opencode"} {
 		dir := filepath.Join(agentsRoot, rt, "agents")
 		if _, err := os.Stat(dir); os.IsNotExist(err) {
-			t.Fatalf("runtime %s/agents/ does not exist", rt)
+			if rt == "opencode" {
+				dir = filepath.Join(agentsRoot, "..", "go-runtime", "internal", "runtimes", "opencode", "agents")
+			}
+			if _, err := os.Stat(dir); os.IsNotExist(err) {
+				t.Fatalf("runtime %s/agents/ does not exist at %s", rt, dir)
+			}
 		}
 	}
 
@@ -48,17 +53,18 @@ func TestMimocodeBrain_CompleteValidation(t *testing.T) {
 	// Anything beyond that means lead/team files leaked into the picker.
 	{
 		rt := "mimocode"
-		files, _ := filepath.Glob(filepath.Join(agentsRoot, rt, "agents", "*.md"))
-		leadLeak, _ := filepath.Glob(filepath.Join(agentsRoot, rt, "agents", "lead-*.md"))
-		teamLeak, _ := filepath.Glob(filepath.Join(agentsRoot, rt, "agents", "team-*.md"))
+		dir := filepath.Join(agentsRoot, rt, "agents")
+		files, _ := filepath.Glob(filepath.Join(dir, "*.md"))
+		leadLeak, _ := filepath.Glob(filepath.Join(dir, "lead-*.md"))
+		teamLeak, _ := filepath.Glob(filepath.Join(dir, "team-*.md"))
 		if len(leadLeak) > 0 {
 			t.Errorf("%s: AreasOnly runtime leaked %d lead files into picker: %v", rt, len(leadLeak), leadLeak)
 		}
 		if len(teamLeak) > 0 {
 			t.Errorf("%s: AreasOnly runtime leaked %d team files into picker: %v", rt, len(teamLeak), teamLeak)
 		}
-		if len(files) != 10 {
-			t.Errorf("%s: expected 10 area files, got %d", rt, len(files))
+		if len(files) != 11 {
+			t.Errorf("%s: expected 10 area files plus ovav.md, got %d", rt, len(files))
 		}
 	}
 
@@ -66,7 +72,8 @@ func TestMimocodeBrain_CompleteValidation(t *testing.T) {
 	// Verify it has 60+ files with permission blocks (GAP-1 converter fix).
 	{
 		rt := "opencode"
-		files, _ := filepath.Glob(filepath.Join(agentsRoot, rt, "agents", "*.md"))
+		opencodeDir := filepath.Join(agentsRoot, "..", "go-runtime", "internal", "runtimes", "opencode", "agents")
+		files, _ := filepath.Glob(filepath.Join(opencodeDir, "*.md"))
 		if len(files) < 60 {
 			t.Errorf("%s: expected 60+ files (areas+leads+teams), got %d", rt, len(files))
 		}
@@ -140,9 +147,9 @@ func TestMimocodeBrain_CompleteValidation(t *testing.T) {
 	for _, mf := range areaFiles {
 		base := filepath.Base(mf)
 		mimoData, _ := os.ReadFile(mf)
-		opData, err := os.ReadFile(filepath.Join(agentsRoot, "opencode", "agents", base))
+		opData, err := os.ReadFile(filepath.Join(agentsRoot, "..", "go-runtime", "internal", "runtimes", "opencode", "agents", base))
 		if err != nil {
-			t.Errorf("opencode missing area %s", base)
+			t.Errorf("opencode missing area %s: %v", base, err)
 			continue
 		}
 		mimoContent := string(mimoData)

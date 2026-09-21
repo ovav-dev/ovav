@@ -113,15 +113,20 @@ func generateConfigJSON(canonicalRoot, outputRoot string, levelsOverride string)
 		return fmt.Errorf("generating config JSON: %w", err)
 	}
 
-	configPath := filepath.Join(outputRoot, ".mimocode", "global_config", "config.json")
-	if err := os.MkdirAll(filepath.Dir(configPath), 0755); err != nil {
-		return fmt.Errorf("creating global_config dir: %w", err)
+	// Output to config/mimocode/mimocode.jsonc so the projector can include it
+	// in the inject pipeline (config/mimocode/ → ~/.config/mimocode/).
+	// Root fix: previous hardcoded output was .mimocode/global_config/config.json
+	// which was NOT in the inject path, causing stale JSONC to persist in user home.
+	configDir := filepath.Join(outputRoot, "config", "mimocode")
+	if err := os.MkdirAll(configDir, 0755); err != nil {
+		return fmt.Errorf("creating config/mimocode dir: %w", err)
 	}
+	configPath := filepath.Join(configDir, "mimocode.jsonc")
 	if err := os.WriteFile(configPath, data, 0644); err != nil {
-		return fmt.Errorf("writing config.json: %w", err)
+		return fmt.Errorf("writing mimocode.jsonc: %w", err)
 	}
 
-	fmt.Printf("  ✅ config.json: %d areas, %d leads, %d teams → .mimocode/global_config/config.json\n",
+	fmt.Printf("  ✅ mimocode.jsonc: %d areas, %d leads, %d teams → config/mimocode/mimocode.jsonc\n",
 		len(areas), len(leads), len(teams))
 	return nil
 }

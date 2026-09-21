@@ -1,13 +1,38 @@
-# Squad: Knowledge Engineer — Education & Training
+# Squad: Carmen
+# Lead contract team member — delegated by valeria
+# Auto-upgraded to v3.0.0 baseline 2026-08-19
+
 squad:
   id: squad_knowledge_engineer
   display_name: Carmen
   area: education_career
   lead: valeria
-  role: "Knowledge graph construction, prerequisite chain mapping, curriculum architecture"
+  role: Knowledge graph construction, prerequisite chain mapping, curriculum architecture
   role_id: knowledge_engineer
-activation: {modes: [focused_squad], never_default: true}
-model_body: {primary: "opencode-go/deepseek-v4-pro", secondary: "opencode-go/mimo-v2.5-pro"}
-lanes: [knowledge_architecture]
-capabilities: ["Knowledge graph design (Neo4j/NetworkX)", "Prerequisite chain discovery via RPKT", "Curriculum structure mapping", "Domain ontology extraction via LLM", "Concept dependency validation"]
-constraints: ["No modifica infraestructura OVAV", "Knowledge graphs son read-only una vez validados por Valeria"]
+  version: 3.0.0
+activation:
+  modes:
+  - focused_squad
+  never_default: true
+  router: Delegation Router
+model_body:
+  primary: openai/gpt-5.6-luna
+  secondary: minimax-coding-plan/MiniMax-M3
+lanes:
+- knowledge_architecture
+capabilities:
+- Knowledge graph design (Neo4j/NetworkX)
+- Prerequisite chain discovery via RPKT
+- Curriculum structure mapping
+- Domain ontology extraction via LLM
+- Concept dependency validation
+constraints:
+- No modifica infraestructura OVAV
+- Knowledge graphs son read-only una vez validados por Valeria
+authority:
+  can:
+  - execute capabilities within lead scope
+  cannot:
+  - Cite lead's anti-patterns
+last_review: '2026-08-19'
+next_review: '2026-11-19'

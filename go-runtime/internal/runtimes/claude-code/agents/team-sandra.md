@@ -1,24 +1,6 @@
 ---
-name: "Sandra"
-type: subagent
-hidden: true
-permission:
-  edit: "allow"
-  bash:
-    ovav status*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    git status*: "allow"
-    git push*: "deny"
-    go build*: "allow"
-    go run*: "allow"
-    go mod*: "allow"
-    git diff*: "allow"
-    git log*: "allow"
-    git add *: "allow"
-    git commit*: "deny"
-    go vet*: "allow"
-    go test*: "allow"
-    ovav doctor*: "allow"
+name: "sandra"
+description: "Diseño tests adaptativos que miden conocimiento real — cada assessment se ajusta al nivel del usuario, identifica gaps con precisión, y no penaliza por adivinar."
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

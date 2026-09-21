@@ -1,101 +1,58 @@
-# OVAV Code Review — Skill
-
-> **Versión:** 1.0 | **Fecha:** 2026-07-30 | **Lead:** Thavren
-
+---
+name: ovav-review
+description: Code review workflow with Warp Code Review integration.
 ---
 
-## Nombre
-`ovav-review`
+# ovav-review
 
-## Descripción
-Code review con SHA-based diff targeting. Reviewer recibe contexto preciso — nunca el history de la sesión completa.
+Pre-commit code review workflow. Warp Code Review is the human-facing gate; OWS is the gating authority.
 
----
+## When to use
 
-## Cuando Request Review
+- Before every merge to develop
+- Before every push to protected branch
+- Before any PR creation
 
-**Obligatorio:**
-- Después de cada task en subagent-driven development
-- Después de completar major feature
-- Antes de merge a main
+## Workflow
 
-**Opcional pero valioso:**
-- Cuando estás atascado (fresh perspective)
-- Antes de refactoring (baseline check)
-- Después de fix complejo
-
----
-
-## Two-Stage Review Gate
-
-### Stage 1: Spec Compliance
-El diff se compara contra EL SPEC, no contra opiniones.
-
-Preguntas:
-- ¿El código hace lo que el spec dice?
-- ¿Hay silent omissions (cosas que el spec dice que se hacen pero no)?
-- ¿Los tests cubren los casos del spec?
-
-### Stage 2: Code Quality
-- ¿Está tipado correctamente?
-- ¿Sigue los patterns del codebase?
-- ¿Tiene tests?
-- ¿Es el código mantenible?
-- ¿Hay security issues?
-
----
-
-## Como Request Review
-
-### 1. Get git SHAs
 ```bash
-BASE_SHA=$(git rev-parse HEAD~1)  # or origin/main
-HEAD_SHA=$(git rev-parse HEAD)
+# 1. Local review (in worktree)
+git diff develop..HEAD --stat
+
+# 2. Warp Code Review (manual or via Workflow)
+# Open Warp → Code Review → attach to branch
+# Review comments go back to OpenCode automatically
+
+# 3. Address feedback
+git commit --amend --no-edit
+
+# 4. Re-verify
+ovav worktree owv
+
+# 5. Merge if approved
+ovav worktree owd
 ```
 
-### 2. Dispatch reviewer subagent
-El reviewer recibe:
-- SHA range (BASE → HEAD)
-- Spec sections relevantes
-- Scope boundary
+## Rules
 
-### 3. Act on feedback
-- **Critical:** Fix inmediatamente
-- **Important:** Fix antes de proceed
-- **Minor:** Note para después
-- **Wrong reviewer:** Push back con razón
+- Code Review is part of the gate — NOT optional
+- Comments land back in OpenCode via Warp ↔ OpenCode integration
+- OWS decides WHEN to integrate, not code review
+- Always review BEFORE `owd`
 
----
+## Review checklist
 
-## Review Checklist
+| Check | Owner |
+|---|---|
+| 8-row responses (CRIT-018) | self |
+| Tests pass | self |
+| Lint clean | self |
+| No secrets in diff | `check_secrets_hygiene` |
+| Breaking changes documented | reviewer |
+| Migration plan if needed | reviewer |
 
-### Spec Compliance
-- [ ] Cada feature del spec está implementada
-- [ ] Cada endpoint del API spec está conectado
-- [ ] Cada test case del spec tiene test
-- [ ] No hay silent omissions
+## Failure modes
 
-### Code Quality
-- [ ] Tipos correctos (TypeScript / Go)
-- [ ] No `any` en TypeScript
-- [ ] Error handling completo
-- [ ] Tests para edge cases
-- [ ] No hardcoded values (config en env)
-- [ ] Security: input validation, SQL injection prevention
-- [ ] Performance: no N+1 queries, no blocking operations
-
-### Testing
-- [ ] Unit tests para lógica de negocio
-- [ ] Integration tests para API handlers
-- [ ] E2E tests para user flows
-- [ ] Coverage ≥80%
-
----
-
-## Metadata
-
-- **Ubicación:** `.ovav/source/skills/ovav-review/SKILL.md`
-- **Skill ID:** `ovav-review`
-- **Trigger:** Después de cada task, antes de merge
-- **Predecesor:** `ovav-build`
-- **Sucesor:** `ovav-verify`
+- Reviewer rejected → address comments, request re-review
+- "OWS denied merge" → check `owv` output, fix issues
+- "Warp comments not flowing" → check Warp OpenCode plugin

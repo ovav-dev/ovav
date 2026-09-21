@@ -29,6 +29,7 @@ const (
 	ProviderAnthropic  Provider = "anthropic"
 	ProviderOpenRouter Provider = "openrouter"
 	ProviderAzure      Provider = "azure"
+	ProviderMiniMax    Provider = "minimax"
 )
 
 // Config holds OVAV-CONNECT configuration
@@ -45,27 +46,22 @@ type Config struct {
 func LoadConfig() *Config {
 	cfg := &Config{
 		Provider:   ProviderOpenAI,
-		Model:      getEnv("OVAV_MODEL", "gpt-4o"),
+		Model:      getEnv("OVAV_MODEL", "openai/gpt-5.6-luna"),
 		MaxTokens:  4096,
 		TimeoutSec: 120,
 	}
 
-	// Detect provider from environment
-	if key := os.Getenv("OPENAI_API_KEY"); key != "" {
-		cfg.Provider = ProviderOpenAI
-		cfg.APIKey = key
-		cfg.BaseURL = getEnv("OPENAI_BASE_URL", "https://api.openai.com/v1")
-	} else if key := os.Getenv("ANTHROPIC_API_KEY"); key != "" {
-		cfg.Provider = ProviderAnthropic
-		cfg.APIKey = key
-		cfg.BaseURL = getEnv("ANTHROPIC_BASE_URL", "https://api.anthropic.com/v1")
-	} else if key := os.Getenv("OPENROUTER_API_KEY"); key != "" {
-		cfg.Provider = ProviderOpenRouter
-		cfg.APIKey = key
-		cfg.BaseURL = getEnv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
+	// 1. FIRST: Check runtime provider config (~/.ovav/provider.json)
+	// This is set by 'ovav provider use <name>' and takes highest priority
+	if runtimeProvider := loadRuntimeProvider(); runtimeProvider != nil {
+		cfg.Provider = runtimeProvider.Provider
+		cfg.APIKey = runtimeProvider.APIKey
+		cfg.BaseURL = runtimeProvider.BaseURL
+		cfg.Model = runtimeProvider.Model
+		return cfg
 	}
 
-	// Allow override via OVAV_PROVIDER, OVAV_API_KEY, OVAV_BASE_URL
+	// 2. THEN: Check OVAV_* override env vars (user manual override)
 	if p := os.Getenv("OVAV_PROVIDER"); p != "" {
 		cfg.Provider = Provider(p)
 	}
@@ -78,8 +74,78 @@ func LoadConfig() *Config {
 	if m := os.Getenv("OVAV_MODEL"); m != "" {
 		cfg.Model = m
 	}
+	if cfg.APIKey != "" && cfg.BaseURL != "" {
+		return cfg // User set OVAV_* vars explicitly
+	}
+
+	// 3. FINALLY: Auto-detect from available *_API_KEY env vars
+	if key := os.Getenv("MINIMAX_API_KEY"); key != "" {
+		cfg.Provider = ProviderMiniMax
+		cfg.APIKey = key
+		cfg.BaseURL = getEnv("MINIMAX_BASE_URL", "https://api.minimaxi.chat/v1")
+		cfg.Model = getEnv("MINIMAX_MODEL", "minimax-coding-plan/MiniMax-M3")
+	} else if key := os.Getenv("OPENAI_API_KEY"); key != "" {
+		cfg.Provider = ProviderOpenAI
+		cfg.APIKey = key
+		cfg.BaseURL = getEnv("OPENAI_BASE_URL", "https://api.openai.com/v1")
+	} else if key := os.Getenv("ANTHROPIC_API_KEY"); key != "" {
+		// MiniMax Direct API keys start with "sk-cp-"
+		// Anthropic real API keys start with "sk-ant-"
+		if strings.HasPrefix(key, "sk-cp-") {
+			cfg.Provider = ProviderMiniMax
+			cfg.APIKey = key
+			cfg.BaseURL = getEnv("ANTHROPIC_API_ENDPOINT", "https://api.minimax.io/anthropic")
+			cfg.Model = getEnv("ANTHROPIC_MODEL", "minimax-coding-plan/MiniMax-M3")
+		} else {
+			cfg.Provider = ProviderAnthropic
+			cfg.APIKey = key
+			cfg.BaseURL = getEnv("ANTHROPIC_BASE_URL", "https://api.anthropic.com/v1")
+		}
+	} else if key := os.Getenv("OPENROUTER_API_KEY"); key != "" {
+		cfg.Provider = ProviderOpenRouter
+		cfg.APIKey = key
+		cfg.BaseURL = getEnv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
+	}
 
 	return cfg
+}
+
+// runtimeProviderConfig represents the persisted provider selection
+type runtimeProviderConfig struct {
+	Provider Provider `json:"provider"`
+	APIKey   string   `json:"api_key"`
+	BaseURL  string   `json:"base_url"`
+	Model    string   `json:"model"`
+	SetAt    string   `json:"set_at"`
+	SetBy    string   `json:"set_by"`
+}
+
+// loadRuntimeProvider loads the user's runtime provider selection from ~/.ovav/provider.json
+func loadRuntimeProvider() *Config {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return nil
+	}
+	path := home + "/.ovav/provider.json"
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil
+	}
+	var p runtimeProviderConfig
+	if err := json.Unmarshal(data, &p); err != nil {
+		return nil
+	}
+	// Validate that the API key is still available in environment
+	// (we store the key ref, not the actual key for security)
+	if p.APIKey == "" {
+		return nil
+	}
+	return &Config{
+		Provider: p.Provider,
+		APIKey:   p.APIKey,
+		BaseURL:  p.BaseURL,
+		Model:    p.Model,
+	}
 }
 
 func getEnv(key, fallback string) string {
@@ -166,7 +232,7 @@ func (c *Client) Invoke(agentID string, task string) (*Response, error) {
 
 	// Make request based on provider
 	switch c.Config.Provider {
-	case ProviderAnthropic:
+	case ProviderAnthropic, ProviderMiniMax:
 		return c.invokeAnthropic(systemPrompt, task)
 	default:
 		return c.invokeOpenAI(messages)
@@ -248,9 +314,10 @@ func (c *Client) invokeOpenAI(messages []Message) (*Response, error) {
 	}
 
 	url := c.Config.BaseURL
-	if !strings.HasSuffix(url, "/v1/chat/completions") {
-		url = strings.TrimSuffix(url, "/") + "/v1/chat/completions"
-	}
+	// Normalize: remove trailing /v1 if present, then append /v1/chat/completions
+	url = strings.TrimSuffix(url, "/v1")
+	url = strings.TrimSuffix(url, "/")
+	url = url + "/v1/chat/completions"
 
 	req, err := http.NewRequest("POST", url, bytes.NewReader(jsonBody))
 	if err != nil {
@@ -321,9 +388,10 @@ func (c *Client) invokeAnthropic(system, task string) (*Response, error) {
 	}
 
 	url := c.Config.BaseURL
-	if !strings.HasSuffix(url, "/v1/messages") {
-		url = strings.TrimSuffix(url, "/") + "/v1/messages"
-	}
+	// Normalize: remove trailing /v1 if present, then append /v1/messages
+	url = strings.TrimSuffix(url, "/v1")
+	url = strings.TrimSuffix(url, "/")
+	url = url + "/v1/messages"
 
 	req, err := http.NewRequest("POST", url, bytes.NewReader(jsonBody))
 	if err != nil {

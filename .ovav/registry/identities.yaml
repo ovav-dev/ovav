@@ -12,90 +12,83 @@
 version: 1
 canonical: true
 updated_by: ceo
-
 identities:
-  - id: ceo-alexander
-    name: Alexander Salvador
-    email: alexander@ovav.dev
-    role: ceo
-    level: 10
-    key_hash: "14b7afe76531f6d504d8bc117930efcbd8901cd06941f25d072099b4c2a21bb1"
-    permissions:
-      - full_system
-      - deploy
-      - manage_registry
-      - manage_identities
-      - vault_read
-      - vault_write
-      - git_push
-      - infra_manage
-      - web_admin
-    status: active
-
-  - id: dev-lead-thavren
-    name: Thavren
-    email: ""
-    role: lead
-    level: 8
-    key_hash: "PLACEHOLDER"
-    permissions:
-      - vault_read
-      - vault_write
-      - git_push
-      - deploy
-      - infra_manage
-      - web_admin
-    status: active
-
-  - id: dev-senior
-    name: Senior Developer
-    email: ""
-    role: developer
-    level: 5
-    key_hash: "PLACEHOLDER"
-    permissions:
-      - vault_read
-      - git_push
-      - deploy
-    status: active
-
-  - id: dev-junior
-    name: Junior Developer
-    email: ""
-    role: developer
-    level: 3
-    key_hash: "PLACEHOLDER"
-    permissions:
-      - vault_read
-      - git_push
-    status: active
-
-  - id: viewer
-    name: Viewer
-    email: ""
-    role: viewer
-    level: 1
-    key_hash: "PLACEHOLDER"
-    permissions:
-      - read_only
-    status: active
-
+    - id: ceo-alexander
+      name: Alexander Salvador
+      email: alexander@ovav.dev
+      role: ceo
+      level: 10
+      key_hash: "a14dfeadc2ea8b88a6e52e30f0973af4235a47b4a1c62d75a909a380b860ec7c"
+      permissions:
+        - full_system
+        - deploy
+        - manage_registry
+        - manage_identities
+        - vault_read
+        - vault_write
+        - git_push
+        - infra_manage
+        - web_admin
+      status: active
+    - id: dev-lead-thavren
+      name: Thavren
+      email: ""
+      role: lead
+      level: 8
+      key_hash: "PLACEHOLDER"
+      permissions:
+        - vault_read
+        - vault_write
+        - git_push
+        - deploy
+        - infra_manage
+        - web_admin
+      status: active
+    - id: dev-senior
+      name: Senior Developer
+      email: ""
+      role: developer
+      level: 5
+      key_hash: "PLACEHOLDER"
+      permissions:
+        - vault_read
+        - git_push
+        - deploy
+      status: active
+    - id: dev-junior
+      name: Junior Developer
+      email: ""
+      role: developer
+      level: 3
+      key_hash: "PLACEHOLDER"
+      permissions:
+        - vault_read
+        - git_push
+      status: active
+    - id: viewer
+      name: Viewer
+      email: ""
+      role: viewer
+      level: 1
+      key_hash: "PLACEHOLDER"
+      permissions:
+        - read_only
+      status: active
 roles:
-  ceo:
-    level: 10
-    description: "Full system access. Can modify registry, manage identities, deploy, destroy."
-  lead:
-    level: 8
-    description: "Technical lead. Full dev access, can deploy and manage infra."
-  developer:
-    level: 5
-    description: "Developer. Can read vault, push code, deploy with approval."
-  viewer:
-    level: 1
-    description: "Read-only access. Can view status, docs, and audit logs."
-
+    ceo:
+        level: 10
+        description: "Full system access. Can modify registry, manage identities, deploy, destroy."
+    lead:
+        level: 8
+        description: "Technical lead. Full dev access, can deploy and manage infra."
+    developer:
+        level: 5
+        description: "Developer. Can read vault, push code, deploy with approval."
+    viewer:
+        level: 1
+        description: "Read-only access. Can view status, docs, and audit logs."
 signature:
-  algorithm: HMAC-SHA256
-  signed_by: ceo
-  signed_at: "2026-06-22T04:40:00Z"
-  value: "f06f0b401ecced93c91474807adef93dca8d0c30bff3edfe03e382167967b93b"
+    algorithm: HMAC-SHA256-V2
+    signed_by: ceo-alexander
+    signed_at: "2026-08-19T20:13:45.273606676Z"
+    value: "78293a549bb6b80e2c11f35d730e553d193713994296b2a9e1fe25f52aa51e46"

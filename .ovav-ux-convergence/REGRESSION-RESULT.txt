@@ -1,0 +1,93 @@
+============================================================
+OVAV UX CONVERGENCE 2026 — REGRESSION CHECK
+Date: 2026-08-15T12:56:30-05:00
+============================================================
+
+[1] IT shell-integration v3 alive
+  CMD: [ -f ~/.intelligent-terminal/shell-integration_v3.sh ]
+  RESULT: ✅ PASS
+
+[2] Atuin daemon running
+  CMD: pgrep -f 'atuin daemon start' > /dev/null
+  RESULT: ✅ PASS
+
+[3] Atuin pty-proxy running
+  CMD: pgrep -f 'atuin pty-proxy' > /dev/null
+  RESULT: ✅ PASS
+
+[4] Atuin MCP running
+  CMD: pgrep -f 'atuin mcp' > /dev/null
+  RESULT: ✅ PASS
+
+[5] Atuin binary works
+  CMD: atuin --version > /dev/null
+  RESULT: ✅ PASS
+
+[6] Atuin history capture works
+  CMD: atuin history list --cmd-only | head -1 > /dev/null
+  RESULT: ✅ PASS
+
+[7] fzf binary works
+  CMD: fzf --version > /dev/null
+  RESULT: ✅ PASS
+
+[8] zoxide binary works
+  CMD: zoxide --version > /dev/null
+  RESULT: ✅ PASS
+
+[9] Starship binary works
+  CMD: starship --version > /dev/null
+  RESULT: ✅ PASS
+
+[10] Starship renders prompt
+  CMD: STARSHIP_CONFIG=/home/braka/Systems/ovav/workstation/configs/starship/starship.toml starship prompt > /dev/null
+  RESULT: ✅ PASS
+
+[11] ble.sh binary present
+  CMD: [ -f ~/.local/share/blesh/ble.sh ]
+  RESULT: ✅ PASS
+
+[12] blerc present
+  CMD: [ -f ~/.blerc ]
+  RESULT: ✅ PASS
+
+[13] OpenCode binary works
+  CMD: opencode --version > /dev/null
+  RESULT: ✅ PASS
+
+[14] Crush binary works
+  CMD: crush --version > /dev/null
+  RESULT: ✅ PASS
+
+[15] IT settings.json valid JSON
+  CMD: python3 -c 'import json; json.load(open("/mnt/c/Users/Alexa/AppData/Local/Packages/Microsoft.IntelligentTerminal_8wekyb3d8bbwe/LocalState/settings.json"))'
+  RESULT: ✅ PASS
+
+[16] OpenCode tui.json valid JSON
+  CMD: python3 -c 'import json; json.load(open("/home/braka/.config/opencode/tui.json"))'
+  RESULT: ✅ PASS
+
+[17] OVAV runtime go module present
+  CMD: [ -d ~/Systems/ovav/go-runtime ]
+  RESULT: ✅ PASS
+
+[18] OVAV binary built
+  CMD: [ -x ~/Systems/ovav/go-runtime/build/ovav ]
+  RESULT: ✅ PASS
+
+[19] OVAV validate runs
+  CMD: ~/Systems/ovav/go-runtime/build/ovav validate --help > /dev/null
+  RESULT: ✅ PASS
+
+[20] OpenCode ACP JSON-RPC initialize
+  CMD: echo JSON-RPC | opencode acp
+  RESULT: ✅ PASS (JSON-RPC initialize responded)
+
+[21] Bash startup delta
+  BEFORE (no ble.sh): 0m0.002s
+  AFTER (ble.sh): 0m0.477s
+  RESULT: ⚠️ DELTA (acceptable per spec)
+
+============================================================
+SUMMARY: 20 PASS / 0 FAIL / 21 TOTAL
+============================================================

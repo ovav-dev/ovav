@@ -1,0 +1,21 @@
+{
+  "defaultProfile": "{11111111-1111-1111-1111-111111111111}",
+  "actions": [
+    {
+      "command": "copy",
+      "keys": "ctrl+c"
+    }
+  ],
+  "profiles": {
+    "defaults": {},
+    "list": [
+      {
+        "guid": "{11111111-1111-1111-1111-111111111111}",
+        "name": "Existing",
+        "commandline": "pwsh.exe"
+      }
+    ]
+  },
+  "schemes": [],
+  "themes": []
+}

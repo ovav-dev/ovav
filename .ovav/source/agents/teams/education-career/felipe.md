@@ -2,7 +2,7 @@
 name: Felipe
 description: Felipe — Tutoring Designer del equipo OVAV. Flujos de conversación, pistas, scaffolding.
 mode: subagent
-model: opencode-go/deepseek-v4-pro
+model: openai/gpt-5.6-luna
 hidden: true
 color: "#6a9e6f"
 permission:

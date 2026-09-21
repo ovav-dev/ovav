@@ -35,12 +35,13 @@ func (v *F3Roles) Validate(ctx context.Context, root string) Result {
 	start := time.Now()
 	var issues []string
 
+	saDir := filepath.Join(root, ".ovav", "service_areas")
 	agentsDir := filepath.Join(root, "go-runtime", "internal", "runtimes", "opencode", "agents")
 
-	// 1. Validate lead agent files
-	issues = append(issues, v.validateLeadAgents(agentsDir)...)
+	// 1. Validate lead agent files (canonical location)
+	issues = append(issues, v.validateLeadAgents(saDir)...)
 
-	// 2. Validate team agent files
+	// 2. Validate team agent files (harness directory)
 	issues = append(issues, v.validateTeamAgents(agentsDir)...)
 
 	// 3. Research profile rules
@@ -134,33 +135,58 @@ func (v *F3Roles) Validate(ctx context.Context, root string) Result {
 	}
 }
 
-// validateLeadAgents checks that all lead-*.md files have valid YAML frontmatter
-// with required fields: mode, hidden, description.
-func (v *F3Roles) validateLeadAgents(agentsDir string) []string {
+// validateLeadAgents checks that all lead_contract.yaml files have valid YAML structure.
+func (v *F3Roles) validateLeadAgents(saDir string) []string {
 	var issues []string
-	pattern := filepath.Join(agentsDir, "lead-*.md")
-	matches, err := filepath.Glob(pattern)
-	if err != nil || len(matches) == 0 {
-		// Try alternate patterns
-		matches2, _ := filepath.Glob(filepath.Join(agentsDir, "area-*.md"))
-		matches = matches2
-	}
-	if len(matches) == 0 {
-		issues = append(issues, "ERROR: No lead agent files found (lead-*.md or area-*.md in go-runtime/internal/runtimes/opencode/agents/)")
+	entries, err := os.ReadDir(saDir)
+	if err != nil {
+		issues = append(issues, fmt.Sprintf("ERROR: Cannot read service areas directory: %v", err))
 		return issues
 	}
 
-	for _, f := range matches {
-		fileIssues := v.validateAgentFrontmatter(f, requiredLeadFields, "lead")
-		issues = append(issues, fileIssues...)
+	leadCount := 0
+	for _, entry := range entries {
+		if !entry.IsDir() {
+			continue
+		}
+		leadContractPath := filepath.Join(saDir, entry.Name(), "lead_contract.yaml")
+		data, err := os.ReadFile(leadContractPath)
+		if err != nil {
+			continue
+		}
+		leadCount++
+		var doc map[string]interface{}
+		if err := yaml.Unmarshal(data, &doc); err != nil {
+			issues = append(issues, fmt.Sprintf("ERROR: %s/lead_contract.yaml invalid YAML: %v", entry.Name(), err))
+			continue
+		}
+		if lc, ok := doc["lead_contract"].(map[string]interface{}); ok {
+			hasLead := false
+			hasArea := false
+			if _, ok := lc["lead"]; ok {
+				hasLead = true
+			}
+			if _, ok := lc["area"]; ok {
+				hasArea = true
+			}
+			if !hasLead && !hasArea {
+				issues = append(issues, fmt.Sprintf("ERROR: %s/lead_contract.yaml missing lead_contract.lead or lead_contract.area", entry.Name()))
+			}
+		} else {
+			issues = append(issues, fmt.Sprintf("ERROR: %s/lead_contract.yaml missing lead_contract section", entry.Name()))
+		}
+	}
+	if leadCount == 0 {
+		issues = append(issues, "ERROR: No lead_contract.yaml files found in .ovav/service_areas/")
 	}
 	return issues
 }
 
-// validateTeamAgents checks that all team-*.md files have mode: subagent.
-func (v *F3Roles) validateTeamAgents(agentsDir string) []string {
+// validateTeamAgents checks that team-*.md files have mode: subagent.
+// Team agents live in the harness directory, not in .ovav/service_areas/.
+func (v *F3Roles) validateTeamAgents(harnessAgentsDir string) []string {
 	var issues []string
-	pattern := filepath.Join(agentsDir, "team-*.md")
+	pattern := filepath.Join(harnessAgentsDir, "team-*.md")
 	matches, _ := filepath.Glob(pattern)
 	if len(matches) == 0 {
 		return nil // Not an error — team agents are optional
@@ -206,9 +232,14 @@ func (v *F3Roles) validateAgentFrontmatter(path string, requiredFields []string,
 	}
 
 	// Validate mode field specifically
+	// NOTE: OpenCode schema only accepts mode: subagent | primary | all.
+	// There is NO "lead mode" — leads use mode:primary (hidden:true) or mode:primary (hidden:false for area).
 	if mode, ok := fm["mode"].(string); ok {
 		if agentType == "lead" && mode == "subagent" {
-			issues = append(issues, fmt.Sprintf("ERROR: %s — lead agent has mode='subagent' (should be a lead mode)", base))
+			issues = append(issues, fmt.Sprintf("ERROR: %s — lead agent has mode='subagent' (should be mode:primary; there is no 'lead' mode in OpenCode schema)", base))
+		}
+		if agentType == "lead" && mode == "lead" {
+			issues = append(issues, fmt.Sprintf("ERROR: %s — 'mode:lead' is INVALID. OpenCode schema only accepts: subagent, primary, all. Use mode:primary.", base))
 		}
 	}
 

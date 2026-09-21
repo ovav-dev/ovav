@@ -84,21 +84,34 @@ func ProfileForName(name string) Profile {
 	profile := Profile{Name: name, Prefix: prefix}
 
 	switch name {
-	case "hotfix", "emergency":
+	case "emergency":
 		profile.Base = "main"
 		profile.MergeTo = "main+develop"
+		profile.Compliance = "maximum"
+	case "hotfix":
+		profile.Base = "main"
+		profile.MergeTo = "main+develop"
+		profile.Compliance = "strict"
 	case "release":
 		profile.Base = "develop"
 		profile.MergeTo = "main"
+		profile.Compliance = "strict"
 	case "patch":
 		profile.Base = "main"
 		profile.MergeTo = "main+develop"
+		profile.Compliance = "strict"
 	case "spike", "research":
 		profile.Base = "develop"
 		profile.MergeTo = "none"
+		profile.Compliance = "quick"
+	case "enterprise":
+		profile.Base = "develop"
+		profile.MergeTo = "develop"
+		profile.Compliance = "strict"
 	default:
 		profile.Base = "develop"
 		profile.MergeTo = "develop"
+		profile.Compliance = "standard"
 	}
 	return profile
 }
@@ -166,9 +179,8 @@ func StartWithProfile(repoRoot, featureName string, profile Profile) error {
 	author := DetectAuthor(repoRoot)
 	baseBranch := profile.Base
 
-	// Fetch latest base branch — capture to suppress verbose output
-	_ = getGitOutput(repoRoot, "fetch", "origin", baseBranch)
-
+	// NOTE: fetch removed — caused 10+ min hang on slow/offline networks.
+	// Branch creation uses local develop which is always up-to-date locally.
 	// Create branch from LOCAL base branch — guard against existing branch
 	if out := getGitOutput(repoRoot, "branch", "--list", branchName); out != "" {
 		_ = runGit(repoRoot, "branch", "-D", branchName)
@@ -751,7 +763,13 @@ func Merge(repoRoot string) (*MergeResult, error) {
 	for _, target := range mergeTargets {
 		fmt.Printf("  Fetching origin/%s...\n", target)
 		if err := runGit(gitRoot, "fetch", "origin", target); err != nil {
-			return result, fmt.Errorf("fetch %s: %w", target, err)
+			// Local integration remains safe when the remote is unavailable as
+			// long as the base's remote-tracking ref already exists. This keeps
+			// OWS usable offline without silently inventing a new base.
+			if refErr := runGit(gitRoot, "show-ref", "--verify", "--quiet", "refs/remotes/origin/"+target); refErr != nil {
+				return result, fmt.Errorf("fetch %s: %w", target, err)
+			}
+			fmt.Printf("  ⚠️  Remote unavailable; using existing origin/%s ref for local integration.\n", target)
 		}
 	}
 
@@ -937,8 +955,8 @@ func mergeLocalTarget(repoRoot, sourceBranch, target string) error {
 
 	// Pull latest
 	fmt.Printf("  Pulling latest %s...\n", target)
-	if err := runGit(repoRoot, "pull", "origin", target); err != nil {
-		return fmt.Errorf("pull %s: %w", target, err)
+	if err := pullTargetOrUseCachedRef(repoRoot, target); err != nil {
+		return err
 	}
 
 	// Merge the source branch (--no-ff ensures merge commit for traceability)
@@ -956,6 +974,41 @@ func mergeLocalTarget(repoRoot, sourceBranch, target string) error {
 
 	fmt.Printf("  ✅ Merged %s → %s (local)\n", sourceBranch, target)
 	return nil
+}
+
+// pullTargetOrUseCachedRef synchronizes a merge target without honoring the
+// repository's pull.rebase setting. The target was already fetched by Merge;
+// an explicit fast-forward merge safely handles local-ahead targets and avoids
+// unexpectedly rebasing protected branches. If the remote is unavailable, an
+// existing origin/<target> ref is an explicit local snapshot and is safe to
+// use for local integration.
+func pullTargetOrUseCachedRef(repoRoot, target string) error {
+	cmd := exec.Command("git", "merge", "--ff-only", "origin/"+target)
+	cmd.Dir = repoRoot
+	out, err := cmd.CombinedOutput()
+	if err == nil {
+		fmt.Print(string(out))
+		return nil
+	}
+
+	message := strings.ToLower(string(out))
+	if isRemoteUnavailable(message) {
+		if refErr := runGit(repoRoot, "show-ref", "--verify", "--quiet", "refs/remotes/origin/"+target); refErr == nil {
+			fmt.Printf("  ⚠️  Remote unavailable; using existing origin/%s ref for local integration.\n", target)
+			return nil
+		}
+	}
+
+	return fmt.Errorf("update %s: %w: %s", target, err, strings.TrimSpace(string(out)))
+}
+
+func isRemoteUnavailable(message string) bool {
+	return strings.Contains(message, "repository not found") ||
+		strings.Contains(message, "could not resolve host") ||
+		strings.Contains(message, "unable to access") ||
+		strings.Contains(message, "failed to connect") ||
+		strings.Contains(message, "network is unreachable") ||
+		strings.Contains(message, "connection timed out")
 }
 
 // pushTarget pushes the target branch to origin with retry on timeout.

@@ -1,0 +1,7 @@
+# Keep prompt colors inherited from the active terminal ANSI palette.
+add_newline = false
+scan_timeout = 20
+command_timeout = 500
+
+[line_break]
+disabled = true

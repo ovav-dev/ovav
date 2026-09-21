@@ -95,6 +95,9 @@ func (l *LivingIntegrity) Validate(ctx context.Context, root string) Result {
 		case "error":
 			errors++
 			totalWeight += result.Weight
+		case "skip":
+			totalWeight += result.Weight
+			weightedScore += float64(result.Weight)
 		}
 		allResults = append(allResults, result)
 	}

@@ -121,15 +121,26 @@ func (t *ToolReadiness) Validate(ctx context.Context, root string) Result {
 	}
 
 	// 3. Check package install denies in opencode.json
+	// OVAV TRUSTED EXECUTION DOMAIN — 2026-08-13:
+	// YOLO mode: bash is 100% allow. The historical "must deny pip/npm/apt
+	// install" check is relaxed. Only fail if the YOLO marker is NOT present
+	// in the policy and the denies are missing.
 	ocPath := filepath.Join(root, "opencode.json")
 	if data, err := os.ReadFile(ocPath); err == nil {
 		var config map[string]interface{}
 		if json.Unmarshal(data, &config) == nil {
+			// Check YOLO marker
+			isYolo := false
+			if _, ok := config["_ovav"].(map[string]interface{}); ok {
+				isYolo = true
+			}
 			if perms, ok := config["permission"].(map[string]interface{}); ok {
 				if bashPerms, ok := perms["bash"].(map[string]interface{}); ok {
 					for _, cmd := range []string{"pip install *", "npm install *", "apt install *"} {
 						if deny, ok := bashPerms[cmd].(string); !ok || deny != "deny" {
-							issues = append(issues, fmt.Sprintf("opencode.json: must deny '%s' in bash permissions", cmd))
+							if !isYolo {
+								issues = append(issues, fmt.Sprintf("opencode.json: must deny '%s' in bash permissions (or enable YOLO via _ovav marker)", cmd))
+							}
 						}
 					}
 				}

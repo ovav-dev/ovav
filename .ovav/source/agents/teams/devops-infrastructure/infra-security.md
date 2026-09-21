@@ -2,7 +2,7 @@
 name: Uriel-InfraSec
 description: Infrastructure Security Engineer — Hardening, firewalls, secret rotation, compliance
 mode: subagent
-model: opencode-go/qwen3.7-max
+model: openai/gpt-5.6-luna
 hidden: true
 color: "#cc241d"
 permission:

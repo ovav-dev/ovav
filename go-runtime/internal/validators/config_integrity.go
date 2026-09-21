@@ -9,7 +9,13 @@ import (
 	"regexp"
 	"strings"
 	"time"
+
+	"gopkg.in/yaml.v3"
 )
+
+// yamlUnmarshal is a tiny indirection so config_integrity.go can share the
+// project's YAML parser without importing gopkg.in/yaml.v3 directly elsewhere.
+var yamlUnmarshal = yaml.Unmarshal
 
 // ConfigIntegrity validates configuration files for syntax correctness,
 // YAML validity, and canonical source integrity.
@@ -104,7 +110,12 @@ func (c *ConfigIntegrity) Validate(ctx context.Context, root string) Result {
 		issues = append(issues, "MISSING: VERSION file not found")
 	}
 
-	// 3a. Cross-check VERSION against latest git tag
+	// 3a. Cross-check product.version (from caps.yaml) against latest git tag.
+	//
+	// The VERSION file is the CLI/go-runtime version stream — it must agree
+	// with go-runtime/cmd/cpanel/shared.go (checked in 3b below), NOT with the
+	// product git tag. Product version lives in caps.yaml product.version and
+	// matches the latest git tag.
 	if fileVersion != "" {
 		if tag, err := getLatestGitTag(root); err == nil && tag != "" {
 			tagVersion := strings.TrimPrefix(tag, "v")
@@ -112,10 +123,11 @@ func (c *ConfigIntegrity) Validate(ctx context.Context, root string) Result {
 			if idx := strings.LastIndex(tagVersion, "-"); idx >= 0 {
 				tagVersion = strings.TrimPrefix(tagVersion[idx+1:], "v")
 			}
-			if tagVersion != fileVersion {
+			productVersion := readProductVersion(root)
+			if productVersion != "" && tagVersion != productVersion {
 				issues = append(issues, fmt.Sprintf(
-					"VERSION_MISMATCH: VERSION file says '%s' but latest git tag is '%s' (expected '%s')",
-					fileVersion, tag, tagVersion))
+					"PRODUCT_VERSION_MISMATCH: caps.yaml product.version is '%s' but latest git tag is '%s' (expected '%s')",
+					productVersion, tag, tagVersion))
 			}
 		}
 	}
@@ -185,6 +197,30 @@ func getLatestGitTag(dir string) (string, error) {
 		return lines[0], nil
 	}
 	return "", fmt.Errorf("no tags found")
+}
+
+// readProductVersion extracts product.version from .ovav/plan/caps.yaml.
+// Returns empty string if the file is missing, unreadable, has no
+// `product.version` field, or the field is not a string. This is the
+// canonical product version stream — see package.json for parity.
+func readProductVersion(root string) string {
+	data, err := os.ReadFile(filepath.Join(root, ".ovav", "plan", "caps.yaml"))
+	if err != nil {
+		return ""
+	}
+	var caps map[string]interface{}
+	if err := yamlUnmarshal(data, &caps); err != nil {
+		return ""
+	}
+	product, ok := caps["product"].(map[string]interface{})
+	if !ok {
+		return ""
+	}
+	ver, ok := product["version"].(string)
+	if !ok {
+		return ""
+	}
+	return strings.TrimSpace(ver)
 }
 
 var _ Validator = (*ConfigIntegrity)(nil)

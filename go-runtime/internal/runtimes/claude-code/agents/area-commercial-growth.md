@@ -1,8 +1,7 @@
 ---
-name: "Commercial Growth"
+name: "commercial-growth"
 description: "Estrategia comercial, pricing, growth, GTM, Product Hunt — Lead: Sofía"
-type: area
-color: "#16a34a"
+color: "green"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->
@@ -20,6 +19,7 @@ color: "#16a34a"
 # Commercial Growth
 
 **Lead:** sofia
+**Surface:** Estrategia comercial, pricing, growth, marketing, ventas, posicionamiento
 
 ## Functions
 

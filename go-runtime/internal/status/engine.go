@@ -60,6 +60,10 @@ type IntegrityStatus struct {
 	Status      string   `json:"status"` // pass | fail | warn | unknown
 	Label       string   `json:"label"`
 	Icon        string   `json:"icon"`
+	Score       float64  `json:"score,omitempty"`
+	Passed      int      `json:"passed,omitempty"`
+	Failed      int      `json:"failed,omitempty"`
+	Errors      int      `json:"errors,omitempty"`
 	Total       int      `json:"total,omitempty"`
 	Intact      int      `json:"intact,omitempty"`
 	Compromised []string `json:"compromised,omitempty"`

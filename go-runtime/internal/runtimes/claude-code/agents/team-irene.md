@@ -1,24 +1,6 @@
 ---
-name: "Irene"
-type: subagent
-hidden: true
-permission:
-  edit: "allow"
-  bash:
-    git push*: "deny"
-    go test*: "allow"
-    go build*: "allow"
-    go mod*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    git status*: "allow"
-    git commit*: "deny"
-    go vet*: "allow"
-    go run*: "allow"
-    ovav doctor*: "allow"
-    ovav status*: "allow"
-    git diff*: "allow"
-    git log*: "allow"
-    git add *: "allow"
+name: "irene"
+description: "Busco archivos por patrón en el codebase con velocidad quirúrgica — encuentro exactamente lo que necesitás en segundos, sin cargar contexto innecesario."
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

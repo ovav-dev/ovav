@@ -1,4 +1,0 @@
-#!/bin/bash
-# own — nuclear worktree delete wrapper
-# Delegates to: ovav own "$@"
-exec /home/braka/Systems/OVAV/bin/ovav own "$@"

@@ -1,10 +1,10 @@
 {
   "name": "ovav-mcp-consumer-local",
-  "version": "1.0.0",
-  "description": "Local OVAV MCP Consumer Servers",
+  "version": "1.1.0",
+  "description": "OVAV-owned Windows singleton MCP service manager",
   "type": "module",
   "scripts": {
-    "test": "echo \"Tests coming soon\""
+    "test": "pwsh -NoLogo -NoProfile -NonInteractive -File test/ovav-mcp-windows-manager.Tests.ps1"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
@@ -12,5 +12,18 @@
   },
   "devDependencies": {
     "typescript": "^5.0.0"
+  },
+  "ovavWindowsServices": {
+    "manager": "bin/ovav-mcp-windows.ps1",
+    "managedRoot": "%LOCALAPPDATA%\\OVAV\\mcp",
+    "playwright": {
+      "package": "@playwright/mcp@0.0.79",
+      "url": "http://127.0.0.1:8931/mcp"
+    },
+    "memory": {
+      "gateway": "supergateway@3.4.3",
+      "package": "@modelcontextprotocol/server-memory@2026.7.4",
+      "url": "http://127.0.0.1:8932/mcp"
+    }
   }
 }

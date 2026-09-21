@@ -147,10 +147,10 @@ func checkBrokenSymlinks(repoRoot string) []string {
 		if err != nil {
 			return nil
 		}
-		// Skip .git, node_modules, .ovav/worktrees
+		// Skip .git, node_modules, .ovav/worktrees, .mimocode (runtime workspace)
 		rel, _ := filepath.Rel(repoRoot, path)
 		if strings.HasPrefix(rel, ".git") || strings.HasPrefix(rel, "node_modules") ||
-			strings.HasPrefix(rel, ".ovav/worktrees") {
+			strings.HasPrefix(rel, ".ovav/worktrees") || strings.HasPrefix(rel, ".mimocode") {
 			if d.IsDir() {
 				return fs.SkipDir
 			}

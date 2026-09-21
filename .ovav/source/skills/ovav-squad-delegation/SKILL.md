@@ -39,7 +39,7 @@ workflow({
     agent_id: "lead-eidren",   // lead or team ID (see directory below)
     task: "Full task description with context",
     context: "state",          // state=checkpoint summaries, full=all context, none=clean
-    model: "opencode-go/deepseek-v4-pro",  // optional
+    model: "openai/gpt-5.6-luna",  // optional; MiniMax is the fallback
   },
 })
 ```

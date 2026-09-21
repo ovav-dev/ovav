@@ -17,7 +17,10 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"sync"
 	"time"
+
+	"github.com/ovav/ovav/internal/identity"
 )
 
 const (
@@ -27,14 +30,17 @@ const (
 
 	stateFile        = ".ovav/runtime/gate_state.json"
 	worktreeHeadsKey = ".ovav/runtime/worktree_heads.json"
+
+	// gateRelPath is the repo-relative path of the protected gate file.
+	gateRelPath = "go-runtime/internal/validators/host_config_drift.go"
 )
 
 // GateState tracks the gate file hash and the last git operation timestamp.
 // Stored at .ovav/runtime/gate_state.json.
 type GateState struct {
-	GateSHA256       string `json:"gate_sha256"`
-	LastGitOpTime    int64  `json:"last_git_op_time"`    // Unix timestamp
-	LastGitOpReflog  string `json:"last_git_op_reflog"`  // Reflog entry describing the op
+	GateSHA256      string `json:"gate_sha256"`
+	LastGitOpTime   int64  `json:"last_git_op_time"`   // Unix timestamp
+	LastGitOpReflog string `json:"last_git_op_reflog"` // Reflog entry describing the op
 }
 
 // GateFileSHA256 computes the SHA-256 hash of the given file path.
@@ -47,6 +53,10 @@ func GateFileSHA256(path string) string {
 	h := sha256.Sum256(data)
 	return fmt.Sprintf("%x", h)
 }
+
+// refreshMu serialises RefreshGateHash calls across goroutines so the
+// stored hash and last_git_op_time never tear under concurrent refresh.
+var refreshMu sync.Mutex
 
 // statePath returns the path to the gate state file within repoRoot.
 func statePath(repoRoot string) string {
@@ -112,6 +122,90 @@ func WriteGateState(repoRoot string, state GateState) error {
 		return err
 	}
 	return os.WriteFile(statePath(repoRoot), data, 0644)
+}
+
+// RefreshGateHash recomputes the SHA-256 of the protected gate file and
+// publishes a new GateState atomically. It preserves LastGitOpTime when the
+// current value still falls within GracePeriod; otherwise it resets the value
+// to zero so a future validator sees an explicit "no recent op" baseline.
+//
+// Returns the previous and new hash prefixes (full SHA-256 each) so the caller
+// can report the change. Refuses to operate when the gate file itself, or the
+// parent directory of the state file, is a symlink — that would defeat the
+// point of an atomic, directory-FD-checked publish.
+//
+// Concurrent callers are serialised by an internal mutex so the file is
+// never observed in a half-written state by a parallel refresh.
+func RefreshGateHash(repoRoot string) (prevHash, nextHash string, err error) {
+	refreshMu.Lock()
+	defer refreshMu.Unlock()
+
+	gateAbs := filepath.Join(repoRoot, gateRelPath)
+
+	// 1. Refuse symlink gate file — the trust target must be a real file.
+	info, err := os.Lstat(gateAbs)
+	if err != nil {
+		return "", "", fmt.Errorf("stat gate file: %w", err)
+	}
+	if info.Mode()&os.ModeSymlink != 0 {
+		return "", "", fmt.Errorf("gate file is a symlink: %s", gateAbs)
+	}
+
+	// 2. Recompute hash from the on-disk file.
+	nextHash = GateFileSHA256(gateAbs)
+	if nextHash == "" {
+		return "", "", fmt.Errorf("could not hash gate file: %s", gateAbs)
+	}
+
+	// 3. Parent-directory recheck — refuse if .ovav/runtime is a symlink.
+	stateFileAbs := statePath(repoRoot)
+	parentDir := filepath.Dir(stateFileAbs)
+	pinfo, err := os.Lstat(parentDir)
+	if err != nil {
+		return "", "", fmt.Errorf("stat state parent dir: %w", err)
+	}
+	if pinfo.Mode()&os.ModeSymlink != 0 {
+		return "", "", fmt.Errorf("state parent dir is a symlink: %s", parentDir)
+	}
+
+	// 4. Read existing state and decide grace preservation.
+	state := ReadGateState(repoRoot)
+	prevHash = state.GateSHA256
+	state.GateSHA256 = nextHash
+
+	if state.LastGitOpTime != 0 {
+		elapsed := time.Since(time.Unix(state.LastGitOpTime, 0))
+		if elapsed >= GracePeriod {
+			// Outside grace — reset so the next validator reports
+			// "no recent git op" rather than a stale timestamp.
+			state.LastGitOpTime = 0
+			state.LastGitOpReflog = ""
+		}
+		// else: preserve; refresh is happening inside the developer grace window.
+	}
+
+	// 5. Marshal and publish atomically.
+	data, err := json.MarshalIndent(state, "", "  ")
+	if err != nil {
+		return prevHash, "", fmt.Errorf("marshal gate state: %w", err)
+	}
+	data = append(data, '\n')
+
+	if err := os.MkdirAll(parentDir, 0755); err != nil {
+		return prevHash, "", fmt.Errorf("mkdir state dir: %w", err)
+	}
+
+	if err := identity.SecureAtomicReplace(stateFileAbs, data); err != nil {
+		return prevHash, "", fmt.Errorf("atomic replace gate state: %w", err)
+	}
+
+	return prevHash, nextHash, nil
+}
+
+// GateRelPath returns the repo-relative path of the protected gate file.
+// Useful for callers (CLI, validators) that need to reference it.
+func GateRelPath() string {
+	return gateRelPath
 }
 
 // GracePeriodOk returns true if the system is currently within the grace period

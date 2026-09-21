@@ -1,24 +1,6 @@
 ---
-name: "Oscar"
-type: subagent
-hidden: true
-permission:
-  edit: "allow"
-  bash:
-    go test*: "allow"
-    go run*: "allow"
-    go mod*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    git status*: "allow"
-    git diff*: "allow"
-    git push*: "deny"
-    go vet*: "allow"
-    go build*: "allow"
-    ovav doctor*: "allow"
-    ovav status*: "allow"
-    git log*: "allow"
-    git add *: "allow"
-    git commit*: "deny"
+name: "oscar"
+description: "Perfilo y optimizo el runtime de OVAV — identifico cuellos de botella, mido latencia, y propongo optimizaciones con datos, no con opiniones."
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

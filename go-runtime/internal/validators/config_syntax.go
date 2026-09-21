@@ -41,6 +41,11 @@ var excludePatterns = []string{
 	".pytest_cache",
 	"integrity_backups",
 	"/artifacts/",
+	// .ovav/worktrees/ contains feature-isolation branches that may include
+	// in-progress or malformed config files (e.g. JS-style comments in JSON,
+	// WIP schema drafts). Worktrees are an isolation mechanism, not source —
+	// they must not trigger validator failures on the parent repo.
+	".ovav/worktrees/",
 }
 
 // File extensions to validate.

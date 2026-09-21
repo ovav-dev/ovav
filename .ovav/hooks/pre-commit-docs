@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+# OVAV pre-commit hook: docs freshness gate.
+#
+# Per Phase 2 / D4 (doc auto-gen): refuses commit if docs/auto-generated/*.md
+# is out-of-date with current registry. Catches stale documentation.
+#
+# Usage:
+#   - Auto-installed via ovav hooks install-pre-commit (the docs check
+#     hook is appended alongside the baseline freshness hook).
+#   - Bypass: OVAV_BYPASS_DOCS_CHECK=1 git commit ...
+#
+# Exit codes:
+#   0 = docs current (or in dry-run / bypass)
+#   1 = docs stale, run 'ovav docs generate' and re-commit
+
+set -euo pipefail
+
+# Bypass detection
+if [ "${OVAV_BYPASS_DOCS_CHECK:-0}" = "1" ]; then
+  echo "⚠️  OVAV: skipping docs freshness check (OVAV_BYPASS_DOCS_CHECK=1)"
+  exit 0
+fi
+
+# Find ovav binary
+OVAV_BIN="${OVAV_BIN:-ovav}"
+if ! command -v "$OVAV_BIN" >/dev/null 2>&1; then
+  if [ -x "./bin/ovav" ]; then
+    OVAV_BIN="./bin/ovav"
+  elif [ -x "$HOME/.local/bin/ovav" ]; then
+    OVAV_BIN="$HOME/.local/bin/ovav"
+  else
+    echo "⚠️  OVAV: ovav binary not found; skipping docs check"
+    exit 0
+  fi
+fi
+
+# Check if any auto-generated docs are staged
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACMR 2>/dev/null || true)
+DOC_STAGED=""
+for f in $STAGED_FILES; do
+  case "$f" in
+    docs/auto-generated/*.md) DOC_STAGED="$DOC_STAGED $f" ;;
+  esac
+done
+
+if [ -z "$DOC_STAGED" ]; then
+  # No docs staged → no need to check
+  exit 0
+fi
+
+# Run docs check
+set +e
+OUTPUT=$("$OVAV_BIN" docs check 2>&1)
+EXIT_CODE=$?
+set -e
+
+if [ "$EXIT_CODE" = "1" ]; then
+  echo "🚫 OVAV pre-commit hook: docs out-of-date"
+  echo ""
+  echo "Auto-generated docs are stale:"
+  echo "$OUTPUT" | grep "❌"
+  echo ""
+  echo "Fix:"
+  echo "  ./bin/ovav docs generate"
+  echo "  git add docs/auto-generated/*.md"
+  echo "  git commit ..."
+  echo ""
+  echo "Bypass:"
+  echo "  OVAV_BYPASS_DOCS_CHECK=1 git commit ..."
+  exit 1
+fi
+
+exit 0

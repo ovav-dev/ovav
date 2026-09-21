@@ -1,8 +1,7 @@
 ---
-name: "Digital Product"
+name: "digital-product"
 description: "Producto frontend React/TypeScript, apps web, landing pages — Lead: Dante"
-type: area
-color: "#ea580c"
+color: "orange"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->
@@ -20,6 +19,7 @@ color: "#ea580c"
 # Digital Product
 
 **Lead:** dante
+**Surface:** Desarrollo web, aplicaciones, frontend, deploy de producto, APIs públicas
 
 ## Functions
 

@@ -2,7 +2,7 @@
 name: Sergio
 description: Sergio — Backend Engineer del equipo Digital Product. APIs, bases de datos, Node.js, Go, Python, lógica de servidor.
 mode: subagent
-model: opencode-go/deepseek-v4-pro
+model: openai/gpt-5.6-luna
 hidden: true
 color: "#8a7a5c"
 permission:

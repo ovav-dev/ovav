@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# OVAV Workspace — initialize 3 tabs (OVAV, OpenCode, OPS) via wta.exe
+# Part of OVAV UX Convergence 2026
+# Bound to Ctrl+Alt+Shift+W in Intelligent Terminal settings.json
+
+set -e
+
+WT_CLI="/mnt/c/Users/Alexa/AppData/Local/Microsoft/WindowsApps/Microsoft.IntelligentTerminal_8wekyb3d8bbwe/wta.exe"
+
+# Find the OVAV Windows path
+OVAV_WIN_PATH='\\wsl.localhost\Ubuntu-26.04\home\braka\Systems\ovav'
+
+# Helper: run wta.exe via cmd.exe to avoid WSL path translation issues
+run_wta() {
+  local subcmd="$1"
+  cmd.exe //c "$WT_CLI $subcmd" >/dev/null 2>&1 &
+}
+
+# Step 1: ensure we're in a WT session (not strictly needed but informative)
+echo "[ovav-workspace] Initializing 3 tabs..."
+
+# Step 2: create the 3 tabs in order
+# OVAV tab: default profile (already has ~/Systems/ovav as startingDirectory)
+run_wta "new-tab --profile OVAV"
+sleep 0.3
+
+# OpenCode tab
+run_wta "new-tab --profile OpenCode"
+sleep 0.3
+
+# OPS tab
+run_wta "new-tab --profile OPS"
+sleep 0.3
+
+echo "[ovav-workspace] Done. Use Alt+1/2/3 to navigate."
+echo "  Alt+1 → OVAV"
+echo "  Alt+2 → OpenCode"
+echo "  Alt+3 → OPS"

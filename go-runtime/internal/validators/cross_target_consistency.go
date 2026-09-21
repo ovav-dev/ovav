@@ -10,7 +10,7 @@ import (
 )
 
 // CrossTargetConsistency validates consistency between canonical agents
-// (go-runtime/internal/agents/) and generated runtime agents (go-runtime/internal/runtimes/opencode/agents/).
+// (.ovav/service_areas/) and generated runtime agents (go-runtime/internal/runtimes/opencode/agents/).
 // Replaces: tools/validators/check_cross_target_consistency.py
 type CrossTargetConsistency struct{}
 
@@ -38,7 +38,7 @@ func (v *CrossTargetConsistency) Validate(ctx context.Context, root string) Resu
 	canonicalAreasDir := filepath.Join(root, "go-runtime", "internal", "agents", "areas")
 	canonicalLeadsDir := filepath.Join(root, "go-runtime", "internal", "agents", "leads")
 	canonicalTeamsDir := filepath.Join(root, "go-runtime", "internal", "agents", "teams")
-	runtimeAgentsDir := filepath.Join(root, "go-runtime", "internal", "runtimes", "opencode", "agents")
+	runtimeAgentsDir := filepath.Join(root, ".ovav", "service_areas")
 
 	canonicalAreas, errAreas := countYAMLFiles(canonicalAreasDir)
 	canonicalLeads, errLeads := countYAMLFiles(canonicalLeadsDir)
@@ -57,7 +57,7 @@ func (v *CrossTargetConsistency) Validate(ctx context.Context, root string) Resu
 		issues = append(issues, fmt.Sprintf("ERROR: Cannot read go-runtime/internal/agents/teams/: %v", errTeams))
 	}
 	if errRuntime != nil {
-		issues = append(issues, fmt.Sprintf("ERROR: Cannot read go-runtime/internal/runtimes/opencode/agents/: %v", errRuntime))
+		issues = append(issues, fmt.Sprintf("ERROR: Cannot read .ovav/service_areas/: %v", errRuntime))
 	}
 
 	if errAreas == nil && errLeads == nil && errTeams == nil && errRuntime == nil {
@@ -104,10 +104,10 @@ func (v *CrossTargetConsistency) Validate(ctx context.Context, root string) Resu
 	// ── 3. Runtime agents directory accessibility ────────────────────────────
 	if entries, err := os.ReadDir(runtimeAgentsDir); err == nil {
 		if countMDFiles(entries) == 0 {
-			issues = append(issues, "INFO: go-runtime/internal/runtimes/opencode/agents/ exists but has no .md files — run GenerateAll()")
+			issues = append(issues, "INFO: .ovav/service_areas/ exists but has no area directories — canonical agents not yet deployed")
 		}
 	} else {
-		issues = append(issues, "INFO: go-runtime/internal/runtimes/opencode/agents/ not found — canonical agents not yet deployed")
+		issues = append(issues, "INFO: .ovav/service_areas/ not found — canonical agents not yet deployed")
 	}
 
 	if len(issues) > 0 {

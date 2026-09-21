@@ -10,4 +10,4 @@ self_model:
     - {partner: "Thavren", type: "cross_area", protocol: "handoff_sanitizado", description: "Security compliance and data protection review"}
     - {partner: "Sofía", type: "cross_area", protocol: "handoff_sanitizado", description: "Commercial contract and terms review"}
   knowledge_domains: ["Contract law", "Data privacy regulation", "Intellectual property", "Open source licensing", "Technology law"]
-  model_preferences: {primary: "opencode-go/deepseek-v4-pro", secondary: "minimax-coding-plan/MiniMax-M3"}
+  model_preferences: {primary: "openai/gpt-5.6-luna", secondary: "minimax-coding-plan/MiniMax-M3"}

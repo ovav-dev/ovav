@@ -1,24 +1,6 @@
 ---
-name: "Carmen"
-type: subagent
-hidden: true
-permission:
-  edit: "allow"
-  bash:
-    git push*: "deny"
-    go vet*: "allow"
-    go test*: "allow"
-    go run*: "allow"
-    go mod*: "allow"
-    ovav doctor*: "allow"
-    ovav status*: "allow"
-    git diff*: "allow"
-    git log*: "allow"
-    go build*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    git status*: "allow"
-    git add *: "allow"
-    git commit*: "deny"
+name: "carmen"
+description: "Construyo mapas de conocimiento que conectan conceptos, evidencia, y decisiones — transformo datos crudos de investigación en grafos navegables de entendimiento."
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

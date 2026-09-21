@@ -2,8 +2,10 @@
 package cli
 
 import (
+	"encoding/json"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -87,6 +89,56 @@ func TestSurfacesCheck(t *testing.T) {
 	}
 }
 
+func TestSurfacesCheckRequiredStatus(t *testing.T) {
+	tests := []struct {
+		name       string
+		setup      func(t *testing.T, root string)
+		wantPassed bool
+	}{
+		{
+			name:       "missing required surfaces",
+			setup:      func(t *testing.T, root string) {},
+			wantPassed: false,
+		},
+		{
+			name: "all required surfaces",
+			setup: func(t *testing.T, root string) {
+				t.Helper()
+				for _, surface := range DefaultManagedSurfaces() {
+					if !surface.Required {
+						continue
+					}
+					path := filepath.Join(root, surface.Path)
+					if filepath.Ext(path) == "" {
+						if err := os.MkdirAll(path, 0755); err != nil {
+							t.Fatal(err)
+						}
+						continue
+					}
+					if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
+						t.Fatal(err)
+					}
+					if err := os.WriteFile(path, []byte("test"), 0644); err != nil {
+						t.Fatal(err)
+					}
+				}
+			},
+			wantPassed: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			root := t.TempDir()
+			tt.setup(t, root)
+			result := SurfacesCheck(root)
+			if got, ok := result["passed"].(bool); !ok || got != tt.wantPassed {
+				t.Errorf("passed = %#v, want %v", result["passed"], tt.wantPassed)
+			}
+		})
+	}
+}
+
 func TestSurfacesRepairPlan(t *testing.T) {
 	tmp := t.TempDir()
 	result := SurfacesRepairPlan(tmp)
@@ -132,6 +184,50 @@ func TestExportGateCheck_ForbiddenFile(t *testing.T) {
 	}
 }
 
+func TestScanForSecrets_IgnoresRegexLiteralsAndComments(t *testing.T) {
+	tmp := t.TempDir()
+	toolsDir := filepath.Join(tmp, "tools", "web")
+	if err := os.MkdirAll(toolsDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+	content := strings.Join([]string{
+		`OPENAI_PATTERN = re.compile(r"sk-[A-Za-z0-9]{32,}")`,
+		`GITHUB_PATTERN = re.compile(r"ghp_[A-Za-z0-9]{36}")`,
+		`# example token prefix: ghp_`,
+	}, "\n")
+	if err := os.WriteFile(filepath.Join(toolsDir, "search_gateway.py"), []byte(content), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	if findings := scanForSecrets(tmp); len(findings) != 0 {
+		t.Fatalf("regex literals and comments produced %d finding(s): %#v", len(findings), findings)
+	}
+}
+
+func TestScanForSecrets_DetectsStructuredSecretWithoutExposingIt(t *testing.T) {
+	tmp := t.TempDir()
+	toolsDir := filepath.Join(tmp, "tools")
+	if err := os.MkdirAll(toolsDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+	secret := "ghp_" + strings.Repeat("A7", 18)
+	if err := os.WriteFile(filepath.Join(toolsDir, "config.py"), []byte(`token = "`+secret+`"`), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	findings := scanForSecrets(tmp)
+	if len(findings) != 1 {
+		t.Fatalf("findings = %d, want 1", len(findings))
+	}
+	encoded, err := json.Marshal(findings)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(string(encoded), secret) {
+		t.Fatal("secret finding exposed matching credential text")
+	}
+}
+
 // ── Repo Presentation Gate ───────────────────────────────────────────────────
 
 func TestRepoPresentationGate_NoReadme(t *testing.T) {
@@ -172,6 +268,71 @@ func TestReleasePackageCheck(t *testing.T) {
 	checks, ok := result["checks"].([]map[string]interface{})
 	if !ok || len(checks) == 0 {
 		t.Error("expected checks")
+	}
+}
+
+func TestReleasePackageCheck_DirtyWorktreeFails(t *testing.T) {
+	root := initCandidateTestRepo(t)
+	mustWriteTestFile(t, root, "VERSION", "3.4.0\n")
+
+	result := ReleasePackageCheck(root)
+	if result["ready"].(bool) {
+		t.Fatal("dirty worktree reported release ready")
+	}
+	checks := result["checks"].([]map[string]interface{})
+	for _, check := range checks {
+		if check["name"] == "no_uncommitted_changes" {
+			if check["passed"].(bool) {
+				t.Fatal("dirty-worktree check passed")
+			}
+			return
+		}
+	}
+	t.Fatal("dirty-worktree check missing")
+}
+
+func TestCheckVersionConsistency(t *testing.T) {
+	tests := []struct {
+		name       string
+		root       string
+		goRuntime  string
+		packageVer string
+		productVer string
+		wantPass   bool
+		wantIssue  string
+	}{
+		{name: "match", root: "3.4.0", goRuntime: "3.4.0", packageVer: "2.3.2", productVer: "2.3.2", wantPass: true},
+		{name: "mismatch", root: "3.4.0", goRuntime: "3.3.0", packageVer: "2.3.2", productVer: "2.3.2", wantIssue: "version mismatch"},
+		{name: "empty", root: "", goRuntime: "3.4.0", packageVer: "2.3.2", productVer: "2.3.2", wantIssue: "VERSION is empty"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			root := t.TempDir()
+			mustWriteTestFile(t, root, "VERSION", tt.root+"\n")
+			mustWriteTestFile(t, root, "go-runtime/VERSION", tt.goRuntime+"\n")
+			mustWriteTestFile(t, root, "package.json", `{"name":"ovav","version":"`+tt.packageVer+`"}`)
+			mustWriteTestFile(t, root, ".ovav/plan/caps.yaml", "product:\n  version: \""+tt.productVer+"\"\n")
+
+			result := checkVersionConsistency(root)
+			if result.Passed() != tt.wantPass {
+				t.Fatalf("Passed() = %v, want %v; issues: %v", result.Passed(), tt.wantPass, result.Issues)
+			}
+			if tt.wantIssue != "" && !strings.Contains(strings.Join(result.Issues, "\n"), tt.wantIssue) {
+				t.Fatalf("issues = %v, want substring %q", result.Issues, tt.wantIssue)
+			}
+		})
+	}
+}
+
+func mustWriteTestFile(t *testing.T, root, rel, content string) {
+	t.Helper()
+	path := filepath.Join(root, filepath.FromSlash(rel))
+	if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(path, []byte(content), 0644); err != nil {
+		t.Fatal(err)
 	}
 }
 

@@ -1,0 +1,133 @@
+#!/usr/bin/env bash
+# OVAV pre-push hook: drift gate (ADR-009).
+#
+# Runs `ovav drift show --json` before push. Blocks if drift found.
+#
+# Per ADR-009 (CI drift gate): catching drift at push time is the
+# last line of defense against the "fragment correct, live stale"
+# pattern that caused 4 sessions of patches (ADR-005).
+#
+# Installation:
+#   ovav hooks install-pre-push
+#   (or: cp .ovav/hooks/pre-push .git/hooks/pre-push && chmod +x)
+#
+# Bypass:
+#   git push --no-verify                     # skip ALL hooks
+#   OVAV_BYPASS_DRIFT_CHECK=1 git push       # skip only drift check
+#
+# Scope:
+#   By default, drift check only fires when pushing to develop.
+#   Configure via .ovav/hooks/pre-push-config.json (see ADR-009).
+
+set -euo pipefail
+
+# ── Configuration ──────────────────────────────────────────────────────────
+# Default: enforce on develop only
+ENFORCED_BRANCHES=("develop")
+SCOPE_OVERRIDE=""  # Set via env: OVAV_DRIFT_SCOPE="main,develop,staging"
+
+# ── Bypass detection ───────────────────────────────────────────────────────
+if [ "${OVAV_BYPASS_DRIFT_CHECK:-0}" = "1" ]; then
+  echo "⚠️  OVAV: skipping drift check (OVAV_BYPASS_DRIFT_CHECK=1)"
+  exit 0
+fi
+
+# ── Branch detection ───────────────────────────────────────────────────────
+# Pre-push hook receives: remote name, remote URL on stdin
+# Format: <local_ref> <local_sha> <remote_ref> <remote_sha>
+# We only care about remote_ref (e.g., refs/heads/develop)
+REMOTE_REF=""
+while read -r line; do
+  remote_ref=$(echo "$line" | awk '{print $3}')
+  if [ -n "$remote_ref" ]; then
+    REMOTE_REF="$remote_ref"
+    break
+  fi
+done
+
+# Strip refs/heads/ prefix
+BRANCH="${REMOTE_REF#refs/heads/}"
+
+# Check if this branch is enforced
+ENFORCED=false
+if [ -n "$SCOPE_OVERRIDE" ]; then
+  if echo ",$SCOPE_OVERRIDE," | grep -q ",$BRANCH,"; then
+    ENFORCED=true
+  fi
+else
+  for b in "${ENFORCED_BRANCHES[@]}"; do
+    if [ "$b" = "$BRANCH" ]; then
+      ENFORCED=true
+      break
+    fi
+  done
+fi
+
+if [ "$ENFORCED" != "true" ]; then
+  # Not in scope — silently allow
+  exit 0
+fi
+
+# ── Run drift check ────────────────────────────────────────────────────────
+# Locate ovav binary
+OVAV_BIN="${OVAV_BIN:-ovav}"
+if ! command -v "$OVAV_BIN" >/dev/null 2>&1; then
+  # Try local bin/
+  if [ -x "./bin/ovav" ]; then
+    OVAV_BIN="./bin/ovav"
+  elif [ -x "$HOME/.local/bin/ovav" ]; then
+    OVAV_BIN="$HOME/.local/bin/ovav"
+  else
+    echo "⚠️  OVAV: ovav binary not found; skipping drift check"
+    echo "   Install: cd go-runtime && make install"
+    exit 0
+  fi
+fi
+
+# Run drift detection
+set +e
+DRIFT_OUTPUT=$("$OVAV_BIN" drift show --json 2>&1)
+DRIFT_EXIT=$?
+set -e
+
+if [ "$DRIFT_EXIT" = "2" ]; then
+  # ovav not available or errored — allow push (fail open)
+  echo "⚠️  OVAV: drift check unavailable (exit $DRIFT_EXIT); allowing push"
+  exit 0
+fi
+
+# Parse JSON for drifted_targets count (use python for reliability)
+DRIFTED=$(echo "$DRIFT_OUTPUT" | python3 -c "
+import json, sys
+try:
+    data = json.load(sys.stdin)
+    print(data.get('drifted_targets', 0))
+except Exception:
+    print(0)
+")
+
+if [ "${DRIFTED:-0}" -gt 0 ]; then
+  echo "🚫 OVAV pre-push hook: drift detected"
+  echo ""
+  echo "Push to $BRANCH blocked: $DRIFTED target(s) have drift."
+  echo ""
+  echo "Run 'ovav drift show' for details, then either:"
+  echo "  • Fix drift:  ./bin/ovav deploy run"
+  echo "  • Bypass:     OVAV_BYPASS_DRIFT_CHECK=1 git push"
+  echo "  • Skip hooks: git push --no-verify"
+  echo ""
+  echo "Drift summary:"
+  echo "$DRIFT_OUTPUT" | python3 -c "
+import json, sys
+try:
+    data = json.load(sys.stdin)
+    for t in data.get('targets', []):
+        if t.get('items'):
+            print(f\"  • {t['target']['ID']}: {len(t['items'])} items\")
+except Exception:
+    pass
+"
+  exit 1
+fi
+
+exit 0

@@ -1,12 +1,14 @@
 package convert
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 
+	"github.com/ovav/ovav/internal/permissions"
 	"gopkg.in/yaml.v3"
 )
 
@@ -61,6 +63,12 @@ func ValidateOpenCodeConfig(root string) (issues []ConfigIssue, err error) {
 
 	// 5. Plugin format
 	issues = append(issues, checkPluginFormat(config)...)
+
+	// 6. Unsupported top-level fields
+	issues = append(issues, checkUnsupportedTopLevelFields(config)...)
+
+	// 7. Model identifiers
+	issues = append(issues, checkModelIdentifiers(config)...)
 
 	return issues, nil
 }
@@ -163,6 +171,9 @@ func checkMCPFormat(config map[string]any) []ConfigIssue {
 			})
 			continue
 		}
+		if enabled, exists := server["enabled"].(bool); exists && !enabled && len(server) == 1 {
+			continue
+		}
 
 		// CRITICAL: Legacy format — command is string + args exists
 		cmd, cmdIsStr := server["command"].(string)
@@ -179,27 +190,44 @@ func checkMCPFormat(config map[string]any) []ConfigIssue {
 			continue
 		}
 
-		// Validate current format
+		// Validate current format against the local/remote MCP union in
+		// https://opencode.ai/config.json.
 		stype, _ := server["type"].(string)
-		if stype != "local" {
+		if stype != "local" && stype != "remote" {
 			issues = append(issues, ConfigIssue{
 				Field: fmt.Sprintf("mcp.%s.type", name), Severity: "warning",
-				Message: fmt.Sprintf("type debe ser 'local' (es: %q)", stype),
+				Message: fmt.Sprintf("type debe ser 'local' o 'remote' (es: %q)", stype),
 			})
 		}
 
-		cmdArr, cmdIsArr := server["command"].([]any)
-		if !cmdIsArr {
-			issues = append(issues, ConfigIssue{
-				Field: fmt.Sprintf("mcp.%s.command", name), Severity: "critical",
-				Message: "'command' debe ser array",
-				Fix:     `"command": ["python3", "script.py", "arg"]`,
-			})
-		} else if len(cmdArr) == 0 {
-			issues = append(issues, ConfigIssue{
-				Field: fmt.Sprintf("mcp.%s.command", name), Severity: "critical",
-				Message: "'command' array vacío",
-			})
+		if stype == "remote" {
+			url, urlOK := server["url"].(string)
+			if !urlOK || url == "" {
+				issues = append(issues, ConfigIssue{
+					Field: fmt.Sprintf("mcp.%s.url", name), Severity: "critical",
+					Message: "'url' debe ser un string no vacío para MCP remoto",
+				})
+			}
+			if _, exists := server["command"]; exists {
+				issues = append(issues, ConfigIssue{
+					Field: fmt.Sprintf("mcp.%s.command", name), Severity: "critical",
+					Message: "MCP remoto no puede declarar 'command'",
+				})
+			}
+		} else {
+			cmdArr, cmdIsArr := server["command"].([]any)
+			if !cmdIsArr {
+				issues = append(issues, ConfigIssue{
+					Field: fmt.Sprintf("mcp.%s.command", name), Severity: "critical",
+					Message: "'command' debe ser array",
+					Fix:     `"command": ["python3", "script.py", "arg"]`,
+				})
+			} else if len(cmdArr) == 0 {
+				issues = append(issues, ConfigIssue{
+					Field: fmt.Sprintf("mcp.%s.command", name), Severity: "critical",
+					Message: "'command' array vacío",
+				})
+			}
 		}
 
 		if _, hasEnabled := server["enabled"]; !hasEnabled {
@@ -302,6 +330,48 @@ func checkPluginFormat(config map[string]any) []ConfigIssue {
 	return issues
 }
 
+func checkUnsupportedTopLevelFields(config map[string]any) []ConfigIssue {
+	if _, exists := config["theme"]; !exists {
+		return nil
+	}
+	return []ConfigIssue{{
+		Field:    "theme",
+		Severity: "critical",
+		Message:  "'theme' no está soportado en opencode.json; configúrelo en tui.json",
+		Fix:      "Eliminar el campo top-level 'theme'",
+	}}
+}
+
+var supportedOpenCodeModels = map[string]struct{}{
+	"openai/gpt-5.6-luna":            {},
+	"minimax-coding-plan/MiniMax-M3": {},
+}
+
+func checkModelIdentifiers(config map[string]any) []ConfigIssue {
+	var issues []ConfigIssue
+	for _, field := range []string{"model", "small_model"} {
+		model, exists := config[field]
+		if !exists {
+			continue
+		}
+		modelID, ok := model.(string)
+		if !ok || modelID == "" {
+			issues = append(issues, ConfigIssue{
+				Field: field, Severity: "critical",
+				Message: "El identificador de modelo debe ser un string no vacío",
+			})
+			continue
+		}
+		if _, supported := supportedOpenCodeModels[modelID]; !supported {
+			issues = append(issues, ConfigIssue{
+				Field: field, Severity: "critical",
+				Message: fmt.Sprintf("Modelo no disponible en la instalación actual: %q", modelID),
+			})
+		}
+	}
+	return issues
+}
+
 // ── OpenCode Config Generation (Canonical YAML → opencode.json) ────────────
 
 // CanonicalOpenCodeConfig mirrors .ovav/source/opencode/config.yaml.
@@ -309,6 +379,7 @@ func checkPluginFormat(config map[string]any) []ConfigIssue {
 type CanonicalOpenCodeConfig struct {
 	Version     string                        `yaml:"version"`
 	Schema      string                        `yaml:"schema"`
+	Ovav        map[string]any                `yaml:"_ovav"`
 	Runtime     canonicalRuntime              `yaml:"runtime"`
 	MCP         map[string]canonicalMCPServer `yaml:"mcp"`
 	Plugins     []string                      `yaml:"plugins"`
@@ -321,17 +392,20 @@ type CanonicalOpenCodeConfig struct {
 }
 
 type canonicalRuntime struct {
-	Model        string         `yaml:"model"`
-	SmallModel   string         `yaml:"small_model"`
-	DefaultAgent string         `yaml:"default_agent"`
-	Instructions []string       `yaml:"instructions"`
-	Agent        map[string]any `yaml:"agent"`
+	Model             string         `yaml:"model"`
+	SmallModel        string         `yaml:"small_model"`
+	DefaultAgent      string         `yaml:"default_agent"`
+	DefaultPermission string         `yaml:"default_permission"`
+	Instructions      []string       `yaml:"instructions"`
+	Agent             map[string]any `yaml:"agent"`
 }
 
 type canonicalMCPServer struct {
-	Type    string   `yaml:"type"`
-	Command []string `yaml:"command"`
-	Enabled bool     `yaml:"enabled"`
+	Type        string            `yaml:"type"`
+	Command     []string          `yaml:"command"`
+	URL         string            `yaml:"url"`
+	Enabled     bool              `yaml:"enabled"`
+	Environment map[string]string `yaml:"environment"`
 }
 
 type canonicalProvider struct {
@@ -339,7 +413,24 @@ type canonicalProvider struct {
 }
 
 type canonicalPermissions struct {
+	Wildcard          string            `yaml:"*"`
 	Edit              string            `yaml:"edit"`
+	Write             string            `yaml:"write"`
+	Read              string            `yaml:"read"`
+	Glob              string            `yaml:"glob"`
+	Grep              string            `yaml:"grep"`
+	List              string            `yaml:"list"`
+	Patch             string            `yaml:"patch"`
+	Task              string            `yaml:"task"`
+	Skill             string            `yaml:"skill"`
+	Webfetch          string            `yaml:"webfetch"`
+	Websearch         string            `yaml:"websearch"`
+	DoomLoop          string            `yaml:"doom_loop"`
+	Invalid           string            `yaml:"invalid"`
+	Question          string            `yaml:"question"`
+	TodoRead          string            `yaml:"todoread"`
+	TodoWrite         string            `yaml:"todowrite"`
+	Diff              string            `yaml:"diff"`
 	Bash              map[string]string `yaml:"bash"`
 	ExternalDirectory map[string]string `yaml:"external_directory"`
 }
@@ -368,8 +459,13 @@ func GenerateOpenCodeConfig(root string) error {
 	}
 
 	var canonical CanonicalOpenCodeConfig
-	if err := yaml.Unmarshal(data, &canonical); err != nil {
+	decoder := yaml.NewDecoder(bytes.NewReader(data))
+	decoder.KnownFields(true)
+	if err := decoder.Decode(&canonical); err != nil {
 		return fmt.Errorf("parse canonical config: %w", err)
+	}
+	if err := validateCanonicalOpenCodeConfig(canonical); err != nil {
+		return fmt.Errorf("validate canonical config: %w", err)
 	}
 
 	// Build opencode.json structure
@@ -394,13 +490,28 @@ func GenerateOpenCodeConfig(root string) error {
 	if len(canonical.MCP) > 0 {
 		mcp := make(map[string]any)
 		for name, server := range canonical.MCP {
-			mcp[name] = map[string]any{
-				"type":    server.Type,
-				"command": server.Command,
-				"enabled": server.Enabled,
+			if !server.Enabled {
+				// OpenCode still validates the shape of disabled entries and
+				// rejects an entry without a type. Omit disabled services from
+				// the materialized config; the canonical YAML remains the policy
+				// registry and can opt a service in later with a complete shape.
+				continue
 			}
+			mcpEntry := map[string]any{"type": server.Type, "enabled": server.Enabled}
+			switch server.Type {
+			case "local":
+				mcpEntry["command"] = server.Command
+				if len(server.Environment) > 0 {
+					mcpEntry["environment"] = server.Environment
+				}
+			case "remote":
+				mcpEntry["url"] = server.URL
+			}
+			mcp[name] = mcpEntry
 		}
-		config["mcp"] = mcp
+		if len(mcp) > 0 {
+			config["mcp"] = mcp
+		}
 	}
 
 	// Plugins
@@ -426,9 +537,61 @@ func GenerateOpenCodeConfig(root string) error {
 	}
 
 	// Permissions
+	authority := permissions.NewPermissionAuthority(root)
+	if _, err := os.Stat(authority.PolicyPath); err == nil {
+		projected, projectErr := authority.MaterializePermissionBlock()
+		if projectErr != nil {
+			return fmt.Errorf("load canonical permission authority: %w", projectErr)
+		}
+		canonical.Permissions.Edit = projected.Edit
+		canonical.Permissions.Bash = projected.Bash
+		canonical.Permissions.ExternalDirectory = projected.ExternalDirectory
+	}
 	if canonical.Permissions.Edit != "" || len(canonical.Permissions.Bash) > 0 {
 		perm := make(map[string]any)
-		perm["edit"] = canonical.Permissions.Edit
+
+		// OVAV TRUSTED DOMAIN — 2026-08-13:
+		// Emit YOLO wildcards FIRST so they are the default for any
+		// tool not explicitly listed. Then emit per-tool rules which
+		// override the wildcard (e.g., bash with critical denies).
+		// Source of truth is the canonicalPermissions struct fields.
+		if canonical.Permissions.Wildcard != "" {
+			perm["*"] = canonical.Permissions.Wildcard
+		} else {
+			perm["*"] = "allow"
+		}
+
+		// Per-tool allow (each field in canonicalPermissions, except bash/ext_dir)
+		type permField struct {
+			key, val string
+		}
+		fields := []permField{
+			{"edit", canonical.Permissions.Edit},
+			{"write", canonical.Permissions.Write},
+			{"read", canonical.Permissions.Read},
+			{"glob", canonical.Permissions.Glob},
+			{"grep", canonical.Permissions.Grep},
+			{"list", canonical.Permissions.List},
+			{"patch", canonical.Permissions.Patch},
+			{"task", canonical.Permissions.Task},
+			{"skill", canonical.Permissions.Skill},
+			{"webfetch", canonical.Permissions.Webfetch},
+			{"websearch", canonical.Permissions.Websearch},
+			{"doom_loop", canonical.Permissions.DoomLoop},
+			{"invalid", canonical.Permissions.Invalid},
+			{"question", canonical.Permissions.Question},
+			{"todoread", canonical.Permissions.TodoRead},
+			{"todowrite", canonical.Permissions.TodoWrite},
+			{"diff", canonical.Permissions.Diff},
+		}
+		for _, f := range fields {
+			if f.val != "" {
+				perm[f.key] = f.val
+			} else {
+				// Default to "allow" if not specified (YOLO completeness)
+				perm[f.key] = "allow"
+			}
+		}
 
 		if len(canonical.Permissions.Bash) > 0 {
 			bash := make(map[string]any)
@@ -488,5 +651,43 @@ func GenerateOpenCodeConfig(root string) error {
 		return fmt.Errorf("write opencode.json: %w", err)
 	}
 
+	return nil
+}
+
+func validateCanonicalOpenCodeConfig(config CanonicalOpenCodeConfig) error {
+	if config.Schema != "https://opencode.ai/config.json" {
+		return fmt.Errorf("unsupported schema %q", config.Schema)
+	}
+	if config.Runtime.Model == "" {
+		return fmt.Errorf("runtime.model is required")
+	}
+	for name, server := range config.MCP {
+		if !server.Enabled {
+			continue
+		}
+		switch server.Type {
+		case "local":
+			if len(server.Command) == 0 {
+				return fmt.Errorf("mcp.%s.command is required when enabled", name)
+			}
+			if server.URL != "" {
+				return fmt.Errorf("mcp.%s.url is not valid for a local server", name)
+			}
+		case "remote":
+			if server.URL == "" {
+				return fmt.Errorf("mcp.%s.url is required when enabled", name)
+			}
+			if len(server.Command) > 0 || len(server.Environment) > 0 {
+				return fmt.Errorf("mcp.%s remote server cannot define command or environment", name)
+			}
+		default:
+			return fmt.Errorf("mcp.%s.type must be local or remote", name)
+		}
+	}
+	for pattern, decision := range config.Permissions.Bash {
+		if decision != "allow" && decision != "ask" && decision != "deny" {
+			return fmt.Errorf("permissions.bash.%s has invalid decision %q", pattern, decision)
+		}
+	}
 	return nil
 }

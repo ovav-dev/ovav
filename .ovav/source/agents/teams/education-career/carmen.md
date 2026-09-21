@@ -2,7 +2,7 @@
 name: Carmen
 description: Carmen — Knowledge Engineer del equipo OVAV. Mapas de conocimiento, cadenas de prerrequisitos, arquitectura conceptual.
 mode: subagent
-model: opencode-go/deepseek-v4-pro
+model: openai/gpt-5.6-luna
 hidden: true
 color: "#5d8a61"
 permission:

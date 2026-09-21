@@ -414,7 +414,7 @@ func TestGenerateTarget_CleanOldOutputError(t *testing.T) {
 	root := t.TempDir()
 	createCanonicalDir(t, root)
 
-	outputDir := filepath.Join(root, "runtimes", "opencode", "agents")
+	outputDir := filepath.Join(root, "go-runtime", "internal", "runtimes", "opencode", "agents")
 	os.MkdirAll(outputDir, 0755)
 	os.WriteFile(filepath.Join(outputDir, "stale-area.md"), []byte("old"), 0644)
 	if err := os.Chmod(outputDir, 0555); err != nil {
@@ -670,7 +670,12 @@ func TestMain_Subprocess_NoRepoRoot(t *testing.T) {
 	}
 	bin := buildBinary(t)
 
-	tmp := t.TempDir()
+	// The workspace contains a nested .ovav/ directory; placing the subprocess
+	// outside it proves root discovery fails without touching real projections.
+	tmp := filepath.Join(t.TempDir(), "outside-workspace")
+	if err := os.MkdirAll(tmp, 0o755); err != nil {
+		t.Fatal(err)
+	}
 	cmd := exec.Command(bin)
 	cmd.Dir = tmp
 	out, err := cmd.CombinedOutput()

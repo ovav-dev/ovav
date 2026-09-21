@@ -1,2 +1,0 @@
-#!/usr/bin/env bash
-exec /home/braka/.local/bin/_ovav_ow_auto m "$@"

@@ -1,0 +1,236 @@
+# ════════════════════════════════════════════════════════════════════════
+#  OVAV Starship Prompt v6 — Nerd Font PUA Icons (CRIT-009 Advanced+)
+#  Refactored per CEO directive 2026-08-17:
+#    - All icons are Nerd Font Private Use Area codepoints
+#    - No emojis (was: 📁🌿🐍🦀🐹🐳☁️🏗️📦🤖)
+#    - Locked to JetBrainsMono Nerd Font (installed on this host)
+#    - Dual palette: ovav-day + ovav-night, auto-switch via
+#      INTELLIGENT_TERMINAL_THEME (light/dark) → bashrc maps to
+#      STARSHIP_PALETTE which is what starship reads.
+#
+#  ICON REFERENCE (Nerd Font codepoints):
+#    folder          \uf07c   fa-folder
+#    git_branch      \ue0a0   dev-git_branch
+#    git_ahead       \uf062   fa-arrow_up
+#    git_behind      \uf063   fa-arrow_down
+#    git_diverged    \uf062\uf063
+#    git_modified    \uf459   fa-pencil
+#    git_untracked   \uf059   fa-question_circle
+#    git_stashed     \uf187   fa-archive
+#    git_conflict    \uf071   fa-warning
+#    git_renamed     \uf061   fa-arrow_right
+#    git_deleted     \uf154   fa-times_circle
+#    nodejs          \ue718   dev-nodejs_small
+#    python          \ue73c   dev-python
+#    golang          \ue626   dev-go
+#    rust            \ue7a8   dev-rust
+#    mise            \ue7b5   dev-mise
+#    docker          \uf308   linux-docker
+#    kubernetes      \u2388   ⎈ (helm wheel)
+#    aws             \uf270   fa-amazon
+#    terraform       \ue20f   dev-terraform
+#    package         \uf487   fa-box
+#    claude          \ue7b0   dev-claude (or fallback)
+#    time            \uf017   fa-clock_o
+#    cmd_duration    \uf252   fa-stopwatch
+#    character       ❯ U+276F
+#    line_break      ─ default separator
+# ════════════════════════════════════════════════════════════════════════
+
+# ─── PALETTES (locked to OVAV brand tokens) ──────────────────────
+[palettes.ovav-night]
+brand    = '#6EA8FE'   # primary blue
+surface  = '#111827'   # bg token
+success  = '#7EE787'   # git clean, ok
+warning  = '#F2CC60'   # dirty, mid-prio
+danger   = '#FF6B81'   # errors
+info     = '#5EEAD4'   # secondary info
+accent   = '#C099FF'   # git branch, special
+muted    = '#4A5568'   # time, low signal
+text     = '#D8E1F0'   # foreground
+
+[palettes.ovav-day]
+brand    = '#2563EB'
+surface  = '#FFFFFF'
+success  = '#1F7A4C'
+warning  = '#8A5A00'
+danger   = '#C24156'
+info     = '#0F766E'
+accent   = '#7C3AED'
+muted    = '#94A3B8'
+text     = '#1B2430'
+
+# ─── FORMAT: 2-line semantic, infrastructure inline ──────────────
+format = """
+$directory$git_branch$git_status$mise$nodejs$python$golang$rust$docker_context$kubernetes$aws$terraform$container$claude_context$line_break$character"""
+
+# ─── RIGHT PROMPT (transient — command duration + time) ──────────
+right_format = """$cmd_duration$time"""
+continuation_prompt = "[❯](bold $accent) "
+
+# ─── WORKSPACE: directory (Nerd Font fa-folder) ───────────────────
+[directory]
+style = "bold $brand"
+format = "[\uf07c $path]($style)"
+truncation_length = 4
+truncation_symbol = "…/"
+
+# ─── GIT BRANCH: branch name (Nerd Font dev-git_branch) ───────────
+[git_branch]
+symbol = "\ue0a0 "
+style = "bold $accent"
+format = "[$symbol$branch]($style) "
+
+# ─── GIT STATUS: Nerd Font compact ───────────────────────────────
+[git_status]
+style = "$warning"
+format = "[$all_status$ahead_behind]($style) "
+conflicted = "\uf071$count "
+ahead = "\uf062$count "
+behind = "\uf063$count "
+diverged = "\uf062\uf063$count "
+untracked = "\uf059$count "
+stashed = "\uf187$count "
+modified = "\uf459$count "
+renamed = "\uf061$count "
+deleted = "\uf154$count "
+
+# ─── MISE (primary toolchain detector — Nerd Font hexagon) ───────
+# Reads .mise.toml / .tool-versions — single source of tool versions.
+[mise]
+format = "[\ue7b5 $version]($style) "
+style = "bold $success"
+
+# ─── TOOLCHAIN FALLBACKS — only render if mise didn't catch it ────
+[nodejs]
+symbol = "\ue718 "
+style = "bold $success"
+format = "[$symbol$version]($style) "
+detect_extensions = ["js", "mjs", "cjs", "ts", "mts", "cts", "jsx", "tsx"]
+detect_files      = ["package.json", ".nvmrc", ".node-version"]
+detect_folders    = ["node_modules"]
+
+[python]
+symbol = "\ue73c "
+style = "bold $warning"
+format = "[$symbol$version]($style) "
+detect_extensions = ["py", "ipynb"]
+detect_files      = ["pyproject.toml", "requirements.txt", "Pipfile", "uv.lock", "poetry.lock"]
+detect_folders    = [".venv", "venv", "__pycache__"]
+
+[golang]
+symbol = "\ue626 "
+style = "bold $info"
+format = "[$symbol$version]($style) "
+detect_extensions = ["go"]
+detect_files      = ["go.mod", "go.sum", "go.work"]
+
+[rust]
+symbol = "\ue7a8 "
+style = "bold #DEA584"
+format = "[$symbol$version]($style) "
+detect_extensions = ["rs"]
+detect_files      = ["Cargo.toml"]
+detect_folders    = ["target"]
+
+# ─── INFRASTRUCTURE (conditional — only when configured) ─────────
+[kubernetes]
+symbol          = "\u2388 "
+style           = "bold #326CE5"
+format          = "[$symbol$context]($style) "
+context_aliases = { "dev-cluster" = "dev", "prod-cluster" = "prod" }
+disabled        = false  # auto-detects ~/.kube/config
+
+[aws]
+symbol = "\uf270 "
+style  = "bold #FF9900"
+format = "[$symbol$profile]($style) "
+
+[docker_context]
+symbol          = "\uf308 "
+style           = "bold #0DB7ED"
+format          = "[$symbol$context]($style) "
+only_with_files = false
+
+[terraform]
+symbol = "\ue20f "
+style  = "bold #844FBA"
+format = "[$symbol$workspace]($style) "
+
+[container]
+symbol = "\uf487 "
+style  = "bold #0DB7ED"
+format = "[$symbol$name]($style) "
+
+# ─── CLAUDE CONTEXT (when running inside Claude Code) ────────────
+[claude_context]
+format = "[\ue7b0 $context]($style) "
+style  = "bold #D97757"
+
+# ─── CHARACTER: ❯ prompt (green=ok, red=error) ────────────────────
+[character]
+success_symbol = "[❯](bold $success)"
+error_symbol   = "[❯](bold $danger)"
+
+# ─── COMMAND DURATION (Nerd Font stopwatch) ──────────────────────
+[cmd_duration]
+min_time = 5_000
+format   = "[\uf252 $duration]($style) "
+style    = "bold $warning"
+
+# ─── TIME (Nerd Font clock, right-prompt transient) ───────────────
+[time]
+disabled    = false
+time_format = "%R"
+style       = "bold $muted"
+format      = "[\uf017 $time]($style) "
+
+# ─── LINE BREAK (visual separator before prompt input) ────────────
+[line_break]
+
+# ─── EXPLICITLY DISABLED — clutter that doesn't add value ────────
+[hostname]
+disabled = true
+
+[username]
+disabled = true
+
+[os]
+disabled = true
+
+[memory_usage]
+disabled = true
+
+[shell]
+disabled = true
+
+[env_var]
+disabled = true
+
+[package]
+disabled = true
+
+[java]
+disabled = true
+
+[php]
+disabled = true
+
+[ruby]
+disabled = true
+
+[dotnet]
+disabled = true
+
+[battery]
+disabled = true  # WSL/IT scenario — host reports better
+
+[status]
+disabled = true  # replaced by character.error_symbol
+
+# ─── PERFORMANCE: scan exclusion + timeout ──────────────────────
+scan_timeout = 30
+
+# ════════════════════════════════════════════════════════════════════════
+#  END OVAV Starship v6 — Nerd Font PUA icons (no emojis)
+# ════════════════════════════════════════════════════════════════════════

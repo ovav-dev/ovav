@@ -15,8 +15,8 @@ activation:
   router: Delegation Router
 
 model_body:
-  primary: "opencode/deepseek-v4-flash-free"
-  secondary: "openai/gpt-4o"
+  primary: "openai/gpt-5.6-luna"
+  secondary: "minimax-coding-plan/MiniMax-M3"
 
 lanes:
   - focused_exploration

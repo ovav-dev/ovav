@@ -109,19 +109,19 @@ var approvedDomains = map[string]bool{
 	"nerdfonts.com": true,
 	"ohmyposh.dev":  true,
 	// OVAV internal & related
-	"mimo.xiaomi.com":         true, // MiMo internal
-	"mimocode.ai":             true, // MiMoCode platform
-	"minimax.io":              true, // MiniMax API
-	"api.minimax.io":          true, // MiniMax API endpoint
+	"mimo.xiaomi.com": true, // MiMo internal
+	"mimocode.ai":     true, // MiMoCode platform
+	"minimax.io":      true, // MiniMax API
+	"api.minimax.io":  true, // MiniMax API endpoint
 	// DEPRECATED - delete from DNS
-	"api.ovav.dev":            true, // DEPRECATED - delete from DNS
-	"d678beea.ovav.dev":       true, // OVAV cPanel (canonical — non-indexable Fly.io machine URL)
-	"docs.ovav.dev":           true, // OVAV documentation site
+	"api.ovav.dev":      true, // DEPRECATED - delete from DNS
+	"d678beea.ovav.dev": true, // OVAV cPanel (canonical — non-indexable Fly.io machine URL)
+	"docs.ovav.dev":     true, // OVAV documentation site
 	// DEPRECATED - never implemented
-	"cdn.ovav.dev":            true, // DEPRECATED - never implemented
+	"cdn.ovav.dev": true, // DEPRECATED - never implemented
 	// DEPRECATED - redirect to ovav.dev
-	"get.ovav.dev":            true, // DEPRECATED - redirect to ovav.dev
-	"status.ovav.dev":         true, // OVAV status page
+	"get.ovav.dev":    true, // DEPRECATED - redirect to ovav.dev
+	"status.ovav.dev": true, // OVAV status page
 	// DEPRECATED - use d678beea.ovav.dev
 	"ovav-cpanel.fly.dev":     true, // DEPRECATED - use d678beea.ovav.dev
 	"api-bitel-agent.fly.dev": true, // Bitel agent API

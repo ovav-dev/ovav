@@ -1,24 +1,6 @@
 ---
-name: "Felipe"
-type: subagent
-hidden: true
-permission:
-  edit: "allow"
-  bash:
-    git log*: "allow"
-    go vet*: "allow"
-    go build*: "allow"
-    go run*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    git diff*: "allow"
-    git add *: "allow"
-    git commit*: "deny"
-    git push*: "deny"
-    go test*: "allow"
-    go mod*: "allow"
-    ovav doctor*: "allow"
-    ovav status*: "allow"
-    git status*: "allow"
+name: "felipe"
+description: "Diseño flujos de conversación y scaffolding que guían al usuario paso a paso — cada interacción está pensada para minimizar fricción y maximizar comprensión."
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

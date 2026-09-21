@@ -1,42 +1,7 @@
 ---
-name: "Soren"
-type: subagent
-hidden: true
-permission:
-  edit: "allow"
-  bash:
-    ovav *: "allow"
-    python3 tools/harnesses/check_*.py: "allow"
-    npm install *: "deny"
-    pytest*: "allow"
-    python3 -m pytest*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    git log*: "allow"
-    git commit*: "deny"
-    apt install *: "deny"
-    *: "deny"
-    go run*: "allow"
-    go mod*: "allow"
-    owc*: "allow"
-    git status*: "allow"
-    git diff*: "allow"
-    git add *: "allow"
-    sudo *: "deny"
-    go test*: "allow"
-    go build*: "allow"
-    owd*: "allow"
-    owv*: "allow"
-    owl*: "allow"
-    python3 tools/validators/*.py: "allow"
-    git push*: "deny"
-    pip install *: "deny"
-    go vet*: "allow"
-    owx*: "allow"
-    ows*: "allow"
-  external_directory:
-    "/home/braka/Labs/mimocode/data/memory/*": "allow"
-    "/home/braka/Systems/OVAV": "allow"
-    "*": "deny"
+name: "soren"
+description: "Implementador Senior — refactors, tests y parches de runtime que duran."
+model: openai/gpt-5.6-luna
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

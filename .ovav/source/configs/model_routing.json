@@ -1,51 +1,24 @@
 {
-  "version": "1.0",
-  "description": "OVAV Model Distribution — Smart routing for cost/quality balance",
-  "default": "mimo/mimo-auto",
+  "version": "2.0",
+  "description": "OVAV Model Distribution — dual-provider routing for cost/quality balance",
+  "default": "openai/gpt-5.6-luna",
+  "small_model": "minimax-coding-plan/MiniMax-M3",
+  "providers": {
+    "primary": "openai",
+    "fallback": "minimax-coding-plan"
+  },
   "routing": {
-    "conversation": {
-      "model": "mimo/mimo-auto",
-      "use_when": "General chat, questions, brainstorm, quick answers",
-      "cost": "free"
-    },
-    "exploration": {
-      "model": "mimo/mimo-auto",
-      "use_when": "File search, codebase scan, grep, glob",
-      "cost": "free"
-    },
-    "go_implementation": {
-      "model": "opencode-go/deepseek-v4-pro",
-      "use_when": "Writing Go code, refactors, new packages, CLI commands",
-      "cost": "$0.55/$2.19 per 1M tokens"
-    },
-    "go_review": {
-      "model": "opencode-go/claude-sonnet-4-20250514",
-      "use_when": "Code review, security audit, architecture decisions",
-      "cost": "$3.00/$15.00 per 1M tokens"
-    },
-    "architecture_final": {
-      "model": "opencode-go/gpt-5.5",
-      "use_when": "Final architecture judgment, critical design decisions",
-      "cost": "$3.75/$15.00 per 1M tokens (USE SPARINGLY)"
-    },
-    "quick_task": {
-      "model": "opencode-go/claude-haiku-3-5",
-      "use_when": "Classification, labeling, simple transforms",
-      "cost": "$0.80/$4.00 per 1M tokens"
-    },
-    "bulk_research": {
-      "model": "opencode-go/deepseek-v4-flash",
-      "use_when": "Large-scale search, reading many files, summarization",
-      "cost": "$0.14/$0.55 per 1M tokens"
-    },
-    "matrix_report": {
-      "model": "opencode-go/qwen3.5-plus",
-      "use_when": "Tables, matrices, comparison reports",
-      "cost": "$0.80/$1.60 per 1M tokens"
-    }
+    "conversation": {"model": "openai/gpt-5.6-luna", "fallback": "minimax-coding-plan/MiniMax-M3", "use_when": "General chat, questions, brainstorm, quick answers"},
+    "exploration": {"model": "openai/gpt-5.6-luna", "fallback": "minimax-coding-plan/MiniMax-M3", "use_when": "File search, codebase scan, grep, glob"},
+    "go_implementation": {"model": "openai/gpt-5.6-luna", "fallback": "minimax-coding-plan/MiniMax-M3", "use_when": "Writing Go code, refactors, new packages, CLI commands"},
+    "go_review": {"model": "openai/gpt-5.6-luna", "fallback": "minimax-coding-plan/MiniMax-M3", "use_when": "Code review, security audit, architecture decisions"},
+    "architecture_final": {"model": "openai/gpt-5.6-luna", "fallback": "minimax-coding-plan/MiniMax-M3", "use_when": "Final architecture judgment, critical design decisions"},
+    "quick_task": {"model": "minimax-coding-plan/MiniMax-M3", "fallback": "openai/gpt-5.6-luna", "use_when": "Classification, labeling, simple transforms"},
+    "bulk_research": {"model": "openai/gpt-5.6-luna", "fallback": "minimax-coding-plan/MiniMax-M3", "use_when": "Large-scale search, reading many files, summarization"},
+    "matrix_report": {"model": "openai/gpt-5.6-luna", "fallback": "minimax-coding-plan/MiniMax-M3", "use_when": "Tables, matrices, comparison reports"}
   },
   "subagent_model_override": {
-    "description": "⚠️ DEPRECATED — replaced by ovav_squad_routing below. Generic keys (explore, general_*) bypass OVAV identity, area boundaries (LAW-001), hard stops, and permission_authority. DO NOT ADD ENTRIES HERE.",
+    "description": "⚠️ DEPRECATED — replaced by ovav_squad_routing below. Generic keys bypass OVAV identity, area boundaries (LAW-001), hard stops, and permission_authority. DO NOT ADD ENTRIES HERE.",
     "_explore_DISABLED": "explore",
     "_general_coding_DISABLED": "general_coding",
     "_general_review_DISABLED": "general_review"
@@ -53,26 +26,28 @@
   "ovav_squad_routing": {
     "description": "OVAV Squad Delegation Router — maps task types to OVAV squad members with identity, boundaries, and model assignment",
     "enforced": true,
-    "fallback_prohibited": true,
+    "fallback_prohibited": false,
+    "default_model": "openai/gpt-5.6-luna",
+    "fallback_model": "minimax-coding-plan/MiniMax-M3",
     "mappings": {
-      "fast_exploration":      { "squad": "irene",   "model": "opencode-go/deepseek-v4-flash", "area": "platform_engineering", "role": "fast_codebase_explorer" },
-      "deep_exploration":      { "squad": "helena",  "model": "opencode-go/deepseek-v4-flash", "area": "platform_engineering", "role": "deep_codebase_explorer" },
-      "code_implementation":   { "squad": "andres",  "model": "opencode-go/deepseek-v4-pro:high",  "area": "platform_engineering", "role": "senior_implementer" },
-      "junior_implementation": { "squad": "lucas",   "model": "opencode-go/deepseek-v4-pro", "area": "platform_engineering", "role": "junior_implementer" },
-      "code_review":           { "squad": "pablo",   "model": "opencode-go/claude-sonnet-4-20250514", "area": "platform_engineering", "role": "code_reviewer" },
-      "security_audit":        { "squad": "diana",   "model": "opencode-go/claude-sonnet-4-20250514", "area": "platform_engineering", "role": "security_auditor" },
-      "performance_analysis":  { "squad": "oscar",   "model": "opencode-go/deepseek-v4-pro:high",  "area": "platform_engineering", "role": "performance_engineer" },
-      "api_security_design":   { "squad": "nora",    "model": "opencode-go/deepseek-v4-pro:high", "area": "platform_engineering", "role": "api_security_engineer" },
-      "qa_testing":            { "squad": "clara",   "model": "opencode-go/deepseek-v4-flash", "area": "platform_engineering", "role": "qa_engineer" },
-      "documentation":         { "squad": "nadia",   "model": "opencode-go/deepseek-v4-flash", "area": "platform_engineering", "role": "documentation_engineer" },
-      "summarization":         { "squad": "mia",     "model": "opencode-go/deepseek-v4-flash", "area": "platform_engineering", "role": "summarizer" },
-      "architecture_design":   { "squad": "marco",   "model": "opencode-go/claude-sonnet-4-20250514", "area": "platform_engineering", "role": "systems_architect" }
+      "fast_exploration": {"squad": "irene", "model": "minimax-coding-plan/MiniMax-M3", "fallback": "openai/gpt-5.6-luna", "area": "platform_engineering", "role": "fast_codebase_explorer"},
+      "deep_exploration": {"squad": "helena", "model": "openai/gpt-5.6-luna", "fallback": "minimax-coding-plan/MiniMax-M3", "area": "platform_engineering", "role": "deep_codebase_explorer"},
+      "code_implementation": {"squad": "andres", "model": "openai/gpt-5.6-luna", "fallback": "minimax-coding-plan/MiniMax-M3", "area": "platform_engineering", "role": "senior_implementer"},
+      "junior_implementation": {"squad": "lucas", "model": "openai/gpt-5.6-luna", "fallback": "minimax-coding-plan/MiniMax-M3", "area": "platform_engineering", "role": "junior_implementer"},
+      "code_review": {"squad": "pablo", "model": "openai/gpt-5.6-luna", "fallback": "minimax-coding-plan/MiniMax-M3", "area": "platform_engineering", "role": "code_reviewer"},
+      "security_audit": {"squad": "diana", "model": "openai/gpt-5.6-luna", "fallback": "minimax-coding-plan/MiniMax-M3", "area": "platform_engineering", "role": "security_auditor"},
+      "performance_analysis": {"squad": "oscar", "model": "openai/gpt-5.6-luna", "fallback": "minimax-coding-plan/MiniMax-M3", "area": "platform_engineering", "role": "performance_engineer"},
+      "api_security_design": {"squad": "nora", "model": "openai/gpt-5.6-luna", "fallback": "minimax-coding-plan/MiniMax-M3", "area": "platform_engineering", "role": "api_security_engineer"},
+      "qa_testing": {"squad": "clara", "model": "openai/gpt-5.6-luna", "fallback": "minimax-coding-plan/MiniMax-M3", "area": "platform_engineering", "role": "qa_engineer"},
+      "documentation": {"squad": "nadia", "model": "openai/gpt-5.6-luna", "fallback": "minimax-coding-plan/MiniMax-M3", "area": "platform_engineering", "role": "documentation_engineer"},
+      "summarization": {"squad": "mia", "model": "minimax-coding-plan/MiniMax-M3", "fallback": "openai/gpt-5.6-luna", "area": "platform_engineering", "role": "summarizer"},
+      "architecture_design": {"squad": "marco", "model": "openai/gpt-5.6-luna", "fallback": "minimax-coding-plan/MiniMax-M3", "area": "platform_engineering", "role": "systems_architect"}
     }
   },
   "budget_rules": {
     "max_session_usd": 10.0,
     "alert_at_pct": 70,
-    "auto_switch_to_free_at_pct": 85,
+    "auto_switch_to_fallback_at_pct": 85,
     "premium_requires_approval": true
   }
 }

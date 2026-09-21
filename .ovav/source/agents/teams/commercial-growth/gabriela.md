@@ -2,7 +2,7 @@
 name: Gabriela
 description: Market Intelligence · Competitive Analysis · TAM/SAM/SOM
 mode: subagent
-model: opencode-go/deepseek-v4-pro
+model: openai/gpt-5.6-luna
 hidden: true
 color: "#c9a24e"
 permission:

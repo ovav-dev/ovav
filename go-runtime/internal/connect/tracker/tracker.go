@@ -15,24 +15,87 @@ import (
 
 // TrackedProvider represents a provider being tracked.
 type TrackedProvider struct {
-	ID        string    `yaml:"id"`
-	Type      string    `yaml:"type"`
-	APIKey    string    `yaml:"api_key,omitempty"`
+	ID   string `yaml:"id"`
+	Type string `yaml:"type"`
+	// APIKey is kept only for in-memory compatibility with legacy provider files.
+	// It is never serialized; new configurations must use APIKeyEnv.
+	APIKey    string    `yaml:"-"`
+	APIKeyEnv string    `yaml:"api_key_env,omitempty"`
 	Enabled   bool      `yaml:"enabled"`
 	AddedAt   time.Time `yaml:"added_at"`
 	LastCheck time.Time `yaml:"last_check"`
 }
 
+// persistedTrackedProvider is the on-disk representation. API credentials are
+// deliberately absent so SaveProviders cannot write a resolved secret.
+type persistedTrackedProvider struct {
+	ID        string    `yaml:"id"`
+	Type      string    `yaml:"type"`
+	APIKeyEnv string    `yaml:"api_key_env,omitempty"`
+	Enabled   bool      `yaml:"enabled"`
+	AddedAt   time.Time `yaml:"added_at"`
+	LastCheck time.Time `yaml:"last_check"`
+}
+
+// MarshalYAML prevents API keys from being persisted, including when callers
+// construct a provider with the legacy in-memory APIKey field.
+func (p TrackedProvider) MarshalYAML() (interface{}, error) {
+	return persistedTrackedProvider{
+		ID:        p.ID,
+		Type:      p.Type,
+		APIKeyEnv: p.APIKeyEnv,
+		Enabled:   p.Enabled,
+		AddedAt:   p.AddedAt,
+		LastCheck: p.LastCheck,
+	}, nil
+}
+
+// UnmarshalYAML accepts legacy api_key values for one-process compatibility,
+// while subsequent saves migrate the file to the environment-reference form.
+func (p *TrackedProvider) UnmarshalYAML(value *yaml.Node) error {
+	var stored struct {
+		ID        string    `yaml:"id"`
+		Type      string    `yaml:"type"`
+		APIKey    string    `yaml:"api_key"`
+		APIKeyEnv string    `yaml:"api_key_env"`
+		Enabled   bool      `yaml:"enabled"`
+		AddedAt   time.Time `yaml:"added_at"`
+		LastCheck time.Time `yaml:"last_check"`
+	}
+	if err := value.Decode(&stored); err != nil {
+		return err
+	}
+	*p = TrackedProvider{
+		ID:        stored.ID,
+		Type:      stored.Type,
+		APIKey:    stored.APIKey,
+		APIKeyEnv: stored.APIKeyEnv,
+		Enabled:   stored.Enabled,
+		AddedAt:   stored.AddedAt,
+		LastCheck: stored.LastCheck,
+	}
+	return nil
+}
+
+// ResolveAPIKey obtains the credential from its configured environment
+// variable. The legacy in-memory value is a compatibility fallback only.
+func (p *TrackedProvider) ResolveAPIKey() string {
+	if p.APIKeyEnv != "" {
+		return os.Getenv(p.APIKeyEnv)
+	}
+	return p.APIKey
+}
+
 // UsageRecord represents a single usage record.
 type UsageRecord struct {
-	ID          string    `yaml:"id"`
-	ProviderID  string    `yaml:"provider_id"`
-	Model       string    `yaml:"model"`
-	InputTokens int       `yaml:"input_tokens"`
-	OutputTokens int      `yaml:"output_tokens"`
-	TotalTokens int       `yaml:"total_tokens"`
-	CostUSD     float64   `yaml:"cost_usd"`
-	Timestamp   time.Time `yaml:"timestamp"`
+	ID           string    `yaml:"id"`
+	ProviderID   string    `yaml:"provider_id"`
+	Model        string    `yaml:"model"`
+	InputTokens  int       `yaml:"input_tokens"`
+	OutputTokens int       `yaml:"output_tokens"`
+	TotalTokens  int       `yaml:"total_tokens"`
+	CostUSD      float64   `yaml:"cost_usd"`
+	Timestamp    time.Time `yaml:"timestamp"`
 }
 
 // UsageSummary represents aggregated usage for a period.
@@ -260,11 +323,12 @@ func (t *Tracker) GetProvider(id string) *TrackedProvider {
 
 // CreateProviderClient creates an API client for a provider.
 func CreateProviderClient(provider *TrackedProvider) (ProviderClient, error) {
+	apiKey := provider.ResolveAPIKey()
 	switch provider.Type {
 	case "openai":
-		return providers.NewOpenAI(provider.APIKey), nil
+		return providers.NewOpenAI(apiKey), nil
 	case "anthropic":
-		return providers.NewAnthropic(provider.APIKey), nil
+		return providers.NewAnthropic(apiKey), nil
 	default:
 		return nil, fmt.Errorf("unsupported provider type: %s", provider.Type)
 	}
@@ -289,10 +353,10 @@ type Record struct {
 func CalculateCost(model string, inputTokens, outputTokens int) float64 {
 	// Simple cost estimation based on model
 	costPer1M := map[string]float64{
-		"gpt-4o":         5.00,
+		"gpt-4o":          5.00,
 		"gpt-4o-mini":     0.15,
-		"gpt-4-turbo":    10.00,
-		"gpt-3.5-turbo":  0.50,
+		"gpt-4-turbo":     10.00,
+		"gpt-3.5-turbo":   0.50,
 		"claude-opus-3":   15.00,
 		"claude-sonnet-3": 3.00,
 		"claude-haiku-3":  0.25,

@@ -1,0 +1,31 @@
+version: 2
+updates:
+  - package-ecosystem: "gomod"
+    directory: "/go-runtime"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "thavren"
+    labels:
+      - "dependencies"
+      - "go"
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    reviewers:
+      - "dante"
+    labels:
+      - "dependencies"
+      - "javascript"
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    reviewers:
+      - "renata"
+    labels:
+      - "dependencies"
+      - "python"

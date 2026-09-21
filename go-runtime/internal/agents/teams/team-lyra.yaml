@@ -21,7 +21,7 @@ response: '🚫 HARD STOP — Fuera de mi especialidad (Summarizer)
   no lo entendí."
 
   '
-model: opencode-go/qwen3.7-plus
+model: openai/gpt-5.6-luna
 permission:
   edit: deny
   bash:

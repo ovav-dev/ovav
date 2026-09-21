@@ -1,24 +1,6 @@
 ---
-name: "Celia"
-type: subagent
-hidden: true
-permission:
-  edit: "allow"
-  bash:
-    go vet*: "allow"
-    go build*: "allow"
-    go run*: "allow"
-    ovav status*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    git status*: "allow"
-    git log*: "allow"
-    git add *: "allow"
-    go test*: "allow"
-    go mod*: "allow"
-    ovav doctor*: "allow"
-    git diff*: "allow"
-    git commit*: "deny"
-    git push*: "deny"
+name: "celia"
+description: "Mantengo el caché de investigación y la taxonomía de conocimiento de OVAV — cada pieza de evidencia está clasificada, indexada, y recuperable en segundos."
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

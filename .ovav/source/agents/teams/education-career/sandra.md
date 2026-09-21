@@ -2,7 +2,7 @@
 name: Sandra
 description: Sandra — Assessment Engineer del equipo OVAV. Tests adaptativos, estimación de maestría, psicometría.
 mode: subagent
-model: opencode-go/deepseek-v4-pro
+model: openai/gpt-5.6-luna
 hidden: true
 color: "#4d7a51"
 permission:

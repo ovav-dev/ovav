@@ -184,33 +184,40 @@ func TestIsAllowed(t *testing.T) {
 func TestToggleAt_ToggleTool(t *testing.T) {
 	s := NewState(nil)
 
-	// Find the index of opencode in selectable rows
+	// Select studio so nvim (min_plan=studio) becomes allowed.
+	if err := s.SelectPlan("studio"); err != nil {
+		t.Fatalf("selectPlan studio: %v", err)
+	}
+
+	// Find the index of nvim in selectable rows. nvim requires studio plan
+	// and after the upgrade is allowed but still inactive — ToggleAt flips
+	// it to active.
 	rows := s.SelectableRows()
-	var opencodeIdx int
+	var nvimIdx int
 	for i, r := range rows {
-		if r.ID == "opencode" {
-			opencodeIdx = i
+		if r.ID == "nvim" {
+			nvimIdx = i
 			break
 		}
 	}
 
-	msg := s.ToggleAt(opencodeIdx)
-	if msg != "OpenCode: included" {
-		t.Errorf("expected 'OpenCode: included', got %q", msg)
+	msg := s.ToggleAt(nvimIdx)
+	if msg != "Neovim: included" {
+		t.Errorf("expected 'Neovim: included', got %q", msg)
 	}
 
-	opencode := s.findTool("opencode")
-	if !opencode.Active {
-		t.Error("expected opencode to be active after toggle")
+	nvim := s.findTool("nvim")
+	if !nvim.Active {
+		t.Error("expected nvim to be active after toggle")
 	}
 
 	// Toggle again
-	msg = s.ToggleAt(opencodeIdx)
-	if msg != "OpenCode: removed" {
-		t.Errorf("expected 'OpenCode: removed', got %q", msg)
+	msg = s.ToggleAt(nvimIdx)
+	if msg != "Neovim: removed" {
+		t.Errorf("expected 'Neovim: removed', got %q", msg)
 	}
-	if opencode.Active {
-		t.Error("expected opencode to be inactive after second toggle")
+	if nvim.Active {
+		t.Error("expected nvim to be inactive after second toggle")
 	}
 }
 
@@ -560,11 +567,13 @@ func TestActiveToolCount(t *testing.T) {
 	s := NewState(nil)
 	initial := s.ActiveToolCount()
 
-	// Enable a tool
-	opencode := s.findTool("opencode")
-	opencode.Active = true
+	// Toggle a tool that's NOT initially active (nvim requires studio,
+	// default plan is nucleo). Toggling must increment the active count.
+	nvim := s.findTool("nvim")
+	nvim.Active = true
 	if s.ActiveToolCount() != initial+1 {
-		t.Error("expected tool count to increase")
+		t.Errorf("expected tool count to increase from %d to %d, got %d",
+			initial, initial+1, s.ActiveToolCount())
 	}
 }
 
@@ -572,11 +581,13 @@ func TestActiveRoleCount(t *testing.T) {
 	s := NewState(nil)
 	initial := s.ActiveRoleCount()
 
-	// Enable a role
-	pe := s.findRole("platform_engineering")
-	pe.Active = true
+	// Toggle a role that's NOT initially active (research_intelligence
+	// requires studio, default plan is nucleo).
+	research := s.findRole("research_intelligence")
+	research.Active = true
 	if s.ActiveRoleCount() != initial+1 {
-		t.Error("expected role count to increase")
+		t.Errorf("expected role count to increase from %d to %d, got %d",
+			initial, initial+1, s.ActiveRoleCount())
 	}
 }
 
@@ -624,5 +635,47 @@ func TestCommandUnlocksAll(t *testing.T) {
 	}
 	if toolCount != 5 {
 		t.Errorf("expected 3 roles visible at command, got %d", roleCount)
+	}
+}
+
+// TestNewState_NucleoActivatesAllowedItems — regression for the bug where
+// NewState() with default SelectedPlan="nucleo" produced
+// `Plan: Core | 0 tools · 0 roles` because items defaulted to Active=false
+// and disableDisallowed only turned items OFF, never ON.
+//
+// Expected behavior: at default state (nucleo selected):
+//   - opencode (min_plan=nucleo) is Active
+//   - git (min_plan=nucleo) is Active
+//   - nvim (min_plan=studio) is NOT Active
+//   - platform_engineering (min_plan=nucleo) is Active
+//   - research_intelligence (min_plan=studio) is NOT Active
+func TestNewState_NucleoActivatesAllowedItems(t *testing.T) {
+	s := NewState(nil)
+
+	if s.SelectedPlan != "nucleo" {
+		t.Fatalf("expected default SelectedPlan=nucleo, got %q", s.SelectedPlan)
+	}
+	if !s.findTool("opencode").Active {
+		t.Error("opencode (min_plan=nucleo) must be Active at default state")
+	}
+	if !s.findTool("git").Active {
+		t.Error("git (min_plan=nucleo) must be Active at default state")
+	}
+	if s.findTool("nvim").Active {
+		t.Error("nvim (min_plan=studio) must NOT be Active at nucleo state")
+	}
+	if !s.findRole("platform_engineering").Active {
+		t.Error("platform_engineering (min_plan=nucleo) must be Active at default state")
+	}
+	if s.findRole("research_intelligence").Active {
+		t.Error("research_intelligence (min_plan=studio) must NOT be Active at nucleo state")
+	}
+
+	// Count sanity check: 2 tools + 1 role active at nucleo
+	if got, want := s.ActiveToolCount(), 2; got != want {
+		t.Errorf("ActiveToolCount: got %d, want %d", got, want)
+	}
+	if got, want := s.ActiveRoleCount(), 1; got != want {
+		t.Errorf("ActiveRoleCount: got %d, want %d", got, want)
 	}
 }

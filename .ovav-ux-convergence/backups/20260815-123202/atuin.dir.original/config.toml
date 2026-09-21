@@ -1,0 +1,75 @@
+# Atuin configuration — OVAV Phase II Terminal Cortex
+# Updated: 2026-08-15
+# Rule #15-SUPERSEDED: pty-proxy now allowed via canary (CEO directive Phase II)
+# Note: Atuin v18.19.0 schema — only verified fields per official docs
+
+## History settings
+[history]
+# Sync is opt-in. Deshabilitado por default — workstation local-only.
+# Activar cuando CEO confirme cuenta Atuin Cloud.
+sync_enabled = false
+
+# Search mode: "fulltext" (substring) | "prefix" | "fuzzy" | "skim"
+search_mode = "fuzzy"
+
+# Inline height for search UI
+inline_height = 18
+
+# Filter mode for interactive search
+filter_mode = "global"
+
+## Daemon (required for output capture via pty-proxy)
+[daemon]
+# Daemon in-memory hot search + output cache
+enabled = true
+# Autostart managed by CLI
+autostart = true
+socket_path = "/run/user/1000/atuin.sock"
+# sync_frequency (seconds)
+sync_frequency = 300
+
+## pty-proxy (experimental but documented — REQUIRED for output capture)
+[pty_proxy]
+# Re-exec shell inside pty-proxy automatically via atuin init
+enabled = true
+
+## PTY capture (output retention)
+[pty_proxy_capture]
+# Local-only, no cloud, no AI provider
+# Max output bytes per command to retain in memory
+max_bytes_per_command = 1048576  # 1 MiB
+# Max output lines per command
+max_lines = 1000
+# Exclude commands matching these patterns (security-first)
+# Note: This is a command-pattern exclusion, not a secret-content filter
+exclude_command_patterns = [
+  "*\\bsudo\\b.*",
+  "*sshpass*",
+  "*curl.*-H.*Authorization:.*",
+  "*\\.aws/credentials*",
+  "*\\.ssh/id_*",
+  "*\\.kube/config*",
+  "*\\.netrc*",
+  "*passwd*",
+  "*\\bgpg\\b.*--export*",
+]
+# Session timeout: how long captured output is kept in daemon memory
+# Default: bounded to keep memory footprint low
+session_timeout_minutes = 60
+
+## Stats
+[stats]
+enabled = true
+common_commands = 10
+
+## Sync (off by default, per rule #14)
+[sync]
+auto_sync = false
+auto_sync_interval = 60
+
+## AI (off by default — we use OpenCode, not Atuin AI)
+[ai]
+# Atuin AI is not used. OVAV uses OpenCode as the agent harness.
+# Leaving this section commented as a no-op.
+# Note: [ai] section may not be a valid Atuin config key in v18.19.0.
+# If Atuin rejects it, remove this block.

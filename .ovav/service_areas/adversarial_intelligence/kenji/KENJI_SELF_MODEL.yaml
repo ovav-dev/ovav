@@ -10,4 +10,4 @@ self_model:
     - {partner: "Thavren", type: "cross_area", protocol: "handoff_sanitizado", description: "Sandbox provisioning and runtime access"}
     - {partner: "Eidren", type: "cross_area", protocol: "handoff_sanitizado", description: "Attack methodology research and validation"}
   knowledge_domains: ["Offensive security", "Adversarial ML", "Race condition theory", "Architectural vulnerability analysis", "Semantic NLP attacks"]
-  model_preferences: {primary: "opencode-go/deepseek-v4-pro", secondary: "mimo/mimo-auto"}
+  model_preferences: {primary: "openai/gpt-5.6-luna", secondary: "minimax-coding-plan/MiniMax-M3"}

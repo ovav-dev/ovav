@@ -1,5 +1,7 @@
 operational_memory_contract:
   version: 3
+  reviewed_at: "2026-09-18"
+  reviewed_by: thavren
   purpose: >-
     Define OVAV operational memory for OVAV SYSTEMS (not Product).
     OVAV Systems retiene memoria acumulativa entre sesiones.

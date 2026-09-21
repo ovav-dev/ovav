@@ -1,0 +1,22 @@
+{
+  "schema": "ovav.external_integrity.v1",
+  "project": "https://github.com/Alexander-Salvador/akrynt-agent.git",
+  "root_path": "/home/braka/Systems/projects/work/akrynt-agent",
+  "commit": "c7df45d92467efbac5c0c6d6c7166ba4b51dd81b",
+  "files": {
+    ".github/workflows/ci.yml": "0ec5eca557dbe667d0b96671bd1df4bee1942845be24acc3e4d2cecc73ddf6fe",
+    ".github/workflows/deploy.yml": "2461fc1e7214a9521e7e7e9d6f5c14e1ccd4792b5c32ad1496d5069f32f5387d",
+    ".gitignore": "529cbda9d23401784097173ee245c1cb73e02d2b2755f41bfc7dd834f28bb772",
+    "Makefile": "4cce9f5bf5547d6ae2a78ecb0e0c7e32224785c3ffd99b32ed495a1ba71eb366",
+    "backend/.gitignore": "a6d2571565718ee905c4e2932542ac0ad21e69ae8d418c5d2b12d567763d677b",
+    "backend/Dockerfile": "7cf9e09f7cb777be199dedc52b6fe725d1621b26ee3b634690b097595efaf510",
+    "backend/Dockerfile.dev": "7126f17205ece29733c97e148854797180134b73b8e401c9dacdef87f415f456",
+    "backend/Dockerfile.scraper": "a94043b959091a1c7230161e039f97ad423162bc5e5b2f1ccf6e356e82050b54",
+    "backend/go.mod": "af817f3957dd1e67a04421dced4b9022e29879145d37a77be7aaba65ad4c404c",
+    "backend/go.sum": "bab76dec60cdde7aa20e357e3d9e7fe8283a9c64261a62286221f3f9187db158",
+    "docs-astro/package-lock.json": "6354e9796f41526eb44679093efc206e308cf35c157a210a81a21c951bba8f40",
+    "docs-astro/package.json": "434176b6848774d22b5f88728276aea9bb50898dbbcf838c04c550ff93535966",
+    "package.json": "8981dc789e22636300817f3fd8ddae847e315c1955d9d01b6bc5a0a8ed96cf93",
+    "pnpm-lock.yaml": "4c6bfce5f4e7558487262488a587b0111ed67aeb6a9525b67146c1ee86444918"
+  }
+}

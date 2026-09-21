@@ -1,4 +1,4 @@
 {
-  "$schema": "https://mimo.xiaomi.com/mimocode/tui.json",
-  "theme": "OVAV Dark"
+  "$schema": "https://opencode.ai/tui.json",
+  "theme": "ovav"
 }

@@ -1,0 +1,12 @@
+# Test minimal starship config
+format = "[$directory]($style)[$character]($style)"
+
+[directory]
+style = "bold blue"
+format = "[ $path ]($style)"
+truncation_length = 3
+truncation_symbol = "…/"
+
+[character]
+success_symbol = "[❯](bold green)"
+error_symbol = "[❯](bold red)"

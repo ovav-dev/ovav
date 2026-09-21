@@ -2,7 +2,7 @@
 name: Uriel-Cloud
 description: Cloud Engineer — Cloud infrastructure, networking, cost optimization
 mode: subagent
-model: opencode-go/qwen3.7-max
+model: openai/gpt-5.6-luna
 hidden: true
 color: "#076678"
 permission:

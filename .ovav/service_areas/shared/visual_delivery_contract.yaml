@@ -1,5 +1,7 @@
 visual_delivery_contract:
   version: 1
+  reviewed_at: "2026-09-18"
+  reviewed_by: thavren
   purpose: >-
     Make each OVAV service area's visible delivery feel like a professional human specialist:
     premium, concise, visual, direct and safe. Platform Engineering and Research Intelligence

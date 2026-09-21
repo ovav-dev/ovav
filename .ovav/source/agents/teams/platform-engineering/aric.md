@@ -2,7 +2,7 @@
 name: Aric
 description: Aric — Systems Architect del equipo OVAV. Diseño de arquitectura, validación DAG, resolución de dependencias y cambios multi-archivo.
 mode: subagent
-model: opencode-go/deepseek-v4-pro
+model: openai/gpt-5.6-luna
 hidden: true
 color: "#458588"
 permission:

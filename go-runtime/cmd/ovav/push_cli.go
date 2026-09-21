@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"time"
 
 	"github.com/ovav/ovav/internal/cli"
+	"github.com/ovav/ovav/internal/consumers"
 	"github.com/ovav/ovav/internal/gitflow"
 	"github.com/ovav/ovav/internal/validators"
 )
@@ -22,34 +24,22 @@ import (
 //   - Protected branch waiver check
 //   - Backup ref before push (refs/backups/<branch>/<timestamp>)
 //   - Audit trail to .ovav/runtime/logs/push_audit.jsonl
-//   - Force-with-lease instead of --force (safer force push)
 //
 // Usage:
 //
-//	ovav push [--dry-run] [--remote <name>] [--force] [--no-validate]
+//	ovav push [--dry-run] [--remote <name>]
 func cmdPush(args []string) int {
-	dryRun := false
-	force := false
-	skipValidate := false
-	remote := "origin"
-
-	for _, arg := range args {
-		switch arg {
-		case "--dry-run", "-n":
-			dryRun = true
-		case "--force", "-f":
-			force = true
-		case "--skip-validate", "--no-validate":
-			skipValidate = true
-		case "--help", "-h":
-			printPushHelp()
-			return 0
-		default:
-			if strings.HasPrefix(arg, "--remote=") {
-				remote = strings.TrimPrefix(arg, "--remote=")
-			}
-		}
+	opts, err := parsePushArgs(args)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "❌ OVAV push: %v\n", err)
+		return 2
 	}
+	if opts.help {
+		printPushHelp()
+		return 0
+	}
+	dryRun := opts.dryRun
+	remote := opts.remote
 
 	repoRoot, err := cli.FindRepoRoot()
 	if err != nil {
@@ -73,7 +63,7 @@ func cmdPush(args []string) int {
 		"staging":    true,
 	}
 
-	if protectedBranches[branch] && !force {
+	if protectedBranches[branch] {
 		waiverPath := fmt.Sprintf("%s/.ovav/runtime/protected_branch_waiver.yaml", repoRoot)
 		if _, err := os.Stat(waiverPath); os.IsNotExist(err) {
 			fmt.Fprintf(os.Stderr, "❌ OVAV push: push to protected branch %q requires CEO waiver.\n", branch)
@@ -83,36 +73,23 @@ func cmdPush(args []string) int {
 		fmt.Printf("  ✅ Protected branch %q — waiver present\n", branch)
 	}
 
-	// ── 3. Pre-flight validation (unless --skip-validate) ─────────────────
-	if !skipValidate {
-		fmt.Println("🔍 Pre-flight validation...")
+	// ── 3. Pre-flight validation ──────────────────────────────────────────
+	fmt.Println("🔍 Pre-flight validation...")
 
-		registry := validators.NewRegistry(
-			validators.NewProtectedBranch(),
-			validators.NewGitPush(),
-			validators.NewWorkspaceSafety(),
-		)
-
-		ctx := context.Background()
-		results := registry.Run(ctx, repoRoot)
-		failed := 0
-		for _, r := range results {
-			icon := "✅"
-			if r.Status == "fail" || r.Status == "error" {
-				icon = "❌"
-				failed++
-			}
-			fmt.Printf("  %s %s: %s\n", icon, r.Name, r.Message)
+	results, passed := runPushPreflight(context.Background(), repoRoot, validators.GovernedPushValidators(repoRoot))
+	for _, r := range results {
+		icon := "✅"
+		if r.Status == "fail" || r.Status == "error" {
+			icon = "❌"
 		}
-		if failed > 0 {
-			fmt.Fprintf(os.Stderr, "\n❌ Pre-flight validation failed — fix issues before push.\n")
-			fmt.Fprintf(os.Stderr, "   Run `go run ./cmd/ovav/ validate` for full report.\n")
-			return 1
-		}
-		fmt.Println("  ✅ Pre-flight passed")
-	} else {
-		fmt.Println("⚠️  Validation skipped (--no-validate)")
+		fmt.Printf("  %s %s: %s\n", icon, r.Name, r.Message)
 	}
+	if !passed {
+		fmt.Fprintf(os.Stderr, "\n❌ Pre-flight validation failed — fix issues before push.\n")
+		fmt.Fprintf(os.Stderr, "   Run `go run ./cmd/ovav/ validate --gate` for full report.\n")
+		return 1
+	}
+	fmt.Println("  ✅ Pre-flight passed")
 
 	// ── 4. Fetch + divergence check ──────────────────────────────────────
 	fmt.Println("🔍 Checking remote divergence...")
@@ -123,7 +100,8 @@ func cmdPush(args []string) int {
 	localCommit := strings.TrimSpace(gitCmdOutput(repoRoot, "rev-parse", "HEAD"))
 	remoteCommit := strings.TrimSpace(gitCmdOutput(repoRoot, "rev-parse", fmt.Sprintf("%s/%s", remote, branch)))
 
-	diverged := localCommit != remoteCommit
+	remoteRefExists := remoteCommit != ""
+	diverged := remoteRefExists && localCommit != remoteCommit
 	behind := false
 	ahead := false
 
@@ -161,7 +139,9 @@ func cmdPush(args []string) int {
 		return 1
 	}
 
-	if !diverged {
+	if !remoteRefExists {
+		fmt.Printf("  ✅ Branch is new on %s — ready to publish %s\n", remote, branch)
+	} else if !diverged {
 		fmt.Printf("  ✅ Branch is up-to-date with %s/%s\n", remote, branch)
 	} else if ahead && !behind {
 		fmt.Printf("  ✅ Branch is ahead of %s/%s — %d commit(s) to push\n", remote, branch, countCommitsBetween(repoRoot, remoteCommit, localCommit))
@@ -187,26 +167,13 @@ func cmdPush(args []string) int {
 	gitCmd(repoRoot, "update-ref", backupRef, "HEAD")
 
 	// ── 6. Audit trail ────────────────────────────────────────────────────
-	logPushAudit(repoRoot, branch, remote, force)
+	logPushAudit(repoRoot, branch, remote, false)
 
 	// ── 7. Execute push via gitflow.Push (HTTPS-only, no force) ──────────
-	if force {
-		// Use force-with-lease (safer than bare --force)
-		fmt.Printf("\n🚀 Governed push %s → %s/%s (force-with-lease)\n", branch, remote, branch)
-		cmd := exec.Command("git", "push", "--force-with-lease", remote, branch)
-		cmd.Dir = repoRoot
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
-		if err := cmd.Run(); err != nil {
-			fmt.Fprintf(os.Stderr, "\n❌ Push failed: %v\n", err)
-			return 1
-		}
-	} else {
-		fmt.Printf("\n🚀 Governed push %s → %s/%s (HTTPS)\n", branch, remote, branch)
-		if err := gitflow.Push(repoRoot); err != nil {
-			fmt.Fprintf(os.Stderr, "\n❌ Push failed: %v\n", err)
-			return 1
-		}
+	fmt.Printf("\n🚀 Governed push %s → %s/%s (HTTPS)\n", branch, remote, branch)
+	if err := gitflow.Push(repoRoot); err != nil {
+		fmt.Fprintf(os.Stderr, "\n❌ Push failed: %v\n", err)
+		return 1
 	}
 
 	// ── 8. Post-push report ───────────────────────────────────────────────
@@ -216,6 +183,53 @@ func cmdPush(args []string) int {
 	fmt.Printf("  🔄 To verify: go run ./cmd/ovav/ validate\n")
 
 	return 0
+}
+
+func governedPushValidators() []validators.Validator {
+	return []validators.Validator{
+		validators.NewProtectedBranch(),
+		validators.NewGitPush(),
+		validators.NewWorkspaceSafety(),
+		validators.NewSupplyChain(validators.ValidationGate),
+		validators.NewRuntimeIntegrity(validators.ValidationGate),
+	}
+}
+
+func runPushPreflight(ctx context.Context, repoRoot string, validatorSet []validators.Validator) ([]validators.Result, bool) {
+	results := validators.NewRegistry(validatorSet...).Run(ctx, repoRoot)
+	for _, result := range results {
+		if result.Status == "fail" || result.Status == "error" {
+			return results, false
+		}
+	}
+	return results, true
+}
+
+type pushOptions struct {
+	dryRun bool
+	remote string
+	help   bool
+}
+
+func parsePushArgs(args []string) (pushOptions, error) {
+	opts := pushOptions{remote: "origin"}
+	for _, arg := range args {
+		switch arg {
+		case "--dry-run", "-n":
+			opts.dryRun = true
+		case "--help", "-h":
+			opts.help = true
+		case "--force", "-f", "--force-with-lease", "--skip-validate", "--no-validate":
+			return pushOptions{}, fmt.Errorf("option %s is prohibited by push governance", arg)
+		default:
+			if strings.HasPrefix(arg, "--remote=") && strings.TrimPrefix(arg, "--remote=") != "" {
+				opts.remote = strings.TrimPrefix(arg, "--remote=")
+				continue
+			}
+			return pushOptions{}, fmt.Errorf("unknown option %s", arg)
+		}
+	}
+	return opts, nil
 }
 
 // gitCmdOutput runs a git command and returns its stdout.
@@ -240,13 +254,17 @@ func gitCmd(repoRoot string, args ...string) {
 
 // logPushAudit writes a push event to the push audit log.
 func logPushAudit(repoRoot, branch, remote string, force bool) {
-	logDir := repoRoot + "/.ovav/runtime/logs"
+	logPath, ok := governedPushAuditPath(repoRoot)
+	if !ok {
+		fmt.Fprintln(os.Stderr, "  ⚠️  Audit log path unavailable; no consumer-local fallback permitted")
+		return
+	}
+	logDir := filepath.Dir(logPath)
 	if err := os.MkdirAll(logDir, 0755); err != nil {
 		fmt.Fprintf(os.Stderr, "  ⚠️  Audit log dir failed: %v\n", err)
 		return
 	}
 
-	logPath := logDir + "/push_audit.jsonl"
 	entry := fmt.Sprintf(
 		`{"event":"governed_push","branch":"%s","remote":"%s","force":%v,"timestamp":"%s","operator":"thavren"}`+"\n",
 		branch, remote, force, time.Now().UTC().Format(time.RFC3339),
@@ -257,6 +275,28 @@ func logPushAudit(repoRoot, branch, remote string, force bool) {
 	}
 }
 
+// governedPushAuditPath keeps external-consumer audit state outside both the
+// consumer checkout and the tracked OVAV checkout. A registered central ID is
+// required; there is deliberately no project-controlled fallback path.
+func governedPushAuditPath(repoRoot string) (string, bool) {
+	profile := consumers.Resolve(repoRoot)
+	if !profile.External {
+		return filepath.Join(repoRoot, ".ovav", "runtime", "logs", "push_audit.jsonl"), true
+	}
+	if profile.Consumer == nil || profile.Consumer.ID == "" || filepath.Base(profile.Consumer.ID) != profile.Consumer.ID {
+		return "", false
+	}
+	configHome := os.Getenv("XDG_CONFIG_HOME")
+	if configHome == "" {
+		home, err := os.UserHomeDir()
+		if err != nil {
+			return "", false
+		}
+		configHome = filepath.Join(home, ".config")
+	}
+	return filepath.Join(configHome, "ovav", "consumer-runtime", profile.Consumer.ID, "push_audit.jsonl"), true
+}
+
 func printPushHelp() {
 	fmt.Print(`
 OVAV Governed Push — safe git push with governance layer
@@ -265,9 +305,7 @@ Usage: ovav push [flags]
 
 Flags:
   --dry-run, -n       Show what would be pushed (no changes)
-  --force, -f        Allow force-push (force-with-lease, not bare --force)
   --remote=<name>    Push to specific remote (default: origin)
-  --skip-validate    Skip pre-flight validation
   --help, -h         Show this help
 
 What ovav push does that raw git push doesn't:
@@ -276,13 +314,11 @@ What ovav push does that raw git push doesn't:
   ✅ Protected branch waiver check
   ✅ Backup ref before push (refs/backups/<branch>/<timestamp>)
   ✅ Audit trail (.ovav/runtime/logs/push_audit.jsonl)
-  ✅ Force-with-lease (safer than --force)
+  ✅ Raw force options are rejected
 
 Examples:
   ovav push                    # Normal governed push
   ovav push --dry-run          # Preview what would be pushed
-  ovav push --force            # Force push with lease (safer)
-  ovav push --skip-validate    # Skip validation (fast but risky)
 `)
 }
 

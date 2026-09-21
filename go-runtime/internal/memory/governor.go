@@ -55,8 +55,8 @@ func (g *Governor) Write(card Card) error {
 	}
 
 	// Stage 3: Write
-	g.ledger.UpsertCard(card)
 	card.LastConfirmed = time.Now().Format("2006-01-02")
+	g.ledger.UpsertCard(card)
 
 	return g.ledger.Save()
 }

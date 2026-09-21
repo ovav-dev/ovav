@@ -28,7 +28,7 @@ type Index struct {
 // IndexConfig holds index configuration.
 type IndexConfig struct {
 	Dimensions int    `json:"dimensions"`
-	IndexPath string `json:"index_path"`
+	IndexPath  string `json:"index_path"`
 }
 
 // NewIndex creates a new embedding index.
@@ -104,7 +104,7 @@ func (idx *Index) Save() error {
 
 // IndexFile represents the on-disk index structure.
 type IndexFile struct {
-	Config     IndexConfig   `json:"config"`
+	Config     IndexConfig  `json:"config"`
 	Embeddings []*Embedding `json:"embeddings"`
 }
 
@@ -257,7 +257,7 @@ func (idx *Index) SaveTo(path string) error {
 	indexFile := IndexFile{
 		Config: IndexConfig{
 			Dimensions: idx.embedder.Dimensions(),
-			IndexPath: path,
+			IndexPath:  path,
 		},
 		Embeddings: embeddings,
 	}

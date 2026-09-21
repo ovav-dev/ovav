@@ -1,21 +1,7 @@
 ---
-name: "Platform Engineering"
+name: "platform-engineering"
 description: "Go runtime, seguridad del sistema, CLI, validación, gobernanza técnica — Lead: Thavren"
-type: area
-color: "#2563eb"
-permission:
-  edit: "allow"
-  bash:
-    ovav_status: "allow"
-    ovav_dashboard: "allow"
-    go: "allow"
-    python3: "allow"
-    ovav_health: "allow"
-    ovav_monitor: "allow"
-  external_directory:
-    "*": "deny"
-    "/home/braka/Systems/OVAV": "allow"
-    "/tmp/opencode": "allow"
+color: "blue"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->
@@ -33,6 +19,7 @@ permission:
 # Platform Engineering
 
 **Lead:** thavren
+**Surface:** Go runtime, seguridad del sistema, CLI, validación, gobernanza técnica
 
 ## Functions
 

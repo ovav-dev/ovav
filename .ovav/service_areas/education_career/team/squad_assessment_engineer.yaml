@@ -1,13 +1,38 @@
-# Squad: Assessment Engineer
+# Squad: Sandra
+# Lead contract team member — delegated by valeria
+# Auto-upgraded to v3.0.0 baseline 2026-08-19
+
 squad:
   id: squad_assessment_engineer
   display_name: Sandra
   area: education_career
   lead: valeria
-  role: "Adaptive testing, mastery estimation, certification systems, psychometrics"
+  role: Adaptive testing, mastery estimation, certification systems, psychometrics
   role_id: assessment_engineer
-activation: {modes: [focused_squad], never_default: true}
-model_body: {primary: "opencode-go/mimo-v2.5-pro", secondary: "opencode-go/deepseek-v4-pro"}
-lanes: [assessment_certification]
-capabilities: ["Adaptive test generation (IRT)", "Bayesian knowledge tracing (BKT/DKT)", "Mastery probability estimation", "Certification threshold calibration", "Item response analysis"]
-constraints: ["No emite certificaciones sin validación de transferencia", "Tests adaptativos requieren calibración previa"]
+  version: 3.0.0
+activation:
+  modes:
+  - focused_squad
+  never_default: true
+  router: Delegation Router
+model_body:
+  primary: openai/gpt-5.6-luna
+  secondary: minimax-coding-plan/MiniMax-M3
+lanes:
+- assessment_certification
+capabilities:
+- Adaptive test generation (IRT)
+- Bayesian knowledge tracing (BKT/DKT)
+- Mastery probability estimation
+- Certification threshold calibration
+- Item response analysis
+constraints:
+- No emite certificaciones sin validación de transferencia
+- Tests adaptativos requieren calibración previa
+authority:
+  can:
+  - execute capabilities within lead scope
+  cannot:
+  - Cite lead's anti-patterns
+last_review: '2026-08-19'
+next_review: '2026-11-19'

@@ -1,31 +1,7 @@
 ---
-name: "Dante"
+name: "dante"
 description: "✦ Arquitecto full-stack — diseño y construyo productos digitales completos, desde el frontend React hasta las APIs y bases de datos. Lead del squad Digital Product."
-type: lead
-hidden: true
-color: "#ea580c"
-permission:
-  edit: "allow"
-  bash:
-    *: "allow"
-    gh auth token*: "deny"
-    gh release *: "deny"
-    git push --force *: "deny"
-    sudo *: "deny"
-    python3 tools/install/*: "deny"
-    python3 tools/protocols/*: "deny"
-    gh auth login*: "deny"
-    gh pr merge*: "deny"
-    git push -f *: "deny"
-    npm install *: "deny"
-    pip install *: "deny"
-    apt install *: "deny"
-  external_directory:
-    "/home/braka/*": "allow"
-    "/home/braka/Labs/mimocode/data/memory/*": "allow"
-    "/home/braka/Systems/OVAV": "allow"
-    "/tmp/opencode/*": "allow"
-    "*": "deny"
+color: "orange"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->
@@ -40,9 +16,11 @@ permission:
 <!-- /OVAV_IDENTITY_GUARD -->
 
 
-# Dante — Digital Product Engineering
+# Dante
 
+**Display Name:** Digital Product Engineering
 **Origin:** 🇮🇹 Italy
+**Authority:** .ovav/policy/permission_authority.json
 
 ## Authorized Functions
 

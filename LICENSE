@@ -1,0 +1,34 @@
+OVAV Commercial License v2.3.2
+
+Copyright (c) 2026 Alexander Salvador. All rights reserved.
+
+PROPRIETARY SOFTWARE — SOURCE-AVAILABLE, NOT OPEN SOURCE.
+
+This software and associated documentation files (the "Software") are
+the proprietary and confidential property of Alexander Salvador and
+Buddaham Academy. The Software is licensed, not sold.
+
+CONDITIONS:
+
+1. The Software may be installed and used by the owner and their
+   authorized agents (OVAV AGENTS) on devices under the owner's control
+   for the purpose of operating OVAV workstations and integrating
+   with the OVAV governance runtime.
+
+2. Modification of the Software is permitted only for the purpose of
+   contributing back to the upstream repository
+   (https://github.com/ovav-dev/ovav) via a pull request reviewed and
+   merged by the repository owner.
+
+3. Redistribution of the Software, in whole or in part, in any form
+   that competes with the OVAV product offering is prohibited.
+
+4. The Software is provided "as is", without warranty of any kind,
+   express or implied. The owner accepts no liability for damages
+   arising from use of the Software.
+
+5. Any OVAV AGENT that operates against this Software is bound by the
+   canonical CRITERIA.yaml of its assigned service area and the
+   caps.yaml single authority contract.
+
+For licensing inquiries: alexander@ovav.dev

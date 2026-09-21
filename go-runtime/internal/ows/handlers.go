@@ -227,6 +227,29 @@ func makeCreateHandler(repoRoot string) func(ctx context.Context, args map[strin
 			}
 		}
 
+		// ── Premium pre-flight summary ──────────────────────────────────────
+		// Show exactly what owc is about to do BEFORE it does anything.
+		// The path output is the actual full path — copy-pasteable into cd.
+		currentBranchRaw := strings.TrimSpace(gitOutput(repoRoot, "rev-parse", "--abbrev-ref", "HEAD"))
+		destPath := filepath.Join(repoRoot, ".ovav", "worktrees", strings.ReplaceAll(branch, "/", "-"))
+		fmt.Println()
+		fmt.Println("  📋 owc pre-flight")
+		fmt.Println("  ─────────────────────────────────────────────────")
+		fmt.Printf("  current branch : %s\n", currentBranchRaw)
+		fmt.Printf("  new branch     : %s\n", branch)
+		fmt.Printf("  base branch    : %s\n", gfProfile.Base)
+		fmt.Printf("  merge target   : %s\n", gfProfile.MergeTo)
+		fmt.Printf("  profile        : %s  (compliance=%s)\n", profileName, complianceLevel)
+		fmt.Printf("  destination    : %s\n", destPath)
+		// Surface a safety check: if the destination path is identical to CWD, abort.
+		cwdClean, _ := filepath.Abs(".")
+		destClean, _ := filepath.Abs(destPath)
+		if cwdClean == destClean {
+			fmt.Printf("  ⚠️  destination == cwd — refusing to nest\n")
+			return fmt.Errorf("owc: refusing to create worktree at CWD (%s)", cwdClean)
+		}
+		fmt.Println("  ─────────────────────────────────────────────────")
+
 		// ── SU-3: --carry-uncommitted — migrate dirty changes to worktree ──
 		carryUncommitted := args["carry-uncommitted"] == "true"
 		var stashRef string
@@ -276,14 +299,38 @@ func makeCreateHandler(repoRoot string) func(ctx context.Context, args map[strin
 		headOut := gitOutput(worktreePath, "rev-parse", "HEAD")
 		if headSHA := strings.TrimSpace(headOut); len(headSHA) == 40 {
 			_ = truststore.WriteWorktreeHead(repoRoot, worktreePath, headSHA)
-			fmt.Printf("   🔐 Trust store: initialized worktree HEAD (%s)\n", headSHA[:8])
 		}
 
 		// Record git op timestamp for gate_self_protection grace period
 		_ = truststore.RecordGitOp(repoRoot)
 
+		// ── Premium post-create success card ────────────────────────────────
+		// The single most important output: where is the new worktree, and how
+		// do I enter it. Single `cd <path>` line, copy-pasteable.
+		fmt.Println()
+		fmt.Println("  ✅ Worktree created")
+		fmt.Println("  ─────────────────────────────────────────────────")
+		fmt.Printf("  branch     : %s\n", branch)
+		fmt.Printf("  HEAD       : %s\n", strings.TrimSpace(headOut)[:min(12, len(strings.TrimSpace(headOut)))])
+		fmt.Printf("  path       : %s\n", worktreePath)
+		fmt.Printf("  %s\n", "  ready! → cd "+worktreePath)
+		fmt.Println()
+		fmt.Println("  Next steps:")
+		fmt.Printf("    cd %s\n", worktreePath)
+		fmt.Printf("    ovav worktree owd                    # when done — verify + merge + cleanup\n")
+		fmt.Printf("    ovav worktree owl --mine             # confirm your worktrees\n")
+		fmt.Println()
+
 		return nil
 	}
+}
+
+// min returns the smaller of two ints (helper for slice truncation in display).
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
 }
 
 // profileToGitflow converts an OWS ProfileConfig to a gitflow.Profile.
@@ -493,27 +540,21 @@ func makeDoneHandler(repoRoot string) func(ctx context.Context, args map[string]
 					}
 				}
 
-				// ── Hygiene blocking: strict/maximum require ZERO issues ──
-				// standard requires no BLOCKING issues (warnings allowed)
-				if reqs.HygieneRequired && !vr.HygieneClean {
-					if complianceLevel == ComplianceStrict || complianceLevel == ComplianceMaximum {
-						return fmt.Errorf("owd: workspace hygiene not clean (%d issues) — compliance %s requires zero issues",
-							vr.HygieneIssues, complianceLevel)
-					}
-					// Standard: only block on blocking issues (large untracked files, etc.)
-					hygiene := WorkspaceHygieneScan(repoRoot)
-					if hygiene.BlockingIssues > 0 {
-						return fmt.Errorf("owd: %d blocking hygiene issue(s) — resolve before merging", hygiene.BlockingIssues)
-					}
-					// Warnings only: show but don't block for standard
-					fmt.Printf("   ⚠️  Hygiene: %d warning(s) (non-blocking for %s)\n", vr.HygieneIssues, complianceLevel)
+				// ── Hygiene blocking: findings have explicit severity ──
+				// Advisory warnings never become blocking merely because compliance is stricter.
+				if reqs.HygieneRequired && vr.HygieneBlocking > 0 {
+					return fmt.Errorf("owd: %d blocking hygiene issue(s) — resolve before merging", vr.HygieneBlocking)
+				}
+				if vr.HygieneIssues > vr.HygieneBlocking {
+					fmt.Printf("   ⚠️  Hygiene: %d advisory warning(s) (non-blocking for %s)\n",
+						vr.HygieneIssues-vr.HygieneBlocking, complianceLevel)
 				}
 
 				// ── Block on code-quality warnings (standard+) ──
 				// Only blocks if go vet, gofmt, go test, or validators failed.
 				// Hygiene warnings are handled separately above.
 				if reqs.BlockOnWarning {
-					codeFailed := !vr.GoVetPass || !vr.GofmtPass || !vr.GoTestPass
+					codeFailed := !vr.GoVetPass || !vr.GofmtPass || !vr.GoTestPass || vr.StackFailures > 0
 					if vr.ValidateRan && vr.ValidateFail > 0 && vr.ValidateTotal > 0 {
 						validatePct := float64(vr.ValidatePass) / float64(vr.ValidateTotal)
 						if validatePct < reqs.ValidateMinPct {
@@ -681,8 +722,14 @@ type SecretFinding struct {
 
 // scanSecretsInChanges scans files changed in branch vs develop for secrets.
 func scanSecretsInChanges(repoRoot, branch string) ([]SecretFinding, error) {
-	// Get list of files changed in this branch vs develop (two-dot: direct comparison)
-	diffCmd := exec.Command("git", "diff", "--name-only", "develop.."+branch)
+	// Get list of files changed in this branch vs develop (two-dot: direct comparison).
+	// Prefer local "develop" first; fall back to "origin/develop" when running in a
+	// freshly cloned worktree where the local ref does not exist yet.
+	diffBase := "develop"
+	if _, err := runGitOutput(repoRoot, "rev-parse", "--verify", "--quiet", diffBase); err != nil {
+		diffBase = "origin/develop"
+	}
+	diffCmd := exec.Command("git", "diff", "--name-only", diffBase+".."+branch)
 	diffCmd.Dir = repoRoot
 	diffOut, err := diffCmd.Output()
 	if err != nil {
@@ -703,7 +750,13 @@ func scanSecretsInChanges(repoRoot, branch string) ([]SecretFinding, error) {
 		// Skip directories that should never be scanned
 		skip := false
 		skipPrefixes := []string{".git/", "node_modules/", "vendor/", ".venv/", "venv/",
-			".ovav/vault/", "go-runtime/bin/", "integrity_backups/", ".wrangler/", "dist/"}
+			".ovav/vault/", "go-runtime/bin/", "integrity_backups/", ".wrangler/", "dist/",
+			// OpenCode agent markdown files — YAML capability configs whose
+			// values are always one of "allow" | "deny" | "ask". The regex
+			// `(password|passwd|pwd)\s*[:=]\s*["']...["']` matches lines like
+			// `cat /etc/passwd: "deny"` because the substring `passwd` appears
+			// in the system path. These are governance rules, not credentials.
+			"go-runtime/internal/runtimes/opencode/agents/"}
 		for _, prefix := range skipPrefixes {
 			if strings.HasPrefix(file, prefix) {
 				skip = true
@@ -736,6 +789,120 @@ func scanSecretsInChanges(repoRoot, branch string) ([]SecretFinding, error) {
 	return findings, nil
 }
 
+// ── OWS secret scanner allowlist (mirrors validators/secrets_hygiene.go) ──
+// These maps suppress false positives where the regex shape matches a benign
+// identifier (public GPG subkey fingerprint, structural const, JSON field tag).
+// Reuses the same philosophy as validators.skipFiles + validators.skipDirs.
+
+// secretFileAllowlist: basenames of files that may contain known-benign
+// "secret-shaped" lines. Files fully exempt from scanning.
+var secretFileAllowlist = map[string]bool{
+	"ovav-commit-wrapper":        true, // GPG signing key fingerprint (public)
+	"permission_authority.json":  true, // mirror of validators.skipFiles
+	"secrets_hygiene.go":         true, // pattern definitions (test fixtures)
+	"secrets_hygiene_test.go":    true, // mirrors validators.skipFiles
+	"validators_test.go":         true, // mirrors validators.skipFiles
+	"check_ovav_ssh_profile.py":  true, // mirrors validators.skipFiles
+	"ovav_public_export_gate.py": true, // mirrors validators.skipFiles
+	"minimax_direct_env.sh":      true, // placeholder API key template
+	"provider_setup.sh":          true, // placeholder API key template
+	"setup_minimax_direct.sh":    true, // placeholder API key template
+}
+
+// secretNameAllowlist: identifiers whose values are NOT secrets — public
+// fingerprints, structural field names, or env vars whose value is metadata.
+// Matched as whole, case-insensitive tokens (word boundaries).
+var secretNameAllowlist = map[string]bool{
+	"GPG_KEY":            true, // public subkey fingerprint (rotated 2026-08-13)
+	"GPG_SIGNING_KEY":    true, // alias for GPG_KEY
+	"SSH_SIGNING_KEY":    true, // SSH key reference (public)
+	"LAST_GIT_OP_REFLOG": true, // git reflog metadata (not a credential)
+	"LASTGITOPREFLOG":    true, // flattened alias for LAST_GIT_OP_REFLOG
+	// Structural Go const identifiers — the regex pattern (KEY/TOKEN/SECRET
+	// followed by `= "..."`) matches the suffix-keyword but the value is a
+	// file path, not a credential. Extend as new constants appear.
+	"WORKTREEHEADSKEY": true, // const in truststore.go — file path constant
+	"STATEFILE":        true, // const in truststore.go — file path constant (defensive)
+	"GATERELPATH":      true, // const in truststore.go — file path constant (defensive)
+}
+
+// goStructTagIdentifier matches Go struct field declarations where the
+// backtick-delimited tag's value is itself a snake_case identifier (no real
+// secret content — JSON field name, not a credential).
+//
+// Examples (each must match):
+//
+//	LastGitOpReflog  string `json:"last_git_op_reflog"`
+//	GateSHA256       string `json:"gate_sha256"`
+//
+// Counter-example (must NOT match — the tag value contains an underscore-
+// separated token that is not a plain identifier, e.g. an actual secret):
+//
+//	APIKey  string `json:"sk-live-supersecretvalue"`
+//
+// Note: `[]byte` is intentionally absent from the type alternatives because
+// Go's RE2 engine interprets the `[` as the start of a character class and
+// `[]` as an empty class, which breaks the surrounding alternation.
+var goStructTagIdentifier = regexp.MustCompile(
+	`\b\w+\s+(string|int|int64|bool|float64|byte|time\.Time)\s+` + // field declaration
+		"`" +
+		`(json|yaml|toml|xml):"[a-z][a-z0-9_]*"` + // snake_case identifier only
+		"`",
+)
+
+// containsAllowedName reports whether `line` contains any whole-word
+// identifier from secretNameAllowlist (case-insensitive).
+func containsAllowedName(line string) bool {
+	if line == "" {
+		return false
+	}
+	upper := strings.ToUpper(line)
+	for name := range secretNameAllowlist {
+		// Build a simple whole-word match using non-word boundaries.
+		// We tokenize on common separators and test each token.
+		token := strings.ToUpper(name)
+		// Use regexp-free split: walk through line at word boundaries.
+		if hasWordToken(upper, token) {
+			return true
+		}
+	}
+	return false
+}
+
+// hasWordToken reports whether `token` appears as a whole word in `line`.
+// "Whole word" means surrounded by non-alphanumeric/underscore characters
+// or string boundaries.
+func hasWordToken(line, token string) bool {
+	if token == "" {
+		return false
+	}
+	idx := 0
+	for {
+		at := strings.Index(line[idx:], token)
+		if at < 0 {
+			return false
+		}
+		abs := idx + at
+		// Check left boundary
+		leftOK := abs == 0 || !isWordByte(line[abs-1])
+		// Check right boundary
+		end := abs + len(token)
+		rightOK := end == len(line) || !isWordByte(line[end])
+		if leftOK && rightOK {
+			return true
+		}
+		idx = abs + 1
+	}
+}
+
+// isWordByte reports whether b is [A-Za-z0-9_] (matches \w in regex).
+func isWordByte(b byte) bool {
+	return (b >= 'A' && b <= 'Z') ||
+		(b >= 'a' && b <= 'z') ||
+		(b >= '0' && b <= '9') ||
+		b == '_'
+}
+
 // matchSecretPatterns checks a single line against all known secret patterns.
 // Uses the same patterns defined in secrets_hygiene.go (imported via validators package).
 func matchSecretPatterns(file string, lineNum int, line string) []SecretFinding {
@@ -744,6 +911,26 @@ func matchSecretPatterns(file string, lineNum int, line string) []SecretFinding 
 	// Skip empty lines and comments (# shell, // C/JS, -- Lua)
 	// For -- skip: ensure it's not a certificate header (-----BEGIN...)
 	if trimmed == "" || strings.HasPrefix(trimmed, "#") || strings.HasPrefix(trimmed, "//") || (strings.HasPrefix(trimmed, "--") && len(trimmed) > 2 && trimmed[2] != '-') {
+		return nil
+	}
+
+	// ── Allowlist #1: file-level skip (basename match) ──
+	// Mirrors validators.skipFiles — known-benign fixture / config files.
+	if secretFileAllowlist[filepath.Base(file)] {
+		return nil
+	}
+
+	// ── Allowlist #2: known-benign identifier (GPG key, reflog field, etc.) ──
+	// Catches suffix-keywords like GPG_KEY, worktreeHeadsKey where the keyword
+	// is at the END of an identifier but the value is structural metadata.
+	if containsAllowedName(trimmed) {
+		return nil
+	}
+
+	// ── Allowlist #3: Go struct field whose tag value is an identifier ──
+	// Catches `LastGitOpReflog  string `json:"last_git_op_reflog"`` where the
+	// regex matches the literal `key"` substring inside the backticked tag.
+	if goStructTagIdentifier.MatchString(trimmed) {
 		return nil
 	}
 
@@ -769,6 +956,9 @@ func matchSecretPatterns(file string, lineNum int, line string) []SecretFinding 
 		{`(?i)hf_[A-Za-z0-9]{32,}`, "HuggingFace API token"},
 		{`(?i)glpat-[A-Za-z0-9\-_]{20,}`, "GitLab personal access token"},
 		{`(?i)(NPM_TOKEN|GITHUB_TOKEN|DOCKER_PASSWORD)\s*=\s*["'][A-Za-z0-9_\-]{8,}["']`, "CI/CD token in config"},
+		// Note: this pattern intentionally allows suffix-keyword identifiers via
+		// the allowlists above (GPG_KEY, struct tags, etc.). Do NOT tighten
+		// with \b without also expanding the name allowlist.
 		{`(?i)(SECRET|TOKEN|KEY|PASSWORD|CREDENTIAL)\s*=\s*["'][A-Za-z0-9_\-\.+/=]{16,}["']`, "Env-style secret in config"},
 	}
 
@@ -866,11 +1056,20 @@ func scanForbiddenFiles(repoRoot, branch string) ([]ForbiddenFile, error) {
 func makeListHandler(repoRoot string) func(ctx context.Context, args map[string]string) error {
 	return func(ctx context.Context, args map[string]string) error {
 		showHistory := args["history"] == "true" || args["history"] == "1"
+		// --json is sugar for --format=json (back-compat).
 		showJSON := args["json"] == "true" || args["json"] == "1"
+		mineOnly := args["mine"] == "true" || args["mine"] == "1"
+		staleOnly := args["stale"] == "true" || args["stale"] == "1"
+		zombieOnly := args["zombie-only"] == "true" || args["zombie-only"] == "1"
+		// --format overrides --json when both present.
+		format := strings.TrimSpace(args["format"])
+		if format == "" && showJSON {
+			format = "json"
+		}
 
 		// ── History mode: read audit trail ──
 		if showHistory {
-			return showAuditTrail(repoRoot, showJSON)
+			return showAuditTrail(repoRoot, format == "json")
 		}
 
 		// ── Untracked mode: smart fetch from parent branch ──
@@ -879,61 +1078,56 @@ func makeListHandler(repoRoot string) func(ctx context.Context, args map[string]
 			return untrackedHandler(ctx, args)
 		}
 
-		// ── Standard: git status + conflict predictions ──
+		// Always go through the rich entries path now — premium UX requires the
+		// full data set (Current, Locked, Profile, Owner) and full path rendering.
+		entries, err := inspectWorktreeEntries(repoRoot)
+		if err != nil {
+			return err
+		}
+
+		// Apply pre-format filters (mine / stale / zombie).
+		// JSON output also passes through the same filter so callers can opt into
+		// a subset via --mine or --zombie.
+		if mineOnly || staleOnly || zombieOnly {
+			entries = filterWorktreeEntries(entries, repoRoot, mineOnly, staleOnly)
+			if zombieOnly {
+				filtered := make([]worktreeListEntry, 0, len(entries))
+				for _, e := range entries {
+					if e.Zombie {
+						filtered = append(filtered, e)
+					}
+				}
+				entries = filtered
+			}
+			if len(entries) == 0 {
+				fmt.Println("  (no worktrees matched the active filters)")
+				if format == "json" {
+					fmt.Println("[]")
+				}
+				return nil
+			}
+		}
+
+		// Detect which output mode is non-table (table is the premium default).
+		if format != "" && format != "table" {
+			// For non-table formats we suppress the legacy "git status" preamble
+			// so machine consumers get clean output.
+			return emitWorktreeFormat(format, entries, false, mineOnly, staleOnly)
+		}
+
+		// TABLE / DEFAULT — emit the rich header + premium table, then optionally
+		// append conflict predictions (preserved from the legacy behaviour).
 		if err := gitflow.Status(repoRoot); err != nil {
 			return err
 		}
 
-		// Extended worktree list with metadata
-		fmt.Println("\n── Worktrees ──")
-		zombieOnly := args["zombie-only"] == "true"
-		out, _ := runGitOutput(repoRoot, "worktree", "list")
-		if out != "" {
-			lines := strings.Split(strings.TrimSpace(out), "\n")
-			for _, line := range lines {
-				if line == "" {
-					continue
-				}
-				// Parse: "/path/to/worktree HASH [branch]" format
-				parts := strings.Fields(line)
-				if len(parts) >= 3 {
-					path := parts[0]
-					branch := strings.Trim(parts[len(parts)-1], "[]")
-					// SU-6: Zombie detection — branch deleted but worktree exists.
-					// Use branchExists() which checks both local AND remote branches.
-					// A worktree is a zombie if its branch no longer exists anywhere.
-					isZombie := false
-					if branch != "" && branch != "HEAD" {
-						if !branchExists(repoRoot, branch) {
-							isZombie = true
-						}
-					}
-					if zombieOnly && !isZombie {
-						continue
-					}
-					// Get worktree metadata
-					info, _ := os.Stat(path)
-					age := ""
-					if info != nil {
-						age = fmt.Sprintf("%.0fd", time.Since(info.ModTime()).Hours()/24)
-					}
-					profile := gitflow.DetectProfileFromBranch(branch)
-					zombieTag := ""
-					if isZombie {
-						zombieTag = " [ZOMBIE]"
-					}
-					fmt.Printf("  %-30s %-25s %-15s %-4s %s%s\n",
-						shorten(path, 30), branch, profile.Name, age, "🟢", zombieTag)
-				}
-			}
-		}
-		if zombieOnly {
-			fmt.Println("\n  💡 Run 'owclean' to remove zombie worktrees.")
-		}
+		fmt.Println()
+		fmt.Println(formatWorktreeTable(entries, true, mineOnly, staleOnly))
 
-		// Conflict predictions
-		fmt.Println("\n── Conflict Predictions ──")
+		// Conflict predictions — only for table mode (preserves legacy UX).
+		fmt.Println("── Conflict Predictions ──")
 		worktrees, _ := parseWorktreeListFromRepo(repoRoot)
+		predictions := 0
 		for _, wt := range worktrees {
 			profile := gitflow.DetectProfileFromBranch(wt)
 			targets := strings.Split(profile.MergeTo, "+")
@@ -946,6 +1140,7 @@ func makeListHandler(repoRoot string) func(ctx context.Context, args map[string]
 				if err != nil {
 					continue
 				}
+				predictions++
 				if matrix.ConflictFiles > 0 {
 					fmt.Printf("  ⚠  %s vs %s: %d potential conflict(s)\n", wt, t, matrix.ConflictFiles)
 				} else {
@@ -953,8 +1148,350 @@ func makeListHandler(repoRoot string) func(ctx context.Context, args map[string]
 				}
 			}
 		}
+		if predictions == 0 {
+			fmt.Println("  (no conflicts to predict)")
+		}
+		if zombieOnly {
+			fmt.Println("\n  💡 Run 'owclean' to remove zombie worktrees.")
+		}
 		return nil
 	}
+}
+
+// worktreeListEntry is the stable machine-readable projection returned by
+// `owl --json`. Git's porcelain output is intentionally normalized here so
+// consumers do not need to understand git worktree internals.
+type worktreeListEntry struct {
+	Path       string `json:"path"`
+	Head       string `json:"head"`
+	Branch     string `json:"branch,omitempty"`
+	Profile    string `json:"profile"`
+	Owner      string `json:"owner,omitempty"`
+	State      string `json:"state"`
+	AgeDays    int    `json:"age_days"`
+	Current    bool   `json:"current"`
+	Detached   bool   `json:"detached"`
+	Locked     bool   `json:"locked"`
+	LockReason string `json:"lock_reason,omitempty"`
+	Prunable   bool   `json:"prunable"`
+	Zombie     bool   `json:"zombie"`
+	Stale      bool   `json:"stale"`
+}
+
+const staleWorktreeAge = 7 * 24 * time.Hour
+
+func inspectWorktreeEntries(repoRoot string) ([]worktreeListEntry, error) {
+	out, err := runGitOutput(repoRoot, "worktree", "list", "--porcelain")
+	if err != nil {
+		return nil, fmt.Errorf("owl: list worktrees: %w", err)
+	}
+
+	metadata := worktreeMetadata(repoRoot)
+	entries := parseWorktreeEntries(out)
+	now := time.Now()
+	for i := range entries {
+		entry := &entries[i]
+		entry.Current = filepath.Clean(entry.Path) == filepath.Clean(repoRoot)
+		entry.Profile = gitflow.DetectProfileFromBranch(entry.Branch).Name
+		if record, ok := metadata[entry.Branch]; ok {
+			entry.Owner = record.Owner
+			entry.State = string(record.State)
+			entry.Locked = entry.Locked || record.Locked
+			if entry.LockReason == "" {
+				entry.LockReason = record.LockReason
+			}
+		}
+		if entry.State == "" {
+			entry.State = "ACTIVE"
+		}
+		if info, statErr := os.Stat(entry.Path); statErr == nil {
+			age := now.Sub(info.ModTime())
+			if age > 0 {
+				entry.AgeDays = int(age / (24 * time.Hour))
+			}
+			entry.Stale = age >= staleWorktreeAge
+		}
+		if entry.Branch != "" && !branchExists(repoRoot, entry.Branch) {
+			entry.Zombie = true
+		}
+	}
+	return entries, nil
+}
+
+func parseWorktreeEntries(out string) []worktreeListEntry {
+	var entries []worktreeListEntry
+	for _, record := range strings.Split(strings.TrimSpace(out), "\n\n") {
+		if strings.TrimSpace(record) == "" {
+			continue
+		}
+		var entry worktreeListEntry
+		for _, line := range strings.Split(record, "\n") {
+			switch {
+			case strings.HasPrefix(line, "worktree "):
+				entry.Path = strings.TrimPrefix(line, "worktree ")
+			case strings.HasPrefix(line, "HEAD "):
+				entry.Head = strings.TrimPrefix(line, "HEAD ")
+			case strings.HasPrefix(line, "branch "):
+				entry.Branch = strings.TrimPrefix(strings.TrimPrefix(line, "branch "), "refs/heads/")
+			case line == "detached":
+				entry.Detached = true
+			case line == "locked":
+				entry.Locked = true
+			case strings.HasPrefix(line, "locked "):
+				entry.Locked = true
+				entry.LockReason = strings.TrimPrefix(line, "locked ")
+			case line == "prunable" || strings.HasPrefix(line, "prunable "):
+				entry.Prunable = true
+			}
+		}
+		if entry.Path != "" {
+			entries = append(entries, entry)
+		}
+	}
+	return entries
+}
+
+func worktreeMetadata(repoRoot string) map[string]WorktreeRecord {
+	metadata := make(map[string]WorktreeRecord)
+	db, err := OpenAudit(repoRoot)
+	if err != nil {
+		return metadata
+	}
+	defer db.Close()
+	records, err := db.ListWorktrees("", "")
+	if err != nil {
+		return metadata
+	}
+	for _, record := range records {
+		if record.Branch != "" {
+			metadata[record.Branch] = record
+		}
+	}
+	return metadata
+}
+
+func currentOWSOwner() string {
+	for _, key := range []string{"OVAV_ACTIVE_LEAD", "USER", "USERNAME"} {
+		if value := strings.TrimSpace(os.Getenv(key)); value != "" {
+			return value
+		}
+	}
+	return ""
+}
+
+func filterWorktreeEntries(entries []worktreeListEntry, repoRoot string, mineOnly, staleOnly bool) []worktreeListEntry {
+	if !mineOnly && !staleOnly {
+		return entries
+	}
+	owner := currentOWSOwner()
+	filtered := make([]worktreeListEntry, 0, len(entries))
+	for _, entry := range entries {
+		mine := entry.Owner != "" && entry.Owner == owner
+		if entry.Current && filepath.Clean(entry.Path) == filepath.Clean(repoRoot) {
+			mine = true
+		}
+		if mineOnly && !mine {
+			continue
+		}
+		if staleOnly && !entry.Stale {
+			continue
+		}
+		filtered = append(filtered, entry)
+	}
+	return filtered
+}
+
+func encodeWorktreeEntries(entries []worktreeListEntry) error {
+	if entries == nil {
+		entries = []worktreeListEntry{}
+	}
+	return json.NewEncoder(os.Stdout).Encode(entries)
+}
+
+// printFilteredWorktreeEntries is the premium display for filtered worktree queries.
+// Supports --format=table (default, premium), shell (scriptable), md (markdown), tree (ascii).
+func printFilteredWorktreeEntries(entries []worktreeListEntry, mineOnly, staleOnly bool) {
+	printWorktreeTable(entries, false, mineOnly, staleOnly)
+}
+
+// formatWorktreeTable produces the premium table output for owl.
+// Paths are ALWAYS rendered in full — never truncated — so the user can copy/paste them
+// directly into `cd`.  All three flags shape the title and copy.
+func formatWorktreeTable(entries []worktreeListEntry, showConflicts bool, mineOnly, staleOnly bool) string {
+	label := "Worktrees"
+	if mineOnly {
+		label += " (mine)"
+	}
+	if staleOnly {
+		label += " (stale)"
+	}
+
+	if len(entries) == 0 {
+		return fmt.Sprintf("── %s (0) ──\n  (no worktrees matched)\n", label)
+	}
+
+	var b strings.Builder
+	fmt.Fprintf(&b, "── %s (%d) ──\n", label, len(entries))
+
+	// Premium columns: branch, path (full), profile, state, age, cd-ready
+	b.WriteString("  BRANCH                       PROFILE      STATE     AGE  PATH\n")
+	b.WriteString("  ───────────────────────────  ───────────  ────────  ───  ─────────────────────────────────────────\n")
+
+	for _, e := range entries {
+		state := e.State
+		if e.Zombie {
+			state = "ZOMBIE"
+		} else if e.Stale {
+			state = "STALE"
+		}
+		currentMarker := " "
+		if e.Current {
+			currentMarker = "*"
+		}
+		lockedMarker := " "
+		if e.Locked {
+			lockedMarker = "🔒"
+		}
+		branch := e.Branch
+		if branch == "" {
+			branch = "(detached)"
+		}
+		// full path always — never shortened
+		fmt.Fprintf(&b, "  %s %s%-27s  %-11s  %-8s  %2dd  %s\n",
+			currentMarker,
+			lockedMarker,
+			truncateRunes(branch, 27),
+			truncateRunes(e.Profile, 11),
+			state,
+			e.AgeDays,
+			e.Path,
+		)
+		if showConflicts {
+			fmt.Fprintf(&b, "      └─ cd %q\n", e.Path)
+		}
+	}
+
+	// Footer hint
+	b.WriteString("\n  Legend: * = current  🔒 = locked\n")
+	b.WriteString("  Tip:    cd <PATH>   to enter   •   owc <name>   to create   •   owd   to merge+cleanup\n")
+	return b.String()
+}
+
+func printWorktreeTable(entries []worktreeListEntry, showConflicts bool, mineOnly, staleOnly bool) {
+	fmt.Print(formatWorktreeTable(entries, showConflicts, mineOnly, staleOnly))
+}
+
+// truncateRunes truncates a string to n runes while keeping multibyte characters intact.
+func truncateRunes(s string, n int) string {
+	runes := []rune(s)
+	if len(runes) <= n {
+		return s
+	}
+	if n <= 3 {
+		return string(runes[:n])
+	}
+	return string(runes[:n-3]) + "..."
+}
+
+// formatWorktreeShell emits one `cd "PATH"` line per worktree — for shell eval.
+// Example: eval "$(ovav worktree owl --format=shell)"
+func formatWorktreeShell(entries []worktreeListEntry) string {
+	var b strings.Builder
+	for _, e := range entries {
+		// shell-quote: wrap in single quotes, replace ' with '\''
+		fmt.Fprintf(&b, "cd '%s'\n", strings.ReplaceAll(e.Path, "'", `'\''`))
+	}
+	return b.String()
+}
+
+// formatWorktreeMarkdown produces a markdown table — great for pasting into PRs / docs.
+func formatWorktreeMarkdown(entries []worktreeListEntry) string {
+	var b strings.Builder
+	b.WriteString("| Branch | Profile | State | Age (days) | Path | Owner |\n")
+	b.WriteString("|---|---|---|---|---|---|\n")
+	for _, e := range entries {
+		state := e.State
+		if e.Zombie {
+			state = "🧟 ZOMBIE"
+		} else if e.Stale {
+			state = "⏰ STALE"
+		}
+		branch := e.Branch
+		if branch == "" {
+			branch = "_(detached)_"
+		}
+		fmt.Fprintf(&b, "| %s | %s | %s | %d | `%s` | %s |\n",
+			branch, e.Profile, state, e.AgeDays, e.Path, e.Owner)
+	}
+	return b.String()
+}
+
+// formatWorktreeTree prints an ascii tree grouping worktrees by base branch.
+func formatWorktreeTree(entries []worktreeListEntry) string {
+	groups := map[string][]worktreeListEntry{}
+	for _, e := range entries {
+		base := profileBaseFor(e.Profile)
+		groups[base] = append(groups[base], e)
+	}
+	var b strings.Builder
+	b.WriteString("── Worktree tree ──\n")
+	for base, list := range groups {
+		fmt.Fprintf(&b, "\n  %s/\n", base)
+		for i, e := range list {
+			conn := "├─"
+			if i == len(list)-1 {
+				conn = "└─"
+			}
+			locked := "  "
+			if e.Locked {
+				locked = "🔒 "
+			}
+			current := "  "
+			if e.Current {
+				current = "* "
+			}
+			branch := e.Branch
+			if branch == "" {
+				branch = "(detached)"
+			}
+			fmt.Fprintf(&b, "  %s %s%s%s (%dd)\n", conn, locked, current, branch, e.AgeDays)
+			fmt.Fprintf(&b, "     %s\n", e.Path)
+		}
+	}
+	return b.String()
+}
+
+// profileBaseFor returns the mergeTo target for the profile (used by tree grouping).
+// Profiles with BaseBranch "main" (hotfix, patch, emergency, release) are grouped
+// under "main"; everything else falls into "develop" for visual clarity.
+func profileBaseFor(profileName string) string {
+	for key, p := range ProfileRegistry {
+		if key == profileName {
+			return p.BaseBranch
+		}
+	}
+	return "develop"
+}
+
+// emitWorktreeFormat dispatches to the right formatter based on --format= value.
+// Supported: table (default), shell, md, markdown, json, tree.
+// JSON is handled separately upstream because it uses encodeWorktreeEntries.
+func emitWorktreeFormat(format string, entries []worktreeListEntry, showConflicts bool, mineOnly, staleOnly bool) error {
+	switch format {
+	case "", "table":
+		printWorktreeTable(entries, showConflicts, mineOnly, staleOnly)
+	case "shell", "bash", "sh", "cd":
+		fmt.Print(formatWorktreeShell(entries))
+	case "md", "markdown":
+		fmt.Print(formatWorktreeMarkdown(entries))
+	case "tree", "ascii":
+		fmt.Print(formatWorktreeTree(entries))
+	case "json":
+		return encodeWorktreeEntries(entries)
+	default:
+		return fmt.Errorf("owl: unknown --format=%q (supported: table|shell|md|tree|json)", format)
+	}
+	return nil
 }
 
 // showAuditTrail reads and displays the OVAV audit trail.
@@ -1543,7 +2080,8 @@ func makeVerifyHandler(repoRoot string) func(ctx context.Context, args map[strin
 		if allPass {
 			fmt.Println("✅ VERIFIED — ready for merge")
 		} else {
-			fmt.Printf("⚠️  VERIFIED WITH WARNINGS — %d/%d phases failed\n", failCount, len(phaseResults))
+			fmt.Printf("❌ VERIFICATION FAILED — %d/%d phases failed\n", failCount, len(phaseResults))
+			return fmt.Errorf("owv: %d verification phase(s) failed", failCount)
 		}
 		return nil
 	}

@@ -49,11 +49,11 @@ func (c *MimocodeConverter) ConvertArea(area *Area, leadForArea map[string]*Lead
 	if area.Permission != nil {
 		writePermissionBlock(&b, area.Permission)
 	}
-	// OVAV instructions: always include the root AGENTS.md (gates,
-	// identity seal, session protocol). Then layer the area-specific
-	// OVAVConnection.Instructions on top.
+	// OVAV instructions: always include the MiMoCode-specific AGENTS.md (gates,
+	// identity seal, session protocol, MiMoCode workflow() delegation).
+	// Then layer the area-specific OVAVConnection.Instructions on top.
 	b.WriteString("instructions:\n")
-	b.WriteString("  - \"AGENTS.md\"\n")
+	b.WriteString("  - \"mimocode_AGENTS.md\"\n")
 	if area.OVAVConnection != nil {
 		for _, inst := range area.OVAVConnection.Instructions {
 			b.WriteString(fmt.Sprintf("  - %q\n", inst))

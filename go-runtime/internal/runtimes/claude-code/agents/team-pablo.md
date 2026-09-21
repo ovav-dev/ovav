@@ -1,27 +1,7 @@
 ---
-name: "Pablo"
-type: subagent
-hidden: true
-permission:
-  edit: "allow"
-  bash:
-    sudo *: "deny"
-    go test*: "allow"
-    python3 tools/ovav_runtime.py*: "allow"
-    git status*: "allow"
-    git diff*: "allow"
-    git log*: "allow"
-    *: "deny"
-    go vet*: "allow"
-    go build*: "allow"
-    ovav doctor*: "allow"
-    git add *: "allow"
-    git commit*: "deny"
-    git push*: "deny"
-  external_directory:
-    "/home/braka/Labs/mimocode/data/memory/*": "allow"
-    "/home/braka/Systems/OVAV": "allow"
-    "*": "deny"
+name: "pablo"
+description: "Valido cada commit antes de que llegue a la rama principal — reviso patrones, consistencia, y adherence a los estándares de código de OVAV."
+model: openai/gpt-5.6-luna
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->

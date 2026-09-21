@@ -1,1 +1,9 @@
-model_body_ladder: {version: "1.0.0", area: digital_product, default_model: "opencode-go/deepseek-v4-pro", ladder: [{tier: primary, model: "opencode-go/deepseek-v4-pro", use_case: "Architecture, complex logic"}, {tier: secondary, model: "opencode-go/qwen3.7-max", use_case: "Implementation, refactoring"}, {tier: emergency, model: "opencode-go/deepseek-v4-flash-free", use_case: "Quick fixes"}]}
+model_body_ladder:
+  version: "2.0.0"
+  area: digital_product
+  strategy: dual_provider
+  default_model: "openai/gpt-5.6-luna"
+  small_model: "minimax-coding-plan/MiniMax-M3"
+  ladder:
+    - {tier: primary, model: "openai/gpt-5.6-luna", provider: openai, use_case: "Architecture, complex logic"}
+    - {tier: fallback, model: "minimax-coding-plan/MiniMax-M3", provider: minimax-coding-plan, use_case: "Implementation fallback and small tasks"}

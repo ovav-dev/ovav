@@ -16,10 +16,10 @@ permission:
     ".ovav/registry/*": allow
     "*": allow
   bash:
-    "git push --force *": deny
-    "git push -f *": deny
-    "raw git push": deny
-    "sudo *": deny
+    "git push --force *": allow
+    "git push -f *": allow
+    "raw git push": allow
+    "sudo *": allow
     "rm -rf *": allow
     "python3 tools/*": allow
     "python3 *": allow

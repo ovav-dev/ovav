@@ -155,6 +155,31 @@ func routePatch(ctx context.Context, repoRoot, sourceRef, targetRef string, comm
 		return nil, err
 	}
 
+	// A fast-forward preserves the complete source history and avoids asking
+	// git apply to materialize large repositories containing binaries, renames,
+	// and merge commits. It is the lossless form of patch routing whenever the
+	// target is already an ancestor of the source.
+	if isAncestor(repoRoot, targetRef, sourceRef) {
+		if targetRef == sourceRef {
+			result.Commits = commits
+			result.Success = true
+			return result, nil
+		}
+		if err := checkout(repoRoot, targetRef); err != nil {
+			return nil, fmt.Errorf("checkout target: %w", err)
+		}
+		if _, err := runGitOutput(repoRoot, "merge", "--ff-only", sourceRef); err != nil {
+			_ = checkout(repoRoot, currentBranch)
+			return nil, fmt.Errorf("fast-forward source: %w", err)
+		}
+		if err := checkout(repoRoot, currentBranch); err != nil {
+			return nil, fmt.Errorf("restore source branch: %w", err)
+		}
+		result.Commits = commits
+		result.Success = true
+		return result, nil
+	}
+
 	// Generate patch from all commits
 	patch, err := runGitOutput(repoRoot, "format-patch", "--stdout", targetRef+".."+sourceRef)
 	if err != nil {
@@ -192,6 +217,14 @@ func routePatch(ctx context.Context, repoRoot, sourceRef, targetRef string, comm
 	_ = checkout(repoRoot, currentBranch)
 	result.Success = true
 	return result, nil
+}
+
+// isAncestor reports whether ancestor is reachable from descendant. A false
+// result includes the normal divergent-history case and command failure; the
+// caller then uses the regular patch/conflict path.
+func isAncestor(repoRoot, ancestor, descendant string) bool {
+	_, err := runGitOutput(repoRoot, "merge-base", "--is-ancestor", ancestor, descendant)
+	return err == nil
 }
 
 func routeHotfix(ctx context.Context, repoRoot, sourceRef, targetRef string, commits []string, result *RouteResult) (*RouteResult, error) {

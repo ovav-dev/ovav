@@ -47,13 +47,16 @@ var staleContractPath = ".ovav/service_areas/shared/current_authority_contract.y
 func (s *SingleAuthority) Validate(ctx context.Context, root string) Result {
 	start := time.Now()
 	var issues []string
+	var failures []string
 	checksPassed := 0
 	checksTotal := 4
 
 	// Check 1: caps.yaml exists as the single authority
 	planFullPath := filepath.Join(root, planPath)
 	if _, err := os.Stat(planFullPath); os.IsNotExist(err) {
-		issues = append(issues, fmt.Sprintf("CRITICAL: %s not found — no canonical plan source", planPath))
+		issue := fmt.Sprintf("CRITICAL: %s not found — no canonical plan source", planPath)
+		issues = append(issues, issue)
+		failures = append(failures, issue)
 	} else {
 		checksPassed++
 		// Verify caps.yaml declares itself as canonical
@@ -67,8 +70,9 @@ func (s *SingleAuthority) Validate(ctx context.Context, root string) Result {
 	// Check 2: Stale authority contract is NOT present
 	staleFullPath := filepath.Join(root, staleContractPath)
 	if _, err := os.Stat(staleFullPath); err == nil {
-		issues = append(issues, fmt.Sprintf(
-			"CRITICAL: %s still exists — was replaced by caps.yaml + git HEAD. Must be deleted.", staleContractPath))
+		issue := fmt.Sprintf("CRITICAL: %s still exists — was replaced by caps.yaml + git HEAD. Must be deleted.", staleContractPath)
+		issues = append(issues, issue)
+		failures = append(failures, issue)
 	} else {
 		checksPassed++
 	}
@@ -109,12 +113,19 @@ func (s *SingleAuthority) Validate(ctx context.Context, root string) Result {
 		checksPassed++
 	}
 
-	if len(issues) > 0 {
+	if len(failures) > 0 {
 		return Result{
 			ID: s.ID(), Name: s.Name(), Status: "fail", Weight: s.Weight(),
 			Message:  fmt.Sprintf("FAIL single authority — %d/%d checks passed", checksPassed, checksTotal),
 			Issues:   issues,
 			Duration: time.Since(start),
+		}
+	}
+	if len(issues) > 0 {
+		return Result{
+			ID: s.ID(), Name: s.Name(), Status: "warn", Weight: s.Weight(),
+			Message: fmt.Sprintf("WARN single authority — %d generated-artifact warning(s)", len(issues)),
+			Issues:  issues, Duration: time.Since(start),
 		}
 	}
 	return Result{

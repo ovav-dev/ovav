@@ -1,0 +1,52 @@
+{
+  "thavren": {
+    "name": "Thavren",
+    "email": "thavren@ovav.dev",
+    "area": "Platform Engineering"
+  },
+  "uriel": {
+    "name": "Uriel",
+    "email": "uriel@ovav.dev",
+    "area": "DevOps & Infrastructure"
+  },
+  "elena": {
+    "name": "Elena",
+    "email": "elena@ovav.dev",
+    "area": "UX Design"
+  },
+  "eidren": {
+    "name": "Eidren",
+    "email": "eidren@ovav.dev",
+    "area": "Research Intelligence"
+  },
+  "dante": {
+    "name": "Dante",
+    "email": "dante@ovav.dev",
+    "area": "Digital Product"
+  },
+  "kenji": {
+    "name": "Kenji Tanaka",
+    "email": "kenji@ovav.dev",
+    "area": "Adversarial Intelligence"
+  },
+  "renata": {
+    "name": "Renata",
+    "email": "renata@ovav.dev",
+    "area": "Health & Performance"
+  },
+  "sofia": {
+    "name": "Sofía",
+    "email": "sofia@ovav.dev",
+    "area": "Commercial & Growth"
+  },
+  "valeria": {
+    "name": "Valeria",
+    "email": "valeria@ovav.dev",
+    "area": "Education & Career"
+  },
+  "camila": {
+    "name": "Camila",
+    "email": "camila@ovav.dev",
+    "area": "Legal & Compliance"
+  }
+}

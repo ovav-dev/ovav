@@ -1,8 +1,7 @@
 ---
-name: "Research Intelligence"
+name: "research-intelligence"
 description: "Investigación, evidencia, fuentes verificadas, grado de evidencia, benchmarks — Lead: Eidren"
-type: area
-color: "#7c3aed"
+color: "purple"
 ---
 
 <!-- OVAV_IDENTITY_GUARD v1.1 — DO NOT REMOVE -->
@@ -20,6 +19,7 @@ color: "#7c3aed"
 # Research Intelligence
 
 **Lead:** eidren
+**Surface:** Investigación, evidencia, benchmarks, fuentes, scoring, decision briefs
 
 ## Functions
 

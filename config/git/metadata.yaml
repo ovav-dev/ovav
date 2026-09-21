@@ -1,0 +1,38 @@
+# Git Config Metadata
+version: "1.0.0"
+tool: git
+platform: wsl2-linux
+
+# Canonical source: .ovav/source/configs/git/
+
+# Deploy target (ovav convert)
+deploy:
+  - path: config/git/
+    description: Git config directory
+
+# Home injection (ovav convert --inject)
+inject:
+  - path: config/git/gitconfig
+    target: ~/.gitconfig
+    description: Main git config
+  - path: config/git/aliases.gitconfig
+    target: ~/.gitconfig-personal
+    description: Git aliases (included in main gitconfig)
+
+# Files
+files:
+  - gitconfig
+  - aliases.gitconfig
+
+# Dependencies
+dependencies:
+  - git >= 2.40
+  - GPG (for commit signing)
+
+# Features
+features:
+  - OVAV signing (GPG)
+  - AI+Human commit model
+  - Short aliases
+  - Auto-color
+  - Custom log format

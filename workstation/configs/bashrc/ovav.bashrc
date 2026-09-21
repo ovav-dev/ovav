@@ -1,0 +1,454 @@
+# ════════════════════════════════════════════════════════════════════════
+#  OVAV INTELLIGENT TERMINAL 2026 — Bash Runtime (ble.sh-aware)
+#
+#  Architecture:
+#    1. PATH (canonical, portable)
+#    2. OVAV identity (auto-detected from script location)
+#    3. ble.sh FIRST (when present) — line editor of record
+#    4. Atuin (history) — bind Ctrl+R via ble-bind if ble.sh, else bind
+#    5. fzf (fuzzy) — bind Ctrl+T / Alt-C via ble-bind if ble.sh, else bind
+#    6. Starship (prompt) — overrides PS1
+#    7. Mise (toolchain) — runtime version manager
+#    8. Zoxide (navigation) — replaces cd
+#    9. OpenCode (agent CLI) — env vars
+#   10. IT shell-integration v3 (OSC 133/9;9/9001) — LAST so PROMPT_COMMAND is finalized
+#   11. PROMPT_COMMAND chain — tab title + starship_precmd via IT user-PC hook
+#   12. Aliases, clipboard bridge, IT-restart check
+#
+#  Keybinding ownership (CRITICAL — see issue noted 2026-08-16):
+#    - IT (Windows Terminal) MUST NOT capture Ctrl+T/W/C/V — bash owns these.
+#    - Atuin owns Ctrl+R.
+#    - fzf owns Ctrl+T (file) and Alt+C (cd).
+#    - ble.sh owns all other readline keys; IT shell-integration owns OSC.
+#
+#  Idempotent — safe to source multiple times. Each tool detects its own state.
+# ════════════════════════════════════════════════════════════════════════
+
+# ───────────────────────────────────────────────────────────────────────
+#  1. PATH (canonical, portable — no hardcoded user paths)
+# ───────────────────────────────────────────────────────────────────────
+for _ovav_path in "$HOME/.local/bin" "$HOME/.atuin/bin" "$HOME/.opencode/bin" "$HOME/.local/share/mise/shims"; do
+    case ":$PATH:" in
+        *":$_ovav_path:"*) ;;
+        *) export PATH="$PATH:$_ovav_path" ;;
+    esac
+done
+unset _ovav_path
+
+# Clear bash command hash — login shells cache negative lookups for
+# binaries not in PATH at first check.
+hash -r 2>/dev/null || true
+
+# ───────────────────────────────────────────────────────────────────────
+#  2. OVAV IDENTITY (auto-detected, no hardcoded paths)
+#     Resolution order:
+#       (a) existing OVAV_ROOT if valid
+#       (b) parent dir of this file's grandparent
+#       (c) ancestor search for known marker (caps.yaml)
+# ───────────────────────────────────────────────────────────────────────
+_ovav_detect_root() {
+    if [ -n "${OVAV_ROOT:-}" ] && [ -d "${OVAV_ROOT}" ] && [ -f "${OVAV_ROOT}/.ovav/plan/caps.yaml" ]; then
+        return 0
+    fi
+    local script_dir
+    script_dir="$(cd "$(dirname "${BASH_SOURCE[0]:-$(dirname "$0")}")" 2>/dev/null && pwd || echo "")"
+    if [ -n "$script_dir" ] && [ -f "$script_dir/../../.ovav/plan/caps.yaml" ]; then
+        OVAV_ROOT="$(cd "$script_dir/../.." && pwd)"
+        export OVAV_ROOT
+        return 0
+    fi
+    if [ -f "/home/braka/Systems/ovav/.ovav/plan/caps.yaml" ]; then
+        export OVAV_ROOT="/home/braka/Systems/ovav"
+        return 0
+    fi
+    return 1
+}
+if ! _ovav_detect_root; then
+    echo "OVAV: WARNING — workspace root not detected; tooling may be degraded" 1>&2
+fi
+unset -f _ovav_detect_root
+
+if [ -n "${OVAV_ROOT:-}" ]; then
+    export OVAV_WORKSTATION="${OVAV_ROOT}/workstation"
+fi
+
+# ───────────────────────────────────────────────────────────────────────
+#  COLOR / TERMINAL
+# ───────────────────────────────────────────────────────────────────────
+export COLORTERM=truecolor
+export TERM=xterm-256color
+
+# ───────────────────────────────────────────────────────────────────────
+#  3. BLE.SH (opt-in via OVAV_USE_BLE) — advanced line editor.
+#     ble.sh REPLACES readline; subsequent `bind` calls are ignored
+#     unless wrapped in ble-bind. Disabled by default because it has
+#     been the cause of 'no se ve lo que escribo' regressions on this
+#     workstation — the CEO can opt back in once the bashrc interactions
+#     with ble.sh are verified safe. Set OVAV_USE_BLE=1 to enable.
+# ───────────────────────────────────────────────────────────────────────
+_BLE_LOADED=""
+if [ "${OVAV_USE_BLE:-0}" = "1" ] && [ -f "$HOME/.local/share/blesh/ble.sh" ]; then
+    if [ -t 0 ] && [ -t 1 ]; then
+        source "$HOME/.local/share/blesh/ble.sh" 2>/dev/null && _BLE_LOADED="yes"
+        [ -f "$HOME/.blerc" ] && source "$HOME/.blerc" 2>/dev/null || true
+    fi
+fi
+export _BLE_LOADED
+
+# ───────────────────────────────────────────────────────────────────────
+#  Helper: bind a key to a function, with or without ble.sh
+# ───────────────────────────────────────────────────────────────────────
+_ovav_bind_key() {
+    local key="$1" widget="$2"
+    if [ "$_BLE_LOADED" = "yes" ] && type ble-bind >/dev/null 2>&1; then
+        # ble.sh active — use ble-bind for widget/function dispatch
+        ble-bind -f "$key" "$widget" 2>/dev/null || true
+    else
+        # Plain bash — use readline bind (only works when no ble.sh)
+        bind "\"$widget\"" 2>/dev/null || true
+    fi
+}
+
+# ───────────────────────────────────────────────────────────────────────
+#  4. ATUIN — history search (Ctrl+R)
+#     Per OVAV workstation rule #15: NO pty-proxy (inmaduro <30d).
+#     Atuin's `init bash` uses readline `bind` to wire Ctrl+R. When ble.sh
+#     is active, those binds are ignored. We disable Atuin's internal bind
+#     and wire Ctrl+R ourselves via ble-bind (or readline bind when no ble).
+# ───────────────────────────────────────────────────────────────────────
+# NOTE on lingering atuin pty-proxy:
+#   The bashrc used to `pkill -f atuin pty-proxy` here as a safety net.
+#   Removed because pkill -f matches against the full process command,
+#   and a parallel interactive session that legitimately depends on
+#   atuin (e.g. OpenCode-TUI driven atuin history) could be killed
+#   transitively. If you suspect a stale pty-proxy is swallowing
+#   keystrokes, run `pgrep -af "atuin pty-proxy"` from another tab
+#   and `kill <pid>` manually.
+
+if command -v atuin >/dev/null 2>&1; then
+    # Disable Atuin's readline bind for Ctrl+R — we handle it below
+    export __atuin_bind_ctrl_r=false
+    export __atuin_bind_up_arrow=false
+    # Load Atuin init (defines __atuin_widget_run, Atuin preexec, etc.)
+    # Suppress ble.sh 'unsupported readline function' warnings when ble.sh
+    # is up — the function definitions are still useful, just the bind
+    # noise is silenced.
+    if [ "$_BLE_LOADED" = "yes" ]; then
+        _ovav_atuin_init="$(atuin init bash --disable-up-arrow 2>/dev/null)"
+        eval "$_ovav_atuin_init"
+        unset _ovav_atuin_init
+    else
+        eval "$(atuin init bash --disable-up-arrow 2>/dev/null)"
+    fi
+    # Wire Ctrl+R → Atuin search (widget 0 in emacs keymap)
+    if type __atuin_widget_run >/dev/null 2>&1; then
+        _ovav_bind_key 'C-r' '__atuin_widget_run 0'
+    fi
+fi
+
+# ───────────────────────────────────────────────────────────────────────
+#  5. FZF — fuzzy file picker (Ctrl+T) and cd picker (Alt+C)
+#     Note: fzf --bash ALSO binds Ctrl+R to __fzf_history__ by default.
+#     Atuin owns Ctrl+R — we explicitly unbind it after fzf init.
+# ───────────────────────────────────────────────────────────────────────
+if command -v fzf >/dev/null 2>&1; then
+    export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git 2>/dev/null || find . -type f -not -path "*/\.git/*"'
+    export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+    export FZF_ALT_C_COMMAND="$FZF_DEFAULT_COMMAND"
+    # Adaptive color palette: prefers terminal ANSI semantic colors
+    export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS \
+      --color=bg+:#2A3A5C,bg:-1,spinner:#5EEAD4,hl:#F2CC60 \
+      --color=fg:#C9D1E0,header:#4A5568,info:#C099FF,pointer:#5EEAD4 \
+      --color=marker:#7EE787,fg+:#E8EEF8,prompt:#6EA8FE,hl+:#F5D88A \
+      --color=selected-bg:#2A3A5C,border:#4A5568 \
+      --no-bold --layout=reverse --height=60%"
+if [ "$_BLE_LOADED" = "yes" ]; then
+        # ble.sh path: fzf's --bash emits readline bind calls that ble.sh
+        # rejects with 'unsupported readline function' warnings. Skip the
+        # eval and define lightweight widgets that ble.sh can dispatch
+        # directly. Suppress stderr from fzf --bash by routing through a
+        # variable to avoid the bleed of 'ble.sh (bind)' messages.
+        if type fzf &>/dev/null; then
+            # Inline fzf file-widget — uses fzf binary directly
+            fzf-file-widget() {
+                local selected
+                selected="$(eval "$FZF_CTRL_T_COMMAND" | fzf --height 60% --layout reverse --no-bold --color 'bg+:#2A3A5C,spinner:#5EEAD4,hl:#F2CC60,fg:#C9D1E0,header:#4A5568,info:#C099FF,pointer:#5EEAD4,marker:#7EE787,fg+:#E8EEF8,prompt:#6EA8FE,hl+:#F5D88A' || true)"
+                printf '%s' "$selected"
+            }
+            fzf-cd-widget() {
+                local dir
+                dir="$(eval "$FZF_ALT_C_COMMAND" | fzf --height 60% --layout reverse --no-bold --color 'bg+:#2A3A5C,spinner:#5EEAD4,hl:#F2CC60,fg:#C9D1E0,header:#4A5568,info:#C099FF,pointer:#5EEAD4,marker:#7EE787,fg+:#E8EEF8,prompt:#6EA8FE,hl+:#F5D88A' || true)"
+                [ -n "$dir" ] && cd "$dir" && printf '\033[1m~%s\033[0m\n' "$dir"
+            }
+        fi
+    else
+        # Plain bash path: load fzf's --bash for full readline integration
+        eval "$(fzf --bash 2>/dev/null)"
+    fi
+    # Wire Ctrl+T → fzf-file-widget (file picker)
+    if type fzf-file-widget >/dev/null 2>&1; then
+        _ovav_bind_key 'C-t' 'fzf-file-widget'
+    fi
+    # Wire Alt+C → fzf-cd-widget (cd picker) — only when bash supports
+    if type fzf-cd-widget >/dev/null 2>&1; then
+        _ovav_bind_key 'M-c' 'fzf-cd-widget'
+    fi
+fi
+unset -f _ovav_bind_key
+
+# ───────────────────────────────────────────────────────────────────────
+#  6. STARSHIP — premium minimal prompt (must come BEFORE mise so its
+#     precmd hook is available when IT shell-integration captures it)
+#  + OVAV_THEME sync (IT profile → bash → starship → opencode tui.json)
+# ───────────────────────────────────────────────────────────────────────
+# _ovav_theme_resolve: maps IT theme to OVAV_THEME (day|night).
+# Resolution order:
+#   (a) $INTELLIGENT_TERMINAL_THEME  (light/dark) — IT shell-integration v3
+#   (b) $WT_PROFILE_ID → settings.json colorScheme lookup (OVAV Night=night)
+#   (c) default: night
+_ovav_theme_resolve() {
+    local _t="${INTELLIGENT_TERMINAL_THEME:-}"
+    if [ -z "$_t" ] && [ -n "${WT_PROFILE_ID:-}" ] && [ -n "${OVAV_ROOT:-}" ]; then
+        local _settings="/mnt/c/Users/Alexa/AppData/Local/Packages/Microsoft.IntelligentTerminal_8wekyb3d8bbwe/LocalState/settings.json"
+        if [ -f "$_settings" ]; then
+            _t="$(python3 -c "
+import json,sys
+try:
+    s=json.load(open(r'$_settings'))
+    for p in s.get('profiles',{}).get('list',[]):
+        if p.get('guid')==r'${WT_PROFILE_ID}' or p.get('name')==r'${WT_PROFILE_ID}':
+            cs=p.get('colorScheme') or s.get('profiles',{}).get('defaults',{}).get('colorScheme','')
+            print('light' if 'Day' in cs else 'dark')
+            sys.exit(0)
+    print('dark')
+except Exception:
+    print('dark')
+" 2>/dev/null)"
+        fi
+    fi
+    case "$_t" in
+        light|day)  echo "day" ;;
+        *)          echo "night" ;;
+    esac
+}
+# _ovav_theme_apply: sets OVAV_THEME, STARSHIP_PALETTE, and syncs
+# ~/.config/opencode/tui.json theme field to match.
+_ovav_theme_apply() {
+    local new_theme="$1"
+    if [ "$new_theme" = "$OVAV_THEME" ] && [ -n "${OVAV_THEME:-}" ]; then
+        return 0
+    fi
+    export OVAV_THEME="$new_theme"
+    case "$new_theme" in
+        day)  export STARSHIP_PALETTE="ovav-day" ;;
+        *)    export STARSHIP_PALETTE="ovav-night" ;;
+    esac
+    # Sync OpenCode tui.json — only if it exists, is valid JSON, and the
+    # theme field is one of the two OVAV themes (skip if user pinned custom).
+    local _tui="${XDG_CONFIG_HOME:-$HOME/.config}/opencode/tui.json"
+    if [ -f "$_tui" ] && command -v python3 >/dev/null 2>&1; then
+        OVAV_THEME="$new_theme" python3 -c "
+import json,os,sys
+p=os.environ.get('_tui') or '$_tui'
+new=os.environ.get('OVAV_THEME','night')
+try:
+    s=json.load(open(p))
+except Exception:
+    sys.exit(0)
+cur=s.get('theme','')
+# Only sync if current is empty or one of the OVAV pair (don't clobber custom)
+if cur in ('','ovav-day','ovav-night','daylight','tokyo-neon','system','dark','light'):
+    target='ovav-'+new
+    if s.get('theme')!=target:
+        s['theme']=target
+        json.dump(s,open(p,'w'),indent=2)
+except Exception:
+    pass
+" 2>/dev/null
+    fi
+}
+# Apply at startup
+_ovav_theme_apply "$(_ovav_theme_resolve)"
+# Stash resolver for the precmd hook (re-checks on every prompt so live
+# theme switches from IT pick up automatically).
+export -f _ovav_theme_resolve _ovav_theme_apply 2>/dev/null || true
+
+if [ -x "$HOME/.local/bin/starship" ] || type starship >/dev/null 2>&1; then
+    export STARSHIP_CONFIG="${OVAV_WORKSTATION:-$HOME/.config}/configs/starship/starship.toml"
+    eval "$(starship init bash 2>/dev/null)"
+fi
+
+# ───────────────────────────────────────────────────────────────────────
+#  7. MISE — runtime version manager (node/python/go)
+# ───────────────────────────────────────────────────────────────────────
+if command -v mise >/dev/null 2>&1; then
+    eval "$(mise activate bash 2>/dev/null)"
+fi
+
+# ───────────────────────────────────────────────────────────────────────
+#  8. ZOXIDE — smart cd (registered as `z` after init)
+# ───────────────────────────────────────────────────────────────────────
+if command -v zoxide >/dev/null 2>&1; then
+    eval "$(zoxide init bash 2>/dev/null)"
+fi
+
+# ───────────────────────────────────────────────────────────────────────
+#  9. OPENCODE — agent CLI on PATH (canonical Linux)
+# ───────────────────────────────────────────────────────────────────────
+if [ -x "$HOME/.opencode/bin/opencode" ]; then
+    export OPENCODE_CONFIG_DIR="${XDG_CONFIG_DIR:-$HOME/.config}/opencode"
+fi
+
+# ───────────────────────────────────────────────────────────────────────
+#  10. INTELLIGENT TERMINAL SHELL INTEGRATION (v3 — official)
+#     Loaded AFTER mise so it has the final word on PROMPT_COMMAND.
+#     It captures __IT_SHELLINTEG_USER_PC and chains it via
+#     __it_shellinteg_prompt (the wrapper). This is the ONLY supported
+#     way to integrate with IT shell-integration; setting PROMPT_COMMAND
+#     directly clobbers IT's wrapper.
+# ───────────────────────────────────────────────────────────────────────
+if [ -f "$HOME/.intelligent-terminal/shell-integration_v3.sh" ]; then
+    . "$HOME/.intelligent-terminal/shell-integration_v3.sh"
+fi
+
+# ───────────────────────────────────────────────────────────────────────
+#  11. PROMPT CHAIN — theme watcher + starship_precmd via IT user-PC hook
+#  Tab title is set statically per profile via IT settings.json
+#  (profile.tabTitle = profile name). No dynamic template injection.
+#  The theme watcher polls IT settings.json every prompt (cheap) so that
+#  when the CEO flips colorScheme in the IT UI, the bashrc detects it on
+#  the next Enter and re-syncs OpenCode tui.json + starship palette.
+# ───────────────────────────────────────────────────────────────────────
+_ovav_prompt_theme_watch() {
+    # Only poll if IT context is present (no point in non-IT shells).
+    [ -z "${WT_PROFILE_ID:-}" ] && [ -z "${INTELLIGENT_TERMINAL:-}" ] && return 0
+    # Fast path: skip if last check was <2s ago (debounce).
+    local now=$(date +%s)
+    [ -n "${_OVAV_THEME_LAST:-}" ] && [ $((now - _OVAV_THEME_LAST)) -lt 2 ] && return 0
+    _OVAV_THEME_LAST=$now
+    local new_theme
+    new_theme="$(_ovav_theme_resolve 2>/dev/null)" || return 0
+    if [ "$new_theme" != "${OVAV_THEME:-}" ]; then
+        _ovav_theme_apply "$new_theme"
+    fi
+}
+if [ -n "${__IT_SHELLINTEG_USER_PC:-}" ]; then
+    export __IT_SHELLINTEG_USER_PC="_ovav_prompt_theme_watch;starship_precmd"
+elif [ -n "${__it_shellinteg_user_pc:-}" ]; then
+    export __it_shellinteg_user_pc="_ovav_prompt_theme_watch;starship_precmd"
+else
+    PROMPT_COMMAND="_ovav_prompt_theme_watch;starship_precmd"
+fi
+
+# ───────────────────────────────────────────────────────────────────────
+#  12. ALIASES, CLIPBOARD BRIDGE, IT RESTART CHECK
+# ───────────────────────────────────────────────────────────────────────
+#  Modern tool aliases (only when modern tool is installed)
+#  CRITICAL: alias `ls` itself to eza so the user gets icons + colors
+#  by default (the CEO complained that bare `ls` shows crude text).
+if command -v eza &>/dev/null; then
+    alias ls='eza --icons --group-directories-first --color=auto --time-style=long-iso'
+    alias ll='eza -la --icons --git --group-directories-first --time-style=long-iso'
+    alias lt='eza --tree --level=2 --icons'
+    alias la='eza -a --icons --group-directories-first'
+    alias l='eza --icons --group-directories-first'
+fi
+# bat — no explicit --theme (rely on terminal palette for day/night).
+# Previously used --theme=Tokyo-Night which is a 3rd-party duplicate;
+# CEO directive 2026-08-17: only OVAV Day/Night native themes.
+# bat's default theme adapts well; if a custom OVAV theme is needed later,
+# drop it in ~/.config/bat/themes/ and set BAT_THEME here.
+command -v bat &>/dev/null && alias cat='bat --style=numbers,changes,header'
+command -v fd &>/dev/null && alias find='fd'
+command -v btop &>/dev/null && alias top='btop'
+command -v nvim &>/dev/null && alias vim='nvim'
+command -v codium &>/dev/null && alias code='codium'
+
+# Editor — prefer Neovim when available
+export EDITOR='nvim'
+export VISUAL='nvim'
+
+# ───────────────────────────────────────────────────────────────────────
+#  R10 (2026-08-17): Ctrl+C must NOT signal bash - IT must capture it
+#  for the Windows-native copy behavior. Without this, bash would
+#  interpret Ctrl+C as SIGINT, cancel the current input line, and show
+#  a new prompt - which is what the CEO called "corta el prompt o lo
+#  cancela y me envia a otro prompt nuevo". We unbind SIGINT (Ctrl+C)
+#  from the tty line discipline; IT then receives the keystroke and
+#  triggers Terminal.CopyToClipboard.
+#
+#  Other signals stay intact:
+#    Ctrl+Z  -> SIGTSTP (suspend)         [stty susp ^Z, default]
+#    Ctrl+\  -> SIGQUIT (core dump)       [stty quit ^\, default]
+#    Ctrl+Y  -> SIGDSUSP  (delayed stop)  [stty dsusp ^Y, default]
+#
+#  To kill a hung process: use kill -SIGINT <pid> from another shell,
+#  or press Ctrl+\ in the offending pane.
+# ───────────────────────────────────────────────────────────────────────
+if [ -t 0 ] && [ -t 1 ]; then
+    # Unbind the tty INTR character (default: Ctrl+C). IT captures ^C.
+    stty intr undef 2>/dev/null || true
+fi
+
+# Productivity aliases
+alias gs='git status'
+alias gp='git pull'
+alias gco='git checkout'
+alias gb='git branch'
+alias gl='git log --oneline -20'
+alias ov='ovav'
+alias ovs='ovav status'
+alias ovv='ovav validate'
+alias ovd='ovav doctor --quick'
+alias ocd='opencode'
+alias ocr='opencode --continue'
+[ -n "${OVAV_ROOT:-}" ] && alias ovproj='cd $OVAV_ROOT'
+
+# Clipboard bridge (WSL ↔ Windows)
+if command -v clip.exe >/dev/null 2>&1; then
+    ovclip() {
+        if [ $# -gt 0 ]; then
+            printf '%s\n' "$*" | clip.exe
+        else
+            clip.exe
+        fi
+    }
+    ovpaste() {
+        powershell.exe -NoProfile -Command 'Get-Clipboard' 2>/dev/null
+    }
+    ovsessions() {
+        opencode session list --format json "$@"
+    }
+    export -f ovclip ovpaste ovsessions 2>/dev/null
+fi
+
+# OVAV runtime binary path
+if [ -x "$HOME/.local/bin/ovav" ]; then
+    export OVAV_BIN="$HOME/.local/bin/ovav"
+fi
+
+# ───────────────────────────────────────────────────────────────────────
+#  IT RESTART CHECK — warns if settings.json is newer than IT process.
+#  Runs only in interactive shells with a TTY.
+# ───────────────────────────────────────────────────────────────────────
+_ov_it_check() {
+  if [ -t 0 ] && command -v powershell.exe >/dev/null 2>&1; then
+    powershell.exe -NoProfile -Command '
+      $settings = "C:\Users\Alexa\AppData\Local\Packages\Microsoft.IntelligentTerminal_8wekyb3d8bbwe\LocalState\settings.json"
+      $proc = Get-Process -Name "WindowsTerminal" -ErrorAction SilentlyContinue | Select-Object -First 1
+      if ($proc -and (Test-Path $settings)) {
+        $st = (Get-Item $settings).LastWriteTime
+        if ($st -gt $proc.StartTime) {
+          Write-Host ""
+          Write-Host "  ⚠️  OVAV: IT settings updated. Restart IT (Ctrl+Shift+W, reopen) to apply."
+          Write-Host ""
+        }
+      }
+    ' 2>/dev/null
+  fi
+}
+case "$-" in *i*) _ov_it_check ;; esac
+
+# ════════════════════════════════════════════════════════════════════════
+#  END OVAV bashrc — sourced from ~/.bashrc
+# ════════════════════════════════════════════════════════════════════════
