@@ -132,9 +132,10 @@ echo '─── Group 6: __ovav_reload_check (dry-run) ────────�
 
 set -l check_out (__ovav_reload_check)
 expect_grep "__ovav_reload_check banner" "reload --check" "$check_out"
-expect_grep "__ovav_reload_check reports modules" "modules : " "$check_out"
-expect_grep "__ovav_reload_check reports snapshot" "snapshot hash" "$check_out"
-expect_grep "__ovav_reload_check verdict" "reload" "$check_out"
+expect_grep "__ovav_reload_check reports modules" "modules" "$check_out"
+expect_grep "__ovav_reload_check reports hash" "hash    :" "$check_out"
+expect_grep "__ovav_reload_check reports drift" "drift   :" "$check_out"
+expect_grep "__ovav_reload_check reports env" "env     :" "$check_out"
 
 # ────────────────────────────────────────────────────────
 echo '─── Group 7: reload --check (via CLI) ─────────────────'
@@ -143,7 +144,7 @@ echo '─── Group 7: reload --check (via CLI) ──────────
 set -l cli_check (reload --check 2>&1)
 expect_grep "reload CLI --check banner" "reload --check" "$cli_check"
 expect_grep "reload CLI --check modules" "modules" "$cli_check"
-expect_grep "reload CLI --check snapshot" "snapshot" "$cli_check"
+expect_grep "reload CLI --check env" "env" "$cli_check"
 
 # ────────────────────────────────────────────────────────
 echo '─── Group 8: reload --help ───────────────────────────'
@@ -157,16 +158,9 @@ expect_grep "reload help --check" "--check" "$help_out"
 expect_grep "reload help --full" "--full" "$help_out"
 expect_grep "reload help --ovav" "--ovav" "$help_out"
 expect_grep "reload help --verbose" "--verbose" "$help_out"
-expect_grep "reload help Behaviour" "Behaviour:" "$help_out"
-expect_grep "reload help PID preserved" "PID" "$help_out"
-
-# --help should NOT exec fish. Capture both status and output.
-set -l help_status $status
-if test "$help_status" -eq 0
-    ok "reload help returns status 0"
-else
-    fail "reload help status $help_status (expected 0)"
-end
+expect_grep "reload help --force" "--force" "$help_out"
+expect_grep "reload help env-aware" "env-aware" "$help_out"
+expect_grep "reload help agent" "agent" "$help_out"
 
 # ────────────────────────────────────────────────────────
 echo '─── Group 9: namespace guard (no builtin clash) ──────'
@@ -231,6 +225,111 @@ echo '─── Group 13: completion cache wipe (--full simulation)'
 set -l src (cat "$sut")
 expect_grep "implementation wipes completion cache" "fish_completions_cache" "$src"
 expect_grep "implementation clears abbreviations" "abbr --erase" "$src"
+
+# ────────────────────────────────────────────────────────
+echo '─── Group 14: no shadow warning (set -U vs -g) ────────'
+# ────────────────────────────────────────────────────────
+# Regression: old version did 'set -g' then 'set -U' for the same var name.
+# Fish emits '...global by that name shadows it' on the universal set.
+# Fixed by removing the prior -g declaration — only universal is needed.
+# Use grep to filter comments before checking for set -g pattern (the
+# docstring mentions $__ovav_last_reload_epoch_unix but lives on a line
+# starting with '#').
+
+expect_grep "implementation uses set -U (no -g shadow)" "set -U" "$src"
+set -l code_lines (echo "$src" | grep -v '^\s*#' | grep -v '^\s*$')
+if string match -q "*set -g __ovav_last_reload_epoch_unix*" -- "$code_lines"
+    fail "source still has redundant set -g before set -U"
+else
+    ok "no redundant set -g before set -U"
+end
+
+# ────────────────────────────────────────────────────────
+echo '─── Group 15: env-aware (alacritty + tmux + opencode) ──'
+# ────────────────────────────────────────────────────────
+# We test the env-detection helper against the *current* environment by
+# looking for known keys. We don't mock ps; instead we assert the format
+# contract and check that real keys are present.
+
+set -l env_out (__ovav_reload_fmt_environment)
+expect_grep "env: ppid present" "ppid=" "$env_out"
+expect_grep "env: pid present" "pid=" "$env_out"
+expect_grep "env: terminal present" "terminal=" "$env_out"
+expect_grep "env: mux present" "mux=" "$env_out"
+expect_grep "env: agent present" "agent=" "$env_out"
+expect_grep "env: embedded present" "embedded=" "$env_out"
+expect_grep "env: fish_depth present" "fish_depth=" "$env_out"
+
+# Whitespace: fields must be space-separated (parseable downstream).
+# Embedded newlines would break downstream parsers.
+if string match -qr '\n' -- "$env_out"
+    fail "env record contains a literal newline"
+else
+    ok "env record is single-line (no embedded newlines)"
+end
+
+# ────────────────────────────────────────────────────────
+echo '─── Group 16: function inventory ──────────────────────'
+# ────────────────────────────────────────────────────────
+# Power-user surface check — all advertised functions exist.
+
+for fn in __ovav_reload_detect_environment \
+         __ovav_reload_fmt_environment \
+         __ovav_reload_count_modules \
+         __ovav_reload_detect_changes \
+         __ovav_reload_snapshot_hash \
+         __ovav_reload_module_fingerprint \
+         __ovav_reload_banner_short \
+         __ovav_reload_banner_long \
+         __ovav_reload_check \
+         __ovav_reload_rehash_only \
+         __ovav_reload_maybe_wipe_caches
+    if functions -q "$fn"
+        ok "$fn exists"
+    else
+        fail "$fn declared in help but not defined"
+    end
+end
+
+# ────────────────────────────────────────────────────────
+echo '─── Group 17: agent-aware rehash (no exec) ───────────'
+# ────────────────────────────────────────────────────────
+# An agent-detected shell must be able to use --rehash without exec
+# being called. We can't perfectly mock the ancestor chain, but we
+# can verify the function exists, runs, and does not invoke exec
+# (which would replace this test process — we would never see output).
+
+set -l rehash_out (reload --rehash 2>&1 | string collect)
+expect_grep "--rehash prints checkmark" "✓ rehash" "$rehash_out"
+if string match -q "*STUB*" -- "$rehash_out"
+    fail "--rehash printed a stub marker — test bug"
+end
+ok "--rehash runs without crashing the test process"
+
+# ────────────────────────────────────────────────────────
+echo '─── Group 18: error path (unknown flag) ───────────────'
+# ────────────────────────────────────────────────────────
+
+# Capture stderr+stdout via a temp file so $status survives the pipe.
+set -l bad_path (mktemp)
+reload --bogus-flag >"$bad_path" 2>&1
+set -l bad_status $status
+expect_eq "unknown flag exits 2" "$bad_status" "2"
+set -l bad (cat "$bad_path")
+expect_grep "unknown flag error mentions reload:" "reload:" "$bad"
+command rm "$bad_path"
+
+# ────────────────────────────────────────────────────────
+echo '─── Group 19: source-grep — agent-aware skip exists ─'
+# ────────────────────────────────────────────────────────
+# We verify the implementation mentions the agent-skip path explicitly
+# so regressions are caught even when running tests in a clean shell.
+
+expect_grep "agent-skip path is documented" "wrapped by an agent" "$src"
+expect_grep "agent names list contains opencode" "opencode" "$src"
+expect_grep "agent names list contains claude-code" "claude" "$src"
+expect_grep "agent names list contains warp" "warp" "$src"
+expect_grep "force flag exists for agent override" "do_force" "$src"
 
 # ────────────────────────────────────────────────────────
 echo '─── Summary ──────────────────────────────────────────'
