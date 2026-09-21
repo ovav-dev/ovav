@@ -73,10 +73,15 @@ echo '─── Group 1: helper signatures ────────────�
 if functions -q __ovav_reload_count_modules;       ok "__ovav_reload_count_modules is defined";       else; fail "__ovav_reload_count_modules is defined"; end
 if functions -q __ovav_reload_detect_changes;       ok "__ovav_reload_detect_changes is defined";       else; fail "__ovav_reload_detect_changes is defined"; end
 if functions -q __ovav_reload_snapshot_hash;        ok "__ovav_reload_snapshot_hash is defined";        else; fail "__ovav_reload_snapshot_hash is defined"; end
-if functions -q __ovav_reload_ovav_update_prompt;   ok "__ovav_reload_ovav_update_prompt is defined";   else; fail "__ovav_reload_ovav_update_prompt is defined"; end
+if functions -q __ovav_reload_detect_environment;   ok "__ovav_reload_detect_environment is defined";   else; fail "__ovav_reload_detect_environment is defined"; end
+if functions -q __ovav_reload_fmt_environment;      ok "__ovav_reload_fmt_environment is defined";      else; fail "__ovav_reload_fmt_environment is defined"; end
 if functions -q __ovav_reload_maybe_rebuild_ovav;   ok "__ovav_reload_maybe_rebuild_ovav is defined";   else; fail "__ovav_reload_maybe_rebuild_ovav is defined"; end
 if functions -q __ovav_reload_rehash_only;          ok "__ovav_reload_rehash_only is defined";          else; fail "__ovav_reload_rehash_only is defined"; end
+if functions -q __ovav_reload_banner_short;         ok "__ovav_reload_banner_short is defined";         else; fail "__ovav_reload_banner_short is defined"; end
+if functions -q __ovav_reload_banner_long;          ok "__ovav_reload_banner_long is defined";          else; fail "__ovav_reload_banner_long is defined"; end
+if functions -q __ovav_reload_maybe_wipe_caches;    ok "__ovav_reload_maybe_wipe_caches is defined";    else; fail "__ovav_reload_maybe_wipe_caches is defined"; end
 if functions -q __ovav_reload_check;                ok "__ovav_reload_check is defined";                else; fail "__ovav_reload_check is defined"; end
+if functions -q __ovav_reload_module_fingerprint;   ok "__ovav_reload_module_fingerprint is defined";   else; fail "__ovav_reload_module_fingerprint is defined"; end
 if functions -q reload;                              ok "reload (main entry) is defined";                else; fail "reload (main entry) is defined"; end
 
 # ────────────────────────────────────────────────────────
@@ -330,6 +335,36 @@ expect_grep "agent names list contains opencode" "opencode" "$src"
 expect_grep "agent names list contains claude-code" "claude" "$src"
 expect_grep "agent names list contains warp" "warp" "$src"
 expect_grep "force flag exists for agent override" "do_force" "$src"
+
+# ────────────────────────────────────────────────────────
+echo '─── Group 20: regression — no “if $var” empty-expansion ──'
+# ────────────────────────────────────────────────────────
+# Earlier version had `if $do_verbose` style — when $do_verbose was empty
+# the `if $do_verbose` expanded to `if` which fish rejects. This regression
+# test ensures we use `test "$var" = true` everywhere instead.
+
+# Search for the dangerous pattern in non-comment lines.
+set -l code_lines (echo "$src" | grep -v '^\s*#' | grep -v '^\s*$')
+if string match -q "*if \$do_*" -- "$code_lines"
+    fail "regression: 'if \$do_xxx' style still present (will explode on empty)"
+else
+    ok "no 'if \$do_xxx' patterns (test-style applied)"
+end
+
+# And no `else if $var` either
+if string match -q "*else if \$*" -- "$code_lines"
+    fail "regression: 'else if \$var' pattern still present (will explode on empty)"
+else
+    ok "no 'else if \$var' patterns"
+end
+
+# Constants must use bare `set` (not `set -g`) at file top level
+# so we don't shadow any future universal by the same name.
+if string match -q "*set -g __ovav_reload_*" -- "$code_lines"
+    fail "regression: 'set -g __ovav_reload_*' still present (will shadow universal)"
+else
+    ok "no 'set -g __ovav_reload_*' (avoids universal shadow)"
+end
 
 # ────────────────────────────────────────────────────────
 echo '─── Summary ──────────────────────────────────────────'

@@ -30,12 +30,15 @@
 
 # Agent executables that wrap fish and would be disrupted by aggressive
 # reloading. Conservative — false positives still fall back to safe path.
-set -g __ovav_reload_agent_names  opencode opencode-bin claude claude-code code-server warp
+# We use top-level `set` (which is local to file scope for conf.d/*.fish)
+# instead of `set -g` — `set -g` would emit "global shadows universal"
+# warnings if the same name is later stored as a universal.
+set __ovav_reload_agent_names  opencode opencode-bin claude claude-code code-server warp
 
 # Terminal emulators used by fish users (for tagging output only).
-set -g __ovav_reload_term_names   alacritty kitty wezterm foot gnome-terminal warp
+set __ovav_reload_term_names   alacritty kitty wezterm foot gnome-terminal warp
 
-set -g __ovav_reload_version     "2.1.0"
+set __ovav_reload_version     "2.1.0"
 
 # ── Environment detection ──────────────────────────────────────────────────
 # Walks the process tree once and returns a structured record.
@@ -432,16 +435,22 @@ printf '  When wrapped by an agent, defaults to --quiet + skip --ovav\n'
 
     # ── detect environment + safety budget ──────────────────────────────
     set -l env_line (__ovav_reload_fmt_environment)
-    set -l is_embedded (string match -qr 'embedded=true' -- "$env_line" | head -1)
+    # Detect agent wrap from env record. `string match -q` is a true/false
+    # command — use `$status` (the return code of the last command) to
+    # capture the result, instead of piping through `head -1` which can
+    # produce empty strings on a negative match.
+    string match -qr 'embedded=true' -- "$env_line"
+    set -l is_embedded $status
     set -l do_safe_rebuild false
-    if $do_ovav
+    if test "$do_ovav" = true
         # Default: NEVER rebuild the ovav binary from inside an agent shell
         # unless --force is supplied. Reason: 'go build' replaces the
         # binary that the agent is using, which can cause transient
         # "text file busy" or signature verification errors mid-call.
-        if $is_embedded; and not $do_force
+        # Compare as integers: $is_embedded is 0 (true) when matched.
+        if test "$is_embedded" = 0; and test "$do_force" != true
             # Silently skip rebuilding; report only in --verbose
-            if $do_verbose
+            if test "$do_verbose" = true
                 printf '%s   skipped:%s ovav rebuild while wrapped by an agent\n' \
                     (set_color brblack) (set_color normal)
             end
@@ -452,13 +461,13 @@ printf '  When wrapped by an agent, defaults to --quiet + skip --ovav\n'
     end
 
     # ── --check ─────────────────────────────────────────────────────────
-    if $do_check
+    if test "$do_check" = true
         __ovav_reload_check
         return 0
     end
 
     # ── --rehash-only ───────────────────────────────────────────────────
-    if $do_rehash_only
+    if test "$do_rehash_only" = true
         __ovav_reload_rehash_only
         set -l elapsed (math "( ( date +%s%N ) - $started ) / 1000000" 2>/dev/null)
         if not $do_quiet
@@ -470,16 +479,16 @@ printf '  When wrapped by an agent, defaults to --quiet + skip --ovav\n'
     end
 
     # ── --full: wipe caches first ────────────────────────────────────────
-    if $do_full
+    if test "$do_full" = true
         __ovav_reload_maybe_wipe_caches
-        if $do_verbose
+        if test "$do_verbose" = true
             printf '%s   wiped:%s completions + abbreviations caches\n' \
                 (set_color yellow) (set_color normal)
         end
     end
 
     # ── --ovav (always guarded): safe rebuild ───────────────────────────
-    if $do_safe_rebuild
+    if test "$do_safe_rebuild" = true
         __ovav_reload_maybe_rebuild_ovav
     end
 
@@ -487,11 +496,11 @@ printf '  When wrapped by an agent, defaults to --quiet + skip --ovav\n'
     # Embedded agents: one line only by default.
     # Local interactive: multi-line if not --quiet.
     set -l banner_mode "short"
-    if $do_verbose
+    if test "$do_verbose" = true
         set banner_mode "long"
-    else if $do_quiet
+    else if test "$do_quiet" = true
         set banner_mode "silent"
-    else if $is_embedded
+    else if test "$is_embedded" = 0
         set banner_mode "short"
     else
         set banner_mode "long"
