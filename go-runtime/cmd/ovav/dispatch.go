@@ -136,6 +136,8 @@ func routeCommand(cmd string, args []string) int {
 		return cmdMemory(args)
 	case "fish":
 		return cmdFish(args)
+	case "session":
+		return cmdSession(args)
 	case "provider", "providers":
 		return cmdProvider(args)
 	case "help", "--help", "-h":
