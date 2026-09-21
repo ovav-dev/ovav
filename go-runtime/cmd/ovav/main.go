@@ -284,7 +284,8 @@ func isKnownSubcommand(cmd string) bool {
 		"validate", "consumer", "monitor", "integrity",
 		"terminal", "push", "memory", "mem",
 		// Added by feat-fish-sync
-		"fish":
+		"fish",
+		"session":
 		return true
 	}
 	return false
