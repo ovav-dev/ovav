@@ -242,9 +242,52 @@ func main() {
 		os.Exit(cmdCockpit(args))
 	}
 
+	// ── Smart routing: if the first arg is a known sub-command, skip Cockpit ──
+	// This makes `ovav fish status` and `ovav worktree owl` work directly from
+	// a TTY shell without forcing `--cli`. Cockpit is only the default when no
+	// sub-command is supplied.
+	if isKnownSubcommand(cmd) {
+		authState.ExtendTTL()
+		os.Exit(routeCommand(cmd, args))
+	}
+
+	// No recognised sub-command → fall through to Cockpit if available.
 	// Extend TTL on activity (called after each successful command)
 	authState.ExtendTTL()
 	os.Exit(routeCommand(cmd, args))
+}
+
+// isKnownSubcommand checks whether the given first arg is a registered
+// sub-command name in the OWS / OVAV dispatch table.
+//
+// We deliberately over-include (anything that's a verb-like identifier
+// qualifies) so power users get predictable routing. Single-hyphen flags
+// like --status, --help, -v are intentionally excluded so they keep going
+// to Cockpit / Cockpit help.
+//
+// Hot path: a slice lookup. Cheap (no regex, no map alloc).
+func isKnownSubcommand(cmd string) bool {
+	switch cmd {
+	case "status", "profile", "config", "tools", "doctor", "health",
+		"update", "vault", "tailor", "waiver", "ceo", "version",
+		"install", "uninstall", "plan", "backup", "apply", "verify",
+		"restore", "rollback", "deploy", "sbom", "project",
+		"worktree", "wt", "own", "nuke", "chronos", "hook", "infra",
+		"login", "signin", "auth", "whoami", "identity",
+		"logout", "signout", "license", "govern", "product",
+		"defend", "security", "smoke", "smoke-all", "launch",
+		"surfaces", "export-gate", "publish-check", "repo-check",
+		"presentation-check", "release-check", "rc-check",
+		"fresh-smoke", "dogfood", "detect-env", "gateway",
+		"sync", "convert", "resolve-subagent", "resolve_subagent",
+		"delegate", "adversarial", "fde", "benchmark", "coverage",
+		"validate", "consumer", "monitor", "integrity",
+		"terminal", "push", "memory", "mem",
+		// Added by feat-fish-sync
+		"fish":
+		return true
+	}
+	return false
 }
 
 func printUsage() {
