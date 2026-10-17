@@ -13,6 +13,6 @@
 
 PyYAML>=6.0
 pytest>=9.0
-jsonschema>=4.10
+jsonschema>=4.26.0
 regex>=2024.0
 tiktoken>=0.7.0
